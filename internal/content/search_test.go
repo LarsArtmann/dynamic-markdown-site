@@ -52,10 +52,8 @@ func TestSearcher_Search(t *testing.T) {
 		wantHighlight map[string]string // title -> expected highlighted text
 	}{
 		{
-			name: "empty query returns nil",
-			setupRepo: func() *InMemoryRepository {
-				return NewInMemoryRepository()
-			},
+			name:      "empty query returns nil",
+			setupRepo: NewInMemoryRepository,
 			query:     "",
 			wantCount: 0,
 			wantErr:   false,

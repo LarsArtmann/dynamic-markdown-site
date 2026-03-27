@@ -28,9 +28,16 @@ func NewDirectoryNode(path URLPath, title string, modified time.Time) (*Director
 	}, nil
 }
 
-func (d *DirectoryNode) Kind() NodeKind      { return NodeKindDirectory }
-func (d *DirectoryNode) Path() URLPath       { return d.path }
-func (d *DirectoryNode) Title() string       { return d.title }
+// Kind returns the node kind for DirectoryNode.
+func (d *DirectoryNode) Kind() NodeKind { return NodeKindDirectory }
+
+// Path returns the URL path for DirectoryNode.
+func (d *DirectoryNode) Path() URLPath { return d.path }
+
+// Title returns the display title for DirectoryNode.
+func (d *DirectoryNode) Title() string { return d.title }
+
+// Modified returns the last modification time for DirectoryNode.
 func (d *DirectoryNode) Modified() time.Time { return d.modified }
 
 // Children returns the child nodes.
@@ -66,11 +73,11 @@ func (d *DirectoryNode) SetChildren(children []ContentNode) {
 	d.children = children
 }
 
-// shouldComeAfter determines if existing should come after new in sort order.
-func shouldComeAfter(existing, new ContentNode) bool {
-	if existing.Kind() != new.Kind() {
-		return existing.Kind() == NodeKindFile && new.Kind() == NodeKindDirectory
+// shouldComeAfter determines if existing should come after newNode in sort order.
+func shouldComeAfter(existing, newNode ContentNode) bool {
+	if existing.Kind() != newNode.Kind() {
+		return existing.Kind() == NodeKindFile && newNode.Kind() == NodeKindDirectory
 	}
 
-	return existing.Title() > new.Title()
+	return existing.Title() > newNode.Title()
 }
