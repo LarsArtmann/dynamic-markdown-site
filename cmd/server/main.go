@@ -1,7 +1,7 @@
-// Cyberdom Site Generator - Main entry point
+// Dynamic Markdown Site - Main entry point
 //
 // A type-safe, high-performance markdown-to-website converter with
-// a distinctive Cyberdom aesthetic.
+// A type-safe, high-performance markdown-to-website converter.
 package main
 
 import (
@@ -56,7 +56,7 @@ func run() error {
 		}
 	}()
 
-	logger.Info("starting cyberdom site generator",
+	logger.Info("starting site generator",
 		slog.Uint64("port", uint64(cfg.Port)),
 		slog.String("root_dir", cfg.RootDir),
 		slog.String("log_level", cfg.LogLevel),

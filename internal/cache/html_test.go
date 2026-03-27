@@ -33,6 +33,7 @@ func runStatsTests(
 	getResult func(Stats) any,
 	errFormat string,
 ) {
+	t.Helper()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			stats := Stats{Hits: tt.hits, Misses: tt.misses}

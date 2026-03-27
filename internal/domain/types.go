@@ -1,4 +1,4 @@
-// Package domain contains the core domain types for the Cyberdom site generator.
+// Package domain contains the core domain types for the dynamic markdown site.
 package domain
 
 import (

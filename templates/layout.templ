@@ -26,11 +26,11 @@ templ Layout(props LayoutProps) {
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<meta name="description" content={ props.Description }/>
-			<title>{ props.Title } - Cyberdom</title>
-			<link rel="stylesheet" href="/static/css/cyberdom.css"/>
+			<title>{ props.Title }</title>
+			<link rel="stylesheet" href="/static/css/site.css"/>
 			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 		</head>
-		<body class="cyberdom-theme">
+		<body class="site-theme">
 			<div class="page-wrapper">
 				@Header(props)
 				<main class="main-content">
@@ -48,7 +48,7 @@ templ Header(props LayoutProps) {
 		<div class="header-container">
 			<a href="/" class="logo">
 				<span class="logo-icon">◈</span>
-				<span class="logo-text">Cyberdom</span>
+				<span class="logo-text">Site</span>
 			</a>
 			if len(props.Breadcrumbs) > 0 {
 				@Breadcrumbs(props.Breadcrumbs)
@@ -82,7 +82,7 @@ templ Footer() {
 	<footer class="site-footer">
 		<div class="footer-container">
 			<p class="footer-text">
-				<span class="footer-brand">Cyberdom</span> - 
+				<span class="footer-brand">Dynamic Markdown Site</span> - 
 				Generated with <span class="heart">♥</span> from markdown
 			</p>
 		</div>
