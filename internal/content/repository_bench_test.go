@@ -44,7 +44,7 @@ func createBenchmarkTestContent(b *testing.B, fileCount int) (string, func()) {
 	}
 
 	cleanup := func() {
-		os.RemoveAll(dir)
+		_ = os.RemoveAll(dir)
 	}
 
 	return dir, cleanup

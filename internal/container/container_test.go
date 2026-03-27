@@ -55,7 +55,7 @@ func TestContainerServices(t *testing.T) {
 		if err != nil {
 			t.Fatalf("New() error: %v", err)
 		}
-		defer container.Shutdown()
+		defer func() { _ = container.Shutdown() }()
 
 		// Test Config accessor
 		cfg := container.Config()
@@ -141,7 +141,7 @@ func TestContainerMultipleAccess(t *testing.T) {
 		if err != nil {
 			t.Fatalf("New() error: %v", err)
 		}
-		defer container.Shutdown()
+		defer func() { _ = container.Shutdown() }()
 
 		// Access services multiple times - should return same instances (singleton)
 		cfg1 := container.Config()
@@ -206,7 +206,7 @@ func TestContainerServiceOrder(t *testing.T) {
 		if err != nil {
 			t.Fatalf("New() error: %v", err)
 		}
-		defer container.Shutdown()
+		defer func() { _ = container.Shutdown() }()
 
 		// Access services in different order than registration
 		// This verifies that dependency resolution works correctly
