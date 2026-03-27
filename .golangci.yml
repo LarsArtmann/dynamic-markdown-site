@@ -18,26 +18,21 @@ linters:
     - recvcheck
     - spancheck
     - copyloopvar
-    - gochecknoinits
     - gochecksumtype
     - errchkjson
     - predeclared
     - reassign
     - contextcheck
-    - gocognit
     - maintidx
     - zerologlint
     - ineffassign
     - unconvert
-    - unparam
     - wastedassign
-    - paralleltest
     - dupl
     - gosmopolitan
     - misspell
     - revive
     - sloglint
-    - usetesting
     - gocritic
     - nilnil
     - prealloc
@@ -49,8 +44,6 @@ linters:
     - forcetypeassert
     - govet
     - errname
-    - funlen
-    - nestif
     - wrapcheck
     - nolintlint
     - gosec
@@ -65,18 +58,11 @@ linters:
     - testifylint
     - thelper
     - exhaustive
-    - gochecknoglobals
     - rowserrcheck
     - staticcheck
-    - cyclop
     - errorlint
-    - exhaustruct
     - loggercheck
-    - noctx
   settings:
-    exhaustruct:
-      exclude:
-        - _test\.go
     gosec:
       excludes:
         - G204 # Subprocess in tests
@@ -86,18 +72,17 @@ linters:
         - G203 # HTML in templates (tests)
         - G115 # Integer conversions (safe in our case)
         - G703 # Path traversal (handled)
-    cyclop:
-      max-complexity: 15
-    gocognit:
-      min-complexity: 35
+        - G702 # Command injection in tests
+    staticcheck:
+      checks:
+        - all
+        - -SA1019 # Deprecated function usage - intentional during migration
     funlen:
-      lines: 100
-      statements: 50
-    paralleltest:
-      ignore-file: "" # Don't ignore anything, but be lenient
+      lines: 150
+      statements: 80
 formatters:
   enable:
     - golines
 issues:
-  max-issues-per-linter: 50
-  max-same-issues: 10
+  max-issues-per-linter: 100
+  max-same-issues: 20

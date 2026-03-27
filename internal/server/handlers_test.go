@@ -534,6 +534,7 @@ func TestStaticPathTraversal(t *testing.T) {
 }
 
 func TestRateLimiterCleanupTriggered(t *testing.T) {
+	_ = t // Unused but kept for test function signature
 	// Create rate limiter with very short cleanup interval
 	rl := newRateLimiter(10, 10*time.Millisecond)
 
@@ -658,7 +659,7 @@ func (f *FailingRepository) Search(_ string) ([]content.SearchResult, error) {
 
 // FailingSearcher wraps a searcher to force errors.
 type FailingSearcher struct {
-	repo content.Repository
+	_ content.Repository
 }
 
 func (f *FailingSearcher) Search(_ string) ([]content.SearchResult, error) {

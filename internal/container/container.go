@@ -78,7 +78,7 @@ func (c *Container) Shutdown() *do.ShutdownReport {
 
 // Provider functions
 
-func provideConfig(i do.Injector) (*config.Config, error) {
+func provideConfig(_ do.Injector) (*config.Config, error) {
 	cfg, err := config.Load()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config: %w", err)
@@ -116,12 +116,12 @@ func provideLogger(i do.Injector) (*slog.Logger, error) {
 	return slog.New(logger), nil
 }
 
-func provideCache(i do.Injector) (*cache.HTMLCache, error) {
+func provideCache(_ do.Injector) (*cache.HTMLCache, error) {
 	// 10,000 entry cache with 1-hour TTL
 	return cache.NewHTMLCache(10_000), nil
 }
 
-func provideRenderer(i do.Injector) (*renderer.GoldmarkRenderer, error) {
+func provideRenderer(_ do.Injector) (*renderer.GoldmarkRenderer, error) {
 	return renderer.NewGoldmarkRenderer(), nil
 }
 

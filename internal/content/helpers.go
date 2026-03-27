@@ -8,6 +8,9 @@ import (
 	"github.com/samber/lo"
 )
 
+// skipDirs contains directory names to skip during content discovery.
+//
+//nolint:gochecknoglobals
 var skipDirs = []string{"node_modules", ".git", "vendor", "dist", "build", "tmp", "temp"}
 
 func shouldSkipDir(name string) bool {

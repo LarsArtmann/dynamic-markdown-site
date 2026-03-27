@@ -97,6 +97,7 @@ func (f *FileNode) HTML() template.HTML {
 }
 
 // SetHTML sets the rendered HTML.
+//
 // Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
 func (f *FileNode) SetHTML(html template.HTML) {
 	f.html = html
@@ -108,6 +109,7 @@ func (f *FileNode) TOC() []TOCItem {
 }
 
 // SetTOC sets the table of contents.
+//
 // Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
 func (f *FileNode) SetTOC(toc []TOCItem) {
 	f.toc = toc
@@ -119,6 +121,7 @@ func (f *FileNode) Metadata() Frontmatter {
 }
 
 // SetMetadata sets the frontmatter.
+//
 // Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
 func (f *FileNode) SetMetadata(meta Frontmatter) {
 	f.metadata = meta

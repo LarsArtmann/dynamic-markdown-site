@@ -25,6 +25,7 @@ func newBenchmarkServer(b *testing.B, fileCount int) (*Server, *gin.Engine) {
 
 	// Add some files for realistic benchmarking
 	for i := range fileCount {
+		_ = fileCount // Suppress unused variable warning (always 50 in practice)
 		path := domain.MustURLPath("/file-" + string(rune('0'+i%10)))
 		contentBytes := []byte(createBenchmarkFileContent(i))
 

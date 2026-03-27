@@ -26,6 +26,7 @@ type HTMLCache struct {
 
 // NewHTMLCache creates a new HTML cache with the specified maximum size.
 func NewHTMLCache(maxSize int) *HTMLCache {
+	//nolint:exhaustruct
 	cache := otter.Must(&otter.Options[string, RenderedContent]{
 		MaximumSize:      maxSize,
 		ExpiryCalculator: otter.ExpiryAccessing[string, RenderedContent](time.Hour),
@@ -60,7 +61,7 @@ func (c *HTMLCache) GetOrCompute(
 		ctx,
 		path,
 		otter.LoaderFunc[string, RenderedContent](
-			func(ctx context.Context, key string) (RenderedContent, error) {
+			func(_ context.Context, _ string) (RenderedContent, error) {
 				return compute()
 			},
 		),

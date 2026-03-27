@@ -85,6 +85,8 @@ func run() error {
 	srv.RegisterRoutes(router)
 
 	// Create HTTP server
+	//
+	//nolint:exhaustruct
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),
 		Handler:      router,
