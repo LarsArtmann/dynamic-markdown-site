@@ -1,0 +1,60 @@
+// Package domain contains the core domain types for the Cyberdom site generator.
+package domain
+
+import (
+	"errors"
+	"time"
+)
+
+// NodeKind represents the type of content node.
+type NodeKind int
+
+const (
+	// NodeKindDirectory indicates a directory node in the content tree.
+	NodeKindDirectory NodeKind = iota
+	// NodeKindFile indicates a file node in the content tree.
+	NodeKindFile
+)
+
+func (k NodeKind) String() string {
+	switch k {
+	case NodeKindDirectory:
+		return "directory"
+	case NodeKindFile:
+		return "file"
+	default:
+		return "unknown"
+	}
+}
+
+// ContentNode is the core interface representing either a directory or file.
+type ContentNode interface {
+	Kind() NodeKind
+	Path() URLPath
+	Title() string
+	Modified() time.Time
+}
+
+var (
+	_ ContentNode = (*DirectoryNode)(nil)
+	_ ContentNode = (*FileNode)(nil)
+)
+
+// RefreshResult contains statistics about a repository refresh operation.
+type RefreshResult struct {
+	Success      bool      `json:"success"`
+	LastModified time.Time `json:"lastModified"`
+	TotalFiles   int       `json:"totalFiles"`
+	TotalDirs    int       `json:"totalDirs"`
+	Duration     string    `json:"duration"`
+	Error        string    `json:"error,omitempty"`
+	Errors       []string  `json:"errors,omitempty"` // Non-fatal errors during refresh
+}
+
+// Sentinel errors for path validation.
+var (
+	// ErrInvalidPath is returned when a path contains directory traversal or invalid characters.
+	ErrInvalidPath = errors.New("invalid path: contains directory traversal or invalid characters")
+	// ErrEmptyPath is returned when a path is empty.
+	ErrEmptyPath = errors.New("path cannot be empty")
+)
