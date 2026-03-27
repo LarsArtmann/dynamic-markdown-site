@@ -1,0 +1,315 @@
+package templates
+
+import (
+	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/larsartmann/dynamic-markdown-site/internal/content"
+	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
+)
+
+// LayoutProps contains all properties needed for the base layout.
+type LayoutProps struct {
+	Title       string
+	Description string
+	Breadcrumbs []domain.Breadcrumb
+	ActivePath  domain.URLPath
+	ShowNav     bool
+}
+
+// Layout is the base layout for all pages.
+templ Layout(props LayoutProps) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<meta name="description" content={ props.Description }/>
+			<title>{ props.Title } - Cyberdom</title>
+			<link rel="stylesheet" href="/static/css/cyberdom.css"/>
+			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
+		</head>
+		<body class="cyberdom-theme">
+			<div class="page-wrapper">
+				@Header(props)
+				<main class="main-content">
+					{ children... }
+				</main>
+				@Footer()
+			</div>
+		</body>
+	</html>
+}
+
+// Header renders the site header with navigation.
+templ Header(props LayoutProps) {
+	<header class="site-header">
+		<div class="header-container">
+			<a href="/" class="logo">
+				<span class="logo-icon">◈</span>
+				<span class="logo-text">Cyberdom</span>
+			</a>
+			if len(props.Breadcrumbs) > 0 {
+				@Breadcrumbs(props.Breadcrumbs)
+			}
+		</div>
+	</header>
+}
+
+// Breadcrumbs renders the breadcrumb navigation.
+templ Breadcrumbs(crumbs []domain.Breadcrumb) {
+	<nav class="breadcrumbs" aria-label="Breadcrumb">
+		<ol class="breadcrumb-list">
+			for _, crumb := range crumbs {
+				<li class="breadcrumb-item">
+					if crumb.IsActive {
+						<span class="breadcrumb-current" aria-current="page">{ crumb.Title }</span>
+					} else {
+						<a href={ templ.SafeURL(crumb.Path.String()) } class="breadcrumb-link">
+							{ crumb.Title }
+						</a>
+						<span class="breadcrumb-separator">/</span>
+					}
+				</li>
+			}
+		</ol>
+	</nav>
+}
+
+// Footer renders the site footer.
+templ Footer() {
+	<footer class="site-footer">
+		<div class="footer-container">
+			<p class="footer-text">
+				<span class="footer-brand">Cyberdom</span> - 
+				Generated with <span class="heart">♥</span> from markdown
+			</p>
+		</div>
+	</footer>
+}
+
+// DirectoryViewProps contains properties for directory listing view.
+type DirectoryViewProps struct {
+	Layout    LayoutProps
+	Directory *domain.DirectoryNode
+	HasReadme bool
+}
+
+// DirectoryView renders a directory listing.
+templ DirectoryView(props DirectoryViewProps) {
+	@Layout(props.Layout) {
+		<div class="directory-view">
+			<header class="directory-header">
+				<h1 class="directory-title">{ props.Layout.Title }</h1>
+				if props.Layout.Description != "" {
+					<p class="directory-description">{ props.Layout.Description }</p>
+				}
+			</header>
+			<div class="directory-content">
+				if len(props.Directory.Children()) > 0 {
+					<div class="content-grid">
+						for _, child := range props.Directory.Children() {
+							@ContentCard(child)
+						}
+					</div>
+				} else {
+					<div class="empty-state">
+						<p class="empty-message">This directory is empty.</p>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}
+
+// ContentCard renders a card for a directory or file.
+templ ContentCard(node domain.ContentNode) {
+	<a href={ templ.SafeURL(node.Path().String()) } class={ "content-card", cardClass(node.Kind()) }>
+		<div class="card-icon">
+			if node.Kind() == domain.NodeKindDirectory {
+				📁
+			} else {
+				📄
+			}
+		</div>
+		<div class="card-content">
+			<h3 class="card-title">{ node.Title() }</h3>
+			<div class="card-meta">
+				<span class="card-type">{ node.Kind().String() }</span>
+				<span class="card-date">{ formatDate(node.Modified()) }</span>
+			</div>
+		</div>
+	</a>
+}
+
+// FileViewProps contains properties for file view.
+type FileViewProps struct {
+	Layout LayoutProps
+	File   *domain.FileNode
+	TOC    []domain.TOCItem
+}
+
+// FileView renders a markdown file with optional TOC.
+templ FileView(props FileViewProps) {
+	@Layout(props.Layout) {
+		<div class="file-view">
+			if len(props.TOC) > 0 {
+				<aside class="toc-sidebar">
+					@TableOfContents(props.TOC)
+				</aside>
+			}
+			<article class="markdown-content">
+				<header class="article-header">
+					<h1 class="article-title">{ props.Layout.Title }</h1>
+					<div class="article-meta">
+						<span class="reading-time">⏱️ { formatReadingTime(props.File.ReadingTime()) } read</span>
+						<span class="last-modified">📅 { formatDate(props.File.Modified()) }</span>
+					</div>
+				</header>
+				<div class="article-body">
+					@templ.Raw(string(props.File.HTML()))
+				</div>
+			</article>
+		</div>
+	}
+}
+
+// TableOfContents renders the TOC.
+templ TableOfContents(items []domain.TOCItem) {
+	<nav class="toc" aria-label="Table of contents">
+		<h2 class="toc-title">On this page</h2>
+		<ul class="toc-list">
+			for _, item := range items {
+				@TOCItem(item)
+			}
+		</ul>
+	</nav>
+}
+
+// TOCItem renders a single TOC item recursively.
+templ TOCItem(item domain.TOCItem) {
+	<li class={ "toc-item", "toc-level-" + string(rune('0'+item.Level)) }>
+		<a href={ templ.SafeURL("#" + item.Anchor) } class="toc-link">{ item.Title }</a>
+		if len(item.Children) > 0 {
+			<ul class="toc-sublist">
+				for _, child := range item.Children {
+					@TOCItem(child)
+				}
+			</ul>
+		}
+	</li>
+}
+
+// ErrorViewProps contains properties for error pages.
+type ErrorViewProps struct {
+	Title      string
+	Message    string
+	StatusCode int
+}
+
+// ErrorView renders an error page.
+templ ErrorView(props ErrorViewProps) {
+	@Layout(LayoutProps{
+		Title:       props.Title,
+		Description: props.Message,
+		ShowNav:     false,
+	}) {
+		<div class="error-view">
+			<div class="error-container">
+				<div class="error-code">{ strconv.Itoa(props.StatusCode) }</div>
+				<h1 class="error-title">{ props.Title }</h1>
+				<p class="error-message">{ props.Message }</p>
+				<a href="/" class="error-home-link">← Back to Home</a>
+			</div>
+		</div>
+	}
+}
+
+// SearchViewProps contains properties for the search view.
+type SearchViewProps struct {
+	Layout  LayoutProps
+	Query   string
+	Results []content.SearchResult
+}
+
+// SearchView renders the search page.
+templ SearchView(props SearchViewProps) {
+	@Layout(props.Layout) {
+		<div class="search-view">
+			<header class="search-header">
+				<h1 class="search-title">Search</h1>
+			</header>
+			<form class="search-form" action="/search" method="get">
+				<div class="search-input-wrapper">
+					<input
+						type="text"
+						name="q"
+						value={ props.Query }
+						placeholder="Search content..."
+						class="search-input"
+						autocomplete="off"
+					/>
+					<button type="submit" class="search-button">Search</button>
+				</div>
+			</form>
+			if props.Query != "" {
+				<div class="search-results">
+					if len(props.Results) == 0 {
+						<p class="search-empty">No results found for "{ props.Query }"</p>
+					} else {
+						<p class="search-count">{ fmt.Sprintf("%d result(s) for", len(props.Results)) } <strong>{ props.Query }</strong></p>
+						<div class="search-results-list">
+							for _, result := range props.Results {
+								@SearchResultCard(result)
+							}
+						</div>
+					}
+				</div>
+			}
+		</div>
+	}
+}
+
+// SearchResultCard renders a single search result.
+templ SearchResultCard(result content.SearchResult) {
+	<a href={ templ.SafeURL(result.Node.Path().String()) } class="search-result-card">
+		<div class="result-icon">
+			if result.Node.Kind() == domain.NodeKindDirectory {
+				📁
+			} else {
+				📄
+			}
+		</div>
+		<div class="result-content">
+			<h3 class="result-title">
+				@templ.Raw(result.Highlighted)
+			</h3>
+			<div class="result-meta">
+				<span class="result-type">{ result.Node.Kind().String() }</span>
+				<span class="result-path">{ result.Node.Path().String() }</span>
+			</div>
+		</div>
+		<div class="result-score">{ fmt.Sprintf("%.0f%%", result.Score*100) }</div>
+	</a>
+}
+
+// Helper functions
+
+func cardClass(kind domain.NodeKind) string {
+	if kind == domain.NodeKindDirectory {
+		return "card-directory"
+	}
+	return "card-file"
+}
+
+func formatDate(t time.Time) string {
+	return t.Format("Jan 2, 2006")
+}
+
+func formatReadingTime(minutes uint) string {
+	if minutes == 1 {
+		return "1 min"
+	}
+	return fmt.Sprintf("%d mins", minutes)
+}
