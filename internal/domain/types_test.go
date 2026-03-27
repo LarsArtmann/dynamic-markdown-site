@@ -209,6 +209,7 @@ func testURLPathMethod[T comparable](t *testing.T, name string, tests []struct {
 	want  T
 }, method func(*domain.URLPath) T, formatGot, formatWant func(T) string,
 ) {
+	t.Helper()
 	t.Run(name, func(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.input, func(t *testing.T) {

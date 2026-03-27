@@ -13,7 +13,7 @@ import (
 func createBenchmarkTestContent(b *testing.B, fileCount int) (string, func()) {
 	b.Helper()
 
-	dir, err := os.MkdirTemp("", "cyberdom-bench-*")
+	dir, err := os.MkdirTemp("", "dms-bench-*")
 	if err != nil {
 		b.Fatalf("failed to create temp dir: %v", err)
 	}

@@ -1,0 +1,103 @@
+version: "2"
+run:
+    timeout: 5m
+    go: 1.26.1
+    build-tags: []
+    allow-parallel-runners: false
+    allow-serial-runners: false
+    issues-exit-code: 1
+    tests: true
+output:
+    formats: {}
+linters:
+    enable:
+        - unused
+        - durationcheck
+        - goconst
+        - musttag
+        - recvcheck
+        - spancheck
+        - copyloopvar
+        - gochecknoinits
+        - gochecksumtype
+        - errchkjson
+        - predeclared
+        - reassign
+        - contextcheck
+        - gocognit
+        - maintidx
+        - zerologlint
+        - ineffassign
+        - unconvert
+        - unparam
+        - wastedassign
+        - paralleltest
+        - dupl
+        - gosmopolitan
+        - misspell
+        - revive
+        - sloglint
+        - usetesting
+        - gocritic
+        - nilnil
+        - prealloc
+        - protogetter
+        - sqlclosecheck
+        - ginkgolinter
+        - gocyclo
+        - interfacebloat
+        - forcetypeassert
+        - govet
+        - errname
+        - funlen
+        - nestif
+        - wrapcheck
+        - nolintlint
+        - gosec
+        - mirror
+        - nilerr
+        - perfsprint
+        - errcheck
+        - bodyclose
+        - intrange
+        - nakedret
+        - nilnesserr
+        - testifylint
+        - thelper
+        - exhaustive
+        - gochecknoglobals
+        - rowserrcheck
+        - staticcheck
+        - cyclop
+        - errorlint
+        - exhaustruct
+        - loggercheck
+        - noctx
+    settings:
+        exhaustruct:
+            exclude:
+                - _test\.go
+        gosec:
+            excludes:
+                - G204  # Subprocess in tests
+                - G304  # File read in content repo
+                - G306  # Test file permissions
+                - G301  # Test directory permissions
+                - G203  # HTML in templates (tests)
+                - G115  # Integer conversions (safe in our case)
+                - G703  # Path traversal (handled)
+        cyclop:
+            max-complexity: 15
+        gocognit:
+            min-complexity: 35
+        funlen:
+            lines: 100
+            statements: 50
+        paralleltest:
+            ignore-file: "" # Don't ignore anything, but be lenient
+formatters:
+    enable:
+        - golines
+issues:
+    max-issues-per-linter: 50
+    max-same-issues: 10

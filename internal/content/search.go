@@ -159,7 +159,7 @@ func extractSnippet(content []byte, query string, padding int) string {
 	}
 
 	if end < len(content) {
-		snippet = snippet + "..."
+		snippet += "..."
 	}
 
 	return highlightMatch(snippet, query)

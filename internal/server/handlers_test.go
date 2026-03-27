@@ -23,10 +23,10 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 	t.Helper()
 
 	logger := slog.New(slog.DiscardHandler)
-	cache_ := cache.NewHTMLCache(100)
+	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
 
-	return NewServer(repo, searcher, logger, cache_)
+	return NewServer(repo, searcher, logger, cache)
 }
 
 func newTestRouter(s *Server) *gin.Engine {
@@ -41,9 +41,9 @@ func newFailingTestServer(t *testing.T) (*Server, *gin.Engine) {
 
 	repo := &FailingRepository{}
 	logger := slog.New(slog.DiscardHandler)
-	cache_ := cache.NewHTMLCache(100)
+	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
-	server := NewServer(repo, searcher, logger, cache_)
+	server := NewServer(repo, searcher, logger, cache)
 	router := newTestRouter(server)
 
 	return server, router
@@ -416,9 +416,9 @@ func TestRefreshEndpointFailure(t *testing.T) {
 	// Test when refresh fails
 	repo := &FailingRepository{refreshError: true}
 	logger := slog.New(slog.DiscardHandler)
-	cache_ := cache.NewHTMLCache(100)
+	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
-	server := NewServer(repo, searcher, logger, cache_)
+	server := NewServer(repo, searcher, logger, cache)
 	router := newTestRouter(server)
 
 	req := httptest.NewRequest(http.MethodGet, "/refresh", nil)
@@ -449,7 +449,7 @@ func TestRootEndpointError(t *testing.T) {
 func TestSearchEndpointError(t *testing.T) {
 	repo := content.NewInMemoryRepository()
 	logger := slog.New(slog.DiscardHandler)
-	cache_ := cache.NewHTMLCache(100)
+	cache := cache.NewHTMLCache(100)
 	// Use failing searcher
 	server := &Server{
 		repo:        repo,
@@ -457,7 +457,7 @@ func TestSearchEndpointError(t *testing.T) {
 		renderer:    nil,
 		logger:      logger,
 		rateLimiter: newRateLimiter(10, time.Minute),
-		cache:       cache_,
+		cache:       cache,
 	}
 	router := gin.New()
 	router.GET("/search", func(c *gin.Context) {

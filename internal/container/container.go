@@ -145,7 +145,7 @@ func provideServer(i do.Injector) (*server.Server, error) {
 	repo := do.MustInvoke[content.Repository](i)
 	searcher := do.MustInvoke[*content.Searcher](i)
 	logger := do.MustInvoke[*slog.Logger](i)
-	cache_ := do.MustInvoke[*cache.HTMLCache](i)
+	cache := do.MustInvoke[*cache.HTMLCache](i)
 
-	return server.NewServer(repo, searcher, logger, cache_), nil
+	return server.NewServer(repo, searcher, logger, cache), nil
 }

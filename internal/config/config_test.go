@@ -17,15 +17,15 @@ func TestLoadSubprocess(t *testing.T) {
 		// This is the subprocess - actually run Load()
 		cfg, err := Load()
 		if err != nil {
-			os.Stderr.WriteString("LOAD_ERROR:" + err.Error())
+			_, _ = os.Stderr.WriteString("LOAD_ERROR:" + err.Error())
 			os.Exit(1)
 		}
 		// Output the config values for verification
-		os.Stdout.WriteString("PORT:" + string(rune(cfg.Port)) + "\n")
-		os.Stdout.WriteString("ROOT:" + cfg.RootDir + "\n")
-		os.Stdout.WriteString("LOG_LEVEL:" + cfg.LogLevel + "\n")
-		os.Stdout.WriteString("CACHE:" + boolStr(cfg.CacheEnabled) + "\n")
-		os.Stdout.WriteString("DEV:" + boolStr(cfg.DevMode) + "\n")
+		_, _ = os.Stdout.WriteString("PORT:" + string(rune(cfg.Port)) + "\n")
+		_, _ = os.Stdout.WriteString("ROOT:" + cfg.RootDir + "\n")
+		_, _ = os.Stdout.WriteString("LOG_LEVEL:" + cfg.LogLevel + "\n")
+		_, _ = os.Stdout.WriteString("CACHE:" + boolStr(cfg.CacheEnabled) + "\n")
+		_, _ = os.Stdout.WriteString("DEV:" + boolStr(cfg.DevMode) + "\n")
 		os.Exit(0)
 	}
 

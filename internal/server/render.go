@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	templ "github.com/a-h/templ"
@@ -17,7 +16,7 @@ func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 
 	props := templates.LayoutProps{
 		Title:       dir.Title(),
-		Description: fmt.Sprintf("Browse %s in Cyberdom", dir.Title()),
+		Description: "Browse " + dir.Title(),
 		Breadcrumbs: crumbs,
 		ActivePath:  dir.Path(),
 		ShowNav:     true,
@@ -85,7 +84,7 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 
 	description := file.Metadata().Description
 	if description == "" {
-		description = fmt.Sprintf("Read %s on Cyberdom", title)
+		description = "Read " + title
 	}
 
 	props := templates.LayoutProps{
@@ -109,7 +108,7 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 func (s *Server) renderSearch(c *gin.Context, query string, results []content.SearchResult) {
 	props := templates.LayoutProps{
 		Title:       "Search",
-		Description: "Search content in Cyberdom",
+		Description: "Search content",
 		ShowNav:     false,
 	}
 
