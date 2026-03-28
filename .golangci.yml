@@ -1,99 +1,99 @@
 version: "2"
 run:
-    timeout: 5m
-    go: 1.26.1
-    build-tags: []
-    allow-parallel-runners: false
-    allow-serial-runners: false
-    issues-exit-code: 1
-    tests: true
+  timeout: 5m
+  go: 1.26.1
+  build-tags: []
+  allow-parallel-runners: false
+  allow-serial-runners: false
+  issues-exit-code: 1
+  tests: true
 output:
-    formats: {}
+  formats: {}
 linters:
-    enable:
-        - maintidx
-        - mirror
-        - testifylint
-        - thelper
-        - loggercheck
-        - spancheck
-        - govet
-        - gosec
-        - gochecksumtype
-        - errchkjson
-        - unconvert
-        - gocritic
-        - errname
-        - usetesting
-        - sloglint
-        - wrapcheck
-        - nilnesserr
-        - nestif
-        - goconst
-        - predeclared
-        - wastedassign
-        - ginkgolinter
-        - funlen
-        - reassign
-        - gosmopolitan
-        - gochecknoglobals
-        - copyloopvar
-        - zerologlint
-        - interfacebloat
-        - cyclop
-        - gocognit
-        - sqlclosecheck
-        - nakedret
-        - staticcheck
-        - contextcheck
-        - dupl
-        - nilerr
-        - errcheck
-        - errorlint
-        - gochecknoinits
-        - prealloc
-        - protogetter
-        - unused
-        - recvcheck
-        - misspell
-        - revive
-        - bodyclose
-        - noctx
-        - unparam
-        - ineffassign
-        - nilnil
-        - nolintlint
-        - perfsprint
-        - rowserrcheck
-        - exhaustruct
-        - gocyclo
-        - intrange
-        - durationcheck
-        - paralleltest
-        - musttag
-        - forcetypeassert
-        - exhaustive
-    settings:
-        funlen:
-            lines: 150
-            statements: 80
-        gosec:
-            excludes:
-                - G204
-                - G304
-                - G306
-                - G301
-                - G203
-                - G115
-                - G703
-                - G702
-        staticcheck:
-            checks:
-                - all
-                - -SA1019
+  enable:
+    - maintidx
+    - mirror
+    - testifylint
+    - thelper
+    - loggercheck
+    - spancheck
+    - govet
+    - gosec
+    - gochecksumtype
+    - errchkjson
+    - unconvert
+    - gocritic
+    - errname
+    - usetesting
+    - sloglint
+    - wrapcheck
+    - nilnesserr
+    - nestif
+    - goconst
+    - predeclared
+    - wastedassign
+    - ginkgolinter
+    - funlen
+    - reassign
+    - gosmopolitan
+    - gochecknoglobals
+    - copyloopvar
+    - zerologlint
+    - interfacebloat
+    - cyclop
+    - gocognit
+    - sqlclosecheck
+    - nakedret
+    - staticcheck
+    - contextcheck
+    - dupl
+    - nilerr
+    - errcheck
+    - errorlint
+    - gochecknoinits
+    - prealloc
+    - protogetter
+    - unused
+    - recvcheck
+    - misspell
+    - revive
+    - bodyclose
+    - noctx
+    - unparam
+    - ineffassign
+    - nilnil
+    - nolintlint
+    - perfsprint
+    - rowserrcheck
+    - exhaustruct
+    - gocyclo
+    - intrange
+    - durationcheck
+    - paralleltest
+    - musttag
+    - forcetypeassert
+    - exhaustive
+  settings:
+    funlen:
+      lines: 150
+      statements: 80
+    gosec:
+      excludes:
+        - G204
+        - G304
+        - G306
+        - G301
+        - G203
+        - G115
+        - G703
+        - G702
+    staticcheck:
+      checks:
+        - all
+        - -SA1019
 formatters:
-    enable:
-        - golines
+  enable:
+    - golines
 issues:
-    max-issues-per-linter: 100
-    max-same-issues: 20
+  max-issues-per-linter: 100
+  max-same-issues: 20

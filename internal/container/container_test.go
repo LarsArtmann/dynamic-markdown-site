@@ -252,7 +252,11 @@ func TestContainerServiceOrder(t *testing.T) {
 	}
 
 	// Run test in subprocess
-	cmd := exec.CommandContext(context.Background(), os.Args[0], "-test.run=TestContainerServiceOrder")
+	cmd := exec.CommandContext(
+		context.Background(),
+		os.Args[0],
+		"-test.run=TestContainerServiceOrder",
+	)
 
 	cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 

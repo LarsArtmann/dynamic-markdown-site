@@ -8,12 +8,12 @@
 
 Policy flagged 4 files importing `html/template`:
 
-| File | Line | Usage |
-|------|------|-------|
-| `internal/cache/html.go` | 6 | Type declaration: `template.HTML` |
-| `internal/cache/html_test.go` | 5 | Type cast: `template.HTML(html)` |
-| `internal/domain/file.go` | 4 | Type declaration: `template.HTML` |
-| `internal/renderer/markdown.go` | 6 | Type cast: `template.HTML(buf.String())` |
+| File                            | Line | Usage                                    |
+| ------------------------------- | ---- | ---------------------------------------- |
+| `internal/cache/html.go`        | 6    | Type declaration: `template.HTML`        |
+| `internal/cache/html_test.go`   | 5    | Type cast: `template.HTML(html)`         |
+| `internal/domain/file.go`       | 4    | Type declaration: `template.HTML`        |
+| `internal/renderer/markdown.go` | 6    | Type cast: `template.HTML(buf.String())` |
 
 ## Why This Is a False Positive
 
@@ -27,7 +27,7 @@ type RenderedContent struct {
     HTML template.HTML  // Just a string with semantic meaning
 }
 
-// No template parsing  
+// No template parsing
 return RenderResult{
     HTML: template.HTML(buf.String()),  // Simple string cast
 }
@@ -35,15 +35,16 @@ return RenderResult{
 
 ### What Policy Assumes vs Reality
 
-| Policy Assumes | Actual Behavior |
-|----------------|-----------------|
-| Using `html/template` for HTML generation | Using only the `HTML` type alias |
+| Policy Assumes                              | Actual Behavior                           |
+| ------------------------------------------- | ----------------------------------------- |
+| Using `html/template` for HTML generation   | Using only the `HTML` type alias          |
 | Template injection vulnerabilities possible | No template rendering - just type marking |
-| Runtime HTML escaping needed | No HTML generation from templates |
+| Runtime HTML escaping needed                | No HTML generation from templates         |
 
 ### Security Impact
 
 **Zero.** The code:
+
 - Never calls `template.Parse()`, `template.Execute()`, or any rendering functions
 - Never accepts user input into templates
 - Only uses `template.HTML` to mark strings as pre-escaped HTML
