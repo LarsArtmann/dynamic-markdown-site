@@ -1,6 +1,5 @@
 // Dynamic Markdown Site - Main entry point
 //
-// A type-safe, high-performance markdown-to-website converter with
 // A type-safe, high-performance markdown-to-website converter.
 package main
 
