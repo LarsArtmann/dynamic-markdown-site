@@ -38,6 +38,7 @@ type ContentNode interface {
 var (
 	_ ContentNode = (*DirectoryNode)(nil)
 	_ ContentNode = (*FileNode)(nil)
+	_ ContentNode = (*RenderedFile)(nil)
 )
 
 // RefreshResult contains statistics about a repository refresh operation.

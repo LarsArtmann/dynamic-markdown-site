@@ -146,6 +146,7 @@ func provideServer(i do.Injector) (*server.Server, error) {
 	searcher := do.MustInvoke[*content.Searcher](i)
 	logger := do.MustInvoke[*slog.Logger](i)
 	cache := do.MustInvoke[*cache.HTMLCache](i)
+	cfg := do.MustInvoke[*config.Config](i)
 
-	return server.NewServer(repo, searcher, logger, cache), nil
+	return server.NewServer(repo, searcher, logger, cache, cfg.DevMode), nil
 }

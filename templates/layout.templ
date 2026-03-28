@@ -16,6 +16,7 @@ type LayoutProps struct {
 	Breadcrumbs []domain.Breadcrumb
 	ActivePath  domain.URLPath
 	ShowNav     bool
+	DevMode     bool
 }
 
 // Layout is the base layout for all pages.
@@ -37,9 +38,74 @@ templ Layout(props LayoutProps) {
 					{ children... }
 				</main>
 				@Footer()
+				if props.DevMode {
+					@LiveReloadScript()
+				}
 			</div>
 		</body>
 	</html>
+}
+
+// LiveReloadScript provides browser-side live reload functionality via SSE.
+templ LiveReloadScript() {
+	<script>
+		(function() {
+			var source = new EventSource('/api/live-reload');
+			var toast = document.createElement('div');
+			toast.className = 'live-reload-toast';
+			toast.textContent = 'Live reload connected';
+			document.body.appendChild(toast);
+
+			setTimeout(function() {
+				toast.classList.add('show');
+			}, 100);
+
+			setTimeout(function() {
+				toast.classList.remove('show');
+			}, 2000);
+
+			source.addEventListener('connected', function(e) {
+				console.log('Live reload connected:', JSON.parse(e.data));
+			});
+
+			source.addEventListener('reload', function(e) {
+				console.log('Content changed, reloading...', JSON.parse(e.data));
+				toast.textContent = 'Reloading...';
+				toast.classList.add('show');
+				setTimeout(function() {
+					window.location.reload();
+				}, 300);
+			});
+
+			source.onerror = function() {
+				console.log('Live reload connection lost, reconnecting...');
+				toast.textContent = 'Reconnecting live reload...';
+				toast.classList.add('show');
+			};
+		})();
+	</script>
+	<style>
+		.live-reload-toast {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			background: #10b981;
+			color: white;
+			padding: 12px 20px;
+			border-radius: 8px;
+			font-family: system-ui, sans-serif;
+			font-size: 14px;
+			z-index: 9999;
+			opacity: 0;
+			transform: translateY(20px);
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		}
+		.live-reload-toast.show {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	</style>
 }
 
 // Header renders the site header with navigation.

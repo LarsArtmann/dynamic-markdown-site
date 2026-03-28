@@ -20,6 +20,7 @@ func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 		Breadcrumbs: crumbs,
 		ActivePath:  dir.Path(),
 		ShowNav:     true,
+		DevMode:     s.devMode,
 	}
 
 	dirProps := templates.DirectoryViewProps{

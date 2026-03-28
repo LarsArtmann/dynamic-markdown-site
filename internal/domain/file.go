@@ -140,3 +140,55 @@ func (f *FileNode) ReadingTime() uint {
 
 	return minutes
 }
+
+// RenderedFile combines a FileNode with its rendered content.
+// This is an immutable value type that should be used instead of
+// mutating FileNode during rendering.
+type RenderedFile struct {
+	file     *FileNode
+	html     HTML
+	toc      []TOCItem
+	metadata Frontmatter
+}
+
+// NewRenderedFile creates a new immutable RenderedFile from a FileNode and render result.
+func NewRenderedFile(file *FileNode, html HTML, toc []TOCItem, metadata Frontmatter) *RenderedFile {
+	return &RenderedFile{
+		file:     file,
+		html:     html,
+		toc:      toc,
+		metadata: metadata,
+	}
+}
+
+// File returns the underlying FileNode.
+func (r *RenderedFile) File() *FileNode { return r.file }
+
+// HTML returns the rendered HTML content.
+func (r *RenderedFile) HTML() HTML { return r.html }
+
+// TOC returns the table of contents.
+func (r *RenderedFile) TOC() []TOCItem { return r.toc }
+
+// Metadata returns the frontmatter metadata.
+func (r *RenderedFile) Metadata() Frontmatter { return r.metadata }
+
+// Path returns the URL path (delegated to FileNode).
+func (r *RenderedFile) Path() URLPath { return r.file.Path() }
+
+// Title returns the title (from metadata if available, otherwise from file).
+func (r *RenderedFile) Title() string {
+	if r.metadata.Title != "" {
+		return r.metadata.Title
+	}
+	return r.file.Title()
+}
+
+// Kind returns the node kind (always File).
+func (r *RenderedFile) Kind() NodeKind { return r.file.Kind() }
+
+// Modified returns when the file was last modified.
+func (r *RenderedFile) Modified() time.Time { return r.file.Modified() }
+
+// ReadingTime returns the estimated reading time.
+func (r *RenderedFile) ReadingTime() uint { return r.file.ReadingTime() }

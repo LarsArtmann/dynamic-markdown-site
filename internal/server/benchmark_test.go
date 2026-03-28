@@ -46,7 +46,7 @@ func newBenchmarkServer(b *testing.B) *gin.Engine {
 	logger := slog.New(slog.DiscardHandler)
 	htmlCache := cache.NewHTMLCache(1000)
 	searcher := content.NewSearcher(repo)
-	srv := NewServer(repo, searcher, logger, htmlCache)
+	srv := NewServer(repo, searcher, logger, htmlCache, false)
 
 	router := gin.New()
 	srv.RegisterRoutes(router)
