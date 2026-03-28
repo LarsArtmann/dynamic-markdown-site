@@ -53,11 +53,7 @@ func run() error {
 		return err
 	}
 
-	router, httpServer, err := setupServer(svc)
-	if err != nil {
-		shutdownServices(svc)
-		return err
-	}
+	router, httpServer := setupServer(svc)
 
 	startFileWatcher(svc)
 
@@ -108,11 +104,12 @@ func logStartupInfo(svc *services) {
 }
 
 // setupServer creates the router and HTTP server.
-func setupServer(svc *services) (*gin.Engine, *http.Server, error) {
+func setupServer(svc *services) (*gin.Engine, *http.Server) {
 	configureGin(svc.config.LogLevel)
 
 	router := createRouter(svc)
 
+	//nolint:exhaustruct
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf(":%d", svc.config.Port),
 		Handler:      router,
@@ -122,7 +119,8 @@ func setupServer(svc *services) (*gin.Engine, *http.Server, error) {
 		ErrorLog:     slog.NewLogLogger(svc.logger.Handler(), slog.LevelError),
 	}
 
-	return router, httpServer, nil
+	return router,
+		httpServer
 }
 
 // configureGin sets the Gin mode based on log level.
