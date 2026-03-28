@@ -36,7 +36,7 @@ func newTestRouter(s *Server) *gin.Engine {
 	return router
 }
 
-func newFailingTestServer(t *testing.T) (*Server, *gin.Engine) {
+func newFailingTestServer(t *testing.T) *gin.Engine {
 	t.Helper()
 
 	repo := &FailingRepository{}
@@ -46,7 +46,7 @@ func newFailingTestServer(t *testing.T) (*Server, *gin.Engine) {
 	server := NewServer(repo, searcher, logger, cache)
 	router := newTestRouter(server)
 
-	return server, router
+	return router
 }
 
 func TestHealthEndpoint(t *testing.T) {
@@ -435,7 +435,7 @@ func TestRefreshEndpointFailure(t *testing.T) {
 }
 
 func TestRootEndpointError(t *testing.T) {
-	_, router := newFailingTestServer(t)
+	router := newFailingTestServer(t)
 
 	runStatusTests(t, router, []statusTestCase{
 		{
@@ -554,7 +554,7 @@ func TestRateLimiterCleanupTriggered(t *testing.T) {
 }
 
 func TestContentByPathNonNotFoundError(t *testing.T) {
-	_, router := newFailingTestServer(t)
+	router := newFailingTestServer(t)
 
 	runStatusTests(t, router, []statusTestCase{
 		{
