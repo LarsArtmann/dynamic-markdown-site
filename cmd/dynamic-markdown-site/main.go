@@ -16,7 +16,9 @@ import (
 
 	cockroachdberrors "github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
+	"github.com/larsartmann/dynamic-markdown-site/internal/config"
 	"github.com/larsartmann/dynamic-markdown-site/internal/container"
+	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
 )
 
@@ -28,6 +30,15 @@ const (
 	shutdownTimeout = 30 * time.Second
 )
 
+// services holds all services obtained from the container.
+type services struct {
+	config    *config.Config
+	logger    *slog.Logger
+	server    *server.Server
+	repo      content.Repository
+	container *container.Container
+}
+
 func main() {
 	err := run()
 	if err != nil {
@@ -37,95 +48,126 @@ func main() {
 }
 
 func run() error {
-	// Create DI container with all services
+	svc, err := setupServices()
+	if err != nil {
+		return err
+	}
+
+	router, httpServer, err := setupServer(svc)
+	if err != nil {
+		shutdownServices(svc)
+		return err
+	}
+
+	startFileWatcher(svc)
+
+	if err := serveHTTP(svc, httpServer, router); err != nil {
+		shutdownServices(svc)
+		return err
+	}
+
+	return gracefulShutdown(svc, httpServer)
+}
+
+// setupServices creates the DI container and extracts all services.
+func setupServices() (*services, error) {
 	c, err := container.New()
 	if err != nil {
-		return cockroachdberrors.Wrap(err, "failed to create DI container")
-	}
-	// Get services from container
-	cfg := c.Config()
-	logger := c.Logger()
-	srv := c.Server()
-	repo := c.Repository()
-
-	defer func() {
-		report := c.Shutdown()
-		if !report.Succeed {
-			logger.Error("failed to shutdown container", slog.String("error", report.Error()))
-		}
-	}()
-
-	logger.Info("starting site generator",
-		slog.Uint64("port", uint64(cfg.Port)),
-		slog.String("root_dir", cfg.RootDir),
-		slog.String("log_level", cfg.LogLevel),
-		slog.Bool("cache_enabled", cfg.CacheEnabled),
-		slog.Bool("dev_mode", cfg.DevMode),
-		slog.Duration("timeout", cfg.Timeout),
-	)
-
-	// Print configuration for visibility
-	logger.Info("configuration", slog.String("config", cfg.String()))
-
-	logger.Info("content repository initialized",
-		slog.Time("last_modified", repo.LastModified()),
-	)
-
-	// Setup Gin
-	if cfg.LogLevel == "info" || cfg.LogLevel == "warn" || cfg.LogLevel == "error" {
-		gin.SetMode(gin.ReleaseMode)
+		return nil, cockroachdberrors.Wrap(err, "failed to create DI container")
 	}
 
-	router := gin.New()
-	router.Use(gin.Recovery())
-	router.Use(requestLogger(logger))
+	svc := &services{
+		config:    c.Config(),
+		logger:    c.Logger(),
+		server:    c.Server(),
+		repo:      c.Repository(),
+		container: c,
+	}
 
-	// Register server routes
-	srv.RegisterRoutes(router)
+	logStartupInfo(svc)
 
-	// Create HTTP server
-	//
-	//nolint:exhaustruct
+	return svc, nil
+}
+
+// logStartupInfo logs all startup configuration.
+func logStartupInfo(svc *services) {
+	svc.logger.Info("starting site generator",
+		slog.Uint64("port", uint64(svc.config.Port)),
+		slog.String("root_dir", svc.config.RootDir),
+		slog.String("log_level", svc.config.LogLevel),
+		slog.Bool("cache_enabled", svc.config.CacheEnabled),
+		slog.Bool("dev_mode", svc.config.DevMode),
+		slog.Duration("timeout", svc.config.Timeout),
+	)
+
+	svc.logger.Info("configuration", slog.String("config", svc.config.String()))
+
+	svc.logger.Info("content repository initialized",
+		slog.Time("last_modified", svc.repo.LastModified()),
+	)
+}
+
+// setupServer creates the router and HTTP server.
+func setupServer(svc *services) (*gin.Engine, *http.Server, error) {
+	configureGin(svc.config.LogLevel)
+
+	router := createRouter(svc)
+
 	httpServer := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.Port),
+		Addr:         fmt.Sprintf(":%d", svc.config.Port),
 		Handler:      router,
-		ReadTimeout:  cfg.Timeout,
-		WriteTimeout: cfg.Timeout,
+		ReadTimeout:  svc.config.Timeout,
+		WriteTimeout: svc.config.Timeout,
 		IdleTimeout:  idleTimeout,
 	}
 
-	// Setup graceful shutdown
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	return router, httpServer, nil
+}
 
-	// Start server in goroutine
+// configureGin sets the Gin mode based on log level.
+func configureGin(logLevel string) {
+	if logLevel == "info" || logLevel == "warn" || logLevel == "error" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+}
+
+// createRouter creates and configures the Gin router.
+func createRouter(svc *services) *gin.Engine {
+	router := gin.New()
+	router.Use(gin.Recovery())
+	router.Use(requestLogger(svc.logger))
+
+	svc.server.RegisterRoutes(router)
+
+	return router
+}
+
+// serveHTTP starts the HTTP server and waits for shutdown.
+func serveHTTP(svc *services, httpServer *http.Server, _ *gin.Engine) error {
 	errChan := make(chan error, 1)
 
 	go func() {
-		logger.Info("server starting", slog.String("address", httpServer.Addr))
+		svc.logger.Info("server starting", slog.String("address", httpServer.Addr))
 
-		err := httpServer.ListenAndServe()
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errChan <- err
 		}
 	}()
 
-	// Start file watcher in dev mode
-	if cfg.DevMode {
-		go watchForChanges(cfg.RootDir, repo, logger)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-		logger.Info("file watcher started in dev mode")
-	}
-
-	// Wait for shutdown signal or error
 	select {
 	case err := <-errChan:
 		return cockroachdberrors.Wrap(err, "server error")
 	case <-ctx.Done():
-		logger.Info("shutdown signal received")
+		svc.logger.Info("shutdown signal received")
+		return nil
 	}
+}
 
-	// Graceful shutdown
+// gracefulShutdown performs the HTTP server shutdown.
+func gracefulShutdown(svc *services, httpServer *http.Server) error {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
 
@@ -133,9 +175,27 @@ func run() error {
 		return cockroachdberrors.Wrap(err, "server shutdown failed")
 	}
 
-	logger.Info("server stopped gracefully")
+	shutdownServices(svc)
+
+	svc.logger.Info("server stopped gracefully")
 
 	return nil
+}
+
+// shutdownServices performs graceful shutdown of services.
+func shutdownServices(svc *services) {
+	report := svc.container.Shutdown()
+	if !report.Succeed {
+		svc.logger.Error("failed to shutdown container", slog.String("error", report.Error()))
+	}
+}
+
+// startFileWatcher starts the file watcher in dev mode.
+func startFileWatcher(svc *services) {
+	if svc.config.DevMode {
+		go watchForChanges(svc.config.RootDir, svc.repo, svc.logger)
+		svc.logger.Info("file watcher started in dev mode")
+	}
 }
 
 // requestLogger is a gin middleware that logs HTTP requests.
