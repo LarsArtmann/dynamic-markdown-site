@@ -119,6 +119,7 @@ func setupServer(svc *services) (*gin.Engine, *http.Server, error) {
 		ReadTimeout:  svc.config.Timeout,
 		WriteTimeout: svc.config.Timeout,
 		IdleTimeout:  idleTimeout,
+		ErrorLog:     slog.NewLogLogger(svc.logger.Handler(), slog.LevelError),
 	}
 
 	return router, httpServer, nil
