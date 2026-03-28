@@ -10,6 +10,19 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
+// writeTestFile creates a test markdown file with the given content.
+func writeTestFile(t *testing.T, dir, name, content string) {
+	t.Helper()
+	if err := os.WriteFile(
+		filepath.Join(dir, name),
+		[]byte(content),
+		0o644,
+	); err != nil {
+		t.Fatalf("failed to create test file: %v", err)
+	}
+}
+
+
 func TestNewFileSystemRepository(t *testing.T) {
 	t.Run("valid directory", func(t *testing.T) {
 		tmpDir := t.TempDir()
@@ -36,10 +49,9 @@ func TestNewFileSystemRepository(t *testing.T) {
 	})
 
 	t.Run("file instead of directory", func(t *testing.T) {
-		tmpFile := filepath.Join(t.TempDir(), "test.txt")
-		if err := os.WriteFile(tmpFile, []byte("test"), 0o644); err != nil {
-			t.Fatalf("failed to create test file: %v", err)
-		}
+		tmpDir := t.TempDir()
+		tmpFile := filepath.Join(tmpDir, "test.txt")
+		writeTestFile(t, tmpDir, "test.txt", "test")
 
 		repo, err := NewFileSystemRepository(tmpFile)
 		if err == nil {
@@ -58,13 +70,7 @@ func TestNewFileSystemRepository(t *testing.T) {
 		tmpDir := t.TempDir()
 
 		// Create a markdown file in the root
-		if err := os.WriteFile(
-			filepath.Join(tmpDir, "readme.md"),
-			[]byte("# README"),
-			0o644,
-		); err != nil {
-			t.Fatalf("failed to create test file: %v", err)
-		}
+		writeTestFile(t, tmpDir, "readme.md", "# README")
 
 		// Add trailing slash to directory path
 		rootWithSlash := tmpDir + string(filepath.Separator)
@@ -142,13 +148,7 @@ func TestFileSystemRepository_Get(t *testing.T) {
 
 	t.Run("get file node", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		if err := os.WriteFile(
-			filepath.Join(tmpDir, "test.md"),
-			[]byte("# Test"),
-			0o644,
-		); err != nil {
-			t.Fatalf("failed to create test file: %v", err)
-		}
+		writeTestFile(t, tmpDir, "test.md", "# Test")
 
 		repo, err := NewFileSystemRepository(tmpDir)
 		if err != nil {
@@ -183,13 +183,7 @@ func TestFileSystemRepository_Get(t *testing.T) {
 			t.Fatalf("failed to create subdirectory: %v", err)
 		}
 
-		if err := os.WriteFile(
-			filepath.Join(subDir, "guide.md"),
-			[]byte("# Guide"),
-			0o644,
-		); err != nil {
-			t.Fatalf("failed to create test file: %v", err)
-		}
+		writeTestFile(t, subDir, "guide.md", "# Guide")
 
 		repo, err := NewFileSystemRepository(tmpDir)
 		if err != nil {
@@ -216,13 +210,7 @@ func TestFileSystemRepository_Get(t *testing.T) {
 			t.Fatalf("failed to create subdirectory: %v", err)
 		}
 
-		if err := os.WriteFile(
-			filepath.Join(subDir, "guide.md"),
-			[]byte("# Guide"),
-			0o644,
-		); err != nil {
-			t.Fatalf("failed to create test file: %v", err)
-		}
+		writeTestFile(t, subDir, "guide.md", "# Guide")
 
 		repo, err := NewFileSystemRepository(tmpDir)
 		if err != nil {
@@ -304,13 +292,7 @@ func TestFileSystemRepository_Refresh(t *testing.T) {
 
 		time.Sleep(10 * time.Millisecond)
 
-		if err := os.WriteFile(
-			filepath.Join(tmpDir, "new.md"),
-			[]byte("# New"),
-			0o644,
-		); err != nil {
-			t.Fatalf("failed to create new file: %v", err)
-		}
+		writeTestFile(t, tmpDir, "new.md", "# New")
 
 		result := repo.Refresh()
 		if !result.Success {
@@ -346,21 +328,8 @@ func TestFileSystemRepository_Refresh(t *testing.T) {
 			t.Fatalf("failed to create subdirectory: %v", err)
 		}
 
-		if err := os.WriteFile(
-			filepath.Join(tmpDir, "index.md"),
-			[]byte("# Index"),
-			0o644,
-		); err != nil {
-			t.Fatalf("failed to create index file: %v", err)
-		}
-
-		if err := os.WriteFile(
-			filepath.Join(subDir, "guide.md"),
-			[]byte("# Guide"),
-			0o644,
-		); err != nil {
-			t.Fatalf("failed to create guide file: %v", err)
-		}
+		writeTestFile(t, tmpDir, "index.md", "# Index")
+		writeTestFile(t, subDir, "guide.md", "# Guide")
 
 		repo, err := NewFileSystemRepository(tmpDir)
 		if err != nil {
@@ -388,21 +357,8 @@ func TestFileSystemRepository_Refresh(t *testing.T) {
 
 func TestFileSystemRepository_SkipsHiddenFiles(t *testing.T) {
 	tmpDir := t.TempDir()
-	if err := os.WriteFile(
-		filepath.Join(tmpDir, "visible.md"),
-		[]byte("# Visible"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create visible file: %v", err)
-	}
-
-	if err := os.WriteFile(
-		filepath.Join(tmpDir, ".hidden.md"),
-		[]byte("# Hidden"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create hidden file: %v", err)
-	}
+	writeTestFile(t, tmpDir, "visible.md", "# Visible")
+	writeTestFile(t, tmpDir, ".hidden.md", "# Hidden")
 
 	repo, err := NewFileSystemRepository(tmpDir)
 	if err != nil {
@@ -435,26 +391,14 @@ func TestFileSystemRepository_SkipsHiddenDirectories(t *testing.T) {
 		t.Fatalf("failed to create visible directory: %v", err)
 	}
 
-	if err := os.WriteFile(
-		filepath.Join(visibleDir, "guide.md"),
-		[]byte("# Guide"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create guide file: %v", err)
-	}
+	writeTestFile(t, visibleDir, "guide.md", "# Guide")
 
 	hiddenDir := filepath.Join(tmpDir, ".git")
 	if err := os.Mkdir(hiddenDir, 0o755); err != nil {
 		t.Fatalf("failed to create hidden directory: %v", err)
 	}
 
-	if err := os.WriteFile(
-		filepath.Join(hiddenDir, "config.md"),
-		[]byte("# Config"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create config file: %v", err)
-	}
+	writeTestFile(t, hiddenDir, "config.md", "# Config")
 
 	repo, err := NewFileSystemRepository(tmpDir)
 	if err != nil {
@@ -482,26 +426,16 @@ func TestFileSystemRepository_SkipsBlacklistedDirectories(t *testing.T) {
 		t.Fatalf("failed to create visible directory: %v", err)
 	}
 
-	if err := os.WriteFile(
-		filepath.Join(visibleDir, "guide.md"),
-		[]byte("# Guide"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create guide file: %v", err)
-	}
+	writeTestFile(t, visibleDir, "guide.md", "# Guide")
 
 	for _, skipDir := range []string{"node_modules", "vendor", "dist", "build", "tmp", "temp"} {
 		dir := filepath.Join(tmpDir, skipDir)
 
-		err := os.Mkdir(dir, 0o755)
-		if err != nil {
+		if err := os.Mkdir(dir, 0o755); err != nil {
 			t.Fatalf("failed to create %s directory: %v", skipDir, err)
 		}
 
-		err = os.WriteFile(filepath.Join(dir, "file.md"), []byte("# File"), 0o644)
-		if err != nil {
-			t.Fatalf("failed to create file in %s: %v", skipDir, err)
-		}
+		writeTestFile(t, dir, "file.md", "# File")
 	}
 
 	repo, err := NewFileSystemRepository(tmpDir)
@@ -524,33 +458,10 @@ func TestFileSystemRepository_SkipsBlacklistedDirectories(t *testing.T) {
 
 func TestFileSystemRepository_OnlyProcessesMarkdown(t *testing.T) {
 	tmpDir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(tmpDir, "doc.md"), []byte("# Doc"), 0o644); err != nil {
-		t.Fatalf("failed to create markdown file: %v", err)
-	}
-
-	if err := os.WriteFile(
-		filepath.Join(tmpDir, "readme.markdown"),
-		[]byte("# Readme"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create markdown file: %v", err)
-	}
-
-	if err := os.WriteFile(
-		filepath.Join(tmpDir, "script.js"),
-		[]byte("console.log('test')"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create js file: %v", err)
-	}
-
-	if err := os.WriteFile(
-		filepath.Join(tmpDir, "style.css"),
-		[]byte("body {}"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create css file: %v", err)
-	}
+	writeTestFile(t, tmpDir, "doc.md", "# Doc")
+	writeTestFile(t, tmpDir, "readme.markdown", "# Readme")
+	writeTestFile(t, tmpDir, "script.js", "console.log('test')")
+	writeTestFile(t, tmpDir, "style.css", "body {}")
 
 	repo, err := NewFileSystemRepository(tmpDir)
 	if err != nil {
@@ -580,13 +491,7 @@ func TestFileSystemRepository_FiltersEmptyDirectories(t *testing.T) {
 		t.Fatalf("failed to create docs directory: %v", err)
 	}
 
-	if err := os.WriteFile(
-		filepath.Join(docsDir, "guide.md"),
-		[]byte("# Guide"),
-		0o644,
-	); err != nil {
-		t.Fatalf("failed to create guide file: %v", err)
-	}
+	writeTestFile(t, docsDir, "guide.md", "# Guide")
 
 	repo, err := NewFileSystemRepository(tmpDir)
 	if err != nil {

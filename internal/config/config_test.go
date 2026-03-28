@@ -182,6 +182,7 @@ func assertValidationError(
 }
 
 func TestConfigValidate(t *testing.T) {
+	t.Parallel()
 	t.Run("valid config", func(t *testing.T) {
 		t.Parallel()
 		tmpDir := t.TempDir()
@@ -221,6 +222,7 @@ func TestConfigValidate(t *testing.T) {
 	})
 
 	t.Run("root is file not directory", func(t *testing.T) {
+		t.Parallel()
 		tmpFile := filepath.Join(t.TempDir(), "testfile")
 		if err := os.WriteFile(tmpFile, []byte("test"), 0o644); err != nil {
 			t.Fatalf("Failed to create test file: %v", err)
@@ -243,10 +245,12 @@ func TestConfigValidate(t *testing.T) {
 	})
 
 	t.Run("invalid log level", func(t *testing.T) {
+		t.Parallel()
 		assertValidationError(t, 8080, t.TempDir(), "invalid", "log level")
 	})
 
 	t.Run("all valid log levels", func(t *testing.T) {
+		t.Parallel()
 		tmpDir := t.TempDir()
 
 		validLevels := []string{
@@ -279,14 +283,10 @@ func TestConfigValidate(t *testing.T) {
 }
 
 func TestConfigLogValue(t *testing.T) {
-	cfg := &Config{
-		Port:         8080,
-		RootDir:      "/test",
-		LogLevel:     "debug",
-		CacheEnabled: true,
-		DevMode:      false,
-		Timeout:      30 * time.Second,
-	}
+	t.Parallel()
+	cfg := DefaultConfig()
+	cfg.RootDir = "/test"
+	cfg.LogLevel = "debug"
 
 	logValue := cfg.LogValue()
 	if logValue.Kind() != slog.KindGroup {
@@ -295,6 +295,7 @@ func TestConfigLogValue(t *testing.T) {
 }
 
 func TestConfigSlogLevel(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		logLevel string
 		expected slog.Level
@@ -313,6 +314,7 @@ func TestConfigSlogLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.logLevel, func(t *testing.T) {
+			t.Parallel()
 			cfg := &Config{LogLevel: tt.logLevel}
 
 			result := cfg.SlogLevel()
@@ -324,6 +326,7 @@ func TestConfigSlogLevel(t *testing.T) {
 }
 
 func TestConfigString(t *testing.T) {
+	t.Parallel()
 	cfg := &Config{
 		Port:         8080,
 		RootDir:      "/test/path",
@@ -361,17 +364,11 @@ func TestConfigString(t *testing.T) {
 }
 
 func TestConfigDefaults(t *testing.T) {
+	t.Parallel()
 	// Test that default values are sensible
 	// Note: We can't test Load() directly because flag.Parse() can only be called once
-	// But we can verify the defaults are set correctly in a new config
-	cfg := &Config{
-		Port:         8080,
-		RootDir:      ".",
-		LogLevel:     "info",
-		CacheEnabled: true,
-		DevMode:      false,
-		Timeout:      30 * time.Second,
-	}
+	// But we can verify the defaults are set correctly
+	cfg := DefaultConfig()
 
 	if cfg.Port != 8080 {
 		t.Errorf("default Port = %d, want 8080", cfg.Port)
@@ -399,16 +396,12 @@ func TestConfigDefaults(t *testing.T) {
 }
 
 func TestConfigDevModeDisablesCache(t *testing.T) {
+	t.Parallel()
 	// This tests the logic that DevMode should disable cache
 	// The actual Load() function applies this after validation
-	cfg := &Config{
-		Port:         8080,
-		RootDir:      t.TempDir(),
-		LogLevel:     "info",
-		CacheEnabled: true,
-		DevMode:      true,
-		Timeout:      30 * time.Second,
-	}
+	cfg := DefaultConfig()
+	cfg.RootDir = t.TempDir()
+	cfg.DevMode = true
 
 	// Simulate the Load() post-processing
 	if cfg.DevMode {
