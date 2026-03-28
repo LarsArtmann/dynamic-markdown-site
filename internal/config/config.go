@@ -65,29 +65,29 @@ func Load() (*Config, error) {
 	}
 
 	// Override with environment variables
-	if port := os.Getenv("CYBERDOM_PORT"); port != "" {
+	if port := os.Getenv("DYNAMIC_MARKDOWN_PORT"); port != "" {
 		if p, err := parseUint16(port); err == nil {
 			cfg.Port = p
 		}
 	}
 
-	if root := os.Getenv("CYBERDOM_ROOT"); root != "" {
+	if root := os.Getenv("DYNAMIC_MARKDOWN_ROOT"); root != "" {
 		cfg.RootDir = root
 	}
 
-	if level := os.Getenv("CYBERDOM_LOG_LEVEL"); level != "" {
+	if level := os.Getenv("DYNAMIC_MARKDOWN_LOG_LEVEL"); level != "" {
 		cfg.LogLevel = level
 	}
 
-	if cache := os.Getenv("CYBERDOM_CACHE"); cache != "" {
+	if cache := os.Getenv("DYNAMIC_MARKDOWN_CACHE"); cache != "" {
 		cfg.CacheEnabled = parseBool(cache)
 	}
 
-	if dev := os.Getenv("CYBERDOM_DEV"); dev != "" {
+	if dev := os.Getenv("DYNAMIC_MARKDOWN_DEV"); dev != "" {
 		cfg.DevMode = parseBool(dev)
 	}
 
-	if timeout := os.Getenv("CYBERDOM_TIMEOUT"); timeout != "" {
+	if timeout := os.Getenv("DYNAMIC_MARKDOWN_TIMEOUT"); timeout != "" {
 		if d, err := time.ParseDuration(timeout); err == nil {
 			cfg.Timeout = d
 		}

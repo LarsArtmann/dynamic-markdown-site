@@ -198,7 +198,7 @@ Uses `charm.land/log` which implements `slog.Handler`:
 logger := slog.New(logger)  // charmbracelet/log implements slog.Handler
 ```
 
-Log levels via `-log-level` flag or `CYBERDOM_LOG_LEVEL` env var.
+Log levels via `-log-level` flag or `DYNAMIC_MARKDOWN_LOG_LEVEL` env var.
 
 ---
 
@@ -332,16 +332,16 @@ The server handles SIGINT/SIGTERM and waits up to 30 seconds for in-flight reque
 
 ### Environment Variables
 
-Prefix: `CYBERDOM_`
+Prefix: `DYNAMIC_MARKDOWN_`
 
 | Variable             | Description     |
 | -------------------- | --------------- |
-| `CYBERDOM_PORT`      | Server port     |
-| `CYBERDOM_ROOT`      | Root directory  |
-| `CYBERDOM_LOG_LEVEL` | Log level       |
-| `CYBERDOM_CACHE`     | Enable caching  |
-| `CYBERDOM_DEV`       | Dev mode        |
-| `CYBERDOM_TIMEOUT`   | Request timeout |
+| `DYNAMIC_MARKDOWN_PORT`      | Server port     |
+| `DYNAMIC_MARKDOWN_ROOT`      | Root directory  |
+| `DYNAMIC_MARKDOWN_LOG_LEVEL` | Log level       |
+| `DYNAMIC_MARKDOWN_CACHE`     | Enable caching  |
+| `DYNAMIC_MARKDOWN_DEV`       | Dev mode        |
+| `DYNAMIC_MARKDOWN_TIMEOUT`   | Request timeout |
 
 ---
 

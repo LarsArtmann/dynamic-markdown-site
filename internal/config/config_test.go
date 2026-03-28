@@ -53,11 +53,11 @@ func TestLoadSubprocess(t *testing.T) {
 		envVars []string
 	}{
 		{"default_config", "with defaults", nil},
-		{"env_override_port", "with env port", []string{"CYBERDOM_PORT=3000"}},
-		{"env_dev_mode", "with dev mode", []string{"CYBERDOM_DEV=true"}},
-		{"env_cache_disabled", "with cache disabled", []string{"CYBERDOM_CACHE=false"}},
-		{"invalid_port_env", "with invalid port env", []string{"CYBERDOM_PORT=invalid"}},
-		{"custom_timeout_env", "with custom timeout", []string{"CYBERDOM_TIMEOUT=60s"}},
+		{"env_override_port", "with env port", []string{"DYNAMIC_MARKDOWN_PORT=3000"}},
+		{"env_dev_mode", "with dev mode", []string{"DYNAMIC_MARKDOWN_DEV=true"}},
+		{"env_cache_disabled", "with cache disabled", []string{"DYNAMIC_MARKDOWN_CACHE=false"}},
+		{"invalid_port_env", "with invalid port env", []string{"DYNAMIC_MARKDOWN_PORT=invalid"}},
+		{"custom_timeout_env", "with custom timeout", []string{"DYNAMIC_MARKDOWN_TIMEOUT=60s"}},
 	}
 
 	for _, tt := range tests {
