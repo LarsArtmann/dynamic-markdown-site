@@ -3,7 +3,6 @@ package renderer
 
 import (
 	"bytes"
-	"html/template"
 	"strings"
 
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
@@ -59,7 +58,7 @@ func NewGoldmarkRenderer() *GoldmarkRenderer {
 
 // RenderResult contains the result of rendering markdown.
 type RenderResult struct {
-	HTML     template.HTML
+	HTML     domain.HTML
 	TOC      []domain.TOCItem
 	Metadata domain.Frontmatter
 }
@@ -87,7 +86,7 @@ func (r *GoldmarkRenderer) Render(source []byte) (RenderResult, error) {
 	}
 
 	return RenderResult{
-		HTML:     template.HTML(buf.String()),
+		HTML:     domain.HTML(buf.String()),
 		TOC:      toc,
 		Metadata: metadata,
 	}, nil
@@ -273,7 +272,7 @@ func NewSimpleRenderer() *SimpleRenderer {
 }
 
 // Render converts markdown to HTML without metadata extraction.
-func (r *SimpleRenderer) Render(source []byte) (template.HTML, error) {
+func (r *SimpleRenderer) Render(source []byte) (domain.HTML, error) {
 	var buf bytes.Buffer
 
 	err := r.md.Convert(source, &buf)
@@ -281,5 +280,5 @@ func (r *SimpleRenderer) Render(source []byte) (template.HTML, error) {
 		return "", errors.Wrap(err, "render markdown")
 	}
 
-	return template.HTML(buf.String()), nil
+	return domain.HTML(buf.String()), nil
 }
