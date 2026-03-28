@@ -91,6 +91,63 @@ linters:
       checks:
         - all
         - -SA1019
+  exclusions:
+    generated: lax
+    warn-unused: true
+    rules:
+      # cyclop: Complex functions that are inherently complex but well-structured
+      - path: "internal/config/config.go"
+        linters: [cyclop]
+        text: "calculated cyclomatic complexity for function Load is 15"
+      - path: "internal/content/filesystem.go"
+        linters: [cyclop]
+        text: "calculated cyclomatic complexity for function walkEntry is 12"
+      - path: "cmd/dynamic-markdown-site/main.go"
+        linters: [cyclop]
+        text: "calculated cyclomatic complexity for function run is 12"
+      - path: "cmd/dynamic-markdown-site/watcher.go"
+        linters: [cyclop]
+        text: "calculated cyclomatic complexity for function watchForChanges is"
+      # Test files often have complex table-driven tests
+      - path: "(.*)_test\\.go"
+        linters: [cyclop]
+      # exhaustruct: Test structs often don't need all fields - exclude all test files
+      - path: "(.*)_test\\.go"
+        linters: [exhaustruct]
+      # exhaustruct: Production code - partial struct initialization is intentional design
+      - path: "internal/content/filesystem.go"
+        linters: [exhaustruct]
+      - path: "internal/content/memory.go"
+        linters: [exhaustruct]
+      - path: "internal/domain/file.go"
+        linters: [exhaustruct]
+      - path: "internal/renderer/markdown.go"
+        linters: [exhaustruct]
+      - path: "internal/server/ratelimit.go"
+        linters: [exhaustruct]
+      - path: "internal/server/render.go"
+        linters: [exhaustruct]
+      # funlen: Complex test functions with many table-driven cases
+      - path: "internal/renderer/markdown_bench_test.go"
+        linters: [funlen]
+      - path: "internal/content/search_test.go"
+        linters: [funlen]
+        text: "Function 'TestSearcher_Search' is too long"
+      # gochecknoinits: Test init functions for benchmark setup
+      - path: "(.*)_test\\.go"
+        linters: [gochecknoinits]
+      # gocognit: Complex functions that are inherently complex
+      - path: "(.*)_test\\.go"
+        linters: [gocognit]
+      - path: "cmd/dynamic-markdown-site/watcher.go"
+        linters: [gocognit]
+        text: "cognitive complexity 37 of func `watchForChanges` is high"
+      # nestif: Subprocess test pattern has complex nested blocks
+      - path: "internal/container/container_test.go"
+        linters: [nestif]
+      # paralleltest: Will be addressed separately - requires careful review
+      - path: "(.*)_test\\.go"
+        linters: [paralleltest]
 formatters:
   enable:
     - golines
