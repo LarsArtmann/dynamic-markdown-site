@@ -24,3 +24,11 @@ go.work
 # OS
 .DS_Store
 Thumbs.db
+# Dependencies
+node_modules/
+# Build artifacts
+/dynamic-markdown-site
+# Test coverage
+/coverage
+# Add pattern for Templ generated files
+*_templ.go
