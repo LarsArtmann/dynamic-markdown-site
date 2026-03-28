@@ -31,6 +31,13 @@ func newRateLimiter(maxRequests int, window time.Duration) *rateLimiter {
 	return rl
 }
 
+// filterValidTimestamps removes expired timestamps from a slice.
+func (rl *rateLimiter) filterValidTimestamps(timestamps []time.Time, now time.Time) []time.Time {
+	return lo.Filter(timestamps, func(ts time.Time, _ int) bool {
+		return now.Sub(ts) < rl.window
+	})
+}
+
 func (rl *rateLimiter) cleanup() {
 	ticker := time.NewTicker(rl.cleanupTick)
 	defer ticker.Stop()
@@ -42,9 +49,7 @@ func (rl *rateLimiter) cleanup() {
 			now := time.Now()
 
 			for ip, timestamps := range rl.requests {
-				valid := lo.Filter(timestamps, func(ts time.Time, _ int) bool {
-					return now.Sub(ts) < rl.window
-				})
+				valid := rl.filterValidTimestamps(timestamps, now)
 				if len(valid) == 0 {
 					delete(rl.requests, ip)
 				} else {
@@ -70,9 +75,7 @@ func (rl *rateLimiter) checkRateLimit(ip string) bool {
 	now := time.Now()
 
 	timestamps := rl.requests[ip]
-	valid := lo.Filter(timestamps, func(ts time.Time, _ int) bool {
-		return now.Sub(ts) < rl.window
-	})
+	valid := rl.filterValidTimestamps(timestamps, now)
 
 	if len(valid) >= rl.maxRequests {
 		return false

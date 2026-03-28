@@ -118,7 +118,7 @@ dynamic-markdown-site/
 
 ### Dependency Injection
 
-Uses `samber/do/v2` for DI. Register providers in `container.New()`:
+Uses `samber/do/v2`. Register providers in `container.New()`:
 
 ```go
 func New() (*Container, error) {
@@ -129,12 +129,7 @@ func New() (*Container, error) {
 }
 ```
 
-Services accessed via typed accessors:
-```go
-func (c *Container) Config() *config.Config {
-    return do.MustInvoke[*config.Config](c.injector)
-}
-```
+Access via typed accessors: `do.MustInvoke[*config.Config](c.injector)`
 
 ### Repository Pattern
 
@@ -221,10 +216,7 @@ Log levels via `-log-level` flag or `CYBERDOM_LOG_LEVEL` env var.
 ```go
 func newTestServer(t *testing.T, repo content.Repository) *Server {
     t.Helper()
-    logger := slog.New(slog.DiscardHandler)
-    cache := cache.NewHTMLCache(100)
-    searcher := content.NewSearcher(repo)
-    return NewServer(repo, searcher, logger, cache)
+    return NewServer(repo, content.NewSearcher(repo), slog.New(slog.DiscardHandler), cache.NewHTMLCache(100))
 }
 ```
 
@@ -232,36 +224,17 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 
 Uses `net/http/httptest`:
 ```go
-func TestHealthEndpoint(t *testing.T) {
-    repo := content.NewInMemoryRepository()
-    server := newTestServer(t, repo)
-    router := newTestRouter(server)
-
-    req := httptest.NewRequest(http.MethodGet, "/health", nil)
-    rec := httptest.NewRecorder()
-    router.ServeHTTP(rec, req)
-
-    if rec.Code != http.StatusOK {
-        t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-    }
-}
+req := httptest.NewRequest(http.MethodGet, "/health", nil)
+rec := httptest.NewRecorder()
+router.ServeHTTP(rec, req)
 ```
 
-### Test Table Patterns
+### Test Tables
 
 ```go
-tests := []struct {
-    name       string
-    path       string
-    wantStatus int
-}{
-    {name: "GET /health returns 200", path: "/health", wantStatus: http.StatusOK},
-}
-
+tests := []struct { name string; path string; wantStatus int }{}
 for _, tt := range tests {
-    t.Run(tt.name, func(t *testing.T) {
-        // test logic
-    })
+    t.Run(tt.name, func(t *testing.T) { /* test */ })
 }
 ```
 
@@ -276,13 +249,7 @@ func (f *FailingRepository) Get(_ domain.URLPath) (domain.ContentNode, error) {
 
 ### Parallel Tests
 
-**Important:** Tests must use `t.Parallel()` when safe:
-```go
-func TestSomething(t *testing.T) {
-    t.Parallel()  // Required by paralleltest linter
-    // ...
-}
-```
+Use `t.Parallel()` in tests (required by paralleltest linter).
 
 ---
 

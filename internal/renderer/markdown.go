@@ -124,6 +124,34 @@ func extractFrontmatter(metaData map[string]any) domain.Frontmatter {
 	return fm
 }
 
+// appendTOCTopLevel appends an item to the top-level items slice and updates tracking maps.
+func appendTOCTopLevel(
+	items *[]domain.TOCItem,
+	item domain.TOCItem,
+	n ast.Node,
+	itemMap map[ast.Node]*domain.TOCItem,
+	orderedItems *[]*domain.TOCItem,
+) {
+	*items = append(*items, item)
+	ptr := &(*items)[len(*items)-1]
+	itemMap[n] = ptr
+	*orderedItems = append(*orderedItems, ptr)
+}
+
+// appendTOCChild appends an item as a child of parent and updates tracking maps.
+func appendTOCChild(
+	parent *domain.TOCItem,
+	item domain.TOCItem,
+	n ast.Node,
+	itemMap map[ast.Node]*domain.TOCItem,
+	orderedItems *[]*domain.TOCItem,
+) {
+	parent.Children = append(parent.Children, item)
+	ptr := &parent.Children[len(parent.Children)-1]
+	itemMap[n] = ptr
+	*orderedItems = append(*orderedItems, ptr)
+}
+
 // extractTOCFromAST extracts table of contents from the parsed AST.
 func extractTOCFromAST(doc ast.Node, source []byte) []domain.TOCItem {
 	var items []domain.TOCItem
@@ -161,22 +189,13 @@ func extractTOCFromAST(doc ast.Node, source []byte) []domain.TOCItem {
 		}
 
 		if heading.Level <= 2 || len(items) == 0 {
-			items = append(items, item)
-			ptr := &items[len(items)-1]
-			itemMap[n] = ptr
-			orderedItems = append(orderedItems, ptr)
+			appendTOCTopLevel(&items, item, n, itemMap, &orderedItems)
 		} else {
 			parent := findTOCParent(orderedItems, heading.Level)
 			if parent != nil {
-				parent.Children = append(parent.Children, item)
-				ptr := &parent.Children[len(parent.Children)-1]
-				itemMap[n] = ptr
-				orderedItems = append(orderedItems, ptr)
+				appendTOCChild(parent, item, n, itemMap, &orderedItems)
 			} else {
-				items = append(items, item)
-				ptr := &items[len(items)-1]
-				itemMap[n] = ptr
-				orderedItems = append(orderedItems, ptr)
+				appendTOCTopLevel(&items, item, n, itemMap, &orderedItems)
 			}
 		}
 
