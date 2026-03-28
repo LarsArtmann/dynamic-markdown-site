@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -33,7 +34,7 @@ func TestLoadSubprocess(t *testing.T) {
 	runSubprocessTest := func(t *testing.T, name string, extraEnv []string) {
 		t.Helper()
 
-		cmd := exec.Command(os.Args[0], "-test.run=TestLoadSubprocess")
+		cmd := exec.CommandContext(context.Background(), os.Args[0], "-test.run=TestLoadSubprocess")
 
 		cmd.Env = append(os.Environ(), append([]string{"TEST_LOAD_CONFIG=1"}, extraEnv...)...)
 

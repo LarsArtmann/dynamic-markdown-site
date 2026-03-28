@@ -1,6 +1,7 @@
 package container
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"testing"
@@ -11,7 +12,7 @@ import (
 // flag.Parse() - and flag.Parse() can only be called once per process.
 func runInSubprocess(t *testing.T) {
 	t.Helper()
-	cmd := exec.Command(os.Args[0], "-test.run="+t.Name())
+	cmd := exec.CommandContext(context.Background(), os.Args[0], "-test.run="+t.Name())
 
 	cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
@@ -251,7 +252,7 @@ func TestContainerServiceOrder(t *testing.T) {
 	}
 
 	// Run test in subprocess
-	cmd := exec.Command(os.Args[0], "-test.run=TestContainerServiceOrder")
+	cmd := exec.CommandContext(context.Background(), os.Args[0], "-test.run=TestContainerServiceOrder")
 
 	cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
