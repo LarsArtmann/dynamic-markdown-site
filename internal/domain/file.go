@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"html/template"
 	"strings"
 	"time"
 )
@@ -41,7 +40,7 @@ type FileNode struct {
 	path     URLPath
 	title    string
 	content  []byte
-	html     template.HTML
+	html     domain.HTML
 	toc      []TOCItem
 	metadata Frontmatter
 	modified time.Time
@@ -92,14 +91,14 @@ func (f *FileNode) Size() uint64 { return f.size }
 func (f *FileNode) Content() []byte { return f.content }
 
 // HTML returns the rendered HTML.
-func (f *FileNode) HTML() template.HTML {
+func (f *FileNode) HTML() domain.HTML {
 	return f.html
 }
 
 // SetHTML sets the rendered HTML.
 //
 // Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
-func (f *FileNode) SetHTML(html template.HTML) {
+func (f *FileNode) SetHTML(html domain.HTML) {
 	f.html = html
 }
 

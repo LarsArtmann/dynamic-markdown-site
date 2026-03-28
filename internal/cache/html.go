@@ -3,7 +3,6 @@ package cache
 
 import (
 	"context"
-	"html/template"
 	"time"
 
 	"github.com/cockroachdb/errors"
@@ -14,7 +13,7 @@ import (
 
 // RenderedContent holds cached rendering results.
 type RenderedContent struct {
-	HTML     template.HTML
+	HTML     domain.HTML
 	TOC      []domain.TOCItem
 	Metadata domain.Frontmatter
 }

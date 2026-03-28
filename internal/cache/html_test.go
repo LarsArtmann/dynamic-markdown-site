@@ -2,7 +2,6 @@ package cache
 
 import (
 	"context"
-	"html/template"
 	"sync"
 	"testing"
 
@@ -12,7 +11,7 @@ import (
 // newTestContent creates a RenderedContent for testing.
 func newTestContent(html string) RenderedContent {
 	return RenderedContent{
-		HTML:     template.HTML(html),
+		HTML:     domain.HTML(html),
 		TOC:      []domain.TOCItem{{Level: 1, Title: "Test", Anchor: "test"}},
 		Metadata: domain.Frontmatter{Title: "Test Title"},
 	}
