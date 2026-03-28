@@ -14,6 +14,9 @@ import (
 // TestLoadSubprocess tests the Load() function by running it in a subprocess
 // This is necessary because flag.Parse() can only be called once per process.
 func TestLoadSubprocess(t *testing.T) {
+	// Note: This test cannot use t.Parallel() because it spawns subprocesses
+	// that also need to call flag.Parse(). The subprocess detection prevents
+	// parallel execution.
 	if os.Getenv("TEST_LOAD_CONFIG") == "1" {
 		// This is the subprocess - actually run Load()
 		cfg, err := Load()
@@ -46,28 +49,34 @@ func TestLoadSubprocess(t *testing.T) {
 
 	// Run subprocess test with defaults
 	t.Run("default_config", func(t *testing.T) {
+		t.Parallel()
 		runSubprocessTest(t, "with defaults", nil)
 	})
 
 	// Test with environment variables
 	t.Run("env_override_port", func(t *testing.T) {
+		t.Parallel()
 		runSubprocessTest(t, "with env port", []string{"CYBERDOM_PORT=3000"})
 	})
 
 	t.Run("env_dev_mode", func(t *testing.T) {
+		t.Parallel()
 		runSubprocessTest(t, "with dev mode", []string{"CYBERDOM_DEV=true"})
 	})
 
 	t.Run("env_cache_disabled", func(t *testing.T) {
+		t.Parallel()
 		runSubprocessTest(t, "with cache disabled", []string{"CYBERDOM_CACHE=false"})
 	})
 
 	t.Run("invalid_port_env", func(t *testing.T) {
+		t.Parallel()
 		// This should still succeed - invalid port env is ignored
 		runSubprocessTest(t, "with invalid port env", []string{"CYBERDOM_PORT=invalid"})
 	})
 
 	t.Run("custom_timeout_env", func(t *testing.T) {
+		t.Parallel()
 		runSubprocessTest(t, "with custom timeout", []string{"CYBERDOM_TIMEOUT=60s"})
 	})
 }
@@ -81,6 +90,7 @@ func boolStr(b bool) string {
 }
 
 func TestParseBool(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		input    string
 		expected bool
@@ -105,6 +115,7 @@ func TestParseBool(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
 			result := parseBool(tt.input)
 			if result != tt.expected {
 				t.Errorf("parseBool(%q) = %v, want %v", tt.input, result, tt.expected)
@@ -114,6 +125,7 @@ func TestParseBool(t *testing.T) {
 }
 
 func TestParseUint16(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		input       string
@@ -133,6 +145,7 @@ func TestParseUint16(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result, err := parseUint16(tt.input)
 			if tt.expectError {
 				if err == nil {
@@ -183,6 +196,7 @@ func assertValidationError(
 
 func TestConfigValidate(t *testing.T) {
 	t.Run("valid config", func(t *testing.T) {
+		t.Parallel()
 		tmpDir := t.TempDir()
 		cfg := &Config{
 			Port:     8080,
@@ -197,10 +211,12 @@ func TestConfigValidate(t *testing.T) {
 	})
 
 	t.Run("zero port", func(t *testing.T) {
+		t.Parallel()
 		assertValidationError(t, 0, t.TempDir(), "info", "port")
 	})
 
 	t.Run("non-existent root dir", func(t *testing.T) {
+		t.Parallel()
 		cfg := &Config{
 			Port:     8080,
 			RootDir:  "/non/existent/directory/12345",
