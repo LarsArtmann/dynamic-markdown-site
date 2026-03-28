@@ -18,14 +18,14 @@ func init() {
 }
 
 // newBenchmarkServer creates a server with in-memory repository for benchmarking.
-func newBenchmarkServer(b *testing.B, fileCount int) (*Server, *gin.Engine) {
+func newBenchmarkServer(b *testing.B) *gin.Engine {
 	b.Helper()
 
 	repo := content.NewInMemoryRepository()
 
 	// Add some files for realistic benchmarking
+	const fileCount = 50
 	for i := range fileCount {
-		_ = fileCount // Suppress unused variable warning (always 50 in practice)
 		path := domain.MustURLPath("/file-" + string(rune('0'+i%10)))
 		contentBytes := []byte(createBenchmarkFileContent(i))
 
@@ -51,7 +51,7 @@ func newBenchmarkServer(b *testing.B, fileCount int) (*Server, *gin.Engine) {
 	router := gin.New()
 	srv.RegisterRoutes(router)
 
-	return srv, router
+	return router
 }
 
 func createBenchmarkFileContent(index int) string {
@@ -92,13 +92,13 @@ End of file.
 
 // BenchmarkServerRootRequest benchmarks requests to the root path.
 func BenchmarkServerRootRequest(b *testing.B) {
-	_, router := newBenchmarkServer(b, 50)
+	router := newBenchmarkServer(b)
 	runBenchmarkRequest(b, router, "/")
 }
 
 // BenchmarkServerFileRequest benchmarks requests for individual files.
 func BenchmarkServerFileRequest(b *testing.B) {
-	_, router := newBenchmarkServer(b, 50)
+	router := newBenchmarkServer(b)
 
 	paths := []string{"/file-0", "/file-1", "/file-2", "/file-3", "/file-4"}
 
@@ -117,7 +117,7 @@ func BenchmarkServerFileRequest(b *testing.B) {
 
 // BenchmarkServerCachedRequest benchmarks requests that hit the HTML cache.
 func BenchmarkServerCachedRequest(b *testing.B) {
-	_, router := newBenchmarkServer(b, 50)
+	router := newBenchmarkServer(b)
 
 	// Prime the cache with a request
 	req := httptest.NewRequest(http.MethodGet, "/file-0", nil)
@@ -145,19 +145,19 @@ func runBenchmarkRequest(b *testing.B, router *gin.Engine, path string) {
 
 // BenchmarkServerNotFound benchmarks 404 responses.
 func BenchmarkServerNotFound(b *testing.B) {
-	_, router := newBenchmarkServer(b, 50)
+	router := newBenchmarkServer(b)
 	runBenchmarkRequest(b, router, "/nonexistent-file")
 }
 
 // BenchmarkServerHealthCheck benchmarks the health endpoint.
 func BenchmarkServerHealthCheck(b *testing.B) {
-	_, router := newBenchmarkServer(b, 50)
+	router := newBenchmarkServer(b)
 	runBenchmarkRequest(b, router, "/health")
 }
 
 // BenchmarkServerConcurrent benchmarks concurrent requests.
 func BenchmarkServerConcurrent(b *testing.B) {
-	_, router := newBenchmarkServer(b, 50)
+	router := newBenchmarkServer(b)
 
 	paths := []string{"/", "/file-0", "/file-1", "/file-2", "/health"}
 
@@ -176,7 +176,7 @@ func BenchmarkServerConcurrent(b *testing.B) {
 
 // BenchmarkServerMixedWorkload simulates realistic traffic mix.
 func BenchmarkServerMixedWorkload(b *testing.B) {
-	_, router := newBenchmarkServer(b, 50)
+	router := newBenchmarkServer(b)
 
 	// Mix of different request types with weights
 	requests := []struct {

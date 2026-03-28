@@ -9,6 +9,7 @@
 A type-safe, high-performance Go web server that converts markdown files into a navigable website with syntax highlighting, search, and caching.
 
 **Key Technologies:**
+
 - Go 1.26.1 with modules
 - Gin web framework for HTTP routing
 - Goldmark + Chroma for markdown rendering with syntax highlighting
@@ -134,6 +135,7 @@ Access via typed accessors: `do.MustInvoke[*config.Config](c.injector)`
 ### Repository Pattern
 
 Content stored in `internal/content/` with interface:
+
 ```go
 type Repository interface {
     Get(path domain.URLPath) (domain.ContentNode, error)
@@ -144,12 +146,14 @@ type Repository interface {
 ```
 
 Implementations:
+
 - `FileSystemRepository` - reads from disk
 - `InMemoryRepository` - for testing
 
 ### Domain Types
 
 Domain types in `internal/domain/`:
+
 - `URLPath` - validated URL paths (prevents traversal)
 - `DirectoryNode` / `FileNode` - content nodes with hierarchy
 - `NodeKind` - enum (directory/file)
@@ -157,11 +161,13 @@ Domain types in `internal/domain/`:
 ### Error Handling
 
 Uses `cockroachdb/errors` for wrapped errors with stack traces:
+
 ```go
 return nil, errors.Wrap(err, "failed to create filesystem repository")
 ```
 
 Sentinel errors defined at package level:
+
 ```go
 var ErrContentNotFound = errors.New("content not found")
 ```
@@ -169,11 +175,13 @@ var ErrContentNotFound = errors.New("content not found")
 ### Template Rendering
 
 Uses `a-h/templ` for type-safe templates. After editing `.templ` files:
+
 ```bash
 templ generate
 ```
 
 Templates receive typed props structs:
+
 ```go
 type FileViewProps struct {
     Layout LayoutProps
@@ -185,6 +193,7 @@ type FileViewProps struct {
 ### Logging
 
 Uses `charm.land/log` which implements `slog.Handler`:
+
 ```go
 logger := slog.New(logger)  // charmbracelet/log implements slog.Handler
 ```
@@ -195,17 +204,17 @@ Log levels via `-log-level` flag or `CYBERDOM_LOG_LEVEL` env var.
 
 ## Naming Conventions
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| Package names | lowercase, single word | `cache`, `domain`, `server` |
-| Interface names | PascalCase | `Repository`, `ContentNode` |
-| Struct names | PascalCase | `FileNode`, `HTMLCache` |
-| Function names | PascalCase (exported), camelCase (unexported) | `NewServer`, `handleContentByPath` |
-| Variable names | camelCase | `urlPath`, `searchResults` |
-| Constants | PascalCase or SCREAMING_SNAKE | `idleTimeout`, `ErrContentNotFound` |
-| Test files | `*_test.go` | `handlers_test.go` |
-| Test functions | `TestXxx` | `TestHealthEndpoint` |
-| Benchmark functions | `BenchmarkXxx` | `BenchmarkRepositoryRefresh` |
+| Element             | Convention                                    | Example                             |
+| ------------------- | --------------------------------------------- | ----------------------------------- |
+| Package names       | lowercase, single word                        | `cache`, `domain`, `server`         |
+| Interface names     | PascalCase                                    | `Repository`, `ContentNode`         |
+| Struct names        | PascalCase                                    | `FileNode`, `HTMLCache`             |
+| Function names      | PascalCase (exported), camelCase (unexported) | `NewServer`, `handleContentByPath`  |
+| Variable names      | camelCase                                     | `urlPath`, `searchResults`          |
+| Constants           | PascalCase or SCREAMING_SNAKE                 | `idleTimeout`, `ErrContentNotFound` |
+| Test files          | `*_test.go`                                   | `handlers_test.go`                  |
+| Test functions      | `TestXxx`                                     | `TestHealthEndpoint`                |
+| Benchmark functions | `BenchmarkXxx`                                | `BenchmarkRepositoryRefresh`        |
 
 ---
 
@@ -223,6 +232,7 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 ### HTTP Testing
 
 Uses `net/http/httptest`:
+
 ```go
 req := httptest.NewRequest(http.MethodGet, "/health", nil)
 rec := httptest.NewRecorder()
@@ -258,6 +268,7 @@ Use `t.Parallel()` in tests (required by paralleltest linter).
 ### 1. URLPath Validation
 
 All paths go through `domain.NewURLPath()` which prevents directory traversal:
+
 ```go
 urlPath, err := domain.NewURLPath(filepath)
 // Returns ErrInvalidPath if contains ".." or invalid chars
@@ -277,6 +288,7 @@ File watcher only runs in dev mode (`-dev` flag). It refreshes the content repos
 ### 4. Frontmatter Support
 
 Markdown files support YAML frontmatter:
+
 ```yaml
 ---
 title: "Page Title"
@@ -290,6 +302,7 @@ draft: false
 ### 5. Templ Generation
 
 After editing `templates/*.templ` files, run:
+
 ```bash
 templ generate
 ```
@@ -308,46 +321,47 @@ The server handles SIGINT/SIGTERM and waits up to 30 seconds for in-flight reque
 
 ### Flags
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-port` | 8080 | HTTP server port |
-| `-root` | `.` | Root directory with markdown files |
-| `-log-level` | info | debug, info, warn, error |
-| `-cache` | true | Enable HTML caching |
-| `-dev` | false | Dev mode (no cache, file watching) |
-| `-timeout` | 30s | Request timeout |
+| Flag         | Default | Description                        |
+| ------------ | ------- | ---------------------------------- |
+| `-port`      | 8080    | HTTP server port                   |
+| `-root`      | `.`     | Root directory with markdown files |
+| `-log-level` | info    | debug, info, warn, error           |
+| `-cache`     | true    | Enable HTML caching                |
+| `-dev`       | false   | Dev mode (no cache, file watching) |
+| `-timeout`   | 30s     | Request timeout                    |
 
 ### Environment Variables
 
 Prefix: `CYBERDOM_`
 
-| Variable | Description |
-|----------|-------------|
-| `CYBERDOM_PORT` | Server port |
-| `CYBERDOM_ROOT` | Root directory |
-| `CYBERDOM_LOG_LEVEL` | Log level |
-| `CYBERDOM_CACHE` | Enable caching |
-| `CYBERDOM_DEV` | Dev mode |
-| `CYBERDOM_TIMEOUT` | Request timeout |
+| Variable             | Description     |
+| -------------------- | --------------- |
+| `CYBERDOM_PORT`      | Server port     |
+| `CYBERDOM_ROOT`      | Root directory  |
+| `CYBERDOM_LOG_LEVEL` | Log level       |
+| `CYBERDOM_CACHE`     | Enable caching  |
+| `CYBERDOM_DEV`       | Dev mode        |
+| `CYBERDOM_TIMEOUT`   | Request timeout |
 
 ---
 
 ## HTTP API
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Root directory view |
-| `/*path` | GET | Content (markdown or directory) |
-| `/health` | GET | Health check |
-| `/refresh` | GET/POST | Refresh content (rate limited) |
-| `/search` | GET | Search content (`?q=query`) |
-| `/static/*path` | GET | Static assets |
+| Endpoint        | Method   | Description                     |
+| --------------- | -------- | ------------------------------- |
+| `/`             | GET      | Root directory view             |
+| `/*path`        | GET      | Content (markdown or directory) |
+| `/health`       | GET      | Health check                    |
+| `/refresh`      | GET/POST | Refresh content (rate limited)  |
+| `/search`       | GET      | Search content (`?q=query`)     |
+| `/static/*path` | GET      | Static assets                   |
 
 ---
 
 ## Quality Gates
 
 Before declaring complete:
+
 - [ ] `go test ./...` passes
 - [ ] `golangci-lint run ./...` passes (or documented exceptions in `.golangci.yml`)
 - [ ] `templ generate` succeeds (if templates changed)
