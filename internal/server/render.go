@@ -106,9 +106,13 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 }
 
 func (s *Server) renderSearch(c *gin.Context, query string, results []content.SearchResult) {
+	crumbs := domain.BuildBreadcrumbs(domain.MustURLPath("/search"))
+
 	props := templates.LayoutProps{
 		Title:       "Search",
 		Description: "Search content",
+		Breadcrumbs: crumbs,
+		ActivePath:  domain.MustURLPath("/search"),
 		ShowNav:     false,
 	}
 

@@ -24,7 +24,7 @@ func createBenchmarkTestContent(b *testing.B, fileCount int) string {
 			subDir = filepath.Join(subDir, "subdir")
 		}
 
-		err := os.MkdirAll(subDir, 0o755)
+		err := os.MkdirAll(subDir, 0o750)
 		if err != nil {
 			b.Fatalf("failed to create subdir: %v", err)
 		}
@@ -113,14 +113,9 @@ This file contains ` + padNum(index) + ` unique identifiers for testing.
 `
 }
 
+// padNum converts a number to a 3-digit zero-padded string.
 func padNum(n int) string {
-	if n < 10 {
-		return "00" + string(rune('0'+n))
-	} else if n < 100 {
-		return "0" + string(rune('0'+n/10)) + string(rune('0'+n%10))
-	}
-
-	return string(rune('0'+n/100)) + string(rune('0'+(n/10)%10)) + string(rune('0'+n%10))
+	return fmt.Sprintf("%03d", n)
 }
 
 // BenchmarkRepositoryRefresh benchmarks the content tree refresh operation.
