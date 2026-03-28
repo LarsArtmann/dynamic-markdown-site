@@ -104,13 +104,7 @@ func BenchmarkServerFileRequest(b *testing.B) {
 
 	for _, path := range paths {
 		b.Run("path_"+path, func(b *testing.B) {
-			b.ResetTimer()
-
-			for range b.N {
-				req := httptest.NewRequest(http.MethodGet, path, nil)
-				w := httptest.NewRecorder()
-				router.ServeHTTP(w, req)
-			}
+			runBenchmarkRequest(b, router, path)
 		})
 	}
 }
@@ -124,11 +118,7 @@ func BenchmarkServerCachedRequest(b *testing.B) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	for b.Loop() {
-		req := httptest.NewRequest(http.MethodGet, "/file-0", nil)
-		w := httptest.NewRecorder()
-		router.ServeHTTP(w, req)
-	}
+	runBenchmarkRequest(b, router, "/file-0")
 }
 
 // runBenchmarkRequest executes a benchmark for a single HTTP GET request to the given path.
