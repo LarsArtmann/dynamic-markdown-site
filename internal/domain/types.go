@@ -58,3 +58,8 @@ var (
 	// ErrEmptyPath is returned when a path is empty.
 	ErrEmptyPath = errors.New("path cannot be empty")
 )
+
+// HTML represents pre-escaped HTML content.
+// This type is used to mark strings that contain pre-escaped HTML,
+// distinguishing them from plain text strings that should be escaped.
+type HTML string
