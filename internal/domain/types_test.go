@@ -11,6 +11,13 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
+func assertTitle(t *testing.T, gotTitle string, wantTitle string, constructor string) {
+	t.Helper()
+	if gotTitle != wantTitle {
+		t.Errorf("%s().Title() = %q, want %q", constructor, gotTitle, wantTitle)
+	}
+}
+
 func TestURLPath_NewURLPath(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -303,12 +310,14 @@ func TestDirectoryNode_NewDirectoryNode(t *testing.T) {
 				return
 			}
 
-			if !tt.wantErr && got.Title() != tt.wantTitle {
-				t.Errorf("NewDirectoryNode().Title() = %q, want %q", got.Title(), tt.wantTitle)
+			if !tt.wantErr {
+				assertTitle(t, got.Title(), tt.wantTitle, "NewDirectoryNode")
 			}
 		})
 	}
 }
+
+
 
 func TestDirectoryNode_AddChild(t *testing.T) {
 	root, _ := domain.NewDirectoryNode(domain.MustURLPath("/"), "Root", time.Now())
@@ -383,8 +392,8 @@ func TestFileNode_NewFileNode(t *testing.T) {
 				return
 			}
 
-			if !tt.wantErr && got.Title() != tt.wantTitle {
-				t.Errorf("NewFileNode().Title() = %q, want %q", got.Title(), tt.wantTitle)
+			if !tt.wantErr {
+				assertTitle(t, got.Title(), tt.wantTitle, "NewFileNode")
 			}
 		})
 	}
