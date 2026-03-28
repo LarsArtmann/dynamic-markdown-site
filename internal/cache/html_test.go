@@ -17,6 +17,14 @@ func newTestContent(html string) RenderedContent {
 	}
 }
 
+// assertContentEqual compares two RenderedContent values for equality.
+func assertContentEqual(t *testing.T, got, want RenderedContent) {
+	t.Helper()
+	if string(got.HTML) != string(want.HTML) {
+		t.Errorf("Expected HTML %q, got %q", want.HTML, got.HTML)
+	}
+}
+
 // statsTestCase represents a test case for Stats methods.
 type statsTestCase struct {
 	name     string
@@ -47,6 +55,7 @@ func runStatsTests(
 }
 
 func TestNewHTMLCache(t *testing.T) {
+	t.Parallel()
 	t.Run("creates empty cache", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
@@ -61,6 +70,7 @@ func TestNewHTMLCache(t *testing.T) {
 }
 
 func TestHTMLCache_Get(t *testing.T) {
+	t.Parallel()
 	t.Run("returns nil for missing key", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
@@ -83,9 +93,7 @@ func TestHTMLCache_Get(t *testing.T) {
 			t.Fatal("Expected non-nil result after Set")
 		}
 
-		if string(result.HTML) != string(content.HTML) {
-			t.Errorf("Expected HTML %q, got %q", content.HTML, result.HTML)
-		}
+		assertContentEqual(t, *result, content)
 	})
 
 	t.Run("returns nil after InvalidateAll", func(t *testing.T) {
@@ -104,6 +112,7 @@ func TestHTMLCache_Get(t *testing.T) {
 }
 
 func TestHTMLCache_Set(t *testing.T) {
+	t.Parallel()
 	t.Run("stores value correctly", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
@@ -148,6 +157,7 @@ func TestHTMLCache_Set(t *testing.T) {
 }
 
 func TestHTMLCache_GetOrCompute(t *testing.T) {
+	t.Parallel()
 	t.Run("computes on miss", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
@@ -175,9 +185,7 @@ func TestHTMLCache_GetOrCompute(t *testing.T) {
 			t.Fatal("Expected non-nil result")
 		}
 
-		if string(result.HTML) != string(content.HTML) {
-			t.Errorf("Expected %q, got %q", content.HTML, result.HTML)
-		}
+		assertContentEqual(t, *result, content)
 	})
 
 	t.Run("returns cached on hit", func(t *testing.T) {
@@ -233,6 +241,7 @@ func TestHTMLCache_GetOrCompute(t *testing.T) {
 }
 
 func TestHTMLCache_Stats(t *testing.T) {
+	t.Parallel()
 	t.Run("returns zero stats initially", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
@@ -307,6 +316,7 @@ func TestStats_Requests(t *testing.T) {
 }
 
 func TestHTMLCache_EstimatedSize(t *testing.T) {
+	t.Parallel()
 	t.Run("returns correct size", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
@@ -337,6 +347,7 @@ func TestHTMLCache_EstimatedSize(t *testing.T) {
 }
 
 func TestHTMLCache_InvalidateAll(t *testing.T) {
+	t.Parallel()
 	t.Run("clears all entries", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
@@ -358,6 +369,7 @@ func TestHTMLCache_InvalidateAll(t *testing.T) {
 }
 
 func TestHTMLCache_Concurrent(t *testing.T) {
+	t.Parallel()
 	t.Run("concurrent Get/Set operations", func(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(1000)

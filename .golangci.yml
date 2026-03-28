@@ -133,6 +133,9 @@ linters:
       - path: "internal/content/search_test.go"
         linters: [funlen]
         text: "Function 'TestSearcher_Search' is too long"
+      - path: "internal/content/filesystem_test.go"
+        linters: [funlen]
+        text: "Function 'TestFileSystemRepository_Get' is too long"
       # gochecknoinits: Test init functions for benchmark setup
       - path: "(.*)_test\\.go"
         linters: [gochecknoinits]

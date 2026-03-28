@@ -6,6 +6,7 @@ import (
 )
 
 func TestNewGoldmarkRenderer(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 	if renderer == nil {
 		t.Fatal("NewGoldmarkRenderer() returned nil")
@@ -17,6 +18,7 @@ func TestNewGoldmarkRenderer(t *testing.T) {
 }
 
 func TestRenderBasicMarkdown(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	tests := []struct {
@@ -104,6 +106,7 @@ func TestRenderBasicMarkdown(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result, err := renderer.Render([]byte(tt.input))
 			if err != nil {
 				t.Fatalf("Render() error: %v", err)
@@ -117,6 +120,7 @@ func TestRenderBasicMarkdown(t *testing.T) {
 }
 
 func TestRenderWithFrontmatter(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `---
@@ -164,6 +168,7 @@ Body text here.`
 }
 
 func TestRenderFrontmatterMissing(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `# No Frontmatter
@@ -193,6 +198,7 @@ Just content.`
 }
 
 func TestRenderTOC(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `# Main Title
@@ -266,6 +272,7 @@ More content.
 }
 
 func TestRenderTOCEmpty(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `Just a paragraph with no headings.`
@@ -281,6 +288,7 @@ func TestRenderTOCEmpty(t *testing.T) {
 }
 
 func TestGenerateAnchorID(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		input    string
 		expected string
@@ -297,6 +305,7 @@ func TestGenerateAnchorID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
 			result := generateAnchorID(tt.input)
 			if result != tt.expected {
 				t.Errorf("generateAnchorID(%q) = %q, want %q", tt.input, result, tt.expected)
@@ -306,6 +315,7 @@ func TestGenerateAnchorID(t *testing.T) {
 }
 
 func TestExtractHeadingText(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	// Parse a simple heading to get the AST node
@@ -327,6 +337,7 @@ func TestExtractHeadingText(t *testing.T) {
 }
 
 func TestRenderResultStructure(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `---
@@ -357,6 +368,7 @@ Content.`
 }
 
 func TestRenderEmptyInput(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	result, err := renderer.Render([]byte(""))
@@ -370,6 +382,7 @@ func TestRenderEmptyInput(t *testing.T) {
 }
 
 func TestRenderCodeBlockWithLanguage(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := "```go\npackage main\n\nfunc main() {}\n```"
@@ -391,6 +404,7 @@ func TestRenderCodeBlockWithLanguage(t *testing.T) {
 }
 
 func TestRenderTable(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `| Name | Age |
@@ -420,6 +434,7 @@ func TestRenderTable(t *testing.T) {
 // SimpleRenderer tests
 
 func TestNewSimpleRenderer(t *testing.T) {
+	t.Parallel()
 	renderer := NewSimpleRenderer()
 	if renderer == nil {
 		t.Fatal("NewSimpleRenderer() returned nil")
@@ -431,6 +446,7 @@ func TestNewSimpleRenderer(t *testing.T) {
 }
 
 func TestSimpleRendererRender(t *testing.T) {
+	t.Parallel()
 	renderer := NewSimpleRenderer()
 
 	input := "# Title\n\nParagraph with **bold**."
@@ -467,6 +483,7 @@ func assertSimpleRendererContains(t *testing.T, input, expected, errMsg string) 
 }
 
 func TestSimpleRendererTable(t *testing.T) {
+	t.Parallel()
 	assertSimpleRendererContains(
 		t,
 		"| A | B |\n|---|---|\n| 1 | 2 |",
@@ -476,6 +493,7 @@ func TestSimpleRendererTable(t *testing.T) {
 }
 
 func TestSimpleRendererStrikethrough(t *testing.T) {
+	t.Parallel()
 	assertSimpleRendererContains(
 		t,
 		"~~strikethrough~~",
@@ -487,6 +505,7 @@ func TestSimpleRendererStrikethrough(t *testing.T) {
 // Integration tests
 
 func TestRenderComplexDocument(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `---
@@ -578,6 +597,7 @@ The end.
 // Domain type verification
 
 func TestRenderResultImplementsDomainTypes(t *testing.T) {
+	t.Parallel()
 	renderer := NewGoldmarkRenderer()
 
 	input := `---

@@ -50,6 +50,7 @@ func newFailingTestServer(t *testing.T) *gin.Engine {
 }
 
 func TestHealthEndpoint(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -66,6 +67,7 @@ func TestHealthEndpoint(t *testing.T) {
 }
 
 func TestRefreshEndpoint(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -89,6 +91,7 @@ func TestRefreshEndpoint(t *testing.T) {
 }
 
 func TestRefreshRateLimit(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -111,12 +114,19 @@ func TestRefreshRateLimit(t *testing.T) {
 		t.Errorf("rate limited request: status = %d, want %d", rec.Code, http.StatusTooManyRequests)
 	}
 
-	if !strings.Contains(rec.Body.String(), "rate limit exceeded") {
-		t.Errorf("body = %s, want to contain 'rate limit exceeded'", rec.Body.String())
+	assertBodyContains(t, rec.Body.String(), "rate limit exceeded")
+}
+
+// assertBodyContains asserts that body contains the given substring.
+func assertBodyContains(t *testing.T, body, substring string) {
+	t.Helper()
+	if !strings.Contains(body, substring) {
+		t.Errorf("body = %s, want to contain %q", body, substring)
 	}
 }
 
 func TestRootEndpoint(t *testing.T) {
+	t.Parallel()
 	runStatusTestSuite(t, []statusTestCase{
 		{
 			name:       "GET / returns 200",
@@ -212,15 +222,6 @@ func TestContentNotFound(t *testing.T) {
 			path:       "/some/deep/path/that/does/not/exist",
 			wantStatus: http.StatusNotFound,
 		},
-	}
-
-	runStatusTestSuite(t, testCases)
-}
-
-func TestPathTraversalProtection(t *testing.T) {
-	t.Parallel()
-
-	testCases := []statusTestCase{
 		{
 			name:       "path traversal with .. returns 404",
 			path:       "/static/../secret",
@@ -237,6 +238,7 @@ func TestPathTraversalProtection(t *testing.T) {
 }
 
 func TestContentWithFile(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 
 	filePath := domain.MustURLPath("/test-file")
@@ -282,6 +284,7 @@ func TestContentWithFile(t *testing.T) {
 }
 
 func TestContentWithDirectory(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 
 	dirPath := domain.MustURLPath("/test-dir")
@@ -326,6 +329,7 @@ func TestContentWithDirectory(t *testing.T) {
 }
 
 func TestStaticFileServing(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -341,6 +345,7 @@ func TestStaticFileServing(t *testing.T) {
 }
 
 func TestMethodNotAllowed(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -362,6 +367,7 @@ func TestMethodNotAllowed(t *testing.T) {
 }
 
 func TestSearchEndpoint(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 
 	// Add test files for search
@@ -421,6 +427,7 @@ func TestSearchEndpoint(t *testing.T) {
 }
 
 func TestRefreshEndpointFailure(t *testing.T) {
+	t.Parallel()
 	// Test when refresh fails
 	repo := &FailingRepository{refreshError: true}
 	logger := slog.New(slog.DiscardHandler)
@@ -437,12 +444,11 @@ func TestRefreshEndpointFailure(t *testing.T) {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusInternalServerError)
 	}
 
-	if !strings.Contains(rec.Body.String(), "error") {
-		t.Errorf("body should contain 'error', got: %s", rec.Body.String())
-	}
+	assertBodyContains(t, rec.Body.String(), "error")
 }
 
 func TestRootEndpointError(t *testing.T) {
+	t.Parallel()
 	router := newFailingTestServer(t)
 
 	runStatusTests(t, router, []statusTestCase{
@@ -455,6 +461,7 @@ func TestRootEndpointError(t *testing.T) {
 }
 
 func TestSearchEndpointError(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
@@ -483,6 +490,7 @@ func TestSearchEndpointError(t *testing.T) {
 }
 
 func TestHandle500(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 
@@ -500,6 +508,7 @@ func TestHandle500(t *testing.T) {
 }
 
 func TestGetContentType(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		path     string
 		expected string
@@ -519,6 +528,7 @@ func TestGetContentType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.path, func(t *testing.T) {
+			t.Parallel()
 			result := getContentType(tt.path)
 			if result != tt.expected {
 				t.Errorf("getContentType(%s) = %q, want %q", tt.path, result, tt.expected)
@@ -528,6 +538,7 @@ func TestGetContentType(t *testing.T) {
 }
 
 func TestStaticPathTraversal(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -542,6 +553,7 @@ func TestStaticPathTraversal(t *testing.T) {
 }
 
 func TestRateLimiterCleanupTriggered(t *testing.T) {
+	t.Parallel()
 	_ = t // Unused but kept for test function signature
 	// Create rate limiter with very short cleanup interval
 	rl := newRateLimiter(10, 10*time.Millisecond)
@@ -562,6 +574,7 @@ func TestRateLimiterCleanupTriggered(t *testing.T) {
 }
 
 func TestContentByPathNonNotFoundError(t *testing.T) {
+	t.Parallel()
 	router := newFailingTestServer(t)
 
 	runStatusTests(t, router, []statusTestCase{
@@ -574,6 +587,7 @@ func TestContentByPathNonNotFoundError(t *testing.T) {
 }
 
 func TestRenderFileWithCache(t *testing.T) {
+	t.Parallel()
 	repo := content.NewInMemoryRepository()
 
 	filePath := domain.MustURLPath("/cached-file")
@@ -624,6 +638,7 @@ func TestRenderFileWithCache(t *testing.T) {
 }
 
 func TestStaticFileDirectoryReturns404(t *testing.T) {
+	t.Parallel()
 	runStatusTestSuite(t, []statusTestCase{
 		{
 			name:       "GET /static/ returns 404",
