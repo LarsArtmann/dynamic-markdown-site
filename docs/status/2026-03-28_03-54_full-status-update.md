@@ -19,32 +19,32 @@ Sat Mar 28 03:54:39 CET 2026
 
 ### 1. Project Infrastructure
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Go module structure | ✅ | go 1.26.1, proper dependency management |
-| DI Container | ✅ | `internal/container` - samber/do/v2 based |
-| Server (Gin) | ✅ | `internal/server` with handlers, rate limiting |
-| Markdown Rendering | ✅ | `internal/renderer` with Goldmark + syntax highlighting |
-| Content Repository | ✅ | `internal/content` with filesystem + memory backends |
-| File Watcher | ✅ | `cmd/dynamic-markdown-site/watcher.go` - fsnotify based |
-| Domain Types | ✅ | `internal/domain` - URL paths, directories, files, trees |
-| Caching | ✅ | `internal/cache` - HTML cache with otter |
-| Config | ✅ | `internal/config` - Environment + CLI flags |
-| Templating | ✅ | `templates/layout.templ` via a-h/templ |
+| Component           | Status | Notes                                                    |
+| ------------------- | ------ | -------------------------------------------------------- |
+| Go module structure | ✅     | go 1.26.1, proper dependency management                  |
+| DI Container        | ✅     | `internal/container` - samber/do/v2 based                |
+| Server (Gin)        | ✅     | `internal/server` with handlers, rate limiting           |
+| Markdown Rendering  | ✅     | `internal/renderer` with Goldmark + syntax highlighting  |
+| Content Repository  | ✅     | `internal/content` with filesystem + memory backends     |
+| File Watcher        | ✅     | `cmd/dynamic-markdown-site/watcher.go` - fsnotify based  |
+| Domain Types        | ✅     | `internal/domain` - URL paths, directories, files, trees |
+| Caching             | ✅     | `internal/cache` - HTML cache with otter                 |
+| Config              | ✅     | `internal/config` - Environment + CLI flags              |
+| Templating          | ✅     | `templates/layout.templ` via a-h/templ                   |
 
 ### 2. Testing
 
-| Package | Coverage | Tests | Status |
-|---------|----------|-------|--------|
-| `internal/cache` | N/A | ~5 | ✅ Pass |
-| `internal/config` | N/A | ~20 | ✅ Pass |
-| `internal/container` | 0.0%* | ~5 | ✅ Pass |
-| `internal/content` | 80.3% | ~25 | ✅ Pass |
-| `internal/domain` | 87.9% | ~50 | ✅ Pass |
-| `internal/renderer` | 92.9% | ~21 | ✅ Pass |
-| `internal/server` | 85.7% | ~30 | ✅ Pass |
+| Package              | Coverage | Tests | Status  |
+| -------------------- | -------- | ----- | ------- |
+| `internal/cache`     | N/A      | ~5    | ✅ Pass |
+| `internal/config`    | N/A      | ~20   | ✅ Pass |
+| `internal/container` | 0.0%\*   | ~5    | ✅ Pass |
+| `internal/content`   | 80.3%    | ~25   | ✅ Pass |
+| `internal/domain`    | 87.9%    | ~50   | ✅ Pass |
+| `internal/renderer`  | 92.9%    | ~21   | ✅ Pass |
+| `internal/server`    | 85.7%    | ~30   | ✅ Pass |
 
-*Container tests don't measure coverage properly
+\*Container tests don't measure coverage properly
 
 ### 3. Code Quality
 
@@ -55,13 +55,13 @@ Sat Mar 28 03:54:39 CET 2026
 
 ### 4. Recent Commits (Last 5)
 
-| Commit | Message |
-|--------|---------|
+| Commit    | Message                                                                       |
+| --------- | ----------------------------------------------------------------------------- |
 | `0e11db5` | refactor: Configure golangci-lint exclusions for complexity and test patterns |
-| `ab50c65` | refactor: Code formatting and test parallelization cleanup (9 files) |
-| `33c8e58` | refactor: Clean up test code and add comprehensive status report |
-| `4c58aec` | refactor: Restructure command directory and modernize test patterns |
-| `aa526ae` | refactor: Use package-local type reference in FileNode |
+| `ab50c65` | refactor: Code formatting and test parallelization cleanup (9 files)          |
+| `33c8e58` | refactor: Clean up test code and add comprehensive status report              |
+| `4c58aec` | refactor: Restructure command directory and modernize test patterns           |
+| `aa526ae` | refactor: Use package-local type reference in FileNode                        |
 
 ### 5. Dependencies (14 Direct)
 
@@ -133,13 +133,13 @@ Sat Mar 28 03:54:39 CET 2026
 
 ### 4. Feature Backlog Items
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Database persistence | Low | Currently only in-memory |
-| Multi-language support | Low | i18n not implemented |
-| Full-text search with stemming | Medium | Basic search exists |
-| Mobile-responsive improvements | Medium | CSS exists but may need work |
-| OpenAPI documentation | Low | Not generated |
+| Item                           | Priority | Notes                        |
+| ------------------------------ | -------- | ---------------------------- |
+| Database persistence           | Low      | Currently only in-memory     |
+| Multi-language support         | Low      | i18n not implemented         |
+| Full-text search with stemming | Medium   | Basic search exists          |
+| Mobile-responsive improvements | Medium   | CSS exists but may need work |
+| OpenAPI documentation          | Low      | Not generated                |
 
 ---
 
@@ -147,13 +147,13 @@ Sat Mar 28 03:54:39 CET 2026
 
 ### 1. **LSP Diagnostics - "parallel golangci-lint is running"**
 
-| Aspect | Details |
-|--------|---------|
-| **Severity** | 🔴 High |
-| **Impact** | LSP (gopls) shows errors in all files |
-| **Root Cause** | golangci-lint running in parallel with LSP |
-| **Workaround** | Kill golangci-lint processes, set `allow-parallel-runners: false` in .golangci.yml |
-| **Fix Applied** | `.golangci.yml` line 6: `allow-parallel-runners: false` |
+| Aspect          | Details                                                                            |
+| --------------- | ---------------------------------------------------------------------------------- |
+| **Severity**    | 🔴 High                                                                            |
+| **Impact**      | LSP (gopls) shows errors in all files                                              |
+| **Root Cause**  | golangci-lint running in parallel with LSP                                         |
+| **Workaround**  | Kill golangci-lint processes, set `allow-parallel-runners: false` in .golangci.yml |
+| **Fix Applied** | `.golangci.yml` line 6: `allow-parallel-runners: false`                            |
 
 ### 2. **Go Version Mismatch (Warning)**
 
@@ -161,21 +161,21 @@ Sat Mar 28 03:54:39 CET 2026
 compile: version "go1.26.1" does not match go tool version "go1.26.0"
 ```
 
-| Aspect | Details |
-|--------|---------|
-| **Severity** | 🟡 Medium |
-| **Impact** | Warnings in coverage output, possible compilation issues |
-| **Root Cause** | Go toolchain version mismatch |
-| **Fix** | Ensure `go1.26.1` toolchain is used consistently |
+| Aspect         | Details                                                  |
+| -------------- | -------------------------------------------------------- |
+| **Severity**   | 🟡 Medium                                                |
+| **Impact**     | Warnings in coverage output, possible compilation issues |
+| **Root Cause** | Go toolchain version mismatch                            |
+| **Fix**        | Ensure `go1.26.1` toolchain is used consistently         |
 
 ### 3. **Command Directory Inconsistency**
 
-| Aspect | Details |
-|--------|---------|
-| **Issue** | Two different cmd paths mentioned in docs |
-| **Current** | `cmd/dynamic-markdown-site/` (correct) |
-| **Old** | `cmd/server/` (outdated in some files) |
-| **Status** | Resolved - files are in correct location |
+| Aspect      | Details                                   |
+| ----------- | ----------------------------------------- |
+| **Issue**   | Two different cmd paths mentioned in docs |
+| **Current** | `cmd/dynamic-markdown-site/` (correct)    |
+| **Old**     | `cmd/server/` (outdated in some files)    |
+| **Status**  | Resolved - files are in correct location  |
 
 ---
 
@@ -261,21 +261,25 @@ compile: version "go1.26.1" does not match go tool version "go1.26.0"
 ### Why does `b.TempDir()` in Go benchmarks NOT require manual cleanup?
 
 **Context:**
+
 - In `repository_bench_test.go`, we removed `defer cleanup()` calls
 - `b.TempDir()` is documented to auto-cleanup via `b.Cleanup()`
 - But `createBenchmarkTestContent()` creates nested directories with `os.MkdirAll()`
 
 **What I need to know:**
+
 1. Does `b.TempDir()` cleanup recursively handle all nested directories?
 2. Is there any scenario where manual cleanup is still required?
 3. Should we add explicit verification that cleanup occurred?
 
 **Why this matters:**
+
 - Benchmarks run multiple iterations (b.N)
 - If cleanup fails, accumulated temp directories waste disk space
 - Need to ensure benchmarks are good citizens
 
 **Research attempted:**
+
 - Checked Go source: `testing.B.TempDir()` uses `b.Cleanup()` internally
 - Verified no `cleanup()` function exists in the file
 - Observed tests pass without the defer calls
@@ -286,16 +290,16 @@ compile: version "go1.26.1" does not match go tool version "go1.26.0"
 
 ## Summary Statistics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Go Version | 1.26.1 (toolchain mismatch) | ⚠️ |
-| Dependencies | 14 direct, 70+ transitive | ✅ |
-| Test Pass Rate | 100% | ✅ |
-| Coverage (avg) | 80-93% on core packages | ✅ |
-| Lint Issues | LSP errors from stuck linter | 🔴 |
-| CI/CD | None | ❌ |
-| Documentation | README is placeholder | ⚠️ |
-| CHANGELOG | Placeholder | ❌ |
+| Metric         | Value                        | Status |
+| -------------- | ---------------------------- | ------ |
+| Go Version     | 1.26.1 (toolchain mismatch)  | ⚠️     |
+| Dependencies   | 14 direct, 70+ transitive    | ✅     |
+| Test Pass Rate | 100%                         | ✅     |
+| Coverage (avg) | 80-93% on core packages      | ✅     |
+| Lint Issues    | LSP errors from stuck linter | 🔴     |
+| CI/CD          | None                         | ❌     |
+| Documentation  | README is placeholder        | ⚠️     |
+| CHANGELOG      | Placeholder                  | ❌     |
 
 ---
 

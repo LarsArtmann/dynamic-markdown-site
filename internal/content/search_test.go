@@ -26,21 +26,21 @@ func newFile(t *testing.T, now time.Time, path, title, content string) *domain.F
 	return node
 }
 
+// setupRepoWithFiles creates an InMemoryRepository and adds the given files as root children.
+func setupRepoWithFiles(files ...*domain.FileNode) *InMemoryRepository {
+	repo := NewInMemoryRepository()
+
+	root, _ := repo.Root()
+	for _, file := range files {
+		root.AddChild(file)
+		repo.Add(file)
+	}
+
+	return repo
+}
+
 func TestSearcher_Search(t *testing.T) {
 	now := time.Now()
-
-	// Helper to set up repository with files as root children
-	setupRepoWithFiles := func(files ...*domain.FileNode) *InMemoryRepository {
-		repo := NewInMemoryRepository()
-
-		root, _ := repo.Root()
-		for _, file := range files {
-			root.AddChild(file)
-			repo.Add(file)
-		}
-
-		return repo
-	}
 
 	tests := []struct {
 		name          string
