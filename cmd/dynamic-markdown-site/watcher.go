@@ -10,10 +10,11 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/fsnotify/fsnotify"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
+	"github.com/larsartmann/dynamic-markdown-site/internal/server"
 )
 
 // watchForChanges monitors the root directory for filesystem changes in dev mode.
-func watchForChanges(rootDir string, repo content.Repository, logger *slog.Logger) {
+func watchForChanges(rootDir string, repo content.Repository, liveReload *server.LiveReload, logger *slog.Logger) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		logger.Error("failed to create file watcher", slog.Any("error", err))
@@ -62,6 +63,11 @@ func watchForChanges(rootDir string, repo content.Repository, logger *slog.Logge
 						slog.Int("total_files", result.TotalFiles),
 						slog.Int("total_dirs", result.TotalDirs),
 					)
+
+					// Notify live reload clients
+					if liveReload != nil {
+						liveReload.Notify("")
+					}
 				}
 
 				refreshPending = false

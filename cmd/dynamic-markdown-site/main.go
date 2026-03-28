@@ -192,7 +192,8 @@ func shutdownServices(svc *services) {
 // startFileWatcher starts the file watcher in dev mode.
 func startFileWatcher(svc *services) {
 	if svc.config.DevMode {
-		go watchForChanges(svc.config.RootDir, svc.repo, svc.logger)
+		liveReload := svc.server.LiveReload()
+		go watchForChanges(svc.config.RootDir, svc.repo, liveReload, svc.logger)
 		svc.logger.Info("file watcher started in dev mode")
 	}
 }

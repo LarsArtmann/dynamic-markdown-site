@@ -23,6 +23,8 @@ type Server struct {
 	logger      *slog.Logger
 	rateLimiter *rateLimiter
 	cache       *cache.HTMLCache
+	liveReload  *LiveReload
+	devMode     bool
 }
 
 // NewServer creates a new HTTP server with dependencies.
@@ -31,8 +33,10 @@ func NewServer(
 	searcher *content.Searcher,
 	log *slog.Logger,
 	cache *cache.HTMLCache,
+	devMode bool,
 ) *Server {
 	rl := newRateLimiter(10, time.Minute)
+	lr := NewLiveReload(log)
 
 	return &Server{
 		repo:        repo,
@@ -41,6 +45,8 @@ func NewServer(
 		logger:      log,
 		rateLimiter: rl,
 		cache:       cache,
+		liveReload:  lr,
+		devMode:     devMode,
 	}
 }
 
@@ -52,7 +58,13 @@ func (s *Server) RegisterRoutes(router *gin.Engine) {
 	router.POST("/refresh", s.handleRefresh)
 	router.GET("/search", s.handleSearch)
 	router.GET("/", s.handleRoot)
+	s.liveReload.RegisterHandler(router)
 	router.NoRoute(s.handle404)
+}
+
+// LiveReload returns the LiveReload instance for external notification.
+func (s *Server) LiveReload() *LiveReload {
+	return s.liveReload
 }
 
 func (s *Server) staticAndContentMiddleware() gin.HandlerFunc {

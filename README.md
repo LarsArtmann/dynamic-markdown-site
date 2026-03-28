@@ -10,7 +10,7 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 - **Structured Logging** — charm.land/log with slog support
 - **Search** — Full-text content search
 - **Caching** — HTML response caching with otter
-- **File Watching** — Live reload in development mode
+- **Live Reload** — Browser auto-reload via SSE in development mode
 
 ## Quick Start
 
@@ -41,14 +41,15 @@ Flags:
 
 ## API Endpoints
 
-| Endpoint        | Method   | Description                     |
-| --------------- | -------- | ------------------------------- |
-| `/`             | GET      | Root directory view             |
-| `/*path`        | GET      | Content (markdown or directory) |
-| `/health`       | GET      | Health check                    |
-| `/refresh`      | GET/POST | Refresh content (rate limited)  |
-| `/search`       | GET      | Search content (`?q=query`)     |
-| `/static/*path` | GET      | Static assets                   |
+| Endpoint          | Method   | Description                          |
+| ----------------- | -------- | ------------------------------------ |
+| `/`               | GET      | Root directory view                  |
+| `/*path`          | GET      | Content (markdown or directory)      |
+| `/health`         | GET      | Health check                         |
+| `/refresh`        | GET/POST | Refresh content (rate limited)       |
+| `/search`         | GET      | Search content (`?q=query`)         |
+| `/static/*path`   | GET      | Static assets                        |
+| `/api/live-reload`| GET      | SSE endpoint for live reload (dev)    |
 
 ## Development
 

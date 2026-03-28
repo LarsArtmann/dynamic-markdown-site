@@ -26,7 +26,7 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
 
-	return NewServer(repo, searcher, logger, cache)
+	return NewServer(repo, searcher, logger, cache, false)
 }
 
 func newTestRouter(s *Server) *gin.Engine {
@@ -43,7 +43,7 @@ func newFailingTestServer(t *testing.T) *gin.Engine {
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
-	server := NewServer(repo, searcher, logger, cache)
+	server := NewServer(repo, searcher, logger, cache, false)
 	router := newTestRouter(server)
 
 	return router
@@ -433,7 +433,7 @@ func TestRefreshEndpointFailure(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
-	server := NewServer(repo, searcher, logger, cache)
+	server := NewServer(repo, searcher, logger, cache, false)
 	router := newTestRouter(server)
 
 	req := httptest.NewRequest(http.MethodGet, "/refresh", nil)
