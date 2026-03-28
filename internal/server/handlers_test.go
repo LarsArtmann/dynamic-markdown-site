@@ -199,7 +199,9 @@ func runStatusTestSuite(t *testing.T, tests []statusTestCase) {
 }
 
 func TestContentNotFound(t *testing.T) {
-	runStatusTestSuite(t, []statusTestCase{
+	t.Parallel()
+
+	testCases := []statusTestCase{
 		{
 			name:       "non-existent file returns 404",
 			path:       "/nonexistent",
@@ -210,11 +212,15 @@ func TestContentNotFound(t *testing.T) {
 			path:       "/some/deep/path/that/does/not/exist",
 			wantStatus: http.StatusNotFound,
 		},
-	})
+	}
+
+	runStatusTestSuite(t, testCases)
 }
 
 func TestPathTraversalProtection(t *testing.T) {
-	runStatusTestSuite(t, []statusTestCase{
+	t.Parallel()
+
+	testCases := []statusTestCase{
 		{
 			name:       "path traversal with .. returns 404",
 			path:       "/static/../secret",
@@ -225,7 +231,9 @@ func TestPathTraversalProtection(t *testing.T) {
 			path:       "/content/../../../etc/passwd",
 			wantStatus: http.StatusNotFound,
 		},
-	})
+	}
+
+	runStatusTestSuite(t, testCases)
 }
 
 func TestContentWithFile(t *testing.T) {
