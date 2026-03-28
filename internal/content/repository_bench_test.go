@@ -268,8 +268,10 @@ func BenchmarkSearcherSearch(b *testing.B) {
 	}
 }
 
-// BenchmarkSearcherSearchTitleOnly benchmarks title-only searches.
-func BenchmarkSearcherSearchTitleOnly(b *testing.B) {
+// runSearchBenchmark creates a repository with test content and benchmarks the search.
+func runSearchBenchmark(b *testing.B, query string) {
+	b.Helper()
+
 	dir := createBenchmarkTestContent(b, 100)
 
 	repo, err := NewFileSystemRepository(dir)
@@ -280,22 +282,16 @@ func BenchmarkSearcherSearchTitleOnly(b *testing.B) {
 	searcher := NewSearcher(repo)
 
 	for b.Loop() {
-		_, _ = searcher.Search("benchmark")
+		_, _ = searcher.Search(query)
 	}
+}
+
+// BenchmarkSearcherSearchTitleOnly benchmarks title-only searches.
+func BenchmarkSearcherSearchTitleOnly(b *testing.B) {
+	runSearchBenchmark(b, "benchmark")
 }
 
 // BenchmarkSearcherSearchContentOnly benchmarks content-only searches.
 func BenchmarkSearcherSearchContentOnly(b *testing.B) {
-	dir := createBenchmarkTestContent(b, 100)
-
-	repo, err := NewFileSystemRepository(dir)
-	if err != nil {
-		b.Fatalf("failed to create repository: %v", err)
-	}
-
-	searcher := NewSearcher(repo)
-
-	for b.Loop() {
-		_, _ = searcher.Search("Lorem ipsum dolor sit amet")
-	}
+	runSearchBenchmark(b, "Lorem ipsum dolor sit amet")
 }

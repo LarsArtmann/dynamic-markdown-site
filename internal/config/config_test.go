@@ -47,38 +47,25 @@ func TestLoadSubprocess(t *testing.T) {
 		}
 	}
 
-	// Run subprocess test with defaults
-	t.Run("default_config", func(t *testing.T) {
-		t.Parallel()
-		runSubprocessTest(t, "with defaults", nil)
-	})
+	tests := []struct {
+		name    string
+		desc    string
+		envVars []string
+	}{
+		{"default_config", "with defaults", nil},
+		{"env_override_port", "with env port", []string{"CYBERDOM_PORT=3000"}},
+		{"env_dev_mode", "with dev mode", []string{"CYBERDOM_DEV=true"}},
+		{"env_cache_disabled", "with cache disabled", []string{"CYBERDOM_CACHE=false"}},
+		{"invalid_port_env", "with invalid port env", []string{"CYBERDOM_PORT=invalid"}},
+		{"custom_timeout_env", "with custom timeout", []string{"CYBERDOM_TIMEOUT=60s"}},
+	}
 
-	// Test with environment variables
-	t.Run("env_override_port", func(t *testing.T) {
-		t.Parallel()
-		runSubprocessTest(t, "with env port", []string{"CYBERDOM_PORT=3000"})
-	})
-
-	t.Run("env_dev_mode", func(t *testing.T) {
-		t.Parallel()
-		runSubprocessTest(t, "with dev mode", []string{"CYBERDOM_DEV=true"})
-	})
-
-	t.Run("env_cache_disabled", func(t *testing.T) {
-		t.Parallel()
-		runSubprocessTest(t, "with cache disabled", []string{"CYBERDOM_CACHE=false"})
-	})
-
-	t.Run("invalid_port_env", func(t *testing.T) {
-		t.Parallel()
-		// This should still succeed - invalid port env is ignored
-		runSubprocessTest(t, "with invalid port env", []string{"CYBERDOM_PORT=invalid"})
-	})
-
-	t.Run("custom_timeout_env", func(t *testing.T) {
-		t.Parallel()
-		runSubprocessTest(t, "with custom timeout", []string{"CYBERDOM_TIMEOUT=60s"})
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			runSubprocessTest(t, tt.desc, tt.envVars)
+		})
+	}
 }
 
 func boolStr(b bool) string {
