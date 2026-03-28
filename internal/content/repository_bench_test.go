@@ -130,7 +130,6 @@ func BenchmarkRepositoryRefresh(b *testing.B) {
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("files_%d", size), func(b *testing.B) {
 			dir := createBenchmarkTestContent(b, size)
-			defer cleanup()
 
 			repo, err := NewFileSystemRepository(dir)
 			if err != nil {
@@ -247,7 +246,6 @@ func BenchmarkSearcherSearch(b *testing.B) {
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("files_%d", size), func(b *testing.B) {
 			dir := createBenchmarkTestContent(b, size)
-			defer cleanup()
 
 			repo, err := NewFileSystemRepository(dir)
 			if err != nil {
