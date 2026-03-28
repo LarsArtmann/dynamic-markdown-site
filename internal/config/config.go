@@ -31,9 +31,9 @@ type Config struct {
 	Timeout      time.Duration
 }
 
-// Load loads configuration from flags, environment, and defaults.
-func Load() (*Config, error) {
-	cfg := &Config{
+// DefaultConfig returns a new Config with default values.
+func DefaultConfig() *Config {
+	return &Config{
 		Port:         8080,
 		RootDir:      ".",
 		LogLevel:     "info",
@@ -41,6 +41,11 @@ func Load() (*Config, error) {
 		DevMode:      false,
 		Timeout:      30 * time.Second,
 	}
+}
+
+// Load loads configuration from flags, environment, and defaults.
+func Load() (*Config, error) {
+	cfg := DefaultConfig()
 
 	// Define flags
 	portFlag := flag.Int("port", int(cfg.Port), "Port to run the server on")

@@ -22,6 +22,14 @@ func runInSubprocess(t *testing.T) {
 	}
 }
 
+// assertNoShutdownError checks that shutdown succeeds or has empty error.
+func assertNoShutdownError(t *testing.T, c *Container) {
+	t.Helper()
+	if err := c.Shutdown(); err != nil && err.Error() != "" {
+		t.Errorf("Shutdown() error: %v", err)
+	}
+}
+
 // TestNew tests that a new container can be created.
 // Note: This test runs in a subprocess because container.New() ultimately
 // calls config.Load() which uses flag.Parse() - and flag.Parse() can only
@@ -39,9 +47,7 @@ func TestNew(t *testing.T) {
 		}
 
 		// Clean shutdown
-		if err := container.Shutdown(); err != nil && err.Error() != "" {
-			t.Errorf("Shutdown() error: %v", err)
-		}
+		assertNoShutdownError(t, container)
 
 		return
 	}
@@ -120,14 +126,10 @@ func TestContainerShutdown(t *testing.T) {
 		_ = container.Cache()
 
 		// Shutdown should succeed (do.ShutdownReport returns non-nil but empty Error() on success)
-		if err := container.Shutdown(); err != nil && err.Error() != "" {
-			t.Errorf("Shutdown() error: %v", err)
-		}
+		assertNoShutdownError(t, container)
 
 		// Second shutdown should be safe (idempotent)
-		if err := container.Shutdown(); err != nil && err.Error() != "" {
-			t.Errorf("Second Shutdown() error: %v", err)
-		}
+		assertNoShutdownError(t, container)
 
 		return
 	}
