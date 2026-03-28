@@ -10,13 +10,10 @@ import (
 )
 
 // createBenchmarkTestContent creates a temporary directory with sample markdown files.
-func createBenchmarkTestContent(b *testing.B, fileCount int) (string, func()) {
+func createBenchmarkTestContent(b *testing.B, fileCount int) string {
 	b.Helper()
 
-	dir, err := os.MkdirTemp("", "dms-bench-*")
-	if err != nil {
-		b.Fatalf("failed to create temp dir: %v", err)
-	}
+	dir := b.TempDir()
 
 	// Create nested directory structure
 	for i := range fileCount {
@@ -43,11 +40,7 @@ func createBenchmarkTestContent(b *testing.B, fileCount int) (string, func()) {
 		}
 	}
 
-	cleanup := func() {
-		_ = os.RemoveAll(dir)
-	}
-
-	return dir, cleanup
+	return dir
 }
 
 func createBenchmarkMarkdown(index int) string {
@@ -136,7 +129,7 @@ func BenchmarkRepositoryRefresh(b *testing.B) {
 
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("files_%d", size), func(b *testing.B) {
-			dir, cleanup := createBenchmarkTestContent(b, size)
+			dir := createBenchmarkTestContent(b, size)
 			defer cleanup()
 
 			repo, err := NewFileSystemRepository(dir)
@@ -155,8 +148,7 @@ func BenchmarkRepositoryRefresh(b *testing.B) {
 
 // BenchmarkRepositoryGet benchmarks content retrieval by path.
 func BenchmarkRepositoryGet(b *testing.B) {
-	dir, cleanup := createBenchmarkTestContent(b, 100)
-	defer cleanup()
+	dir := createBenchmarkTestContent(b, 100)
 
 	repo, err := NewFileSystemRepository(dir)
 	if err != nil {
@@ -187,8 +179,7 @@ func BenchmarkRepositoryGet(b *testing.B) {
 
 // BenchmarkRepositoryRoot benchmarks getting the root directory.
 func BenchmarkRepositoryRoot(b *testing.B) {
-	dir, cleanup := createBenchmarkTestContent(b, 100)
-	defer cleanup()
+	dir := createBenchmarkTestContent(b, 100)
 
 	repo, err := NewFileSystemRepository(dir)
 	if err != nil {
@@ -204,8 +195,7 @@ func BenchmarkRepositoryRoot(b *testing.B) {
 
 // BenchmarkRepositoryRefreshConcurrent benchmarks concurrent refresh operations.
 func BenchmarkRepositoryRefreshConcurrent(b *testing.B) {
-	dir, cleanup := createBenchmarkTestContent(b, 100)
-	defer cleanup()
+	dir := createBenchmarkTestContent(b, 100)
 
 	repo, err := NewFileSystemRepository(dir)
 	if err != nil {
@@ -222,8 +212,7 @@ func BenchmarkRepositoryRefreshConcurrent(b *testing.B) {
 
 // BenchmarkRepositoryGetConcurrent benchmarks concurrent content retrieval.
 func BenchmarkRepositoryGetConcurrent(b *testing.B) {
-	dir, cleanup := createBenchmarkTestContent(b, 100)
-	defer cleanup()
+	dir := createBenchmarkTestContent(b, 100)
 
 	repo, err := NewFileSystemRepository(dir)
 	if err != nil {
@@ -257,7 +246,7 @@ func BenchmarkSearcherSearch(b *testing.B) {
 
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("files_%d", size), func(b *testing.B) {
-			dir, cleanup := createBenchmarkTestContent(b, size)
+			dir := createBenchmarkTestContent(b, size)
 			defer cleanup()
 
 			repo, err := NewFileSystemRepository(dir)
@@ -288,8 +277,7 @@ func BenchmarkSearcherSearch(b *testing.B) {
 
 // BenchmarkSearcherSearchTitleOnly benchmarks title-only searches.
 func BenchmarkSearcherSearchTitleOnly(b *testing.B) {
-	dir, cleanup := createBenchmarkTestContent(b, 100)
-	defer cleanup()
+	dir := createBenchmarkTestContent(b, 100)
 
 	repo, err := NewFileSystemRepository(dir)
 	if err != nil {
@@ -305,8 +293,7 @@ func BenchmarkSearcherSearchTitleOnly(b *testing.B) {
 
 // BenchmarkSearcherSearchContentOnly benchmarks content-only searches.
 func BenchmarkSearcherSearchContentOnly(b *testing.B) {
-	dir, cleanup := createBenchmarkTestContent(b, 100)
-	defer cleanup()
+	dir := createBenchmarkTestContent(b, 100)
 
 	repo, err := NewFileSystemRepository(dir)
 	if err != nil {
