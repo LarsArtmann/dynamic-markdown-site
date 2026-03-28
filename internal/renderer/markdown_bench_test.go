@@ -330,37 +330,30 @@ main();
 	}
 }
 
+// buildTOCMarkdown generates markdown content with the specified number of headings.
+func buildTOCMarkdown(numHeadings int) string {
+	var sb strings.Builder
+	for i := range numHeadings {
+		depth := (i % 4) + 1
+		for range depth {
+			sb.WriteString("#")
+		}
+		sb.WriteString(" Heading " + string(rune('0'+i%10)) + "\n\nContent for section.\n\n")
+	}
+	return sb.String()
+}
+
 // BenchmarkRenderWithLargeTOC benchmarks documents with many headings.
 func BenchmarkRenderWithLargeTOC(b *testing.B) {
 	renderer := NewGoldmarkRenderer()
-
-	var source string
-
-	var sourceSb341 strings.Builder
-
-	for i := range 100 {
-		depth := (i % 4) + 1
-
-		prefix := ""
-
-		var prefixSb344 strings.Builder
-		for range depth {
-			prefixSb344.WriteString("#")
-		}
-
-		prefix += prefixSb344.String()
-
-		sourceSb341.WriteString(
-			prefix + " Heading " + string(rune('0'+i%10)) + "\n\nContent for section.\n\n",
-		)
-	}
-
-	source += sourceSb341.String()
+	source := buildTOCMarkdown(100)
 
 	for b.Loop() {
 		_, _ = renderer.Render([]byte(source))
 	}
 }
+
+
 
 // BenchmarkRenderConcurrent benchmarks concurrent rendering.
 func BenchmarkRenderConcurrent(b *testing.B) {
