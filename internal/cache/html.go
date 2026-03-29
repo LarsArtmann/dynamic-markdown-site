@@ -66,7 +66,7 @@ func (c *HTMLCache) GetOrCompute(
 		),
 	)
 	if err != nil {
-		return nil, errors.Wrap(err, "cache get failed")
+		return nil, errors.Wrapf(err, "cache get failed for path %s", path)
 	}
 
 	return &val, nil

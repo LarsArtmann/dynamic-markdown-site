@@ -149,7 +149,7 @@ func (s *Server) handleRefresh(c *gin.Context) {
 func (s *Server) handleRoot(c *gin.Context) {
 	root, err := s.repo.Root()
 	if err != nil {
-		s.logger.Error("failed to get root", "error", err)
+		s.logger.Error("failed to get root", "error", err, "path", "/")
 		s.handle500(c)
 
 		return
@@ -169,7 +169,7 @@ func (s *Server) handleSearch(c *gin.Context) {
 
 	results, err := s.searcher.Search(query)
 	if err != nil {
-		s.logger.Error("search failed", "query", query, "error", err)
+		s.logger.Error("search failed", "query", query, "error", err, "path", "/search")
 		s.handle500(c)
 
 		return
@@ -181,7 +181,7 @@ func (s *Server) handleSearch(c *gin.Context) {
 func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
 	urlPath, err := domain.NewURLPath(filepath)
 	if err != nil {
-		s.logger.Warn("invalid path requested", "path", filepath)
+		s.logger.Warn("invalid path requested", "path", filepath, "error", err)
 		s.handle404(c)
 
 		return
@@ -190,12 +190,13 @@ func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
 	node, err := s.repo.Get(urlPath)
 	if err != nil {
 		if errors.Is(err, content.ErrContentNotFound) {
+			s.logger.Debug("content not found", "path", urlPath)
 			s.handle404(c)
 
 			return
 		}
 
-		s.logger.Error("failed to get content", "error", err)
+		s.logger.Error("failed to get content", "path", urlPath, "error", err)
 		s.handle500(c)
 
 		return
@@ -207,7 +208,7 @@ func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
 	case *domain.FileNode:
 		s.renderFile(c, n)
 	default:
-		s.logger.Error("unknown node type", "type", fmt.Sprintf("%T", node))
+		s.logger.Error("unknown node type", "type", fmt.Sprintf("%T", node), "path", urlPath)
 		s.handle500(c)
 	}
 }
