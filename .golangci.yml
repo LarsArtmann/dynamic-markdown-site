@@ -127,6 +127,9 @@ linters:
         linters: [exhaustruct]
       - path: "internal/server/render.go"
         linters: [exhaustruct]
+      # exhaustruct: Third-party D2 library types have many optional fields
+      - path: "internal/renderer/diagrams.go"
+        linters: [exhaustruct]
       # funlen: Complex test functions with many table-driven cases
       - path: "internal/renderer/markdown_bench_test.go"
         linters: [funlen]
@@ -145,12 +148,21 @@ linters:
       - path: "cmd/dynamic-markdown-site/watcher.go"
         linters: [gocognit]
         text: "cognitive complexity 37 of func `watchForChanges` is high"
-      # nestif: Subprocess test pattern has complex nested blocks
+      - path: "cmd/dynamic-markdown-site/watcher.go"
+        linters: [gocognit]
+        text: "cognitive complexity 41 of func `watchForChanges` is high"
+      # nestif: Complex control flow for file watching and debouncing
       - path: "internal/container/container_test.go"
+        linters: [nestif]
+      - path: "cmd/dynamic-markdown-site/watcher.go"
         linters: [nestif]
       # paralleltest: Will be addressed separately - requires careful review
       - path: "(.*)_test\\.go"
         linters: [paralleltest]
+      # revive: Package name 'errors' conflicts with Go standard library - intentional for error type isolation
+      - path: "pkg/errors/errors.go"
+        linters: [revive]
+        text: "avoid package names that conflict with Go standard library package names"
 formatters:
   enable:
     - golines
