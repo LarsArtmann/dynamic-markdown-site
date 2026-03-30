@@ -28,9 +28,12 @@ func (s *Server) renderError(c *gin.Context, statusCode int, title, message stri
 	}
 
 	component := templates.ErrorView(props)
+	s.renderComponent(c, component, statusCode, "error page")
+}
 
+func (s *Server) renderComponent(c *gin.Context, component templ.Component, statusCode int, context string) {
 	if err := component.Render(c.Request.Context(), c.Writer); err != nil {
-		s.logger.Error("failed to render error page", "status", statusCode, "error", err)
+		s.logger.Error("failed to render "+context, "status", statusCode, "error", err)
 		if statusCode == http.StatusInternalServerError {
 			c.String(statusCode, "Internal Server Error")
 		}
