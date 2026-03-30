@@ -5,7 +5,6 @@ import (
 
 	templ "github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
-	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/templates"
@@ -71,7 +70,7 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 		file.SetHasMermaid(result.HasMermaid)
 
 		// Cache the rendered content
-		s.cache.Set(path, cache.RenderedContent{
+		s.cache.Set(path, domain.RenderedContent{
 			HTML:       result.HTML,
 			TOC:        result.TOC,
 			Metadata:   result.Metadata,
