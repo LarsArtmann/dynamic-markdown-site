@@ -53,10 +53,7 @@ LABEL org.opencontainers.image.source="https://github.com/larsartmann/dynamic-ma
 # Set working directory
 WORKDIR /app
 
-# Copy static assets (CSS, favicon, etc.)
-COPY --chown=nonroot:nonroot internal/static/ ./internal/static/
-
-# Copy the compiled binary
+# Copy the compiled binary (static assets embedded via //go:embed)
 COPY --chown=nonroot:nonroot --from=builder /build/dynamic-markdown-site .
 
 # Expose port (configurable via PORT env var, defaults to 8080)
