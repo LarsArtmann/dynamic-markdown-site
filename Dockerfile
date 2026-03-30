@@ -39,7 +39,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build \
     ./cmd/dynamic-markdown-site
 
 # =============================================================================
-# STAGE 2: Runtime (distroless)
+# STAGE 2: Runtime (distroless Debian 13)
 # =============================================================================
 FROM gcr.io/distroless/static-debian13:nonroot
 

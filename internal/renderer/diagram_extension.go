@@ -4,6 +4,7 @@ package renderer
 import (
 	"bytes"
 
+	"github.com/cockroachdb/errors"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
@@ -63,10 +64,10 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 
 	// Get the content
 	var content bytes.Buffer
-	for i := 0; i < n.Lines().Len(); i++ {
+	for i := range n.Lines().Len() {
 		line := n.Lines().At(i)
 		if _, err := content.Write(line.Value(source)); err != nil {
-			return ast.WalkContinue, err
+			return ast.WalkContinue, errors.Wrap(err, "write fence code line")
 		}
 	}
 
@@ -87,26 +88,26 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 	if err != nil {
 		// If rendering fails, fall back to code block
 		if _, writeErr := w.WriteString("<pre><code class=\"language-d2\">"); writeErr != nil {
-			return ast.WalkContinue, writeErr
+			return ast.WalkContinue, errors.Wrap(writeErr, "write D2 fallback pre tag")
 		}
 		if _, writeErr := w.WriteString(escapeHTML(content)); writeErr != nil {
-			return ast.WalkContinue, writeErr
+			return ast.WalkContinue, errors.Wrap(writeErr, "write D2 fallback content")
 		}
 		if _, writeErr := w.WriteString("</code></pre>"); writeErr != nil {
-			return ast.WalkContinue, writeErr
+			return ast.WalkContinue, errors.Wrap(writeErr, "write D2 fallback closing tag")
 		}
 
 		return ast.WalkContinue, nil
 	}
 
 	if _, writeErr := w.WriteString(`<div class="diagram d2-diagram">`); writeErr != nil {
-		return ast.WalkStop, writeErr
+		return ast.WalkStop, errors.Wrap(writeErr, "write D2 diagram opening div")
 	}
 	if _, writeErr := w.Write(svg); writeErr != nil {
-		return ast.WalkStop, writeErr
+		return ast.WalkStop, errors.Wrap(writeErr, "write D2 SVG")
 	}
 	if _, writeErr := w.WriteString("</div>"); writeErr != nil {
-		return ast.WalkStop, writeErr
+		return ast.WalkStop, errors.Wrap(writeErr, "write D2 diagram closing div")
 	}
 
 	return ast.WalkStop, nil
@@ -119,7 +120,7 @@ func (r *DiagramRendererNode) renderMermaid(
 ) (ast.WalkStatus, error) {
 	html := RenderMermaidToHTML(content)
 	if _, err := w.WriteString(html); err != nil {
-		return ast.WalkStop, err
+		return ast.WalkStop, errors.Wrap(err, "write mermaid HTML")
 	}
 
 	return ast.WalkStop, nil
