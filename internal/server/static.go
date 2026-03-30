@@ -1,11 +1,15 @@
 package server
 
 import (
-	"os"
+	"embed"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+//go:embed static/* static/css/*
+var staticFS embed.FS
 
 func (s *Server) serveStaticFile(c *gin.Context) {
 	filepath := c.Request.URL.Path
@@ -17,21 +21,21 @@ func (s *Server) serveStaticFile(c *gin.Context) {
 		return
 	}
 
-	fullPath := "./internal/static/" + relativePath
+	fullPath := "static/" + relativePath
 
-	info, err := os.Stat(fullPath)
-	if err != nil || info.IsDir() {
+	data, err := staticFS.ReadFile(fullPath)
+	if err != nil {
 		s.handle404(c)
 
 		return
 	}
 
-	contentType := getContentType(fullPath)
+	contentType := getContentType(relativePath)
 	if contentType != "" {
 		c.Header("Content-Type", contentType)
 	}
 
-	c.File(fullPath)
+	c.Data(http.StatusOK, contentType, data)
 }
 
 func getContentType(path string) string {
