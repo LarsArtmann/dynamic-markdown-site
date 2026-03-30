@@ -82,26 +82,28 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 	}
 }
 
+// writeStrings writes multiple strings to the writer and returns an error if any write fails.
+func writeStrings(w util.BufWriter, errMsg string, parts ...string) error {
+	for _, p := range parts {
+		if _, err := w.WriteString(p); err != nil {
+			return errors.New(errMsg + ": " + err.Error())
+		}
+	}
+	return nil
+}
+
 // renderD2 renders a D2 diagram to SVG.
 func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.WalkStatus, error) {
 	svg, err := r.diagramRenderer.RenderD2(content)
 	if err != nil {
-		// If rendering fails, fall back to code block
-		if _, writeErr := w.WriteString("<pre><code class=\"language-d2\">"); writeErr != nil {
-			return ast.WalkContinue, errors.Wrap(writeErr, "write D2 fallback pre tag")
+		if writeErr := writeStrings(w, "write D2 fallback", "<pre><code class=\"language-d2\">", escapeHTML(content), "</code></pre>"); writeErr != nil {
+			return ast.WalkContinue, writeErr
 		}
-		if _, writeErr := w.WriteString(escapeHTML(content)); writeErr != nil {
-			return ast.WalkContinue, errors.Wrap(writeErr, "write D2 fallback content")
-		}
-		if _, writeErr := w.WriteString("</code></pre>"); writeErr != nil {
-			return ast.WalkContinue, errors.Wrap(writeErr, "write D2 fallback closing tag")
-		}
-
 		return ast.WalkContinue, nil
 	}
 
-	if _, writeErr := w.WriteString(`<div class="diagram d2-diagram">`); writeErr != nil {
-		return ast.WalkStop, errors.Wrap(writeErr, "write D2 diagram opening div")
+	if writeErr := writeStrings(w, "write D2 output", `<div class="diagram d2-diagram">`); writeErr != nil {
+		return ast.WalkStop, writeErr
 	}
 	if _, writeErr := w.Write(svg); writeErr != nil {
 		return ast.WalkStop, errors.Wrap(writeErr, "write D2 SVG")

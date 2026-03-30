@@ -11,34 +11,28 @@ import (
 func (s *Server) handle404(c *gin.Context) {
 	c.Status(http.StatusNotFound)
 
-	props := templates.ErrorViewProps{
-		Title:      "Page Not Found",
-		Message:    "The page you're looking for doesn't exist in this dimension.",
-		StatusCode: 404,
-	}
-
-	component := templates.ErrorView(props)
-
-	err := component.Render(c.Request.Context(), c.Writer)
-	if err != nil {
-		s.logger.Error("failed to render 404", "error", err)
-	}
+	s.renderError(c, 404, "Page Not Found", "The page you're looking for doesn't exist in this dimension.")
 }
 
 func (s *Server) handle500(c *gin.Context) {
 	c.Status(http.StatusInternalServerError)
 
+	s.renderError(c, 500, "Internal Server Error", "Something went wrong in the cyber realm. Please try again later.")
+}
+
+func (s *Server) renderError(c *gin.Context, statusCode int, title, message string) {
 	props := templates.ErrorViewProps{
-		Title:      "Internal Server Error",
-		Message:    "Something went wrong in the cyber realm. Please try again later.",
-		StatusCode: 500,
+		Title:      title,
+		Message:    message,
+		StatusCode: statusCode,
 	}
 
 	component := templates.ErrorView(props)
 
-	err := component.Render(c.Request.Context(), c.Writer)
-	if err != nil {
-		s.logger.Error("failed to render 500", "error", err)
-		c.String(http.StatusInternalServerError, "Internal Server Error")
+	if err := component.Render(c.Request.Context(), c.Writer); err != nil {
+		s.logger.Error("failed to render error page", "status", statusCode, "error", err)
+		if statusCode == http.StatusInternalServerError {
+			c.String(statusCode, "Internal Server Error")
+		}
 	}
 }
