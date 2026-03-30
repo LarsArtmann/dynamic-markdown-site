@@ -12,8 +12,12 @@ import (
 func (s *Server) handle404(c *gin.Context) {
 	c.Status(http.StatusNotFound)
 
-	s.renderError(c, 404, "Page Not Found", "The page you're looking for "+
-		"doesn't exist in this dimension.")
+	s.renderError(
+		c,
+		404,
+		"Page Not Found",
+		"The page you're looking for doesn't exist in this dimension.",
+	)
 }
 
 func (s *Server) handle500(c *gin.Context) {

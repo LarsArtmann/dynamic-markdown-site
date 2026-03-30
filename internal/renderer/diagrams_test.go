@@ -156,11 +156,6 @@ func TestNewDiagramRenderer(t *testing.T) {
 func TestDiagramRendererRenderD2(t *testing.T) {
 	t.Parallel()
 
-	renderer, err := NewDiagramRenderer()
-	if err != nil {
-		t.Fatalf("failed to create diagram renderer: %v", err)
-	}
-
 	tests := []struct {
 		name      string
 		content   string
@@ -181,6 +176,11 @@ func TestDiagramRendererRenderD2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
+			renderer, err := NewDiagramRenderer()
+			if err != nil {
+				t.Fatalf("failed to create diagram renderer: %v", err)
+			}
 
 			svg, err := renderer.RenderD2(tt.content)
 			if tt.wantError {
