@@ -19,14 +19,14 @@ func TestDetectDiagrams(t *testing.T) {
 			expected: 0,
 		},
 		{
-			name: "single D2 diagram",
-			content: "# Diagram\n\n```d2\nx -> y\n```",
+			name:     "single D2 diagram",
+			content:  "# Diagram\n\n```d2\nx -> y\n```",
 			expected: 1,
 			types:    []DiagramType{DiagramTypeD2},
 		},
 		{
-			name: "single Mermaid diagram",
-			content: "# Flowchart\n\n```mermaid\ngraph TD;\n    A-->B;\n```",
+			name:     "single Mermaid diagram",
+			content:  "# Flowchart\n\n```mermaid\ngraph TD;\n    A-->B;\n```",
 			expected: 1,
 			types:    []DiagramType{DiagramTypeMermaid},
 		},
@@ -45,8 +45,8 @@ func TestDetectDiagrams(t *testing.T) {
 			types:    []DiagramType{DiagramTypeD2, DiagramTypeMermaid},
 		},
 		{
-			name: "code block with different language",
-			content: "# Code\n\n```go\nfmt.Println(\"hello\")\n```",
+			name:     "code block with different language",
+			content:  "# Code\n\n```go\nfmt.Println(\"hello\")\n```",
 			expected: 0,
 		},
 	}
