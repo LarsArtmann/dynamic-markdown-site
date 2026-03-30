@@ -132,6 +132,10 @@ func (s *treeStats) addError(msg string) {
 	s.errors = append(s.errors, msg)
 }
 
+func (s *treeStats) recordError(fsPath, operation string, err error) {
+	s.errors = append(s.errors, fmt.Sprintf("%s at %s: %v", operation, fsPath, err))
+}
+
 func (r *FileSystemRepository) buildTree(stats *treeStats) (*domain.DirectoryNode, error) {
 	rootPath := domain.MustURLPath("/")
 
@@ -165,7 +169,7 @@ func (r *FileSystemRepository) walkEntry(
 	dirNodes map[string]*domain.DirectoryNode, stats *treeStats,
 ) error {
 	if err != nil {
-		stats.addError(fmt.Sprintf("walk error at %s: %v", fsPath, err))
+		stats.recordError(fsPath, "walk error", err)
 
 		return nil
 	}
@@ -188,21 +192,21 @@ func (r *FileSystemRepository) walkEntry(
 
 	info, err := d.Info()
 	if err != nil {
-		stats.addError(fmt.Sprintf("failed to get info for %s: %v", fsPath, err))
+		stats.recordError(fsPath, "failed to get info", err)
 
 		return nil
 	}
 
 	relPath, err := filepath.Rel(r.rootDir, fsPath)
 	if err != nil {
-		stats.addError(fmt.Sprintf("failed to get relative path for %s: %v", fsPath, err))
+		stats.recordError(fsPath, "failed to get relative path", err)
 
 		return nil
 	}
 
 	urlPath, err := domain.NewURLPath("/" + filepath.ToSlash(relPath))
 	if err != nil {
-		stats.addError(fmt.Sprintf("invalid path %s: %v", fsPath, err))
+		stats.recordError(fsPath, "invalid path", err)
 
 		return nil
 	}
