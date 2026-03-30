@@ -112,18 +112,31 @@ func DetectDiagrams(content string) []DetectedDiagram {
 func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 	ctx := log.WithDefault(context.Background())
 
-	layoutResolver := func(engine string) (d2graph.LayoutGraph, error) {
+	layoutResolver := func(_ string) (d2graph.LayoutGraph, error) {
 		return d2dagrelayout.DefaultLayout, nil
 	}
 
 	compileOpts := &d2lib.CompileOptions{
 		LayoutResolver: layoutResolver,
 		Ruler:          r.ruler,
+		UTF16Pos:       false,
 	}
 
 	pad := int64(10)
 	renderOpts := &d2svg.RenderOpts{
-		Pad: &pad,
+		Pad:             &pad,
+		Sketch:          false,
+		Center:          false,
+		ThemeID:         0,
+		DarkThemeID:     0,
+		ThemeOverrides:  nil,
+		DarkThemeOverrides: nil,
+		Font:            "",
+		Scale:           1.0,
+		MasterID:        "",
+		NoXMLTag:        false,
+		Salt:            "",
+		OmitVersion:     false,
 	}
 
 	diagram, _, err := d2lib.Compile(ctx, content, compileOpts, renderOpts)
