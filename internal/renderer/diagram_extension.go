@@ -10,6 +10,11 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
+const (
+	diagramTypeD2      = "d2"
+	diagramTypeMermaid = "mermaid"
+)
+
 // DiagramExtension is a goldmark extension for rendering diagrams.
 type DiagramExtension struct {
 	diagramRenderer *DiagramRenderer
@@ -48,7 +53,10 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 		return ast.WalkContinue, nil
 	}
 
-	n := node.(*ast.FencedCodeBlock)
+	n, ok := node.(*ast.FencedCodeBlock)
+	if !ok {
+		return ast.WalkContinue, nil
+	}
 
 	// Get the language
 	lang := string(n.Language(source))
@@ -57,13 +65,15 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 	var content bytes.Buffer
 	for i := 0; i < n.Lines().Len(); i++ {
 		line := n.Lines().At(i)
-		content.Write(line.Value(source))
+		if _, err := content.Write(line.Value(source)); err != nil {
+			return ast.WalkContinue, err
+		}
 	}
 
 	switch lang {
-	case "d2":
+	case diagramTypeD2:
 		return r.renderD2(w, content.String())
-	case "mermaid":
+	case diagramTypeMermaid:
 		return r.renderMermaid(w, content.String())
 	default:
 		// Not a diagram, let default renderer handle it
@@ -76,16 +86,28 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 	svg, err := r.diagramRenderer.RenderD2(content)
 	if err != nil {
 		// If rendering fails, fall back to code block
-		w.WriteString("<pre><code class=\"language-d2\">")
-		w.WriteString(escapeHTML(content))
-		w.WriteString("</code></pre>")
+		if _, writeErr := w.WriteString("<pre><code class=\"language-d2\">"); writeErr != nil {
+			return ast.WalkContinue, writeErr
+		}
+		if _, writeErr := w.WriteString(escapeHTML(content)); writeErr != nil {
+			return ast.WalkContinue, writeErr
+		}
+		if _, writeErr := w.WriteString("</code></pre>"); writeErr != nil {
+			return ast.WalkContinue, writeErr
+		}
 
 		return ast.WalkContinue, nil
 	}
 
-	w.WriteString(`<div class="diagram d2-diagram">`)
-	w.Write(svg)
-	w.WriteString("</div>")
+	if _, writeErr := w.WriteString(`<div class="diagram d2-diagram">`); writeErr != nil {
+		return ast.WalkStop, writeErr
+	}
+	if _, writeErr := w.Write(svg); writeErr != nil {
+		return ast.WalkStop, writeErr
+	}
+	if _, writeErr := w.WriteString("</div>"); writeErr != nil {
+		return ast.WalkStop, writeErr
+	}
 
 	return ast.WalkStop, nil
 }
@@ -96,7 +118,9 @@ func (r *DiagramRendererNode) renderMermaid(
 	content string,
 ) (ast.WalkStatus, error) {
 	html := RenderMermaidToHTML(content)
-	w.WriteString(html)
+	if _, err := w.WriteString(html); err != nil {
+		return ast.WalkStop, err
+	}
 
 	return ast.WalkStop, nil
 }

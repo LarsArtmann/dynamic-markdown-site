@@ -833,3 +833,59 @@ button:focus-visible {
   background-color: var(--color-accent-glow);
   color: var(--color-text-primary);
 }
+
+/* ==========================================================================
+   Diagram Styles (D2 and Mermaid)
+   ========================================================================== */
+
+/* Container for all diagrams */
+.diagram {
+  margin: var(--space-lg) 0;
+  padding: var(--space-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* D2 diagram specific styles */
+.d2-diagram svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mermaid diagram container */
+.mermaid {
+  margin: var(--space-lg) 0;
+}
+
+/* Mermaid rendered SVG */
+.mermaid svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* Ensure mermaid text is readable in dark theme */
+.mermaid .node rect,
+.mermaid .node circle,
+.mermaid .node ellipse,
+.mermaid .node polygon {
+  stroke: var(--color-border-accent) !important;
+}
+
+.mermaid .node .label {
+  color: var(--color-text-primary) !important;
+}
+
+.mermaid .edgeLabel {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.mermaid .cluster rect {
+  fill: var(--color-bg-tertiary) !important;
+  stroke: var(--color-border) !important;
+}
