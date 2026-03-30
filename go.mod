@@ -16,7 +16,6 @@ require (
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	github.com/yuin/goldmark-meta v1.1.0
 	oss.terrastruct.com/d2 v0.7.1
-	oss.terrastruct.com/util-go v0.0.0-20250213174338-243d8661088a
 )
 
 require (
@@ -94,6 +93,7 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	oss.terrastruct.com/util-go v0.0.0-20250213174338-243d8661088a // indirect
 )
 
 tool github.com/a-h/templ/cmd/templ

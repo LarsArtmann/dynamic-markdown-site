@@ -14,7 +14,6 @@ import (
 	"oss.terrastruct.com/d2/d2renderers/d2svg"
 	"oss.terrastruct.com/d2/lib/log"
 	"oss.terrastruct.com/d2/lib/textmeasure"
-	"oss.terrastruct.com/util-go/go2"
 )
 
 // DiagramRenderer handles rendering of D2 and Mermaid diagrams.
@@ -122,8 +121,9 @@ func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 		Ruler:          r.ruler,
 	}
 
+	pad := int64(10)
 	renderOpts := &d2svg.RenderOpts{
-		Pad: go2.Pointer(int64(10)),
+		Pad: &pad,
 	}
 
 	diagram, _, err := d2lib.Compile(ctx, content, compileOpts, renderOpts)
