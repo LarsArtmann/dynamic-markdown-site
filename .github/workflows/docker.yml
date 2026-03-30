@@ -4,22 +4,15 @@ on:
   push:
     branches: [master]
     paths:
-      - "**/*.go"
-      - "**/*.templ"
-      - "**/*.css"
-      - "**/*.svg"
+      - "**.go"
+      - "**.templ"
+      - "**.css"
+      - "**.svg"
       - "Dockerfile"
+      - ".dockerignore"
       - "go.mod"
       - "go.sum"
       - ".github/workflows/docker.yml"
-      - "cmd/**"
-      - "internal/**"
-      - "templates/**"
-      - "pkg/**"
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -30,6 +23,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Generate templ templates
+        run: |
+          go install github.com/a-h/templ/cmd/templ@latest
+          templ generate
+
+      - name: Run tests
+        run: go test ./... -cover -race
+
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: latest
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -43,13 +54,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Save Docker image as tar
-        run: docker save dynamic-markdown-site:${{ github.sha }} -o image.tar
+      - name: Smoke test - verify container starts and serves health
+        run: |
+          mkdir -p /tmp/smoke-content
+          echo "# Hello" > /tmp/smoke-content/index.md
+          docker run -d --name smoke-test \
+            -p 8080:8080 \
+            -v /tmp/smoke-content:/content:ro \
+            dynamic-markdown-site:${{ github.sha }}
+          sleep 3
+          curl -sf http://localhost:8080/health \
+            || { docker logs smoke-test && exit 1; }
+          docker stop smoke-test
+          docker rm smoke-test
 
-      - name: Upload Docker image artifact
+      - name: Save Docker image
+        run: |
+          docker save dynamic-markdown-site:${{ github.sha }} | gzip > image.tar.gz
+          echo "Image size: $(du -h image.tar.gz | cut -f1)"
+
+      - name: Upload Docker image
         uses: actions/upload-artifact@v4
         with:
           name: dynamic-markdown-site-${{ github.sha }}
-          path: image.tar
+          path: image.tar.gz
           retention-days: 14
           if-no-files-found: error
