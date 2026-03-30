@@ -63,7 +63,12 @@ func TestDetectDiagrams(t *testing.T) {
 
 			for i, expectedType := range tt.types {
 				if i < len(diagrams) && diagrams[i].Type != expectedType {
-					t.Errorf("diagram %d: expected type %v, got %v", i, expectedType, diagrams[i].Type)
+					t.Errorf(
+						"diagram %d: expected type %v, got %v",
+						i,
+						expectedType,
+						diagrams[i].Type,
+					)
 				}
 			}
 		})
