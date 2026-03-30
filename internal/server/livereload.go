@@ -30,6 +30,7 @@ type LiveReload struct {
 func NewLiveReload(logger *slog.Logger) *LiveReload {
 	return &LiveReload{
 		logger:  logger,
+		mu:      sync.RWMutex{},
 		clients: make(map[chan LiveReloadEvent]struct{}),
 	}
 }
@@ -114,7 +115,9 @@ func (lr *LiveReload) handleSSE(c *gin.Context) {
 				lr.logger.Error("failed to marshal live reload event", "error", err)
 				continue
 			}
-			fmt.Fprintf(c.Writer, "event: reload\ndata: %s\n\n", data)
+			if _, err := fmt.Fprintf(c.Writer, "event: reload\ndata: %s\n\n", data); err != nil {
+				lr.logger.Debug("failed to send live reload event", "error", err)
+			}
 			c.Writer.Flush()
 		}
 	}
