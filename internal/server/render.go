@@ -41,46 +41,20 @@ func (s *Server) renderTemplate(c *gin.Context, component templ.Component, conte
 func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 	path := file.Path().String()
 
-	// Check cache first
-	if cached := s.cache.Get(path); cached != nil {
-		file.SetHTML(cached.HTML)
-		file.SetTOC(cached.TOC)
-		file.SetMetadata(cached.Metadata)
-		file.SetHasMermaid(cached.HasMermaid)
-	} else if file.HTML() == "" {
-		result, err := s.renderer.Render(file.Content())
-		if err != nil {
-			s.logger.Error("failed to render markdown",
-				"path", path,
-				"error", err,
-			)
-			s.handle500(c)
+	// Get or render content
+	renderedContent := s.getOrRenderContent(path, file)
 
-			return
-		}
-
-		file.SetHTML(result.HTML)
-		file.SetTOC(result.TOC)
-		file.SetMetadata(result.Metadata)
-		file.SetHasMermaid(result.HasMermaid)
-
-		// Cache the rendered content
-		s.cache.Set(path, domain.RenderedContent{
-			HTML:       result.HTML,
-			TOC:        result.TOC,
-			Metadata:   result.Metadata,
-			HasMermaid: result.HasMermaid,
-		})
-	}
+	// Create immutable RenderedFile combining FileNode with rendered content
+	renderedFile := domain.NewRenderedFileWithContent(file, renderedContent)
 
 	crumbs := domain.BuildBreadcrumbs(file.Path())
 
-	title := file.Title()
+	title := renderedFile.Title()
 	if title == "" {
 		title = file.Path().Filename()
 	}
 
-	description := file.Metadata().Description
+	description := renderedFile.Metadata().Description
 	if description == "" {
 		description = "Read " + title
 	}
@@ -91,17 +65,45 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 		Breadcrumbs: crumbs,
 		ActivePath:  file.Path(),
 		ShowNav:     true,
-		HasMermaid:  file.HasMermaid(),
+		HasMermaid:  renderedFile.HasMermaid(),
 	}
 
 	fileProps := templates.FileViewProps{
-		Layout: props,
-		File:   file,
-		TOC:    file.TOC(),
+		Layout:       props,
+		RenderedFile: renderedFile,
 	}
 
 	component := templates.FileView(fileProps)
 	s.renderTemplate(c, component, "file")
+}
+
+// getOrRenderContent returns cached content or renders and caches it.
+func (s *Server) getOrRenderContent(path string, file *domain.FileNode) domain.RenderedContent {
+	// Check cache first
+	if cached := s.cache.Get(path); cached != nil {
+		return *cached
+	}
+
+	// Render the content
+	result, err := s.renderer.Render(file.Content())
+	if err != nil {
+		// Return empty content on error - handler will deal with it
+		s.logger.Error("failed to render markdown", "path", path, "error", err)
+
+		return domain.RenderedContent{}
+	}
+
+	content := domain.RenderedContent{
+		HTML:       result.HTML,
+		TOC:        result.TOC,
+		Metadata:   result.Metadata,
+		HasMermaid: result.HasMermaid,
+	}
+
+	// Cache the rendered content
+	s.cache.Set(path, content)
+
+	return content
 }
 
 func (s *Server) renderSearch(c *gin.Context, query string, results []content.SearchResult) {

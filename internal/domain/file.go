@@ -27,15 +27,7 @@ type Frontmatter struct {
 const wordsPerMinute = 200
 
 // FileNode represents a markdown file that can be rendered.
-//
-// TODO: Refactor to immutable pattern. Currently has mutable setters (SetHTML,
-// SetTOC, SetMetadata) that are called during rendering. This breaks immutability
-// and could cause race conditions. Future refactoring should:
-//  1. Remove setters from FileNode
-//  2. Create RenderedFile struct combining FileNode + rendered content
-//  3. Pass RenderedFile to templates instead of mutating FileNode
-//
-// This is a medium-priority architectural improvement tracked in the roadmap.
+// Rendering produces a RenderedFile which combines the FileNode with rendered content.
 type FileNode struct {
 	path       URLPath
 	title      string
@@ -91,55 +83,24 @@ func (f *FileNode) Size() uint64 { return f.size }
 // Content returns the raw file content.
 func (f *FileNode) Content() []byte { return f.content }
 
-// HTML returns the rendered HTML.
+// HTML returns the rendered HTML (empty until rendered).
 func (f *FileNode) HTML() HTML {
 	return f.html
 }
 
-// SetHTML sets the rendered HTML.
-//
-// Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
-func (f *FileNode) SetHTML(html HTML) {
-	f.html = html
-}
-
-// TOC returns the table of contents.
+// TOC returns the table of contents (empty until rendered).
 func (f *FileNode) TOC() []TOCItem {
 	return f.toc
 }
 
-// SetTOC sets the table of contents.
-//
-// Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
-func (f *FileNode) SetTOC(toc []TOCItem) {
-	f.toc = toc
-}
-
-// Metadata returns the extracted frontmatter.
+// Metadata returns the extracted frontmatter (empty until rendered).
 func (f *FileNode) Metadata() Frontmatter {
 	return f.metadata
 }
 
-// SetMetadata sets the frontmatter.
-//
-// Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
-func (f *FileNode) SetMetadata(meta Frontmatter) {
-	f.metadata = meta
-	if meta.Title != "" {
-		f.title = meta.Title
-	}
-}
-
-// HasMermaid returns true if the file contains mermaid diagrams.
+// HasMermaid returns true if the file contains mermaid diagrams (false until rendered).
 func (f *FileNode) HasMermaid() bool {
 	return f.hasMermaid
-}
-
-// SetHasMermaid sets whether the file contains mermaid diagrams.
-//
-// Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
-func (f *FileNode) SetHasMermaid(hasMermaid bool) {
-	f.hasMermaid = hasMermaid
 }
 
 // ReadingTime returns estimated reading time in minutes.
@@ -158,10 +119,11 @@ func (f *FileNode) ReadingTime() uint {
 // This is an immutable value type that should be used instead of
 // mutating FileNode during rendering.
 type RenderedFile struct {
-	file     *FileNode
-	html     HTML
-	toc      []TOCItem
-	metadata Frontmatter
+	file       *FileNode
+	html       HTML
+	toc        []TOCItem
+	metadata   Frontmatter
+	hasMermaid bool
 }
 
 // NewRenderedFile creates a new immutable RenderedFile from a FileNode and render result.
@@ -171,6 +133,17 @@ func NewRenderedFile(file *FileNode, html HTML, toc []TOCItem, metadata Frontmat
 		html:     html,
 		toc:      toc,
 		metadata: metadata,
+	}
+}
+
+// NewRenderedFileWithContent creates a RenderedFile from a FileNode and RenderedContent.
+func NewRenderedFileWithContent(file *FileNode, content RenderedContent) *RenderedFile {
+	return &RenderedFile{
+		file:       file,
+		html:       content.HTML,
+		toc:        content.TOC,
+		metadata:   content.Metadata,
+		hasMermaid: content.HasMermaid,
 	}
 }
 
@@ -207,4 +180,4 @@ func (r *RenderedFile) Modified() time.Time { return r.file.Modified() }
 func (r *RenderedFile) ReadingTime() uint { return r.file.ReadingTime() }
 
 // HasMermaid returns whether the file contains mermaid diagrams.
-func (r *RenderedFile) HasMermaid() bool { return r.file.HasMermaid() }
+func (r *RenderedFile) HasMermaid() bool { return r.hasMermaid }

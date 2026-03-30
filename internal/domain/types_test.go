@@ -428,7 +428,7 @@ func TestFileNode_ReadingTime(t *testing.T) {
 	}
 }
 
-func TestFileNode_Metadata(t *testing.T) {
+func TestRenderedFile_Metadata(t *testing.T) {
 	t.Parallel()
 	node, _ := domain.NewFileNode(
 		domain.MustURLPath("/test.md"),
@@ -444,17 +444,29 @@ func TestFileNode_Metadata(t *testing.T) {
 		Author:      "John Doe",
 		Draft:       false,
 	}
-	node.SetMetadata(meta)
 
-	if node.Metadata().Title != "Actual Title" {
-		t.Errorf("Metadata().Title = %q, want %q", node.Metadata().Title, "Actual Title")
+	// Create RenderedFile with metadata - this is the immutable pattern
+	renderedFile := domain.NewRenderedFile(node, "<p>content</p>", nil, meta)
+
+	if renderedFile.Metadata().Title != "Actual Title" {
+		t.Errorf("Metadata().Title = %q, want %q", renderedFile.Metadata().Title, "Actual Title")
 	}
 
-	if node.Title() != "Actual Title" {
+	// RenderedFile.Title() returns metadata title if available
+	if renderedFile.Title() != "Actual Title" {
 		t.Errorf(
-			"Title() = %q, want %q (should update from metadata)",
-			node.Title(),
+			"Title() = %q, want %q (should return metadata title)",
+			renderedFile.Title(),
 			"Actual Title",
+		)
+	}
+
+	// FileNode title remains unchanged (immutable)
+	if node.Title() != "Test" {
+		t.Errorf(
+			"FileNode.Title() = %q, want %q (should not be mutated)",
+			node.Title(),
+			"Test",
 		)
 	}
 }

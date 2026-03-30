@@ -223,30 +223,29 @@ templ ContentCard(node domain.ContentNode) {
 
 // FileViewProps contains properties for file view.
 type FileViewProps struct {
-	Layout LayoutProps
-	File   *domain.FileNode
-	TOC    []domain.TOCItem
+	Layout       LayoutProps
+	RenderedFile *domain.RenderedFile
 }
 
 // FileView renders a markdown file with optional TOC.
 templ FileView(props FileViewProps) {
 	@Layout(props.Layout) {
 		<div class="file-view">
-			if len(props.TOC) > 0 {
+			if len(props.RenderedFile.TOC()) > 0 {
 				<aside class="toc-sidebar">
-					@TableOfContents(props.TOC)
+					@TableOfContents(props.RenderedFile.TOC())
 				</aside>
 			}
 			<article class="markdown-content">
 				<header class="article-header">
 					<h1 class="article-title">{ props.Layout.Title }</h1>
 					<div class="article-meta">
-						<span class="reading-time">⏱️ { formatReadingTime(props.File.ReadingTime()) } read</span>
-						<span class="last-modified">📅 { formatDate(props.File.Modified()) }</span>
+						<span class="reading-time">⏱️ { formatReadingTime(props.RenderedFile.ReadingTime()) } read</span>
+						<span class="last-modified">📅 { formatDate(props.RenderedFile.Modified()) }</span>
 					</div>
 				</header>
 				<div class="article-body">
-					@templ.Raw(string(props.File.HTML()))
+					@templ.Raw(string(props.RenderedFile.HTML()))
 				</div>
 			</article>
 		</div>
