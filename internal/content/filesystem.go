@@ -215,7 +215,7 @@ func (r *FileSystemRepository) walkEntry(
 
 	parentNode, exists := dirNodes[parentDir]
 	if !exists {
-		stats.addError("parent directory not found for " + fsPath)
+		stats.recordError(fsPath, "parent not found", errors.New("parent directory not found"))
 
 		return nil
 	}
