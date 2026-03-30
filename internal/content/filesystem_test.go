@@ -22,7 +22,6 @@ func writeTestFile(t *testing.T, dir, name, content string) {
 	}
 }
 
-
 func TestNewFileSystemRepository(t *testing.T) {
 	t.Run("valid directory", func(t *testing.T) {
 		tmpDir := t.TempDir()

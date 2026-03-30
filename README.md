@@ -41,15 +41,15 @@ Flags:
 
 ## API Endpoints
 
-| Endpoint          | Method   | Description                          |
-| ----------------- | -------- | ------------------------------------ |
-| `/`               | GET      | Root directory view                  |
-| `/*path`          | GET      | Content (markdown or directory)      |
-| `/health`         | GET      | Health check                         |
-| `/refresh`        | GET/POST | Refresh content (rate limited)       |
-| `/search`         | GET      | Search content (`?q=query`)         |
-| `/static/*path`   | GET      | Static assets                        |
-| `/api/live-reload`| GET      | SSE endpoint for live reload (dev)    |
+| Endpoint           | Method   | Description                        |
+| ------------------ | -------- | ---------------------------------- |
+| `/`                | GET      | Root directory view                |
+| `/*path`           | GET      | Content (markdown or directory)    |
+| `/health`          | GET      | Health check                       |
+| `/refresh`         | GET/POST | Refresh content (rate limited)     |
+| `/search`          | GET      | Search content (`?q=query`)        |
+| `/static/*path`    | GET      | Static assets                      |
+| `/api/live-reload` | GET      | SSE endpoint for live reload (dev) |
 
 ## Development
 

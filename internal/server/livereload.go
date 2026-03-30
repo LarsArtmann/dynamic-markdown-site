@@ -77,7 +77,13 @@ func (lr *LiveReload) handleSSE(c *gin.Context) {
 		lr.mu.Unlock()
 	}()
 
-	lr.logger.Info("live reload client connected", "client_ip", c.ClientIP(), "total_clients", clientCount)
+	lr.logger.Info(
+		"live reload client connected",
+		"client_ip",
+		c.ClientIP(),
+		"total_clients",
+		clientCount,
+	)
 
 	// Set SSE headers
 	c.Header("Content-Type", "text/event-stream")
@@ -115,5 +121,5 @@ func (lr *LiveReload) handleSSE(c *gin.Context) {
 
 // getTimestamp returns the current Unix timestamp as a string.
 func getTimestamp() string {
-	return fmt.Sprintf("%d", time.Now().Unix())
+	return strconv.FormatInt(time.Now().Unix(), 10)
 }

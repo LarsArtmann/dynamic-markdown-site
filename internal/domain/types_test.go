@@ -11,7 +11,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
-func assertTitle(t *testing.T, gotTitle string, wantTitle string, constructor string) {
+func assertTitle(t *testing.T, gotTitle, wantTitle, constructor string) {
 	t.Helper()
 	if gotTitle != wantTitle {
 		t.Errorf("%s().Title() = %q, want %q", constructor, gotTitle, wantTitle)
@@ -316,8 +316,6 @@ func TestDirectoryNode_NewDirectoryNode(t *testing.T) {
 		})
 	}
 }
-
-
 
 func TestDirectoryNode_AddChild(t *testing.T) {
 	root, _ := domain.NewDirectoryNode(domain.MustURLPath("/"), "Root", time.Now())

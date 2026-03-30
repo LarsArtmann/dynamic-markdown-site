@@ -353,8 +353,6 @@ func BenchmarkRenderWithLargeTOC(b *testing.B) {
 	}
 }
 
-
-
 // BenchmarkRenderConcurrent benchmarks concurrent rendering.
 func BenchmarkRenderConcurrent(b *testing.B) {
 	renderer := NewGoldmarkRenderer()
