@@ -14,7 +14,12 @@ import (
 )
 
 // watchForChanges monitors the root directory for filesystem changes in dev mode.
-func watchForChanges(rootDir string, repo content.Repository, liveReload *server.LiveReload, logger *slog.Logger) {
+func watchForChanges(
+	rootDir string,
+	repo content.Repository,
+	liveReload *server.LiveReload,
+	logger *slog.Logger,
+) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		logger.Error("failed to create file watcher", slog.Any("error", err))

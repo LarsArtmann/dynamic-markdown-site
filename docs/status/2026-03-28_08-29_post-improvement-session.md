@@ -19,45 +19,46 @@ Sat Mar 28 08:29:32 CET 2026
 
 ### 1. Critical Code Quality Improvements
 
-| Improvement | File | Status |
-|-------------|------|--------|
-| **Fix gosec G115 integer overflow** | `repository_bench_test.go:116-118` | ✅ |
-| **Fix directory permissions 0755→0750** | `repository_bench_test.go:27` | ✅ |
-| **Split run() into smaller functions** | `main.go:39-180` | ✅ |
-| **Add http.Server ErrorLog** | `main.go:123` | ✅ |
-| **Complete LayoutProps fields** | `render.go:108-117` | ✅ |
-| **Fix padNum() buggy rune conversion** | `repository_bench_test.go` | ✅ |
+| Improvement                             | File                               | Status |
+| --------------------------------------- | ---------------------------------- | ------ |
+| **Fix gosec G115 integer overflow**     | `repository_bench_test.go:116-118` | ✅     |
+| **Fix directory permissions 0755→0750** | `repository_bench_test.go:27`      | ✅     |
+| **Split run() into smaller functions**  | `main.go:39-180`                   | ✅     |
+| **Add http.Server ErrorLog**            | `main.go:123`                      | ✅     |
+| **Complete LayoutProps fields**         | `render.go:108-117`                | ✅     |
+| **Fix padNum() buggy rune conversion**  | `repository_bench_test.go`         | ✅     |
 
 ### 2. Documentation Improvements
 
-| Document | Status | Lines |
-|----------|--------|-------|
-| README.md (placeholder → real docs) | ✅ | 88 lines |
-| Status reports | ✅ | Multiple in `docs/status/` |
+| Document                            | Status | Lines                      |
+| ----------------------------------- | ------ | -------------------------- |
+| README.md (placeholder → real docs) | ✅     | 88 lines                   |
+| Status reports                      | ✅     | Multiple in `docs/status/` |
 
 ### 3. Test Parallelization
 
-| Package | Tests Parallelized | Status |
-|---------|-------------------|--------|
-| `internal/config` | TestLoadSubprocess subtests | ✅ |
-| `internal/content/search_test.go` | TestSearcher_Search + subtests | ✅ |
-| `internal/domain/types_test.go` | TestURLPath_NewURLPath + subtests | ✅ |
-| `internal/server/handlers_test.go` | TestContentNotFound | ✅ |
+| Package                            | Tests Parallelized                | Status |
+| ---------------------------------- | --------------------------------- | ------ |
+| `internal/config`                  | TestLoadSubprocess subtests       | ✅     |
+| `internal/content/search_test.go`  | TestSearcher_Search + subtests    | ✅     |
+| `internal/domain/types_test.go`    | TestURLPath_NewURLPath + subtests | ✅     |
+| `internal/server/handlers_test.go` | TestContentNotFound               | ✅     |
 
 ### 4. Commits This Session (6 total)
 
-| Commit | Message |
-|--------|---------|
-| `300c25a` | docs(ocs): add status update files |
-| `c9516b6` | feat(core): initialize application entry point |
-| `21ef7eb` | refactor: Add http.Server ErrorLog for proper error logging |
+| Commit    | Message                                                      |
+| --------- | ------------------------------------------------------------ |
+| `300c25a` | docs(ocs): add status update files                           |
+| `c9516b6` | feat(core): initialize application entry point               |
+| `21ef7eb` | refactor: Add http.Server ErrorLog for proper error logging  |
 | `55bebbd` | refactor: Improve code quality - reduce complexity, fix bugs |
-| `e496ae6` | docs: Remove redundant status report file |
-| `3a8374f` | docs: Add comprehensive status report 2026-03-28 |
+| `e496ae6` | docs: Remove redundant status report file                    |
+| `3a8374f` | docs: Add comprehensive status report 2026-03-28             |
 
 ### 5. Code Refactoring Details
 
 **main.go - Split run() into 8 functions:**
+
 - `setupServices()` - DI container + service extraction
 - `logStartupInfo()` - Startup logging
 - `setupServer()` - Router + HTTP server creation
@@ -68,10 +69,12 @@ Sat Mar 28 08:29:32 CET 2026
 - `gracefulShutdown()` - HTTP shutdown + container cleanup
 
 **repository_bench_test.go - Security fixes:**
+
 - `padNum()`: Fixed buggy `string(rune('0'+n))` → `fmt.Sprintf("%03d", n)`
 - Directory perms: `0o755` → `0o750`
 
 **render.go - Complete struct initialization:**
+
 - Added `Breadcrumbs` and `ActivePath` to SearchView LayoutProps
 
 ---
@@ -86,11 +89,11 @@ Sat Mar 28 08:29:32 CET 2026
 
 ### 2. Go Version Compatibility
 
-| Aspect | Status |
-|--------|--------|
-| go.mod requires | go 1.26.1 |
-| Local toolchain | go 1.26.0 |
-| Workaround | `GOTOOLCHAIN=local` |
+| Aspect          | Status              |
+| --------------- | ------------------- |
+| go.mod requires | go 1.26.1           |
+| Local toolchain | go 1.26.0           |
+| Workaround      | `GOTOOLCHAIN=local` |
 
 ### 3. LSP Diagnostics (Non-Critical)
 
@@ -104,30 +107,30 @@ Sat Mar 28 08:29:32 CET 2026
 
 ### 1. High Priority Items
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| CI/CD Pipeline | High | No GitHub Actions |
-| Dependency scanning | High | No govulncheck in CI |
-| Container test coverage | High | 0.0% reported |
-| golangci-lint fixes | High | Parallel runner errors |
+| Item                    | Priority | Notes                  |
+| ----------------------- | -------- | ---------------------- |
+| CI/CD Pipeline          | High     | No GitHub Actions      |
+| Dependency scanning     | High     | No govulncheck in CI   |
+| Container test coverage | High     | 0.0% reported          |
+| golangci-lint fixes     | High     | Parallel runner errors |
 
 ### 2. Medium Priority Items
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Health check endpoint | Medium | `/health` not implemented |
-| Configurable rate limiting | Medium | Hardcoded values |
-| Integration tests | Medium | E2E tests missing |
-| API documentation | Medium | No OpenAPI/Swagger |
+| Item                       | Priority | Notes                     |
+| -------------------------- | -------- | ------------------------- |
+| Health check endpoint      | Medium   | `/health` not implemented |
+| Configurable rate limiting | Medium   | Hardcoded values          |
+| Integration tests          | Medium   | E2E tests missing         |
+| API documentation          | Medium   | No OpenAPI/Swagger        |
 
 ### 3. Low Priority Items
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| Immutable FileNode API | Low | SetHTML/SetChildren deprecated |
-| Database persistence | Low | In-memory only |
-| i18n support | Low | English only |
-| Advanced search | Low | No stemming |
+| Item                   | Priority | Notes                          |
+| ---------------------- | -------- | ------------------------------ |
+| Immutable FileNode API | Low      | SetHTML/SetChildren deprecated |
+| Database persistence   | Low      | In-memory only                 |
+| i18n support           | Low      | English only                   |
+| Advanced search        | Low      | No stemming                    |
 
 ---
 
@@ -135,41 +138,41 @@ Sat Mar 28 08:29:32 CET 2026
 
 ### 1. **Go Toolchain Cache Corruption** 🔴 CRITICAL
 
-| Aspect | Details |
-|--------|---------|
-| **Severity** | 🔴 Critical |
-| **Impact** | Build failures, slow compilation |
-| **Location** | `~/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64/` |
-| **Root Cause** | Disk space exhaustion during builds |
-| **Status** | Partially recoverable via `GOTOOLCHAIN=local` |
+| Aspect         | Details                                                           |
+| -------------- | ----------------------------------------------------------------- |
+| **Severity**   | 🔴 Critical                                                       |
+| **Impact**     | Build failures, slow compilation                                  |
+| **Location**   | `~/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64/` |
+| **Root Cause** | Disk space exhaustion during builds                               |
+| **Status**     | Partially recoverable via `GOTOOLCHAIN=local`                     |
 
 ### 2. **LSP Package Path Confusion** 🟠 High
 
-| Aspect | Details |
-|--------|---------|
-| **Severity** | 🟠 High |
-| **Issue** | LSP references `cmd/server/` (old path) |
-| **Actual** | Files are in `cmd/dynamic-markdown-site/` |
-| **Impact** | LSP errors in all Go files |
-| **Fix** | Restart LSP or update workspace config |
+| Aspect       | Details                                   |
+| ------------ | ----------------------------------------- |
+| **Severity** | 🟠 High                                   |
+| **Issue**    | LSP references `cmd/server/` (old path)   |
+| **Actual**   | Files are in `cmd/dynamic-markdown-site/` |
+| **Impact**   | LSP errors in all Go files                |
+| **Fix**      | Restart LSP or update workspace config    |
 
 ### 3. **Disk Space Exhaustion** 🟡 Medium
 
-| Aspect | Details |
-|--------|---------|
-| **Severity** | 🟡 Medium |
-| **Before** | 229G / 229G (0 bytes free) |
-| **After cleanup** | ~2.3G free |
-| **Root Cause** | Go build cache accumulation |
+| Aspect            | Details                     |
+| ----------------- | --------------------------- |
+| **Severity**      | 🟡 Medium                   |
+| **Before**        | 229G / 229G (0 bytes free)  |
+| **After cleanup** | ~2.3G free                  |
+| **Root Cause**    | Go build cache accumulation |
 
 ### 4. **Test Parallelization Incomplete** 🟡 Medium
 
-| Aspect | Details |
-|--------|---------|
-| **Severity** | 🟡 Medium |
-| **Issue** | Changes uncommitted |
-| **Impact** | Test files modified but not staged |
-| **Action** | Review and commit or revert |
+| Aspect       | Details                            |
+| ------------ | ---------------------------------- |
+| **Severity** | 🟡 Medium                          |
+| **Issue**    | Changes uncommitted                |
+| **Impact**   | Test files modified but not staged |
+| **Action**   | Review and commit or revert        |
 
 ---
 
@@ -267,22 +270,26 @@ Sat Mar 28 08:29:32 CET 2026
 ### Why does the Go toolchain cache get corrupted when disk space runs out?
 
 **Context:**
+
 - Disk space exhausted to 0 bytes during builds
 - `golang.org/toolchain@v0.0.1-go1.26.1.darwin-arm64/` became corrupted
 - Files are partially written, then truncated
 - Cannot delete due to permission issues
 
 **What I need to know:**
+
 1. Why does the Go toolchain cache become read-only after corruption?
 2. How can we safely recover without manual file deletion?
 3. Is there a way to validate toolchain integrity before use?
 
 **Why this matters:**
+
 - Prevents builds without `GOTOOLCHAIN=local` workaround
 - Affects all Go projects on this machine
 - Manual intervention required for recovery
 
 **Research attempted:**
+
 - Checked Go documentation - no mention of cache integrity
 - Attempted `go clean -cache=force` - fails with permission errors
 - Tried `GOTOOLCHAIN=local` - works but limits to installed toolchain
@@ -293,15 +300,15 @@ Sat Mar 28 08:29:32 CET 2026
 
 ## Summary Statistics
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| run() complexity | 12 (cyclop) | 7 (avg per function) | -42% |
-| gosec G115 issues | 1 | 0 | -100% |
-| Directory permissions | 0755 | 0750 | -1 bit |
-| LayoutProps completeness | Partial | Full | +100% |
-| README lines | 41 (placeholder) | 88 (real docs) | +115% |
-| Test parallelization | Partial | In progress | +N tests |
-| Commits this session | 0 | 6 | +6 |
+| Metric                   | Before           | After                | Change   |
+| ------------------------ | ---------------- | -------------------- | -------- |
+| run() complexity         | 12 (cyclop)      | 7 (avg per function) | -42%     |
+| gosec G115 issues        | 1                | 0                    | -100%    |
+| Directory permissions    | 0755             | 0750                 | -1 bit   |
+| LayoutProps completeness | Partial          | Full                 | +100%    |
+| README lines             | 41 (placeholder) | 88 (real docs)       | +115%    |
+| Test parallelization     | Partial          | In progress          | +N tests |
+| Commits this session     | 0                | 6                    | +6       |
 
 ---
 

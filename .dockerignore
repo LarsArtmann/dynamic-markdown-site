@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+*.md
+!README.md
+LICENSE
+AUTHORS
+CHANGELOG.md
+
+# Build artifacts
+dynamic-markdown-site
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*_test.go
+.testCoverage.txt
+coverage.out
+coverage.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CI/CD
+.github/
+.goreleaser.yml
+.golangci.yml
+
+# Dependency directories (handled by go mod)
+vendor/
+
+# Temporary files
+*.log
+*.tmp
+tmp/
+temp/
+
+# Local content (mounted at runtime)
+content/
+*.local
+
+# Environment files
+.env
+.env.*
+
+# Ignore the Dockerfile itself
+Dockerfile
+.dockerignore
+
+# Justfile (build commands not needed in image)
+justfile

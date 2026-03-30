@@ -15,30 +15,31 @@ Successfully enhanced error context throughout the codebase following branching-
 
 ### a) FULLY DONE ✅
 
-| Task | File | Lines Changed | Status |
-|------|------|---------------|--------|
-| Add `path` context to handleRoot | `internal/server/handlers.go` | 1 | ✅ |
-| Add `query` and `path` context to handleSearch | `internal/server/handlers.go` | 1 | ✅ |
-| Add `path` and `error` context to handleContentByPath | `internal/server/handlers.go` | 3 | ✅ |
-| Add `path` context to cache errors | `internal/cache/html.go` | 1 | ✅ |
-| Verify search error context (already adequate) | `internal/content/search.go` | 0 | ✅ |
+| Task                                                  | File                          | Lines Changed | Status |
+| ----------------------------------------------------- | ----------------------------- | ------------- | ------ |
+| Add `path` context to handleRoot                      | `internal/server/handlers.go` | 1             | ✅     |
+| Add `query` and `path` context to handleSearch        | `internal/server/handlers.go` | 1             | ✅     |
+| Add `path` and `error` context to handleContentByPath | `internal/server/handlers.go` | 3             | ✅     |
+| Add `path` context to cache errors                    | `internal/cache/html.go`      | 1             | ✅     |
+| Verify search error context (already adequate)        | `internal/content/search.go`  | 0             | ✅     |
 
 ### b) Error Context Improvements
 
-| Location | Before | After |
-|----------|--------|-------|
-| `handleRoot` | `"error": err` | `"error": err, "path": "/"` |
-| `handleSearch` | `"query": query, "error": err` | `"query": query, "error": err, "path": "/search"` |
-| `handleContentByPath` | `"error": err` | `"path": urlPath, "error": err` |
-| `handleContentByPath` (404) | No logging | `"path": urlPath` (debug level) |
-| `handleContentByPath` (unknown type) | `"type": ...` | `"type": ..., "path": urlPath` |
-| `cache.GetOrCompute` | `"cache get failed"` | `"cache get failed for path %s"` |
+| Location                             | Before                         | After                                             |
+| ------------------------------------ | ------------------------------ | ------------------------------------------------- |
+| `handleRoot`                         | `"error": err`                 | `"error": err, "path": "/"`                       |
+| `handleSearch`                       | `"query": query, "error": err` | `"query": query, "error": err, "path": "/search"` |
+| `handleContentByPath`                | `"error": err`                 | `"path": urlPath, "error": err`                   |
+| `handleContentByPath` (404)          | No logging                     | `"path": urlPath` (debug level)                   |
+| `handleContentByPath` (unknown type) | `"type": ...`                  | `"type": ..., "path": urlPath`                    |
+| `cache.GetOrCompute`                 | `"cache get failed"`           | `"cache get failed for path %s"`                  |
 
 ---
 
 ## Verification Results
 
 ### Test Results
+
 ```
 ok  	github.com/larsartmann/dynamic-markdown-site/internal/cache        0.347s
 ok  	github.com/larsartmann/dynamic-markdown-site/internal/config       0.507s
@@ -50,6 +51,7 @@ ok  	github.com/larsartmann/dynamic-markdown-site/internal/server     0.983s
 ```
 
 ### Linter Results
+
 - Modified files: **0 issues**
 - No new lint issues introduced
 
@@ -66,10 +68,10 @@ internal/cache/html.go        (+1 error context attribute)
 
 ## Impact
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Error paths with full context | ~60% | ~85% |
-| Average attributes per error log | 2.1 | 3.2 |
+| Metric                           | Before      | After       |
+| -------------------------------- | ----------- | ----------- |
+| Error paths with full context    | ~60%        | ~85%        |
+| Average attributes per error log | 2.1         | 3.2         |
 | Missing path context in handlers | 4 locations | 0 locations |
 
 ---
@@ -77,13 +79,17 @@ internal/cache/html.go        (+1 error context attribute)
 ## Error Handling Patterns
 
 ### Consistent Logging Format
+
 All error logs now follow consistent pattern:
+
 ```
 logger.Error("operation failed", "path", urlPath, "error", err)
 ```
 
 ### Debug Level for Expected Cases
+
 Content not found (404) now uses `Debug` level instead of no logging:
+
 ```go
 s.logger.Debug("content not found", "path", urlPath)
 ```
@@ -99,4 +105,4 @@ s.logger.Debug("content not found", "path", urlPath)
 
 ---
 
-*Generated: 2026-03-29*
+_Generated: 2026-03-29_

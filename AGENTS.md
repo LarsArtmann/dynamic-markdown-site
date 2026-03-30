@@ -334,8 +334,8 @@ The server handles SIGINT/SIGTERM and waits up to 30 seconds for in-flight reque
 
 Prefix: `DYNAMIC_MARKDOWN_`
 
-| Variable             | Description     |
-| -------------------- | --------------- |
+| Variable                     | Description     |
+| ---------------------------- | --------------- |
 | `DYNAMIC_MARKDOWN_PORT`      | Server port     |
 | `DYNAMIC_MARKDOWN_ROOT`      | Root directory  |
 | `DYNAMIC_MARKDOWN_LOG_LEVEL` | Log level       |

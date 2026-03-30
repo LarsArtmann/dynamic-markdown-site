@@ -546,7 +546,7 @@ func TestStaticPathTraversal(t *testing.T) {
 	runStatusTests(t, router, []statusTestCase{
 		{
 			name:       "path traversal in static file returns 404",
-			path:       "/static/../internal/static/secret",
+			path:       "/static/../server/static/secret",
 			wantStatus: http.StatusNotFound,
 		},
 	})
