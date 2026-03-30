@@ -62,12 +62,6 @@ COPY --chown=nonroot:nonroot --from=builder /build/dynamic-markdown-site .
 # Expose port (configurable via PORT env var, defaults to 8080)
 EXPOSE 8080
 
-# Health check using HTTP endpoint
-# Note: distroless images don't have curl, so we use the binary's built-in health check capability
-# The application exposes /health endpoint
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD ["/app/dynamic-markdown-site", "-help"] || exit 1
-
 # Run as non-root user (distroless:nonroot is UID 65532)
 USER nonroot:nonroot
 
@@ -84,5 +78,5 @@ VOLUME ["/content"]
 # Entrypoint using exec form (required for proper signal handling)
 ENTRYPOINT ["/app/dynamic-markdown-site"]
 
-# Default flags
+# Default flags - root path points to /content volume
 CMD ["-root", "/content", "-port", "8080", "-cache"]
