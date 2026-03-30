@@ -35,12 +35,7 @@ func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 func (s *Server) renderTemplate(c *gin.Context, component templ.Component, context string) {
 	// Must explicitly set 200 OK - Gin may have set 404 for unmatched routes
 	c.Status(http.StatusOK)
-
-	err := component.Render(c.Request.Context(), c.Writer)
-	if err != nil {
-		s.logger.Error("failed to render template", "context", context, "error", err)
-		s.handle500(c)
-	}
+	s.renderComponent(c, component, http.StatusOK, context)
 }
 
 func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
