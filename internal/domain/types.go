@@ -64,3 +64,11 @@ var (
 // This type is used to mark strings that contain pre-escaped HTML,
 // distinguishing them from plain text strings that should be escaped.
 type HTML string
+
+// RenderedContent holds the result of rendering markdown content.
+type RenderedContent struct {
+	HTML       HTML
+	TOC        []TOCItem
+	Metadata   Frontmatter
+	HasMermaid bool
+}
