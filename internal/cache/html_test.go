@@ -199,7 +199,7 @@ func TestHTMLCache_GetOrCompute(t *testing.T) {
 		result, err := cache.GetOrCompute(
 			context.Background(),
 			"/test",
-			func() (RenderedContent, error) {
+			func() (domain.RenderedContent, error) {
 				computeCalled = true
 
 				return newTestContent("<h1>Computed</h1>"), nil
@@ -226,8 +226,8 @@ func TestHTMLCache_GetOrCompute(t *testing.T) {
 		result, err := cache.GetOrCompute(
 			context.Background(),
 			"/test",
-			func() (RenderedContent, error) {
-				return RenderedContent{}, expectedErr
+			func() (domain.RenderedContent, error) {
+				return domain.RenderedContent{}, expectedErr
 			},
 		)
 		if err == nil {
@@ -428,7 +428,7 @@ func TestHTMLCache_Concurrent(t *testing.T) {
 				_, _ = cache.GetOrCompute(
 					context.Background(),
 					"/shared",
-					func() (RenderedContent, error) {
+					func() (domain.RenderedContent, error) {
 						mu.Lock()
 						computeCount++
 						mu.Unlock()

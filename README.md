@@ -38,14 +38,14 @@ Open [http://localhost:8080](http://localhost:8080) — your markdown files are 
 dynamic-markdown-site [flags]
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-port` | `8080` | HTTP server port |
-| `-root` | `.` | Root directory containing markdown files |
-| `-log-level` | `info` | Log level: `debug`, `info`, `warn`, `error` |
-| `-cache` | `true` | Enable HTML response caching |
-| `-dev` | `false` | Development mode: disables cache, enables file watching & live reload |
-| `-timeout` | `30s` | HTTP request timeout |
+| Flag         | Default | Description                                                           |
+| ------------ | ------- | --------------------------------------------------------------------- |
+| `-port`      | `8080`  | HTTP server port                                                      |
+| `-root`      | `.`     | Root directory containing markdown files                              |
+| `-log-level` | `info`  | Log level: `debug`, `info`, `warn`, `error`                           |
+| `-cache`     | `true`  | Enable HTML response caching                                          |
+| `-dev`       | `false` | Development mode: disables cache, enables file watching & live reload |
+| `-timeout`   | `30s`   | HTTP request timeout                                                  |
 
 ### Environment Variables
 
@@ -82,16 +82,16 @@ just install-local # Install with go install
 
 All [Goldmark extensions](https://github.com/yuin/goldmark) are enabled:
 
-| Extension | Syntax |
-|-----------|--------|
-| Tables | Standard GFM tables |
-| Strikethrough | `~~deleted~~` |
-| Task lists | `- [ ]` / `- [x]` |
-| Definition lists | Term followed by `: definition` |
-| Footnotes | `[^1]` with `[^1]: text` |
-| Auto headings | Slugged heading IDs for anchor links |
-| Linkify | Auto-link bare URLs |
-| Typographer | Smart quotes, dashes, ellipses |
+| Extension        | Syntax                               |
+| ---------------- | ------------------------------------ |
+| Tables           | Standard GFM tables                  |
+| Strikethrough    | `~~deleted~~`                        |
+| Task lists       | `- [ ]` / `- [x]`                    |
+| Definition lists | Term followed by `: definition`      |
+| Footnotes        | `[^1]` with `[^1]: text`             |
+| Auto headings    | Slugged heading IDs for anchor links |
+| Linkify          | Auto-link bare URLs                  |
+| Typographer      | Smart quotes, dashes, ellipses       |
 
 ### Frontmatter
 
@@ -105,7 +105,6 @@ author: "Author Name"
 tags: ["go", "markdown"]
 draft: false
 ---
-
 # Your content here
 ```
 
@@ -137,15 +136,15 @@ graph LR
 
 ## API
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Root directory listing |
-| `/*path` | GET | Markdown file or directory listing |
-| `/health` | GET | Health check (`200 OK`) |
-| `/refresh` | GET/POST | Refresh content from disk (rate limited: 10/min/IP) |
-| `/search` | GET | Full-text search (`?q=query`) |
-| `/static/*path` | GET | Static assets (CSS, favicon) |
-| `/api/live-reload` | GET | SSE endpoint for live reload (dev mode only) |
+| Endpoint           | Method   | Description                                         |
+| ------------------ | -------- | --------------------------------------------------- |
+| `/`                | GET      | Root directory listing                              |
+| `/*path`           | GET      | Markdown file or directory listing                  |
+| `/health`          | GET      | Health check (`200 OK`)                             |
+| `/refresh`         | GET/POST | Refresh content from disk (rate limited: 10/min/IP) |
+| `/search`          | GET      | Full-text search (`?q=query`)                       |
+| `/static/*path`    | GET      | Static assets (CSS, favicon)                        |
+| `/api/live-reload` | GET      | SSE endpoint for live reload (dev mode only)        |
 
 ## Docker
 
@@ -160,6 +159,7 @@ docker run -p 8080:8080 -v ./content:/content dynamic-markdown-site
 ```
 
 The image uses a multi-stage build:
+
 - **Builder:** `golang:1.26-alpine` with static binary compilation
 - **Runtime:** `distroless/static-debian13` running as `nonroot` (UID 65532)
 
@@ -237,17 +237,17 @@ pkg/
 
 ## Tech Stack
 
-| Component | Library |
-|-----------|---------|
-| HTTP framework | [Gin](https://gin-gonic.com/) |
-| Markdown | [Goldmark](https://github.com/yuin/goldmark) |
-| Syntax highlighting | [Chroma](https://github.com/alecthomas/chroma) |
-| Templates | [Templ](https://templ.guide/) |
-| Dependency injection | [samber/do/v2](https://github.com/samber/do) |
-| Caching | [Otter](https://github.com/maypok86/otter) |
-| D2 diagrams | [d2](https://d2lang.com/) |
-| Logging | [charm.land/log](https://github.com/charmbracelet/log) |
-| Error handling | [cockroachdb/errors](https://github.com/cockroachdb/errors) |
+| Component            | Library                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| HTTP framework       | [Gin](https://gin-gonic.com/)                               |
+| Markdown             | [Goldmark](https://github.com/yuin/goldmark)                |
+| Syntax highlighting  | [Chroma](https://github.com/alecthomas/chroma)              |
+| Templates            | [Templ](https://templ.guide/)                               |
+| Dependency injection | [samber/do/v2](https://github.com/samber/do)                |
+| Caching              | [Otter](https://github.com/maypok86/otter)                  |
+| D2 diagrams          | [d2](https://d2lang.com/)                                   |
+| Logging              | [charm.land/log](https://github.com/charmbracelet/log)      |
+| Error handling       | [cockroachdb/errors](https://github.com/cockroachdb/errors) |
 
 ## License
 

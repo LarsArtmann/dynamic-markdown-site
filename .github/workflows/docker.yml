@@ -4,18 +4,18 @@ on:
   push:
     branches: [master]
     paths:
-      - '**/*.go'
-      - '**/*.templ'
-      - '**/*.css'
-      - '**/*.svg'
-      - 'Dockerfile'
-      - 'go.mod'
-      - 'go.sum'
-      - '.github/workflows/docker.yml'
-      - 'cmd/**'
-      - 'internal/**'
-      - 'templates/**'
-      - 'pkg/**'
+      - "**/*.go"
+      - "**/*.templ"
+      - "**/*.css"
+      - "**/*.svg"
+      - "Dockerfile"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/docker.yml"
+      - "cmd/**"
+      - "internal/**"
+      - "templates/**"
+      - "pkg/**"
 
 env:
   REGISTRY: ghcr.io
