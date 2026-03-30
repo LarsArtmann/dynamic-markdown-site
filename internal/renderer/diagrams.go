@@ -117,26 +117,33 @@ func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 	}
 
 	compileOpts := &d2lib.CompileOptions{
-		LayoutResolver:  layoutResolver,
+		LayoutResolver: layoutResolver,
 		Ruler:          r.ruler,
-		UTF16Pos:       ptr(false),
+		UTF16Pos:       false,
 	}
 
+	sketch := false
+	center := false
+	themeID := int64(0)
+	darkThemeID := int64(0)
 	pad := int64(10)
+	scale := 1.0
+	noXMLTag := false
+	salt := ""
+	omitVersion := false
+
 	renderOpts := &d2svg.RenderOpts{
-		Pad:                &pad,
-		Sketch:             ptr(false),
-		Center:             ptr(false),
-		ThemeID:            ptr(int64(0)),
-		DarkThemeID:        ptr(int64(0)),
-		ThemeOverrides:     nil,
-		DarkThemeOverrides: nil,
-		Font:               ptr(""),
-		Scale:              ptr(1.0),
-		MasterID:           ptr(""),
-		NoXMLTag:           ptr(false),
-		Salt:               ptr(""),
-		OmitVersion:        ptr(false),
+		Pad:         &pad,
+		Sketch:      &sketch,
+		Center:      &center,
+		ThemeID:     &themeID,
+		DarkThemeID: &darkThemeID,
+		Font:        "",
+		Scale:       &scale,
+		MasterID:    "",
+		NoXMLTag:    &noXMLTag,
+		Salt:        &salt,
+		OmitVersion: &omitVersion,
 	}
 
 	diagram, _, err := d2lib.Compile(ctx, content, compileOpts, renderOpts)
