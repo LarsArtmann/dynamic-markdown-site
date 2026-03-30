@@ -9,8 +9,8 @@ import (
 )
 
 // newTestContent creates a RenderedContent for testing.
-func newTestContent(html string) RenderedContent {
-	return RenderedContent{
+func newTestContent(html string) domain.RenderedContent {
+	return domain.RenderedContent{
 		HTML:     domain.HTML(html),
 		TOC:      []domain.TOCItem{{Level: 1, Title: "Test", Anchor: "test"}},
 		Metadata: domain.Frontmatter{Title: "Test Title"},
@@ -18,7 +18,7 @@ func newTestContent(html string) RenderedContent {
 }
 
 // assertContentEqual compares two RenderedContent values for equality.
-func assertContentEqual(t *testing.T, got, want RenderedContent) {
+func assertContentEqual(t *testing.T, got, want domain.RenderedContent) {
 	t.Helper()
 	if string(got.HTML) != string(want.HTML) {
 		t.Errorf("Expected HTML %q, got %q", want.HTML, got.HTML)
@@ -167,7 +167,7 @@ func TestHTMLCache_GetOrCompute(t *testing.T) {
 		result, err := cache.GetOrCompute(
 			context.Background(),
 			"/test",
-			func() (RenderedContent, error) {
+			func() (domain.RenderedContent, error) {
 				computeCalled = true
 
 				return content, nil

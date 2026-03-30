@@ -39,9 +39,9 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build \
     ./cmd/dynamic-markdown-site
 
 # =============================================================================
-# STAGE 2: Runtime (distroless)
+# STAGE 2: Runtime (distroless Debian 13)
 # =============================================================================
-FROM gcr.io/distroless/static-debian12:nonroot
+FROM gcr.io/distroless/static-debian13:nonroot
 
 # OCI-compliant labels
 LABEL org.opencontainers.image.source="https://github.com/larsartmann/dynamic-markdown-site" \

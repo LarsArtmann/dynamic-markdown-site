@@ -17,6 +17,7 @@ type LayoutProps struct {
 	ActivePath  domain.URLPath
 	ShowNav     bool
 	DevMode     bool
+	HasMermaid  bool
 }
 
 // Layout is the base layout for all pages.
@@ -40,6 +41,9 @@ templ Layout(props LayoutProps) {
 				@Footer()
 				if props.DevMode {
 					@LiveReloadScript()
+				}
+				if props.HasMermaid {
+					@MermaidScript()
 				}
 			</div>
 		</body>
@@ -106,6 +110,14 @@ templ LiveReloadScript() {
 			transform: translateY(0);
 		}
 	</style>
+}
+
+// MermaidScript injects the Mermaid.js library for client-side diagram rendering.
+templ MermaidScript() {
+	<script type="module">
+		import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+		mermaid.initialize({ startOnLoad: true });
+	</script>
 }
 
 // Header renders the site header with navigation.

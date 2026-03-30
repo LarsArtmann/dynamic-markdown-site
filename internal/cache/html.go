@@ -11,25 +11,17 @@ import (
 	"github.com/maypok86/otter/v2/stats"
 )
 
-// RenderedContent holds cached rendering results.
-type RenderedContent struct {
-	HTML       domain.HTML
-	TOC        []domain.TOCItem
-	Metadata   domain.Frontmatter
-	HasMermaid bool
-}
-
 // HTMLCache provides caching for rendered HTML content.
 type HTMLCache struct {
-	cache *otter.Cache[string, RenderedContent]
+	cache *otter.Cache[string, domain.RenderedContent]
 }
 
 // NewHTMLCache creates a new HTML cache with the specified maximum size.
 func NewHTMLCache(maxSize int) *HTMLCache {
 	//nolint:exhaustruct
-	cache := otter.Must(&otter.Options[string, RenderedContent]{
+	cache := otter.Must(&otter.Options[string, domain.RenderedContent]{
 		MaximumSize:      maxSize,
-		ExpiryCalculator: otter.ExpiryAccessing[string, RenderedContent](time.Hour),
+		ExpiryCalculator: otter.ExpiryAccessing[string, domain.RenderedContent](time.Hour),
 		StatsRecorder:    stats.NewCounter(),
 	})
 
@@ -37,7 +29,7 @@ func NewHTMLCache(maxSize int) *HTMLCache {
 }
 
 // Get retrieves cached content by path. Returns nil if not found.
-func (c *HTMLCache) Get(path string) *RenderedContent {
+func (c *HTMLCache) Get(path string) *domain.RenderedContent {
 	val, ok := c.cache.GetIfPresent(path)
 	if !ok {
 		return nil
@@ -47,7 +39,7 @@ func (c *HTMLCache) Get(path string) *RenderedContent {
 }
 
 // Set stores rendered content at the given path.
-func (c *HTMLCache) Set(path string, content RenderedContent) {
+func (c *HTMLCache) Set(path string, content domain.RenderedContent) {
 	c.cache.Set(path, content)
 }
 
@@ -55,13 +47,13 @@ func (c *HTMLCache) Set(path string, content RenderedContent) {
 func (c *HTMLCache) GetOrCompute(
 	ctx context.Context,
 	path string,
-	compute func() (RenderedContent, error),
-) (*RenderedContent, error) {
+	compute func() (domain.RenderedContent, error),
+) (*domain.RenderedContent, error) {
 	val, err := c.cache.Get(
 		ctx,
 		path,
-		otter.LoaderFunc[string, RenderedContent](
-			func(_ context.Context, _ string) (RenderedContent, error) {
+		otter.LoaderFunc[string, domain.RenderedContent](
+			func(_ context.Context, _ string) (domain.RenderedContent, error) {
 				return compute()
 			},
 		),
