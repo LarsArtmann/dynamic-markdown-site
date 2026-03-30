@@ -71,9 +71,10 @@ func NewGoldmarkRendererWithDiagrams(diagramRenderer *DiagramRenderer) *Goldmark
 
 // RenderResult contains the result of rendering markdown.
 type RenderResult struct {
-	HTML     domain.HTML
-	TOC      []domain.TOCItem
-	Metadata domain.Frontmatter
+	HTML       domain.HTML
+	TOC        []domain.TOCItem
+	Metadata   domain.Frontmatter
+	HasMermaid bool
 }
 
 // Render converts markdown to HTML and extracts metadata.
@@ -98,10 +99,14 @@ func (r *GoldmarkRenderer) Render(source []byte) (RenderResult, error) {
 		return RenderResult{}, errors.Wrap(err, "render markdown")
 	}
 
+	// Check for mermaid diagrams
+	hasMermaid := HasMermaidDiagrams(string(source))
+
 	return RenderResult{
-		HTML:     domain.HTML(buf.String()),
-		TOC:      toc,
-		Metadata: metadata,
+		HTML:       domain.HTML(buf.String()),
+		TOC:        toc,
+		Metadata:   metadata,
+		HasMermaid: hasMermaid,
 	}, nil
 }
 
