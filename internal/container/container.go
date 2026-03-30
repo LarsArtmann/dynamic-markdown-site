@@ -126,7 +126,9 @@ func provideRenderer(_ do.Injector) (*renderer.GoldmarkRenderer, error) {
 	diagramRenderer, err := renderer.NewDiagramRenderer()
 	if err != nil {
 		// Continue without diagram support if D2 renderer fails
-		return renderer.NewGoldmarkRenderer(), nil
+		// We intentionally swallow the error here to degrade gracefully
+		// when diagram dependencies are unavailable
+		return renderer.NewGoldmarkRenderer(), nil //nolint:nilerr // graceful degradation
 	}
 
 	return renderer.NewGoldmarkRendererWithDiagrams(diagramRenderer), nil

@@ -37,15 +37,15 @@ const wordsPerMinute = 200
 //
 // This is a medium-priority architectural improvement tracked in the roadmap.
 type FileNode struct {
-	path        URLPath
-	title       string
-	content     []byte
-	html        HTML
-	toc         []TOCItem
-	metadata    Frontmatter
-	modified    time.Time
-	size        uint64
-	hasMermaid  bool // True if file contains mermaid diagrams
+	path       URLPath
+	title      string
+	content    []byte
+	html       HTML
+	toc        []TOCItem
+	metadata   Frontmatter
+	modified   time.Time
+	size       uint64
+	hasMermaid bool // True if file contains mermaid diagrams
 }
 
 // NewFileNode creates a new FileNode with validation.

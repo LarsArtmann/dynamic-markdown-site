@@ -6,9 +6,7 @@ import (
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 )
 
@@ -74,7 +72,7 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 	if err != nil {
 		// If rendering fails, fall back to code block
 		w.WriteString("<pre><code class=\"language-d2\">")
-		w.Write([]byte(escapeHTML(content)))
+		w.WriteString(escapeHTML(content))
 		w.WriteString("</code></pre>")
 
 		return ast.WalkContinue, nil
@@ -93,26 +91,4 @@ func (r *DiagramRendererNode) renderMermaid(w util.BufWriter, content string) (a
 	w.WriteString(html)
 
 	return ast.WalkStop, nil
-}
-
-// MermaidTransformer is a parser transformer that marks mermaid code blocks.
-type MermaidTransformer struct{}
-
-// Transform marks mermaid code blocks for special handling.
-func (t *MermaidTransformer) Transform(node *ast.Document, reader text.Reader, pc parser.Context) {
-	ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
-		if !entering {
-			return ast.WalkContinue, nil
-		}
-
-		if cb, ok := n.(*ast.FencedCodeBlock); ok {
-			lang := string(cb.Language(reader.Source()))
-			if lang == "mermaid" {
-				// Store info for renderer
-				cb.SetBlankPreviousLines(true)
-			}
-		}
-
-		return ast.WalkContinue, nil
-	})
 }
