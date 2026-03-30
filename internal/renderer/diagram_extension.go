@@ -38,7 +38,12 @@ func (r *DiagramRendererNode) RegisterFuncs(reg renderer.NodeRendererFuncRegiste
 }
 
 // renderFencedCodeBlock renders fenced code blocks, handling d2 and mermaid specially.
-func (r *DiagramRendererNode) renderFencedCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *DiagramRendererNode) renderFencedCodeBlock(
+	w util.BufWriter,
+	source []byte,
+	node ast.Node,
+	entering bool,
+) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -86,7 +91,10 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 }
 
 // renderMermaid renders a Mermaid diagram to HTML for client-side processing.
-func (r *DiagramRendererNode) renderMermaid(w util.BufWriter, content string) (ast.WalkStatus, error) {
+func (r *DiagramRendererNode) renderMermaid(
+	w util.BufWriter,
+	content string,
+) (ast.WalkStatus, error) {
 	html := RenderMermaidToHTML(content)
 	w.WriteString(html)
 
