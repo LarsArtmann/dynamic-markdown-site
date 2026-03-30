@@ -13,9 +13,10 @@ import (
 
 // RenderedContent holds cached rendering results.
 type RenderedContent struct {
-	HTML     domain.HTML
-	TOC      []domain.TOCItem
-	Metadata domain.Frontmatter
+	HTML       domain.HTML
+	TOC        []domain.TOCItem
+	Metadata   domain.Frontmatter
+	HasMermaid bool
 }
 
 // HTMLCache provides caching for rendered HTML content.
