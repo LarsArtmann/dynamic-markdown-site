@@ -1,0 +1,55 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '**/*.go'
+      - '**/*.templ'
+      - '**/*.css'
+      - '**/*.svg'
+      - 'Dockerfile'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/docker.yml'
+      - 'cmd/**'
+      - 'internal/**'
+      - 'templates/**'
+      - 'pkg/**'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: dynamic-markdown-site:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Save Docker image as tar
+        run: docker save dynamic-markdown-site:${{ github.sha }} -o image.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dynamic-markdown-site-${{ github.sha }}
+          path: image.tar
+          retention-days: 14
+          if-no-files-found: error
