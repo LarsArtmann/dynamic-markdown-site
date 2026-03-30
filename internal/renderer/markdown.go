@@ -21,39 +21,52 @@ import (
 
 // GoldmarkRenderer implements markdown rendering using goldmark.
 type GoldmarkRenderer struct {
-	md goldmark.Markdown
+	md              goldmark.Markdown
+	diagramRenderer *DiagramRenderer
 }
 
 // NewGoldmarkRenderer creates a new configured goldmark renderer.
 func NewGoldmarkRenderer() *GoldmarkRenderer {
-	md := goldmark.New(
-		goldmark.WithExtensions(
-			// Standard extensions
-			extension.Table,
-			extension.Strikethrough,
-			extension.Linkify,
-			extension.TaskList,
-			extension.DefinitionList,
-			extension.Footnote,
-			extension.Typographer,
+	return NewGoldmarkRendererWithDiagrams(nil)
+}
 
-			// Syntax highlighting with Chroma
-			highlighting.NewHighlighting(
-				highlighting.WithStyle("monokai"),
-				highlighting.WithFormatOptions(
-					chromahtml.WithLineNumbers(false),
-				),
+// NewGoldmarkRendererWithDiagrams creates a renderer with diagram support.
+func NewGoldmarkRendererWithDiagrams(diagramRenderer *DiagramRenderer) *GoldmarkRenderer {
+	extensions := []goldmark.Extender{
+		// Standard extensions
+		extension.Table,
+		extension.Strikethrough,
+		extension.Linkify,
+		extension.TaskList,
+		extension.DefinitionList,
+		extension.Footnote,
+		extension.Typographer,
+
+		// Syntax highlighting with Chroma
+		highlighting.NewHighlighting(
+			highlighting.WithStyle("monokai"),
+			highlighting.WithFormatOptions(
+				chromahtml.WithLineNumbers(false),
 			),
-
-			// Frontmatter support
-			meta.Meta,
 		),
+
+		// Frontmatter support
+		meta.Meta,
+	}
+
+	// Add diagram extension if renderer is provided
+	if diagramRenderer != nil {
+		extensions = append(extensions, NewDiagramExtension(diagramRenderer))
+	}
+
+	md := goldmark.New(
+		goldmark.WithExtensions(extensions...),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
 		),
 	)
 
-	return &GoldmarkRenderer{md: md}
+	return &GoldmarkRenderer{md: md, diagramRenderer: diagramRenderer}
 }
 
 // RenderResult contains the result of rendering markdown.

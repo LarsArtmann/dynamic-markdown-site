@@ -37,14 +37,15 @@ const wordsPerMinute = 200
 //
 // This is a medium-priority architectural improvement tracked in the roadmap.
 type FileNode struct {
-	path     URLPath
-	title    string
-	content  []byte
-	html     HTML
-	toc      []TOCItem
-	metadata Frontmatter
-	modified time.Time
-	size     uint64
+	path        URLPath
+	title       string
+	content     []byte
+	html        HTML
+	toc         []TOCItem
+	metadata    Frontmatter
+	modified    time.Time
+	size        uint64
+	hasMermaid  bool // True if file contains mermaid diagrams
 }
 
 // NewFileNode creates a new FileNode with validation.
@@ -129,6 +130,18 @@ func (f *FileNode) SetMetadata(meta Frontmatter) {
 	}
 }
 
+// HasMermaid returns true if the file contains mermaid diagrams.
+func (f *FileNode) HasMermaid() bool {
+	return f.hasMermaid
+}
+
+// SetHasMermaid sets whether the file contains mermaid diagrams.
+//
+// Deprecated: Mutates the FileNode. Will be replaced by immutable RenderedFile pattern.
+func (f *FileNode) SetHasMermaid(hasMermaid bool) {
+	f.hasMermaid = hasMermaid
+}
+
 // ReadingTime returns estimated reading time in minutes.
 func (f *FileNode) ReadingTime() uint {
 	wordCount := uint(len(strings.Fields(string(f.content))))
@@ -192,3 +205,6 @@ func (r *RenderedFile) Modified() time.Time { return r.file.Modified() }
 
 // ReadingTime returns the estimated reading time.
 func (r *RenderedFile) ReadingTime() uint { return r.file.ReadingTime() }
+
+// HasMermaid returns whether the file contains mermaid diagrams.
+func (r *RenderedFile) HasMermaid() bool { return r.file.HasMermaid() }

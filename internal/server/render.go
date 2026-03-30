@@ -52,6 +52,7 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 		file.SetHTML(cached.HTML)
 		file.SetTOC(cached.TOC)
 		file.SetMetadata(cached.Metadata)
+		file.SetHasMermaid(cached.HasMermaid)
 	} else if file.HTML() == "" {
 		result, err := s.renderer.Render(file.Content())
 		if err != nil {
@@ -67,12 +68,14 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 		file.SetHTML(result.HTML)
 		file.SetTOC(result.TOC)
 		file.SetMetadata(result.Metadata)
+		file.SetHasMermaid(result.HasMermaid)
 
 		// Cache the rendered content
 		s.cache.Set(path, cache.RenderedContent{
-			HTML:     result.HTML,
-			TOC:      result.TOC,
-			Metadata: result.Metadata,
+			HTML:       result.HTML,
+			TOC:        result.TOC,
+			Metadata:   result.Metadata,
+			HasMermaid: result.HasMermaid,
 		})
 	}
 

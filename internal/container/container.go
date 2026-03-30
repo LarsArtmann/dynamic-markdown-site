@@ -122,7 +122,14 @@ func provideCache(_ do.Injector) (*cache.HTMLCache, error) {
 }
 
 func provideRenderer(_ do.Injector) (*renderer.GoldmarkRenderer, error) {
-	return renderer.NewGoldmarkRenderer(), nil
+	// Create diagram renderer for D2 support
+	diagramRenderer, err := renderer.NewDiagramRenderer()
+	if err != nil {
+		// Continue without diagram support if D2 renderer fails
+		return renderer.NewGoldmarkRenderer(), nil
+	}
+
+	return renderer.NewGoldmarkRendererWithDiagrams(diagramRenderer), nil
 }
 
 func provideRepository(i do.Injector) (content.Repository, error) {
