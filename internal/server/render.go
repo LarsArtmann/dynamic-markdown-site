@@ -97,6 +97,7 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 		Breadcrumbs: crumbs,
 		ActivePath:  file.Path(),
 		ShowNav:     true,
+		HasMermaid:  file.HasMermaid(),
 	}
 
 	fileProps := templates.FileViewProps{
