@@ -96,13 +96,16 @@ func writeStrings(w util.BufWriter, errMsg string, parts ...string) error {
 func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.WalkStatus, error) {
 	svg, err := r.diagramRenderer.RenderD2(content)
 	if err != nil {
-		if writeErr := writeStrings(w, "write D2 fallback", "<pre><code class=\"language-d2\">", escapeHTML(content), "</code></pre>"); writeErr != nil {
+		htmlContent := escapeHTML(content)
+		if writeErr := writeStrings(w, "write D2 fallback",
+			"<pre><code class=\"language-d2\">", htmlContent, "</code></pre>"); writeErr != nil {
 			return ast.WalkContinue, writeErr
 		}
 		return ast.WalkContinue, nil
 	}
 
-	if writeErr := writeStrings(w, "write D2 output", `<div class="diagram d2-diagram">`); writeErr != nil {
+	if writeErr := writeStrings(w, "write D2 output",
+		`<div class="diagram d2-diagram">`); writeErr != nil {
 		return ast.WalkStop, writeErr
 	}
 	if _, writeErr := w.Write(svg); writeErr != nil {

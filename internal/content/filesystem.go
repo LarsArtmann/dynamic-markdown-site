@@ -128,10 +128,6 @@ type treeStats struct {
 	errors []string
 }
 
-func (s *treeStats) addError(msg string) {
-	s.errors = append(s.errors, msg)
-}
-
 func (s *treeStats) recordError(fsPath, operation string, err error) {
 	s.errors = append(s.errors, fmt.Sprintf("%s at %s: %v", operation, fsPath, err))
 }
