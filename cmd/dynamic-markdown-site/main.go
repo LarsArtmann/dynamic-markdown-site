@@ -158,7 +158,7 @@ func serveHTTP(svc *services, httpServer *http.Server, _ *gin.Engine) error {
 
 	select {
 	case err := <-errChan:
-		return cockroachdberrors.Wrap(err, "server error")
+		return cockroachdberrors.Wrapf(err, "server error (addr: %s)", httpServer.Addr)
 	case <-ctx.Done():
 		svc.logger.Info("shutdown signal received")
 		return nil
@@ -171,7 +171,7 @@ func gracefulShutdown(svc *services, httpServer *http.Server) error {
 	defer cancel()
 
 	if err := httpServer.Shutdown(shutdownCtx); err != nil {
-		return cockroachdberrors.Wrap(err, "server shutdown failed")
+		return cockroachdberrors.Wrapf(err, "server shutdown failed (addr: %s)", httpServer.Addr)
 	}
 
 	shutdownServices(svc)

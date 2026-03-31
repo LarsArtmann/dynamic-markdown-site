@@ -148,12 +148,12 @@ func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 
 	diagram, _, err := d2lib.Compile(ctx, content, compileOpts, renderOpts)
 	if err != nil {
-		return nil, errors.Wrap(err, "compile D2 diagram")
+		return nil, errors.Wrapf(err, "compile D2 diagram: %s", truncateForLog(content))
 	}
 
 	svg, err := d2svg.Render(diagram, renderOpts)
 	if err != nil {
-		return nil, errors.Wrap(err, "render D2 diagram to SVG")
+		return nil, errors.Wrapf(err, "render D2 diagram to SVG: %s", truncateForLog(content))
 	}
 
 	return svg, nil

@@ -14,7 +14,16 @@ import (
 const (
 	diagramTypeD2      = "d2"
 	diagramTypeMermaid = "mermaid"
+	maxLogContentLen   = 100
 )
+
+// truncateForLog truncates content for safe logging.
+func truncateForLog(content string) string {
+	if len(content) <= maxLogContentLen {
+		return content
+	}
+	return content[:maxLogContentLen] + "..."
+}
 
 // DiagramExtension is a goldmark extension for rendering diagrams.
 type DiagramExtension struct {
@@ -67,7 +76,7 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 	for i := range n.Lines().Len() {
 		line := n.Lines().At(i)
 		if _, err := content.Write(line.Value(source)); err != nil {
-			return ast.WalkContinue, errors.Wrap(err, "write fence code line")
+			return ast.WalkContinue, errors.Wrapf(err, "write fence code line (entering: %t, lang: %s)", entering, lang)
 		}
 	}
 
@@ -86,7 +95,7 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 func writeStrings(w util.BufWriter, errMsg string, parts ...string) error {
 	for _, p := range parts {
 		if _, err := w.WriteString(p); err != nil {
-			return errors.New(errMsg + ": " + err.Error())
+			return errors.Wrapf(err, "%s (writing %d parts)", errMsg, len(parts))
 		}
 	}
 	return nil
@@ -114,13 +123,13 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 		"write D2 output",
 		`<div class="diagram d2-diagram">`,
 	); writeErr != nil {
-		return ast.WalkStop, writeErr
+		return ast.WalkStop, errors.Wrapf(writeErr, "write D2 div start for content: %s", truncateForLog(content))
 	}
 	if _, writeErr := w.Write(svg); writeErr != nil {
-		return ast.WalkStop, errors.Wrap(writeErr, "write D2 SVG")
+		return ast.WalkStop, errors.Wrapf(writeErr, "write D2 SVG for content: %s", truncateForLog(content))
 	}
 	if _, writeErr := w.WriteString("</div>"); writeErr != nil {
-		return ast.WalkStop, errors.Wrap(writeErr, "write D2 diagram closing div")
+		return ast.WalkStop, errors.Wrapf(writeErr, "write D2 div end for content: %s", truncateForLog(content))
 	}
 
 	return ast.WalkStop, nil
@@ -133,7 +142,7 @@ func (r *DiagramRendererNode) renderMermaid(
 ) (ast.WalkStatus, error) {
 	html := RenderMermaidToHTML(content)
 	if _, err := w.WriteString(html); err != nil {
-		return ast.WalkStop, errors.Wrap(err, "write mermaid HTML")
+		return ast.WalkStop, errors.Wrapf(err, "write mermaid HTML for content: %s", truncateForLog(content))
 	}
 
 	return ast.WalkStop, nil
