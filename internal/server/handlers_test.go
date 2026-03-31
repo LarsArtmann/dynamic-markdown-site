@@ -150,7 +150,12 @@ func runStatusTests(t *testing.T, router *gin.Engine, tests []statusTestCase) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, tt.path, nil)
+			req := httptest.NewRequestWithContext(
+				context.Background(),
+				http.MethodGet,
+				tt.path,
+				nil,
+			)
 			rec := httptest.NewRecorder()
 			router.ServeHTTP(rec, req)
 
@@ -481,7 +486,12 @@ func TestSearchEndpointError(t *testing.T) {
 		server.handle500(c)
 	})
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/search?q=test", nil)
+	req := httptest.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		"/search?q=test",
+		nil,
+	)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -611,7 +621,12 @@ func TestRenderFileWithCache(t *testing.T) {
 	router := newTestRouter(server)
 
 	// First request - renders and caches
-	req1 := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/cached-file", nil)
+	req1 := httptest.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		"/cached-file",
+		nil,
+	)
 	rec1 := httptest.NewRecorder()
 	router.ServeHTTP(rec1, req1)
 
@@ -620,7 +635,12 @@ func TestRenderFileWithCache(t *testing.T) {
 	}
 
 	// Second request - should use cache
-	req2 := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/cached-file", nil)
+	req2 := httptest.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		"/cached-file",
+		nil,
+	)
 	rec2 := httptest.NewRecorder()
 	router.ServeHTTP(rec2, req2)
 

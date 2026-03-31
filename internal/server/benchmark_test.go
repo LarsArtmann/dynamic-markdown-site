@@ -156,7 +156,12 @@ func BenchmarkServerConcurrent(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		i := 0
 		for pb.Next() {
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, paths[i%len(paths)], nil)
+			req := httptest.NewRequestWithContext(
+				context.Background(),
+				http.MethodGet,
+				paths[i%len(paths)],
+				nil,
+			)
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
 

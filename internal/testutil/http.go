@@ -46,7 +46,12 @@ func (r *HTTPTestRunner) Run(t *testing.T, cases []HTTPTestCase) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			req := httptest.NewRequestWithContext(context.Background(), tc.Method, tc.Path, strings.NewReader(tc.Body))
+			req := httptest.NewRequestWithContext(
+				context.Background(),
+				tc.Method,
+				tc.Path,
+				strings.NewReader(tc.Body),
+			)
 			rec := httptest.NewRecorder()
 
 			r.Router.ServeHTTP(rec, req)
