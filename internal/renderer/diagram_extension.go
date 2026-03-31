@@ -76,7 +76,7 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 	for i := range n.Lines().Len() {
 		line := n.Lines().At(i)
 		if _, err := content.Write(line.Value(source)); err != nil {
-			return ast.WalkContinue, errors.Wrapf(err, "write fence code line (entering: %t, lang: %s)", entering, lang)
+			return ast.WalkContinue, errors.Wrapf(err, "write fence code line")
 		}
 	}
 
@@ -123,13 +123,25 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 		"write D2 output",
 		`<div class="diagram d2-diagram">`,
 	); writeErr != nil {
-		return ast.WalkStop, errors.Wrapf(writeErr, "write D2 div start for content: %s", truncateForLog(content))
+		return ast.WalkStop, errors.Wrapf(
+			writeErr,
+			"write D2 div start for: %s",
+			truncateForLog(content),
+		)
 	}
 	if _, writeErr := w.Write(svg); writeErr != nil {
-		return ast.WalkStop, errors.Wrapf(writeErr, "write D2 SVG for content: %s", truncateForLog(content))
+		return ast.WalkStop, errors.Wrapf(
+			writeErr,
+			"write D2 SVG for: %s",
+			truncateForLog(content),
+		)
 	}
 	if _, writeErr := w.WriteString("</div>"); writeErr != nil {
-		return ast.WalkStop, errors.Wrapf(writeErr, "write D2 div end for content: %s", truncateForLog(content))
+		return ast.WalkStop, errors.Wrapf(
+			writeErr,
+			"write D2 div end for: %s",
+			truncateForLog(content),
+		)
 	}
 
 	return ast.WalkStop, nil
@@ -142,7 +154,11 @@ func (r *DiagramRendererNode) renderMermaid(
 ) (ast.WalkStatus, error) {
 	html := RenderMermaidToHTML(content)
 	if _, err := w.WriteString(html); err != nil {
-		return ast.WalkStop, errors.Wrapf(err, "write mermaid HTML for content: %s", truncateForLog(content))
+		return ast.WalkStop, errors.Wrapf(
+			err,
+			"write mermaid HTML for: %s",
+			truncateForLog(content),
+		)
 	}
 
 	return ast.WalkStop, nil
