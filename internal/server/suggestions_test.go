@@ -123,12 +123,20 @@ func TestFindSuggestions(t *testing.T) {
 			got := findSuggestions(tt.requested, tt.paths, tt.maxSuggestions)
 
 			if len(got) != tt.wantCount {
-				t.Errorf("findSuggestions() returned %d suggestions, want %d", len(got), tt.wantCount)
+				t.Errorf(
+					"findSuggestions() returned %d suggestions, want %d",
+					len(got),
+					tt.wantCount,
+				)
 			}
 
 			if tt.wantFirst != "" && len(got) > 0 {
 				if got[0].Path.String() != tt.wantFirst {
-					t.Errorf("findSuggestions() first suggestion = %q, want %q", got[0].Path.String(), tt.wantFirst)
+					t.Errorf(
+						"findSuggestions() first suggestion = %q, want %q",
+						got[0].Path.String(),
+						tt.wantFirst,
+					)
 				}
 			}
 		})
@@ -222,7 +230,12 @@ func TestSuggestedPath_ScoreOrdering(t *testing.T) {
 	// Check that results are sorted by score descending
 	for i := 1; i < len(suggestions); i++ {
 		if suggestions[i].Score > suggestions[i-1].Score {
-			t.Errorf("suggestions not sorted by score: %v > %v at index %d", suggestions[i].Score, suggestions[i-1].Score, i)
+			t.Errorf(
+				"suggestions not sorted by score: %v > %v at index %d",
+				suggestions[i].Score,
+				suggestions[i-1].Score,
+				i,
+			)
 		}
 	}
 
