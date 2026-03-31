@@ -272,7 +272,7 @@ func TestContentWithFile(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	rec := executeRequest(router, http.MethodGet, "/test-file")
+	rec := executeRequest(router, "/test-file")
 
 	if rec.Code != http.StatusOK {
 		t.Errorf(
@@ -322,7 +322,7 @@ func TestContentWithDirectory(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	rec := executeRequest(router, http.MethodGet, "/test-dir")
+	rec := executeRequest(router, "/test-dir")
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
