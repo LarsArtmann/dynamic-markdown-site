@@ -76,7 +76,12 @@ func (r *DiagramRendererNode) renderFencedCodeBlock(
 	for i := range n.Lines().Len() {
 		line := n.Lines().At(i)
 		if _, err := content.Write(line.Value(source)); err != nil {
-			return ast.WalkContinue, errors.Wrapf(err, "write fence code line")
+			return ast.WalkContinue, errors.Wrapf(
+				err,
+				"write fence code line (lang: %s, partial: %s)",
+				lang,
+				truncateForLog(content.String()),
+			)
 		}
 	}
 
@@ -101,6 +106,11 @@ func writeStrings(w util.BufWriter, errMsg string, parts ...string) error {
 	return nil
 }
 
+// wrapWriteError wraps a write error with context including truncated content.
+func wrapWriteError(err error, msg string, content string) error {
+	return errors.Wrapf(err, "%s: %s", msg, truncateForLog(content))
+}
+
 // renderD2 renders a D2 diagram to SVG.
 func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.WalkStatus, error) {
 	svg, err := r.diagramRenderer.RenderD2(content)
@@ -113,7 +123,11 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 			htmlContent,
 			"</code></pre>",
 		); writeErr != nil {
-			return ast.WalkContinue, writeErr
+			return ast.WalkContinue, wrapWriteError(
+				writeErr,
+				"write D2 fallback for diagram",
+				content,
+			)
 		}
 		return ast.WalkContinue, nil
 	}
@@ -123,25 +137,13 @@ func (r *DiagramRendererNode) renderD2(w util.BufWriter, content string) (ast.Wa
 		"write D2 output",
 		`<div class="diagram d2-diagram">`,
 	); writeErr != nil {
-		return ast.WalkStop, errors.Wrapf(
-			writeErr,
-			"write D2 div start for: %s",
-			truncateForLog(content),
-		)
+		return ast.WalkStop, wrapWriteError(writeErr, "write D2 div start", content)
 	}
 	if _, writeErr := w.Write(svg); writeErr != nil {
-		return ast.WalkStop, errors.Wrapf(
-			writeErr,
-			"write D2 SVG for: %s",
-			truncateForLog(content),
-		)
+		return ast.WalkStop, wrapWriteError(writeErr, "write D2 SVG", content)
 	}
 	if _, writeErr := w.WriteString("</div>"); writeErr != nil {
-		return ast.WalkStop, errors.Wrapf(
-			writeErr,
-			"write D2 div end for: %s",
-			truncateForLog(content),
-		)
+		return ast.WalkStop, wrapWriteError(writeErr, "write D2 div end", content)
 	}
 
 	return ast.WalkStop, nil
@@ -154,11 +156,7 @@ func (r *DiagramRendererNode) renderMermaid(
 ) (ast.WalkStatus, error) {
 	html := RenderMermaidToHTML(content)
 	if _, err := w.WriteString(html); err != nil {
-		return ast.WalkStop, errors.Wrapf(
-			err,
-			"write mermaid HTML for: %s",
-			truncateForLog(content),
-		)
+		return ast.WalkStop, wrapWriteError(err, "write mermaid HTML", content)
 	}
 
 	return ast.WalkStop, nil

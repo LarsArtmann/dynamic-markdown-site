@@ -25,6 +25,14 @@ func assertContentEqual(t *testing.T, got, want domain.RenderedContent) {
 	}
 }
 
+// assertCacheSize asserts the expected cache size.
+func assertCacheSize(t *testing.T, cache *HTMLCache, expected int) {
+	t.Helper()
+	if size := cache.EstimatedSize(); size != expected {
+		t.Errorf("Expected cache size %d, got %d", expected, size)
+	}
+}
+
 // statsTestCase represents a test case for Stats methods.
 type statsTestCase struct {
 	name     string
@@ -63,9 +71,7 @@ func TestNewHTMLCache(t *testing.T) {
 			t.Fatal("NewHTMLCache returned nil")
 		}
 
-		if size := cache.EstimatedSize(); size != 0 {
-			t.Errorf("Expected empty cache, got size %d", size)
-		}
+		assertCacheSize(t, cache, 0)
 	})
 }
 
@@ -119,10 +125,7 @@ func TestHTMLCache_Set(t *testing.T) {
 		content := newTestContent("<h1>Test</h1>")
 
 		cache.Set("/path/to/file", content)
-
-		if size := cache.EstimatedSize(); size != 1 {
-			t.Errorf("Expected size 1, got %d", size)
-		}
+		assertCacheSize(t, cache, 1)
 	})
 
 	t.Run("overwrites existing value", func(t *testing.T) {
@@ -150,9 +153,7 @@ func TestHTMLCache_Set(t *testing.T) {
 		cache.Set("/b", newTestContent("B"))
 		cache.Set("/c", newTestContent("C"))
 
-		if size := cache.EstimatedSize(); size != 3 {
-			t.Errorf("Expected size 3, got %d", size)
-		}
+		assertCacheSize(t, cache, 3)
 	})
 }
 
@@ -321,28 +322,17 @@ func TestHTMLCache_EstimatedSize(t *testing.T) {
 		t.Parallel()
 		cache := NewHTMLCache(100)
 
-		if size := cache.EstimatedSize(); size != 0 {
-			t.Errorf("Expected size 0, got %d", size)
-		}
+		assertCacheSize(t, cache, 0)
 
 		cache.Set("/a", newTestContent("A"))
-
-		if size := cache.EstimatedSize(); size != 1 {
-			t.Errorf("Expected size 1, got %d", size)
-		}
+		assertCacheSize(t, cache, 1)
 
 		cache.Set("/b", newTestContent("B"))
 		cache.Set("/c", newTestContent("C"))
-
-		if size := cache.EstimatedSize(); size != 3 {
-			t.Errorf("Expected size 3, got %d", size)
-		}
+		assertCacheSize(t, cache, 3)
 
 		cache.InvalidateAll()
-
-		if size := cache.EstimatedSize(); size != 0 {
-			t.Errorf("Expected size 0 after invalidation, got %d", size)
-		}
+		assertCacheSize(t, cache, 0)
 	})
 }
 
@@ -356,15 +346,10 @@ func TestHTMLCache_InvalidateAll(t *testing.T) {
 			cache.Set("/test"+string(rune('0'+i)), newTestContent("content"))
 		}
 
-		if size := cache.EstimatedSize(); size != 10 {
-			t.Fatalf("Expected size 10 before invalidation, got %d", size)
-		}
+		assertCacheSize(t, cache, 10)
 
 		cache.InvalidateAll()
-
-		if size := cache.EstimatedSize(); size != 0 {
-			t.Errorf("Expected size 0 after invalidation, got %d", size)
-		}
+		assertCacheSize(t, cache, 0)
 	})
 }
 

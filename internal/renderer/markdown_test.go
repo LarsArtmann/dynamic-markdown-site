@@ -5,6 +5,14 @@ import (
 	"testing"
 )
 
+// assertHTMLContains is a helper to assert rendered HTML contains expected content.
+func assertHTMLContains(t *testing.T, html, expected, msg string) {
+	t.Helper()
+	if !strings.Contains(html, expected) {
+		t.Errorf("%s: expected HTML to contain %q, got: %s", msg, expected, html)
+	}
+}
+
 func TestNewGoldmarkRenderer(t *testing.T) {
 	t.Parallel()
 	renderer := NewGoldmarkRenderer()
@@ -394,13 +402,8 @@ func TestRenderCodeBlockWithLanguage(t *testing.T) {
 
 	// Should contain syntax-highlighted code
 	html := string(result.HTML)
-	if !strings.Contains(html, "<pre") {
-		t.Error("Should contain <pre> tag")
-	}
-
-	if !strings.Contains(html, "<code") {
-		t.Error("Should contain <code> tag")
-	}
+	assertHTMLContains(t, html, "<pre", "code block")
+	assertHTMLContains(t, html, "<code", "code element")
 }
 
 func TestRenderTable(t *testing.T) {
@@ -418,17 +421,9 @@ func TestRenderTable(t *testing.T) {
 	}
 
 	html := string(result.HTML)
-	if !strings.Contains(html, "<table>") {
-		t.Error("Should contain <table> tag")
-	}
-
-	if !strings.Contains(html, "<thead>") {
-		t.Error("Should contain <thead> tag")
-	}
-
-	if !strings.Contains(html, "<tbody>") {
-		t.Error("Should contain <tbody> tag")
-	}
+	assertHTMLContains(t, html, "<table>", "table")
+	assertHTMLContains(t, html, "<thead>", "table head")
+	assertHTMLContains(t, html, "<tbody>", "table body")
 }
 
 // SimpleRenderer tests
@@ -447,23 +442,10 @@ func TestNewSimpleRenderer(t *testing.T) {
 
 func TestSimpleRendererRender(t *testing.T) {
 	t.Parallel()
-	renderer := NewSimpleRenderer()
-
 	input := "# Title\n\nParagraph with **bold**."
 
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("SimpleRenderer.Render() error: %v", err)
-	}
-
-	html := string(result)
-	if !strings.Contains(html, "<h1") {
-		t.Error("Should contain <h1> tag")
-	}
-
-	if !strings.Contains(html, "<strong>") {
-		t.Error("Should contain <strong> tag")
-	}
+	assertSimpleRendererContains(t, input, "<h1", "Should contain <h1> tag")
+	assertSimpleRendererContains(t, input, "<strong>", "Should contain <strong> tag")
 }
 
 // assertSimpleRendererContains renders markdown and asserts the result contains expected string.

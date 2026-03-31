@@ -108,6 +108,11 @@ func DetectDiagrams(content string) []DetectedDiagram {
 	return diagrams
 }
 
+// d2Error wraps an error with D2 rendering context.
+func d2Error(err error, ctx string, content string) error {
+	return errors.Wrapf(err, "%s: %s", ctx, truncateForLog(content))
+}
+
 // RenderD2 renders D2 content to SVG.
 func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 	ctx := log.WithDefault(context.Background())
@@ -148,12 +153,12 @@ func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 
 	diagram, _, err := d2lib.Compile(ctx, content, compileOpts, renderOpts)
 	if err != nil {
-		return nil, errors.Wrapf(err, "compile D2 diagram: %s", truncateForLog(content))
+		return nil, d2Error(err, "compile D2 diagram", content)
 	}
 
 	svg, err := d2svg.Render(diagram, renderOpts)
 	if err != nil {
-		return nil, errors.Wrapf(err, "render D2 diagram to SVG: %s", truncateForLog(content))
+		return nil, d2Error(err, "render D2 diagram to SVG", content)
 	}
 
 	return svg, nil

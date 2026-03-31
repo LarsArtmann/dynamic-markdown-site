@@ -6,6 +6,15 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
+// paths creates a slice of URLPath from string paths.
+func paths(paths ...string) []domain.URLPath {
+	result := make([]domain.URLPath, len(paths))
+	for i, p := range paths {
+		result[i] = domain.MustURLPath(p)
+	}
+	return result
+}
+
 func TestFindSuggestions(t *testing.T) {
 	t.Parallel()
 
@@ -32,85 +41,56 @@ func TestFindSuggestions(t *testing.T) {
 			wantCount:      0,
 		},
 		{
-			name:      "exact match is excluded",
-			requested: "/home",
-			paths: []domain.URLPath{
-				domain.MustURLPath("/home"),
-				domain.MustURLPath("/about"),
-			},
+			name:           "exact match is excluded",
+			requested:      "/home",
+			paths:          paths("/home", "/about"),
 			maxSuggestions: 5,
 			wantCount:      1,
 			wantFirst:      "/about",
 		},
 		{
-			name:      "case insensitive exact match excluded",
-			requested: "/HOME",
-			paths: []domain.URLPath{
-				domain.MustURLPath("/home"),
-				domain.MustURLPath("/about"),
-			},
+			name:           "case insensitive exact match excluded",
+			requested:      "/HOME",
+			paths:          paths("/home", "/about"),
 			maxSuggestions: 5,
 			wantCount:      1,
 			wantFirst:      "/about",
 		},
 		{
-			name:      "typo correction with Levenshtein",
-			requested: "/abou",
-			paths: []domain.URLPath{
-				domain.MustURLPath("/about"),
-				domain.MustURLPath("/home"),
-				domain.MustURLPath("/contact"),
-			},
+			name:           "typo correction with Levenshtein",
+			requested:      "/abou",
+			paths:          paths("/about", "/home", "/contact"),
 			maxSuggestions: 5,
 			wantCount:      1, // Only /about above 0.3 threshold
 			wantFirst:      "/about",
 		},
 		{
-			name:      "prefix match gets boosted",
-			requested: "/bl",
-			paths: []domain.URLPath{
-				domain.MustURLPath("/blog"),
-				domain.MustURLPath("/about"),
-				domain.MustURLPath("/home"),
-			},
+			name:           "prefix match gets boosted",
+			requested:      "/bl",
+			paths:          paths("/blog", "/about", "/home"),
 			maxSuggestions: 5,
 			wantCount:      2, // /blog and /about above 0.3 threshold
 			wantFirst:      "/blog",
 		},
 		{
-			name:      "max suggestions respected",
-			requested: "/t",
-			paths: []domain.URLPath{
-				domain.MustURLPath("/test1"),
-				domain.MustURLPath("/test2"),
-				domain.MustURLPath("/test3"),
-				domain.MustURLPath("/test4"),
-				domain.MustURLPath("/test5"),
-				domain.MustURLPath("/test6"),
-			},
+			name:           "max suggestions respected",
+			requested:      "/t",
+			paths:          paths("/test1", "/test2", "/test3", "/test4", "/test5", "/test6"),
 			maxSuggestions: 3,
 			wantCount:      3,
 		},
 		{
-			name:      "substring match gets boosted",
-			requested: "log",
-			paths: []domain.URLPath{
-				domain.MustURLPath("/blog"),
-				domain.MustURLPath("/about"),
-				domain.MustURLPath("/login"),
-			},
+			name:           "substring match gets boosted",
+			requested:      "log",
+			paths:          paths("/blog", "/about", "/login"),
 			maxSuggestions: 5,
 			wantCount:      2, // /blog and /login above 0.3 threshold
 			wantFirst:      "/blog",
 		},
 		{
-			name:      "low score suggestions filtered by threshold",
-			requested: "/xyz123",
-			paths: []domain.URLPath{
-				domain.MustURLPath("/abc"),
-				domain.MustURLPath("/def"),
-				domain.MustURLPath("/ghi"),
-			},
+			name:           "low score suggestions filtered by threshold",
+			requested:      "/xyz123",
+			paths:          paths("/abc", "/def", "/ghi"),
 			maxSuggestions: 5,
 			wantCount:      0, // No matches above 0.3 threshold
 		},

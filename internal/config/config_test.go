@@ -11,6 +11,14 @@ import (
 	"time"
 )
 
+// assertStringContains is a helper to assert a string contains a substring.
+func assertStringContains(t *testing.T, s, substr, msg string) {
+	t.Helper()
+	if !strings.Contains(s, substr) {
+		t.Errorf("%s: expected %q to contain %q", msg, s, substr)
+	}
+}
+
 // TestLoadSubprocess tests the Load() function by running it in a subprocess
 // This is necessary because flag.Parse() can only be called once per process.
 func TestLoadSubprocess(t *testing.T) {
@@ -338,29 +346,12 @@ func TestConfigString(t *testing.T) {
 
 	result := cfg.String()
 
-	if !strings.Contains(result, "8080") {
-		t.Error("String() should contain port")
-	}
-
-	if !strings.Contains(result, "/test/path") {
-		t.Error("String() should contain root dir")
-	}
-
-	if !strings.Contains(result, "debug") {
-		t.Error("String() should contain log level")
-	}
-
-	if !strings.Contains(result, "Cache") {
-		t.Error("String() should contain Cache")
-	}
-
-	if !strings.Contains(result, "Dev Mode") {
-		t.Error("String() should contain Dev Mode")
-	}
-
-	if !strings.Contains(result, "Timeout") {
-		t.Error("String() should contain Timeout")
-	}
+	assertStringContains(t, result, "8080", "port")
+	assertStringContains(t, result, "/test/path", "root dir")
+	assertStringContains(t, result, "debug", "log level")
+	assertStringContains(t, result, "Cache", "Cache")
+	assertStringContains(t, result, "Dev Mode", "Dev Mode")
+	assertStringContains(t, result, "Timeout", "Timeout")
 }
 
 func TestConfigDefaults(t *testing.T) {

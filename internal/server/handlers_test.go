@@ -20,6 +20,14 @@ func init() {
 	gin.SetMode(gin.TestMode)
 }
 
+// executeRequest executes a GET HTTP request and returns the response recorder.
+func executeRequest(router *gin.Engine, path string) *httptest.ResponseRecorder {
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	return rec
+}
+
 func newTestServer(t *testing.T, repo content.Repository) *Server {
 	t.Helper()
 
@@ -98,18 +106,14 @@ func TestRefreshRateLimit(t *testing.T) {
 	router := newTestRouter(server)
 
 	for i := range 10 {
-		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/refresh", nil)
-		rec := httptest.NewRecorder()
-		router.ServeHTTP(rec, req)
+		rec := executeRequest(router, "/refresh")
 
 		if rec.Code != http.StatusOK {
 			t.Errorf("request %d: status = %d, want %d", i+1, rec.Code, http.StatusOK)
 		}
 	}
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/refresh", nil)
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := executeRequest(router, "/refresh")
 
 	if rec.Code != http.StatusTooManyRequests {
 		t.Errorf("rate limited request: status = %d, want %d", rec.Code, http.StatusTooManyRequests)
@@ -268,9 +272,7 @@ func TestContentWithFile(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/test-file", nil)
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := executeRequest(router, http.MethodGet, "/test-file")
 
 	if rec.Code != http.StatusOK {
 		t.Errorf(
@@ -320,9 +322,7 @@ func TestContentWithDirectory(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/test-dir", nil)
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := executeRequest(router, http.MethodGet, "/test-dir")
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
@@ -442,9 +442,7 @@ func TestRefreshEndpointFailure(t *testing.T) {
 	server := NewServer(repo, searcher, logger, cache, false)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/refresh", nil)
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := executeRequest(router, "/refresh")
 
 	if rec.Code != http.StatusInternalServerError {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusInternalServerError)
