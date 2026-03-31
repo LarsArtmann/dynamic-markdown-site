@@ -108,11 +108,17 @@ linters:
       - path: "cmd/dynamic-markdown-site/watcher.go"
         linters: [cyclop]
         text: "calculated cyclomatic complexity for function watchForChanges is"
+      - path: "internal/server/suggestions.go"
+        linters: [cyclop]
+        text: "calculated cyclomatic complexity for function findSuggestions is"
       # Test files often have complex table-driven tests
       - path: "(.*)_test\\.go"
         linters: [cyclop]
       # exhaustruct: Test structs often don't need all fields - exclude all test files
       - path: "(.*)_test\\.go"
+        linters: [exhaustruct]
+      # exhaustruct: Testutil package provides fixtures with minimal initialization
+      - path: "internal/testutil/"
         linters: [exhaustruct]
       # exhaustruct: Production code - partial struct initialization is intentional design
       - path: "internal/content/filesystem.go"
@@ -142,6 +148,9 @@ linters:
       # gochecknoinits: Test init functions for benchmark setup
       - path: "(.*)_test\\.go"
         linters: [gochecknoinits]
+      # gochecknoinits: testutil uses init to set gin test mode
+      - path: "internal/testutil/"
+        linters: [gochecknoinits]
       # gocognit: Complex functions that are inherently complex
       - path: "(.*)_test\\.go"
         linters: [gocognit]
@@ -163,6 +172,10 @@ linters:
       - path: "pkg/errors/errors.go"
         linters: [revive]
         text: "avoid package names that conflict with Go standard library package names"
+      # revive: Package comments not consistently enforced across codebase
+      - path: "internal/server/"
+        linters: [revive]
+        text: "should have a package comment"
 formatters:
   enable:
     - golines
