@@ -278,11 +278,20 @@ templ TOCItem(item domain.TOCItem) {
 	</li>
 }
 
+// SuggestedPath represents a suggested path for 404 pages.
+type SuggestedPath struct {
+	Path  domain.URLPath
+	Title string
+	Score float64
+}
+
 // ErrorViewProps contains properties for error pages.
 type ErrorViewProps struct {
-	Title      string
-	Message    string
-	StatusCode int
+	Title       string
+	Message     string
+	StatusCode  int
+	RequestPath string
+	Suggestions []SuggestedPath
 }
 
 // ErrorView renders an error page.
@@ -297,6 +306,22 @@ templ ErrorView(props ErrorViewProps) {
 				<div class="error-code">{ strconv.Itoa(props.StatusCode) }</div>
 				<h1 class="error-title">{ props.Title }</h1>
 				<p class="error-message">{ props.Message }</p>
+				if props.RequestPath != "" {
+					<p class="error-request-path">{ props.RequestPath }</p>
+				}
+				if len(props.Suggestions) > 0 {
+					<div class="error-suggestions">
+						<h2 class="suggestions-title">Did you mean?</h2>
+						<div class="suggestions-list">
+							for _, suggestion := range props.Suggestions {
+								<a href={ templ.SafeURL(suggestion.Path.String()) } class="suggestion-link">
+									<span class="suggestion-icon">→</span>
+									<span class="suggestion-path">{ suggestion.Path.String() }</span>
+								</a>
+							}
+						</div>
+					</div>
+				}
 				<a href="/" class="error-home-link">← Back to Home</a>
 			</div>
 		</div>

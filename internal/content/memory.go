@@ -83,3 +83,18 @@ func (r *InMemoryRepository) LastModified() time.Time {
 
 	return r.modified
 }
+
+// AllPaths returns all URL paths in the repository.
+func (r *InMemoryRepository) AllPaths() []domain.URLPath {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	paths := make([]domain.URLPath, 0, len(r.nodes)+1)
+	paths = append(paths, r.root.Path())
+
+	for path := range r.nodes {
+		paths = append(paths, path)
+	}
+
+	return paths
+}

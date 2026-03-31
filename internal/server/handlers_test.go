@@ -676,6 +676,10 @@ func (f *FailingRepository) Refresh() domain.RefreshResult {
 	return domain.RefreshResult{Success: true}
 }
 
+func (f *FailingRepository) AllPaths() []domain.URLPath {
+	return nil
+}
+
 func (f *FailingRepository) Search(_ string) ([]content.SearchResult, error) {
 	return nil, errors.New("search error")
 }

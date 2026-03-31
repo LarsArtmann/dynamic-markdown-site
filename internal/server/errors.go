@@ -12,12 +12,45 @@ import (
 func (s *Server) handle404(c *gin.Context) {
 	c.Status(http.StatusNotFound)
 
-	s.renderError(
-		c,
-		404,
-		"Page Not Found",
-		"The page you're looking for doesn't exist in this dimension.",
-	)
+	requestPath := c.Request.URL.Path
+	suggestions := s.getPathSuggestions(requestPath)
+
+	s.renderNotFound(c, requestPath, suggestions)
+}
+
+// getPathSuggestions returns path suggestions based on similarity to the requested path.
+func (s *Server) getPathSuggestions(requestedPath string) []SuggestedPath {
+	paths := s.repo.AllPaths()
+
+	return findSuggestions(requestedPath, paths, 5)
+}
+
+func (s *Server) renderNotFound(c *gin.Context, requestPath string, suggestions []SuggestedPath) {
+	props := templates.ErrorViewProps{
+		Title:       "Page Not Found",
+		Message:     "The page you're looking for doesn't exist in this dimension.",
+		StatusCode:  404,
+		RequestPath: requestPath,
+		Suggestions: convertToTemplateSuggestions(suggestions),
+	}
+
+	component := templates.ErrorView(props)
+	s.renderComponent(c, component, http.StatusNotFound, "404 page")
+}
+
+// convertToTemplateSuggestions converts server suggestions to template suggestions.
+func convertToTemplateSuggestions(suggestions []SuggestedPath) []templates.SuggestedPath {
+	result := make([]templates.SuggestedPath, len(suggestions))
+
+	for i, s := range suggestions {
+		result[i] = templates.SuggestedPath{
+			Path:  s.Path,
+			Title: s.Title,
+			Score: s.Score,
+		}
+	}
+
+	return result
 }
 
 func (s *Server) handle500(c *gin.Context) {

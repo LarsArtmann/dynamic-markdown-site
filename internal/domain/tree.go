@@ -20,6 +20,24 @@ func (t *ContentTree) Find(path URLPath) (ContentNode, bool) {
 	return t.findInNode(t.root, path)
 }
 
+// AllPaths returns all paths in the content tree.
+func (t *ContentTree) AllPaths() []URLPath {
+	return t.collectPaths(t.root)
+}
+
+func (t *ContentTree) collectPaths(node ContentNode) []URLPath {
+	var paths []URLPath
+	paths = append(paths, node.Path())
+
+	if dir, ok := node.(*DirectoryNode); ok {
+		for _, child := range dir.Children() {
+			paths = append(paths, t.collectPaths(child)...)
+		}
+	}
+
+	return paths
+}
+
 func (t *ContentTree) findInNode(node ContentNode, target URLPath) (ContentNode, bool) {
 	if node.Path() == target {
 		return node, true

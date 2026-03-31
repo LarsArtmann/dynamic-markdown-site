@@ -24,4 +24,6 @@ type Repository interface {
 	Refresh() domain.RefreshResult
 	// LastModified returns when the content was last indexed
 	LastModified() time.Time
+	// AllPaths returns all URL paths in the repository
+	AllPaths() []domain.URLPath
 }

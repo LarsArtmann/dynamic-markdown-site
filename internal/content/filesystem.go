@@ -90,6 +90,18 @@ func (r *FileSystemRepository) LastModified() time.Time {
 	return r.lastModified
 }
 
+// AllPaths returns all URL paths in the repository.
+func (r *FileSystemRepository) AllPaths() []domain.URLPath {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if r.tree == nil {
+		return []domain.URLPath{domain.MustURLPath("/")}
+	}
+
+	return r.tree.AllPaths()
+}
+
 // Refresh rebuilds the content tree from the filesystem and returns statistics.
 func (r *FileSystemRepository) Refresh() domain.RefreshResult {
 	start := time.Now()
