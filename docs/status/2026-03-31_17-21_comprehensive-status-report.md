@@ -16,6 +16,7 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
 ## A) FULLY DONE ✅
 
 ### 1. Production Code Clone Elimination (COMPLETE)
+
 - **Status:** 100% Complete - 0 clone groups remaining
 - **Achievement:** Eliminated all 14 production code clones identified in previous analysis
 - **Key Refactors:**
@@ -25,6 +26,7 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
   - Removed deprecated FileNode setters
 
 ### 2. 404 Page Enhancement (COMPLETE)
+
 - **Status:** Shipped and pushed to origin
 - **Features Delivered:**
   - Case-insensitive exact match exclusion
@@ -34,11 +36,13 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
 - **Commits:** `a1af8c2`, `c84c72c`, `30ca7fd`
 
 ### 3. Request ID Middleware (COMPLETE)
+
 - **Status:** Production ready
 - **Commit:** `2e5fed7`
 - **Features:** Request tracing with `X-Request-ID` header
 
 ### 4. Test Utilities Package (COMPLETE)
+
 - **Status:** Created and ready for integration
 - **Location:** `internal/testutil/`
 - **Components:**
@@ -48,6 +52,7 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
   - `ServerFixture` - Server test setup
 
 ### 5. Lint Configuration (COMPLETE)
+
 - **Status:** Updated for new patterns
 - **Commit:** `801b398`
 - **Exclusions Added:**
@@ -56,6 +61,7 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
   - Server package package-comment exclusion
 
 ### 6. Critical Bug Fix (COMPLETE)
+
 - **Issue:** Missing `context` import in `requestid_test.go`
 - **Fix:** Added import, tests now passing
 - **Commit:** `f947b05`
@@ -65,17 +71,20 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
 ## B) PARTIALLY DONE 🟡
 
 ### 1. Test Code Clone Elimination (43% Ready)
+
 - **Current:** 46 clone groups identified
 - **Solution:** `testutil` package ready
 - **Integration Status:** NOT STARTED
 - **Estimated Impact:** Eliminate ~20 clone groups (43% reduction)
 
 ### 2. Docker Build Pipeline (NEEDS ATTENTION)
+
 - **Status:** GitHub Actions workflow exists
 - **Issue:** 8 lint errors may block build (pre-existing patterns)
 - **Action Required:** Review and potentially exclude test file patterns
 
 ### 3. Documentation (ONGOING)
+
 - **Status Reports:** 5 comprehensive reports written
 - **Coverage:** Good historical documentation
 - **Gap:** No architectural decision records (ADRs)
@@ -85,7 +94,9 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
 ## C) NOT STARTED 🔴
 
 ### 1. Testutil Integration (HIGH PRIORITY)
+
 **Target Files:**
+
 - `internal/cache/html_test.go` - Replace `newTestContent()`
 - `internal/server/handlers_test.go` - Use `ServerFixture`, `HTTPTestRunner`
 - `internal/renderer/markdown_test.go` - Use `ContentFixture`
@@ -95,18 +106,21 @@ The project is in **EXCELLENT** health. All production code clones eliminated (0
 **Impact:** High (eliminates ~20 clone groups)
 
 ### 2. Remaining Lint Issues (8 issues)
-| File | Issue | Linter | Priority |
-|------|-------|--------|----------|
-| `errors.go:64` | Missing ErrorViewProps fields | exhaustruct | Low |
-| `requestid_test.go:113` | For loop can use range | intrange | Low |
-| `requestid_test.go:25` | Use NewRequestWithContext | noctx | Medium (5x) |
+
+| File                    | Issue                         | Linter      | Priority    |
+| ----------------------- | ----------------------------- | ----------- | ----------- |
+| `errors.go:64`          | Missing ErrorViewProps fields | exhaustruct | Low         |
+| `requestid_test.go:113` | For loop can use range        | intrange    | Low         |
+| `requestid_test.go:25`  | Use NewRequestWithContext     | noctx       | Medium (5x) |
 
 ### 3. Performance Optimization
+
 - **Cache:** Currently using otter with 1-hour expiry
 - **Opportunity:** Add cache warming, size-based eviction
 - **Effort:** Low
 
 ### 4. Content Features
+
 - **Missing:** No actual markdown content in `content/` directory
 - **Impact:** Site serves empty directory structure
 - **Action:** Add sample content for demonstration
@@ -176,6 +190,7 @@ The project has no critical issues. All systems operational.
 ## F) TOP #25 THINGS TO GET DONE NEXT
 
 ### P0 - Critical (Do First)
+
 1. ✅ ~~Fix broken build (missing context import)~~ DONE
 2. 🔄 Integrate testutil into `cache/html_test.go`
 3. 🔄 Integrate testutil into `server/handlers_test.go`
@@ -183,6 +198,7 @@ The project has no critical issues. All systems operational.
 5. 🔄 Fix `noctx` lint issues in test files
 
 ### P1 - High Value (This Week)
+
 6. Create end-to-end integration tests
 7. Add request timing/metrics middleware
 8. Implement cache warming on startup
@@ -190,6 +206,7 @@ The project has no critical issues. All systems operational.
 10. Create comprehensive README with screenshots
 
 ### P2 - Medium Value (This Month)
+
 11. Add content hot-reload in production
 12. Implement search result ranking
 13. Add OpenTelemetry tracing
@@ -197,6 +214,7 @@ The project has no critical issues. All systems operational.
 15. Add image optimization pipeline
 
 ### P3 - Nice to Have (Future)
+
 16. Web-based markdown editor
 17. Git sync for content
 18. Multi-language support (i18n)
@@ -215,22 +233,26 @@ The project has no critical issues. All systems operational.
 ### Question: Should we deprecate and remove the deprecated FileNode setter methods immediately, or maintain backward compatibility during a transition period?
 
 **Context:**
+
 - FileNode has deprecated methods: `SetHTML()`, `SetTOC()`, `SetMetadata()`, `SetHasMermaid()`
 - These are marked as deprecated with "Will be replaced by immutable RenderedFile pattern"
 - The immutable `RenderedFile` type now exists and is used in `render.go`
 - However, tests and potentially other code may still use these methods
 
 **What I've Checked:**
+
 - `grep -r "SetHTML\|SetTOC\|SetMetadata\|SetHasMermaid" --include="*.go" .`
 - Found usage in `internal/server/render.go` (lines 52-55, 68-71)
 - These are deprecation warnings from the immutable migration
 
 **Options:**
+
 1. **Remove immediately** - Clean break, forces migration
 2. **Keep for 1 release** - Graceful transition, add removal timeline
 3. **Convert to no-ops** - Keep API but make them do nothing
 
 **What I Need:**
+
 - Decision on deprecation policy for this project
 - Timeline for breaking changes
 - Whether to add automated migration tooling
@@ -239,18 +261,18 @@ The project has no critical issues. All systems operational.
 
 ## Metrics Summary
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Production Clones | 0 | ✅ Perfect |
-| Test Clones | 46 | 🟡 Acceptable |
-| Test Coverage | 8/8 packages pass | ✅ Good |
-| Lint Errors | 8 (pre-existing) | 🟡 Tolerable |
-| Build Status | Passing | ✅ Good |
-| Commits Ahead | 3 | ✅ Recently pushed |
-| TODOs in Code | 0 | ✅ Clean |
-| nolint Comments | 4 | ✅ Minimal |
-| Test Files | 15 | ✅ Comprehensive |
-| Production Files | 27 | ✅ Compact |
+| Metric            | Value             | Status             |
+| ----------------- | ----------------- | ------------------ |
+| Production Clones | 0                 | ✅ Perfect         |
+| Test Clones       | 46                | 🟡 Acceptable      |
+| Test Coverage     | 8/8 packages pass | ✅ Good            |
+| Lint Errors       | 8 (pre-existing)  | 🟡 Tolerable       |
+| Build Status      | Passing           | ✅ Good            |
+| Commits Ahead     | 3                 | ✅ Recently pushed |
+| TODOs in Code     | 0                 | ✅ Clean           |
+| nolint Comments   | 4                 | ✅ Minimal         |
+| Test Files        | 15                | ✅ Comprehensive   |
+| Production Files  | 27                | ✅ Compact         |
 
 ---
 

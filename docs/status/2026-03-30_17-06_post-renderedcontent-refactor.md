@@ -14,27 +14,28 @@ Project is in **EXCELLENT** state. Successfully completed the immutable render a
 **Build Status:** ✅ PASSING  
 **Test Status:** ✅ PASSING (79.9% avg coverage)  
 **Lint Status:** ✅ PASSING (2 minor formatting issues only)  
-**Docker:** ✅ CI workflow added for automated builds  
+**Docker:** ✅ CI workflow added for automated builds
 
 ---
 
 ## a) FULLY DONE ✅
 
 ### 1. Immutable Render Architecture
+
 - **Added `domain.RenderedContent` type** (`domain/types.go:68-74`)
   - Holds HTML, TOC, Metadata, HasMermaid
   - Pure data structure, no methods, fully immutable
-  
 - **Refactored `cache.HTMLCache`** (`cache/html.go`)
   - Now uses `domain.RenderedContent` directly
   - Eliminated duplicate type definition in cache package
   - 100% test coverage maintained
 
-- **Updated `server/render.go`** 
+- **Updated `server/render.go`**
   - Uses `domain.RenderedContent` for caching
   - Still uses deprecated FileNode setters (next phase)
 
 ### 2. CI/CD Infrastructure
+
 - **GitHub Actions workflow** (`.github/workflows/docker.yml`)
   - Builds Docker image on every push to master
   - Uses Buildx with layer caching (type=gha)
@@ -42,11 +43,13 @@ Project is in **EXCELLENT** state. Successfully completed the immutable render a
   - Triggers on Go, Templ, CSS, Dockerfile changes
 
 ### 3. Dependency Updates
+
 - **Security fixes** (dependabot)
   - Bumped `golang.org/x/crypto` (CVE fixes)
   - All dependencies current
 
 ### 4. Documentation
+
 - **README restructured** with comprehensive sections
 - **Architecture diagrams** added
 - **Feature matrix** documented
@@ -56,6 +59,7 @@ Project is in **EXCELLENT** state. Successfully completed the immutable render a
 ## b) PARTIALLY DONE ⚠️
 
 ### Immutable Render Pipeline
+
 - ✅ `RenderedContent` type created
 - ✅ Cache uses `RenderedContent`
 - ✅ Server imports and uses `RenderedContent`
@@ -63,6 +67,7 @@ Project is in **EXCELLENT** state. Successfully completed the immutable render a
 - ⏳ Templates still expect `*domain.FileNode`
 
 ### Linter Issues
+
 - 2 minor `golines` formatting issues (line length)
   - `internal/renderer/diagram_extension.go:99`
   - `internal/server/errors.go:14`
@@ -72,17 +77,20 @@ Project is in **EXCELLENT** state. Successfully completed the immutable render a
 ## c) NOT STARTED ❌
 
 ### Phase 2: Complete Immutable Refactor
+
 1. Create `RenderedFileView` struct combining FileNode + RenderedContent
 2. Update templates to use new view model
 3. Remove deprecated setters from FileNode
 4. Update all tests
 
 ### Search Enhancements
+
 - No fuzzy matching
 - No result highlighting
 - No autocomplete/suggestions
 
 ### Observability
+
 - No Prometheus metrics
 - No request tracing
 - No performance profiling
@@ -100,17 +108,20 @@ All systems operational. Build passes, tests pass, lint passes (except 2 formatt
 ## e) WHAT WE SHOULD IMPROVE 📈
 
 ### Immediate (This Week)
+
 1. **Fix golines formatting** - 2 files need line breaks
 2. **Complete immutable refactor** - Remove FileNode setters
 3. **Add HEALTHCHECK** - Research distroless options
 
 ### Short Term (Next 2 Weeks)
+
 4. Add search result highlighting
 5. Implement cache metrics endpoint
 6. Add request timing middleware
 7. Create architecture decision records
 
 ### Medium Term (Next Month)
+
 8. Add Prometheus metrics
 9. Implement fuzzy search
 10. Add structured logging to renderer
@@ -153,12 +164,14 @@ All systems operational. Build passes, tests pass, lint passes (except 2 formatt
 **What's the best migration path for removing FileNode setters?**
 
 Current state:
+
 - Templates expect `*domain.FileNode` with `.HTML()`, `.TOC()`, `.Metadata()`, `.HasMermaid()`
 - FileNode has deprecated setters that mutate state
 - `RenderedContent` exists as the immutable alternative
 - `RenderedFile` (in file.go:157-210) already exists but isn't used
 
 Options:
+
 1. **Extend RenderedFile** - Make it embed FileNode + RenderedContent, implement ContentNode
 2. **Template View Model** - Create FileViewProps with fields from both types
 3. **Interface Approach** - Create RenderedContent interface that FileNode and RenderedFile implement
@@ -206,16 +219,19 @@ d27cc81 refactor(cache): eliminate local RenderedContent type definition
 ## Key Architectural Decisions
 
 ### 1. RenderedContent Type Location
+
 - **Decision:** Placed in `domain` package, not `renderer`
 - **Rationale:** It's a core domain concept, not implementation detail
 - **Impact:** Cache can depend on domain, no circular deps
 
 ### 2. Cache Storage Type
+
 - **Decision:** Store `domain.RenderedContent` directly in cache
 - **Rationale:** Eliminates conversion overhead, type-safe
 - **Impact:** Cleaner code, slightly faster lookups
 
 ### 3. CI/CD Strategy
+
 - **Decision:** Build on every master push, upload artifacts
 - **Rationale:** Fast feedback, no registry auth needed for basic builds
 - **Impact:** 14-day artifact retention, cache-enabled builds
@@ -232,5 +248,5 @@ The project has achieved a significant milestone with the immutable render archi
 
 ---
 
-*Report generated by Crush AI Assistant*  
-*Next review recommended: After Phase 2 immutable refactor completion*
+_Report generated by Crush AI Assistant_  
+_Next review recommended: After Phase 2 immutable refactor completion_

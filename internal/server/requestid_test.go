@@ -110,7 +110,7 @@ func TestGenerateRequestID_Uniqueness(t *testing.T) {
 	t.Parallel()
 
 	ids := make(map[string]bool)
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		id := generateRequestID()
 		assert.False(t, ids[id], "duplicate ID generated: %s", id)
 		ids[id] = true

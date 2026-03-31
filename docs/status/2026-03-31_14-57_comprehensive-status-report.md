@@ -20,61 +20,64 @@ The dynamic-markdown-site project is in excellent condition with **all tests pas
 ## A) FULLY DONE ✅
 
 ### Core Features
-| Feature | Status | Details |
-|---------|--------|---------|
-| Markdown Rendering | ✅ Complete | Goldmark + Chroma syntax highlighting |
-| Syntax Highlighting | ✅ Complete | 100+ language support via Chroma |
-| Mermaid Diagrams | ✅ Complete | Native mermaid.js integration |
-| D2 Diagrams | ✅ Complete | Server-side SVG rendering |
-| Table of Contents | ✅ Complete | Auto-generated from headings |
-| Search Functionality | ✅ Complete | Full-text content search |
-| File Watching | ✅ Complete | fsnotify-based live reload |
-| HTML Caching | ✅ Complete | Otter cache (100% test coverage) |
-| Rate Limiting | ✅ Complete | IP-based request throttling |
-| **Smart 404** | ✅ **NEW** | Path suggestions with Levenshtein distance |
+
+| Feature              | Status      | Details                                    |
+| -------------------- | ----------- | ------------------------------------------ |
+| Markdown Rendering   | ✅ Complete | Goldmark + Chroma syntax highlighting      |
+| Syntax Highlighting  | ✅ Complete | 100+ language support via Chroma           |
+| Mermaid Diagrams     | ✅ Complete | Native mermaid.js integration              |
+| D2 Diagrams          | ✅ Complete | Server-side SVG rendering                  |
+| Table of Contents    | ✅ Complete | Auto-generated from headings               |
+| Search Functionality | ✅ Complete | Full-text content search                   |
+| File Watching        | ✅ Complete | fsnotify-based live reload                 |
+| HTML Caching         | ✅ Complete | Otter cache (100% test coverage)           |
+| Rate Limiting        | ✅ Complete | IP-based request throttling                |
+| **Smart 404**        | ✅ **NEW**  | Path suggestions with Levenshtein distance |
 
 ### Architecture Improvements
-| Improvement | Status | Impact |
-|-------------|--------|--------|
+
+| Improvement               | Status      | Impact                          |
+| ------------------------- | ----------- | ------------------------------- |
 | Immutable Render Pipeline | ✅ Complete | Thread-safe, no race conditions |
-| RenderedFile Pattern | ✅ Complete | Clean separation of concerns |
-| Dependency Injection | ✅ Complete | samber/do/v2 container |
-| Type-Safe Templates | ✅ Complete | a-h/templ integration |
-| Structured Logging | ✅ Complete | charm.land/log |
-| Error Wrapping | ✅ Complete | cockroachdb/errors |
+| RenderedFile Pattern      | ✅ Complete | Clean separation of concerns    |
+| Dependency Injection      | ✅ Complete | samber/do/v2 container          |
+| Type-Safe Templates       | ✅ Complete | a-h/templ integration           |
+| Structured Logging        | ✅ Complete | charm.land/log                  |
+| Error Wrapping            | ✅ Complete | cockroachdb/errors              |
 
 ### Quality Infrastructure
-| Component | Status | Coverage |
-|-----------|--------|----------|
-| Unit Tests | ✅ Complete | 75%+ avg coverage |
-| Benchmarks | ✅ Complete | Repository, Renderer, Config |
-| Linting | ✅ Complete | 75+ linters via golangci-lint |
-| Test Utilities | ✅ Complete | `internal/testutil` package |
+
+| Component      | Status      | Coverage                      |
+| -------------- | ----------- | ----------------------------- |
+| Unit Tests     | ✅ Complete | 75%+ avg coverage             |
+| Benchmarks     | ✅ Complete | Repository, Renderer, Config  |
+| Linting        | ✅ Complete | 75+ linters via golangci-lint |
+| Test Utilities | ✅ Complete | `internal/testutil` package   |
 
 ---
 
 ## B) PARTIALLY DONE 🔄
 
-| Item | Status | What's Missing |
-|------|--------|----------------|
-| Container Tests | 🔄 Partial | Coverage: 0% (DI setup only) |
-| Renderer Tests | 🔄 Partial | Coverage: 67.8% (edge cases) |
-| Content Tests | 🔄 Partial | Coverage: 75.7% (error paths) |
+| Item            | Status     | What's Missing                |
+| --------------- | ---------- | ----------------------------- |
+| Container Tests | 🔄 Partial | Coverage: 0% (DI setup only)  |
+| Renderer Tests  | 🔄 Partial | Coverage: 67.8% (edge cases)  |
+| Content Tests   | 🔄 Partial | Coverage: 75.7% (error paths) |
 
 ---
 
 ## C) NOT STARTED ⏳
 
-| Feature | Priority | Rationale |
-|---------|----------|-----------|
-| RSS Feed Generation | Low | Nice-to-have, not requested |
-| Sitemap XML | Low | SEO feature, can add later |
-| Dark Mode Toggle | Low | CSS-only feature |
-| Docker Compose | Low | Single binary deployment preferred |
-| Prometheus Metrics | Medium | Would enhance observability |
-| OpenTelemetry Tracing | Medium | Would improve debugging |
-| WebSocket Live Reload | Medium | Current SSE/polling works |
-| Full-Text Search (Bleve/Meilisearch) | Low | Current search adequate |
+| Feature                              | Priority | Rationale                          |
+| ------------------------------------ | -------- | ---------------------------------- |
+| RSS Feed Generation                  | Low      | Nice-to-have, not requested        |
+| Sitemap XML                          | Low      | SEO feature, can add later         |
+| Dark Mode Toggle                     | Low      | CSS-only feature                   |
+| Docker Compose                       | Low      | Single binary deployment preferred |
+| Prometheus Metrics                   | Medium   | Would enhance observability        |
+| OpenTelemetry Tracing                | Medium   | Would improve debugging            |
+| WebSocket Live Reload                | Medium   | Current SSE/polling works          |
+| Full-Text Search (Bleve/Meilisearch) | Low      | Current search adequate            |
 
 ---
 
@@ -83,11 +86,12 @@ The dynamic-markdown-site project is in excellent condition with **all tests pas
 **NONE** - Zero critical issues. All systems operational.
 
 ### Minor LSP Warnings (False Positives)
-| Warning | Location | Status |
-|---------|----------|--------|
-| `RenderedFile field unknown` | render.go:73 | Stale LSP cache |
-| `props.File undefined` | layout.templ:243-244 | Stale LSP cache |
-| `golangci-lint running` | go.mod:1 | LSP service warning |
+
+| Warning                      | Location             | Status              |
+| ---------------------------- | -------------------- | ------------------- |
+| `RenderedFile field unknown` | render.go:73         | Stale LSP cache     |
+| `props.File undefined`       | layout.templ:243-244 | Stale LSP cache     |
+| `golangci-lint running`      | go.mod:1             | LSP service warning |
 
 **Note:** These are LSP/editor artifacts. Build passes, tests pass, zero lint errors.
 
@@ -152,43 +156,47 @@ The dynamic-markdown-site project is in excellent condition with **all tests pas
 ## F) TOP 25 NEXT ACTIONS 🎯
 
 ### P0 - Critical (Do Now)
+
 1. ✅ **ALL COMPLETE** - No critical actions remaining
 
 ### P1 - High Priority (This Week)
-| # | Action | Effort | Impact |
-|---|--------|--------|--------|
-| 2 | Add AllPaths() unit tests | 30 min | Quality |
-| 3 | Add suggestion edge case tests | 30 min | Quality |
-| 4 | Improve container test coverage | 45 min | Quality |
-| 5 | Add Prometheus metrics endpoint | 2 hrs | Observability |
-| 6 | Implement structured health check | 1 hr | Operations |
-| 7 | Add request ID middleware | 30 min | Debugging |
-| 8 | Create architecture decision records | 1 hr | Documentation |
-| 9 | Add OpenAPI/Swagger docs | 2 hrs | API Documentation |
-| 10 | Implement graceful shutdown tests | 1 hr | Reliability |
+
+| #   | Action                               | Effort | Impact            |
+| --- | ------------------------------------ | ------ | ----------------- |
+| 2   | Add AllPaths() unit tests            | 30 min | Quality           |
+| 3   | Add suggestion edge case tests       | 30 min | Quality           |
+| 4   | Improve container test coverage      | 45 min | Quality           |
+| 5   | Add Prometheus metrics endpoint      | 2 hrs  | Observability     |
+| 6   | Implement structured health check    | 1 hr   | Operations        |
+| 7   | Add request ID middleware            | 30 min | Debugging         |
+| 8   | Create architecture decision records | 1 hr   | Documentation     |
+| 9   | Add OpenAPI/Swagger docs             | 2 hrs  | API Documentation |
+| 10  | Implement graceful shutdown tests    | 1 hr   | Reliability       |
 
 ### P2 - Medium Priority (Next 2 Weeks)
-| # | Action | Effort | Impact |
-|---|--------|--------|--------|
-| 11 | Add content validation middleware | 1 hr | Security |
-| 12 | Create admin/debug endpoints | 2 hrs | Operations |
-| 13 | Add configuration validation | 1 hr | Robustness |
-| 14 | Implement rate limiting tests | 1 hr | Security |
-| 15 | Add template render benchmarks | 30 min | Performance |
-| 16 | Create end-to-end tests | 3 hrs | Quality |
-| 17 | Add mutation testing | 2 hrs | Quality |
-| 18 | Implement pprof profiling | 1 hr | Debugging |
-| 19 | Add gzip compression | 30 min | Performance |
-| 20 | Create deployment guide | 2 hrs | Documentation |
+
+| #   | Action                            | Effort | Impact        |
+| --- | --------------------------------- | ------ | ------------- |
+| 11  | Add content validation middleware | 1 hr   | Security      |
+| 12  | Create admin/debug endpoints      | 2 hrs  | Operations    |
+| 13  | Add configuration validation      | 1 hr   | Robustness    |
+| 14  | Implement rate limiting tests     | 1 hr   | Security      |
+| 15  | Add template render benchmarks    | 30 min | Performance   |
+| 16  | Create end-to-end tests           | 3 hrs  | Quality       |
+| 17  | Add mutation testing              | 2 hrs  | Quality       |
+| 18  | Implement pprof profiling         | 1 hr   | Debugging     |
+| 19  | Add gzip compression              | 30 min | Performance   |
+| 20  | Create deployment guide           | 2 hrs  | Documentation |
 
 ### P3 - Low Priority (Backlog)
-| # | Action | Effort | Impact |
-|---|--------|--------|--------|
-| 21 | Dark mode support | 2 hrs | UX |
-| 22 | RSS feed generation | 2 hrs | Feature |
-| 23 | Sitemap.xml generation | 1 hr | SEO |
-| 24 | WebSocket live reload | 3 hrs | UX |
-| 25 | Full-text search (Bleve) | 2 days | Feature |
+
+| #   | Action                   | Effort | Impact  |
+| --- | ------------------------ | ------ | ------- |
+| 21  | Dark mode support        | 2 hrs  | UX      |
+| 22  | RSS feed generation      | 2 hrs  | Feature |
+| 23  | Sitemap.xml generation   | 1 hr   | SEO     |
+| 24  | WebSocket live reload    | 3 hrs  | UX      |
+| 25  | Full-text search (Bleve) | 2 days | Feature |
 
 ---
 
@@ -197,6 +205,7 @@ The dynamic-markdown-site project is in excellent condition with **all tests pas
 ### **Question:** Should we migrate to a proper database for content storage?
 
 **Context:**
+
 - Currently using in-memory tree rebuilt from filesystem
 - Content is static markdown files
 - Refresh rebuilds entire tree
@@ -222,13 +231,15 @@ The dynamic-markdown-site project is in excellent condition with **all tests pas
    - ⚠️ Another service to run
    - ⚠️ Overkill for single-node?
 
-**My Recommendation:** 
+**My Recommendation:**
 Stay with current architecture until:
+
 - Content exceeds 1000 files, OR
 - Search performance degrades, OR
 - Multi-node deployment needed
 
 **When to reconsider:**
+
 - If search latency > 100ms
 - If startup time > 5 seconds
 - If clustering becomes requirement
@@ -288,6 +299,7 @@ Observability:  ██████████░░░░░░░░░░  Ba
 The project is in **excellent health**. All critical features are implemented, tested, and production-ready. The immutable render pipeline architecture is clean and thread-safe. Code quality is high with comprehensive linting and good test coverage.
 
 **Immediate next steps:**
+
 1. Add Prometheus metrics for observability
 2. Increase container package test coverage
 3. Document architecture decisions
@@ -296,5 +308,5 @@ The project is in **excellent health**. All critical features are implemented, t
 
 ---
 
-*Report generated: 2026-03-31 14:57*  
-*Commit: 84a9361 - feat: add custom 404 page with path suggestions*
+_Report generated: 2026-03-31 14:57_  
+_Commit: 84a9361 - feat: add custom 404 page with path suggestions_

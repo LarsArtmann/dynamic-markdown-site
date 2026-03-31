@@ -16,6 +16,7 @@ Successfully rewrote **all 64 commits** in git history, changing the author/comm
 ## A) FULLY DONE ✅
 
 ### 1. Git History Email Rewrite — COMPLETE ✅
+
 - [x] All 63 Lars Artmann author emails: `lars@lars.dev` → `git@lars.software`
 - [x] All 63 Lars Artmann committer emails: `lars@lars.dev` → `git@lars.software`
 - [x] Zero remaining `lars@lars.dev` in entire history (verified via `git log --all --format='%ae %ce' | grep lars@lars.dev`)
@@ -26,32 +27,35 @@ Successfully rewrote **all 64 commits** in git history, changing the author/comm
 - [x] Branch structure preserved: single `master` branch
 
 ### 2. Repository Integrity — VERIFIED ✅
+
 - [x] `go build ./...` — passes with zero errors
 - [x] `go test ./... -cover` — all 10 packages pass
 - [x] `golangci-lint run ./...` — **0 issues** (3 warnings are pre-existing exclusion rules)
 - [x] Working tree is clean (aside from 2 minor lint-fix files, see section B)
 
 ### 3. Origin Remote — RESTORED ✅
+
 - [x] `git filter-repo` removed origin remote (expected behavior)
 - [x] Re-added: `origin → git@github.com:LarsArtmann/dynamic-markdown-site.git`
 - [x] Verified fetch + push URLs correct
 
 ### 4. Test Coverage Report ✅
 
-| Package | Coverage | Status |
-|---------|----------|--------|
-| `internal/cache` | 100.0% | ✅ Perfect |
-| `internal/config` | 94.5% | ✅ Excellent |
-| `internal/content` | 80.3% | ✅ Good |
-| `internal/domain` | 80.3% | ✅ Good |
-| `internal/server` | 70.9% | ✅ Good |
-| `internal/renderer` | 67.8% | ⚠️ Moderate |
-| `internal/container` | 0.0% | ⚠️ DI wiring |
-| `cmd/dynamic-markdown-site` | 0.0% | ⚠️ Entrypoint |
-| `pkg/errors` | 0.0% | ⚠️ Wrapper pkg |
-| `templates` | 0.0% | ⚠️ Generated |
+| Package                     | Coverage | Status         |
+| --------------------------- | -------- | -------------- |
+| `internal/cache`            | 100.0%   | ✅ Perfect     |
+| `internal/config`           | 94.5%    | ✅ Excellent   |
+| `internal/content`          | 80.3%    | ✅ Good        |
+| `internal/domain`           | 80.3%    | ✅ Good        |
+| `internal/server`           | 70.9%    | ✅ Good        |
+| `internal/renderer`         | 67.8%    | ⚠️ Moderate    |
+| `internal/container`        | 0.0%     | ⚠️ DI wiring   |
+| `cmd/dynamic-markdown-site` | 0.0%     | ⚠️ Entrypoint  |
+| `pkg/errors`                | 0.0%     | ⚠️ Wrapper pkg |
+| `templates`                 | 0.0%     | ⚠️ Generated   |
 
 ### 5. Project Metrics ✅
+
 - **Production code:** ~4,590 lines of Go
 - **Test code:** ~5,536 lines of Go (test:production ratio = 1.2:1)
 - **Linters configured:** ~75 in `.golangci.yml`
@@ -63,14 +67,18 @@ Successfully rewrote **all 64 commits** in git history, changing the author/comm
 ## B) PARTIALLY DONE ⚠️
 
 ### 1. Unstaged Lint Fixes (2 files)
+
 Two files have minor formatting changes that were applied during a previous session but not committed:
+
 - `internal/renderer/diagrams_test.go` — moved `NewDiagramRenderer()` inside `t.Run()` for proper parallel test isolation
 - `internal/server/errors.go` — multi-line argument formatting (golines style)
 
 These are **safe, correct, lint-compliant changes** that just need to be committed.
 
 ### 2. Force Push to Origin — NOT YET PUSHED
+
 The local history has been rewritten but the remote still has the old `lars@lars.dev` commits.
+
 - **3 commits ahead of origin** (including the rewrite divergence)
 - **Requires:** `git push --force-with-lease origin master`
 - **WARNING:** This will rewrite public history. Any collaborators must re-clone.
@@ -95,6 +103,7 @@ The local history has been rewritten but the remote still has the old `lars@lars
 ### NOTHING IS FUCKED UP 🎉
 
 The rewrite went perfectly:
+
 - No data loss
 - No commit corruption
 - No test failures
@@ -123,6 +132,7 @@ The rewrite went perfectly:
 ## F) TOP #25 THINGS TO DO NEXT
 
 ### Immediate (Do Now)
+
 1. **Commit the 2 unstaged lint fixes** (`diagrams_test.go`, `errors.go`)
 2. **Force push to origin** (`git push --force-with-lease origin master`)
 3. **Verify `git@lars.software` is added as verified email** in GitHub account settings
@@ -130,6 +140,7 @@ The rewrite went perfectly:
 5. **Verify GitHub Actions CI** passes on the rewritten `master`
 
 ### Short-Term (This Week)
+
 6. **Add `.mailmap` file** at repo root for `git shortlog` display correctness
 7. **Add git `user.email` config** locally to `git@lars.software` to prevent future drift
 8. **Write a pre-commit hook** that validates author email is `git@lars.software`
@@ -141,6 +152,7 @@ The rewrite went perfectly:
 14. **Clean up dependabot committer email** — `github@d1rk.art` is odd; verify this is intentional
 
 ### Medium-Term (Next Sprint)
+
 15. **Add E2E/integration tests** — full HTTP request lifecycle tests
 16. **Add `CHANGELOG.md`** — track user-facing changes for releases
 17. **Set up branch protection** on `master` requiring CI pass before merge
@@ -160,6 +172,7 @@ The rewrite went perfectly:
 **Is the committer email `github@d1rk.art` (on the dependabot merge commit `6ab753f`) intentional or should that also be changed to `git@lars.software`?**
 
 Context:
+
 - Commit `6ab753f` ("Bump golang.org/x/crypto...") was authored by `dependabot[bot]` but **committed by** `Lars Artmann <github@d1rk.art>`
 - This is the merge commit where dependabot's PR was merged via the GitHub web UI
 - `github@d1rk.art` appears to be a GitHub-specific email tied to the GitHub account
@@ -172,12 +185,12 @@ This is a **user preference decision** I cannot make autonomously.
 
 ## Appendix: Email State After Rewrite
 
-| Role | Email | Count | Status |
-|------|-------|-------|--------|
-| Author (Lars) | `git@lars.software` | 63 | ✅ Rewritten |
-| Committer (Lars) | `git@lars.software` | 63 | ✅ Rewritten |
-| Author (dependabot) | `49699333+dependabot[bot]@users.noreply.github.com` | 1 | ✅ Correct (unchanged) |
-| Committer (dependabot merge) | `github@d1rk.art` | 1 | ⚠️ See question G |
+| Role                         | Email                                               | Count | Status                 |
+| ---------------------------- | --------------------------------------------------- | ----- | ---------------------- |
+| Author (Lars)                | `git@lars.software`                                 | 63    | ✅ Rewritten           |
+| Committer (Lars)             | `git@lars.software`                                 | 63    | ✅ Rewritten           |
+| Author (dependabot)          | `49699333+dependabot[bot]@users.noreply.github.com` | 1     | ✅ Correct (unchanged) |
+| Committer (dependabot merge) | `github@d1rk.art`                                   | 1     | ⚠️ See question G      |
 
 ---
 

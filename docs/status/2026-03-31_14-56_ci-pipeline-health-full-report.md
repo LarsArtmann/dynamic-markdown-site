@@ -62,48 +62,48 @@
 
 ### Critical — Get CI Green (1-5)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 1 | Fix 17 `noctx` errors: replace `httptest.NewRequest` → `httptest.NewRequestWithContext` in test files | 30 min | **Unblocks CI** |
-| 2 | Fix 6 `exhaustruct` errors: add missing struct fields in testutil and test helpers | 15 min | **Unblocks CI** |
-| 3 | Fix 2 `golines` formatting errors in `suggestions.go` and `suggestions_test.go` | 5 min | **Unblocks CI** |
-| 4 | Fix 1 `gochecknoinits` error in `testutil/http.go` — replace `init()` with explicit setup | 10 min | **Unblocks CI** |
-| 5 | Fix 1 `cyclop` error (complexity 12 in `cmd/dynamic-markdown-site/main.go`) | 15 min | **Unblocks CI** |
+| #   | Task                                                                                                  | Effort | Impact          |
+| --- | ----------------------------------------------------------------------------------------------------- | ------ | --------------- |
+| 1   | Fix 17 `noctx` errors: replace `httptest.NewRequest` → `httptest.NewRequestWithContext` in test files | 30 min | **Unblocks CI** |
+| 2   | Fix 6 `exhaustruct` errors: add missing struct fields in testutil and test helpers                    | 15 min | **Unblocks CI** |
+| 3   | Fix 2 `golines` formatting errors in `suggestions.go` and `suggestions_test.go`                       | 5 min  | **Unblocks CI** |
+| 4   | Fix 1 `gochecknoinits` error in `testutil/http.go` — replace `init()` with explicit setup             | 10 min | **Unblocks CI** |
+| 5   | Fix 1 `cyclop` error (complexity 12 in `cmd/dynamic-markdown-site/main.go`)                           | 15 min | **Unblocks CI** |
 
 ### High — Verify Pipeline End-to-End (6-10)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 6 | Run `golangci-lint run ./...` locally after fixes, confirm 0 issues | 5 min | Confidence |
-| 7 | Run `go test ./... -race -cover` locally, confirm all pass | 5 min | Confidence |
-| 8 | Commit all lint fixes with detailed message | 5 min | History |
-| 9 | Push and monitor CI run to green | 5 min | **DONE** |
-| 10 | Verify Docker artifact appears in GitHub Actions artifacts | 2 min | Validation |
+| #   | Task                                                                | Effort | Impact     |
+| --- | ------------------------------------------------------------------- | ------ | ---------- |
+| 6   | Run `golangci-lint run ./...` locally after fixes, confirm 0 issues | 5 min  | Confidence |
+| 7   | Run `go test ./... -race -cover` locally, confirm all pass          | 5 min  | Confidence |
+| 8   | Commit all lint fixes with detailed message                         | 5 min  | History    |
+| 9   | Push and monitor CI run to green                                    | 5 min  | **DONE**   |
+| 10  | Verify Docker artifact appears in GitHub Actions artifacts          | 2 min  | Validation |
 
 ### Medium — Safety Nets (11-15)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 11 | Add `just pre-push` command to justfile (lint + test + race) | 5 min | Prevention |
-| 12 | Add git pre-push hook calling `just pre-push` | 5 min | Prevention |
-| 13 | Separate CI workflow into two: `test.yml` (fast) + `docker.yml` (build) | 15 min | Speed |
-| 14 | Add PR trigger to CI (not just master push) | 5 min | Early detection |
-| 15 | Add `golangci-lint` version pinning in workflow (use project's `.golangci.yml`) | 5 min | Reproducibility |
+| #   | Task                                                                            | Effort | Impact          |
+| --- | ------------------------------------------------------------------------------- | ------ | --------------- |
+| 11  | Add `just pre-push` command to justfile (lint + test + race)                    | 5 min  | Prevention      |
+| 12  | Add git pre-push hook calling `just pre-push`                                   | 5 min  | Prevention      |
+| 13  | Separate CI workflow into two: `test.yml` (fast) + `docker.yml` (build)         | 15 min | Speed           |
+| 14  | Add PR trigger to CI (not just master push)                                     | 5 min  | Early detection |
+| 15  | Add `golangci-lint` version pinning in workflow (use project's `.golangci.yml`) | 5 min  | Reproducibility |
 
 ### Lower — Architecture & Quality (16-25)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 16 | Remove `pkg/errors` package (conflicts with stdlib name, flagged by `revive`) | 15 min | Cleanup |
-| 17 | Reduce complexity in `watchForChanges` (gocognit: 37) | 30 min | Readability |
-| 18 | Reduce complexity in `run()` in main.go (cyclop: 12) | 15 min | Readability |
-| 19 | Add `templ generate` check to CI (verify templates are up-to-date) | 10 min | Safety |
-| 20 | Pin `templ` version in Dockerfile instead of `@latest` | 5 min | Reproducibility |
-| 21 | Add `.editorconfig` for consistent formatting | 5 min | Consistency |
-| 22 | Consider `exhaustruct` config — add test files to exclusion if too noisy | 5 min | Noise reduction |
-| 23 | Add `Repository.AllPaths()` to search suggestion feature properly | 15 min | Feature completion |
-| 24 | Add integration test for 404 suggestions endpoint | 15 min | Coverage |
-| 25 | Document CI pipeline in README | 10 min | Onboarding |
+| #   | Task                                                                          | Effort | Impact             |
+| --- | ----------------------------------------------------------------------------- | ------ | ------------------ |
+| 16  | Remove `pkg/errors` package (conflicts with stdlib name, flagged by `revive`) | 15 min | Cleanup            |
+| 17  | Reduce complexity in `watchForChanges` (gocognit: 37)                         | 30 min | Readability        |
+| 18  | Reduce complexity in `run()` in main.go (cyclop: 12)                          | 15 min | Readability        |
+| 19  | Add `templ generate` check to CI (verify templates are up-to-date)            | 10 min | Safety             |
+| 20  | Pin `templ` version in Dockerfile instead of `@latest`                        | 5 min  | Reproducibility    |
+| 21  | Add `.editorconfig` for consistent formatting                                 | 5 min  | Consistency        |
+| 22  | Consider `exhaustruct` config — add test files to exclusion if too noisy      | 5 min  | Noise reduction    |
+| 23  | Add `Repository.AllPaths()` to search suggestion feature properly             | 15 min | Feature completion |
+| 24  | Add integration test for 404 suggestions endpoint                             | 15 min | Coverage           |
+| 25  | Document CI pipeline in README                                                | 10 min | Onboarding         |
 
 ---
 
