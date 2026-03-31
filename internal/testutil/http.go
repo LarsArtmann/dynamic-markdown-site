@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -45,7 +46,7 @@ func (r *HTTPTestRunner) Run(t *testing.T, cases []HTTPTestCase) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			req := httptest.NewRequest(tc.Method, tc.Path, strings.NewReader(tc.Body))
+			req := httptest.NewRequestWithContext(context.Background(), tc.Method, tc.Path, strings.NewReader(tc.Body))
 			rec := httptest.NewRecorder()
 
 			r.Router.ServeHTTP(rec, req)
@@ -95,7 +96,7 @@ func (f *ServerFixture) NewRouter() *gin.Engine {
 
 // NewRequest creates a new HTTP request for testing.
 func (f *ServerFixture) NewRequest(method, path string) *http.Request {
-	return httptest.NewRequest(method, path, nil)
+	return httptest.NewRequestWithContext(context.Background(), method, path, nil)
 }
 
 // Execute executes a request and returns the response recorder.
