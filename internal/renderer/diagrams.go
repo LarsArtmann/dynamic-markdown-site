@@ -109,7 +109,7 @@ func DetectDiagrams(content string) []DetectedDiagram {
 }
 
 // d2Error wraps an error with D2 rendering context.
-func d2Error(err error, ctx string, content string) error {
+func d2Error(err error, ctx, content string) error {
 	return errors.Wrapf(err, "%s: %s", ctx, truncateForLog(content))
 }
 

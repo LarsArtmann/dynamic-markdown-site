@@ -107,7 +107,7 @@ func writeStrings(w util.BufWriter, errMsg string, parts ...string) error {
 }
 
 // wrapWriteError wraps a write error with context including truncated content.
-func wrapWriteError(err error, msg string, content string) error {
+func wrapWriteError(err error, msg, content string) error {
 	return errors.Wrapf(err, "%s: %s", msg, truncateForLog(content))
 }
 
