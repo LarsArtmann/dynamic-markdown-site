@@ -62,7 +62,7 @@ func TestFindSuggestions(t *testing.T) {
 				domain.MustURLPath("/contact"),
 			},
 			maxSuggestions: 5,
-			wantCount:      3,
+			wantCount:      1, // Only /about above 0.3 threshold
 			wantFirst:      "/about",
 		},
 		{
@@ -74,7 +74,7 @@ func TestFindSuggestions(t *testing.T) {
 				domain.MustURLPath("/home"),
 			},
 			maxSuggestions: 5,
-			wantCount:      3,
+			wantCount:      2, // /blog and /about above 0.3 threshold
 			wantFirst:      "/blog",
 		},
 		{
@@ -100,7 +100,7 @@ func TestFindSuggestions(t *testing.T) {
 				domain.MustURLPath("/login"),
 			},
 			maxSuggestions: 5,
-			wantCount:      3,
+			wantCount:      2, // /blog and /login above 0.3 threshold
 			wantFirst:      "/blog",
 		},
 		{
