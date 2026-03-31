@@ -32,33 +32,55 @@ func TestFindSuggestions(t *testing.T) {
 			wantCount:      0,
 		},
 		{
-			name:           "exact match is excluded",
-			requested:      "/home",
-			paths:          []domain.URLPath{domain.MustURLPath("/home"), domain.MustURLPath("/about")},
+			name:      "exact match is excluded",
+			requested: "/home",
+			paths: []domain.URLPath{
+				domain.MustURLPath("/home"),
+				domain.MustURLPath("/about"),
+			},
 			maxSuggestions: 5,
 			wantCount:      1,
 			wantFirst:      "/about",
 		},
 		{
-			name:           "typo correction with Levenshtein",
-			requested:      "/abou",
-			paths:          []domain.URLPath{domain.MustURLPath("/about"), domain.MustURLPath("/home"), domain.MustURLPath("/contact")},
+			name:      "case insensitive exact match excluded",
+			requested: "/HOME",
+			paths: []domain.URLPath{
+				domain.MustURLPath("/home"),
+				domain.MustURLPath("/about"),
+			},
+			maxSuggestions: 5,
+			wantCount:      1,
+			wantFirst:      "/about",
+		},
+		{
+			name:      "typo correction with Levenshtein",
+			requested: "/abou",
+			paths: []domain.URLPath{
+				domain.MustURLPath("/about"),
+				domain.MustURLPath("/home"),
+				domain.MustURLPath("/contact"),
+			},
 			maxSuggestions: 5,
 			wantCount:      3,
 			wantFirst:      "/about",
 		},
 		{
-			name:           "prefix match gets boosted",
-			requested:      "/bl",
-			paths:          []domain.URLPath{domain.MustURLPath("/blog"), domain.MustURLPath("/about"), domain.MustURLPath("/home")},
+			name:      "prefix match gets boosted",
+			requested: "/bl",
+			paths: []domain.URLPath{
+				domain.MustURLPath("/blog"),
+				domain.MustURLPath("/about"),
+				domain.MustURLPath("/home"),
+			},
 			maxSuggestions: 5,
 			wantCount:      3,
 			wantFirst:      "/blog",
 		},
 		{
-			name:           "max suggestions respected",
-			requested:      "/t",
-			paths:          []domain.URLPath{
+			name:      "max suggestions respected",
+			requested: "/t",
+			paths: []domain.URLPath{
 				domain.MustURLPath("/test1"),
 				domain.MustURLPath("/test2"),
 				domain.MustURLPath("/test3"),
@@ -70,12 +92,27 @@ func TestFindSuggestions(t *testing.T) {
 			wantCount:      3,
 		},
 		{
-			name:           "substring match gets boosted",
-			requested:      "log",
-			paths:          []domain.URLPath{domain.MustURLPath("/blog"), domain.MustURLPath("/about"), domain.MustURLPath("/login")},
+			name:      "substring match gets boosted",
+			requested: "log",
+			paths: []domain.URLPath{
+				domain.MustURLPath("/blog"),
+				domain.MustURLPath("/about"),
+				domain.MustURLPath("/login"),
+			},
 			maxSuggestions: 5,
 			wantCount:      3,
 			wantFirst:      "/blog",
+		},
+		{
+			name:      "low score suggestions filtered by threshold",
+			requested: "/xyz123",
+			paths: []domain.URLPath{
+				domain.MustURLPath("/abc"),
+				domain.MustURLPath("/def"),
+				domain.MustURLPath("/ghi"),
+			},
+			maxSuggestions: 5,
+			wantCount:      0, // No matches above 0.3 threshold
 		},
 	}
 

@@ -1,10 +1,14 @@
 package server
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
+
+// minScoreThreshold is the minimum score for a suggestion to be considered relevant.
+const minScoreThreshold = 0.3
 
 // SuggestedPath represents a path suggestion with similarity score.
 type SuggestedPath struct {
@@ -15,20 +19,25 @@ type SuggestedPath struct {
 
 // findSuggestions returns similar paths based on Levenshtein distance.
 // It returns up to maxSuggestions paths, sorted by similarity (highest first).
+// Only suggestions with score >= minScoreThreshold are returned.
 func findSuggestions(requested string, paths []domain.URLPath, maxSuggestions int) []SuggestedPath {
 	if len(paths) == 0 || requested == "" {
 		return nil
 	}
 
+	requestedLower := strings.ToLower(requested)
 	var suggestions []SuggestedPath
 
 	for _, path := range paths {
-		if path.String() == requested {
-			continue // Skip exact matches
+		pathStr := path.String()
+		pathLower := strings.ToLower(pathStr)
+
+		if pathLower == requestedLower {
+			continue // Skip exact matches (case-insensitive)
 		}
 
-		distance := levenshteinDistance(requested, path.String())
-		maxLen := max(len(requested), len(path.String()))
+		distance := levenshteinDistance(requestedLower, pathLower)
+		maxLen := max(len(requested), len(pathStr))
 
 		if maxLen == 0 {
 			continue
@@ -38,30 +47,31 @@ func findSuggestions(requested string, paths []domain.URLPath, maxSuggestions in
 		score := 1.0 - float64(distance)/float64(maxLen)
 
 		// Boost score for path prefix matches
-		if strings.HasPrefix(path.String(), requested) || strings.HasPrefix(requested, path.String()) {
+		if strings.HasPrefix(pathLower, requestedLower) ||
+			strings.HasPrefix(requestedLower, pathLower) {
 			score += 0.2
 		}
 
 		// Boost score for substring matches
-		if strings.Contains(path.String(), requested) || strings.Contains(requested, path.String()) {
+		if strings.Contains(pathLower, requestedLower) ||
+			strings.Contains(requestedLower, pathLower) {
 			score += 0.1
 		}
 
-		suggestions = append(suggestions, SuggestedPath{
-			Path:  path,
-			Title: path.Filename(),
-			Score: score,
-		})
-	}
-
-	// Sort by score descending
-	for i := range suggestions {
-		for j := i + 1; j < len(suggestions); j++ {
-			if suggestions[j].Score > suggestions[i].Score {
-				suggestions[i], suggestions[j] = suggestions[j], suggestions[i]
-			}
+		// Only include suggestions above threshold
+		if score >= minScoreThreshold {
+			suggestions = append(suggestions, SuggestedPath{
+				Path:  path,
+				Title: path.Filename(),
+				Score: score,
+			})
 		}
 	}
+
+	// Sort by score descending (higher score = better match)
+	sort.Slice(suggestions, func(i, j int) bool {
+		return suggestions[i].Score > suggestions[j].Score
+	})
 
 	// Return top N suggestions
 	if len(suggestions) > maxSuggestions {
