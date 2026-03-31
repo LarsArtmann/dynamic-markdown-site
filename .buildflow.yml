@@ -1,0 +1,29 @@
+# BuildFlow Configuration
+# https://github.com/buildflow/buildflow
+
+# Build mode: full (all checks)
+build-mode: full
+
+# Test files are intentionally larger for comprehensive testing
+# Increase max file size or exclude test files
+max-file-size: 600
+
+# Test files are excluded from file size check
+exclude:
+  - vendor
+  - .git
+  - node_modules
+  - dist
+  - generated.go
+  - .pb.go
+  - .gen.go
+  - "*_test.go"
+
+# Parallel execution
+parallel: true
+
+# Semantic mode for better duplicate detection
+semantic: true
+
+# Auto-fix mode
+fix: true

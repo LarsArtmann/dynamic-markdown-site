@@ -62,9 +62,11 @@ func (s *Server) handle500(c *gin.Context) {
 
 func (s *Server) renderError(c *gin.Context, statusCode int, title, message string) {
 	props := templates.ErrorViewProps{
-		Title:      title,
-		Message:    message,
-		StatusCode: statusCode,
+		Title:       title,
+		Message:     message,
+		StatusCode:  statusCode,
+		RequestPath: "",
+		Suggestions: nil,
 	}
 
 	component := templates.ErrorView(props)
