@@ -130,7 +130,7 @@ func watchForChanges(
 func addDirectoriesRecursive(watcher *fsnotify.Watcher, root string, logger *slog.Logger) error {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return errors.Wrap(err, "walking directory tree")
+			return errors.Wrapf(err, "walking directory tree at %s (root: %s)", path, root)
 		}
 
 		if info.IsDir() {
@@ -161,7 +161,7 @@ func addDirectoriesRecursive(watcher *fsnotify.Watcher, root string, logger *slo
 		return nil
 	})
 	if err != nil {
-		return errors.Wrap(err, "walk directories")
+		return errors.Wrapf(err, "walk directories in root: %s", root)
 	}
 
 	return nil
