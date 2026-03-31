@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -97,7 +98,7 @@ func TestRefreshRateLimit(t *testing.T) {
 	router := newTestRouter(server)
 
 	for i := range 10 {
-		req := httptest.NewRequest(http.MethodGet, "/refresh", nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/refresh", nil)
 		rec := httptest.NewRecorder()
 		router.ServeHTTP(rec, req)
 
@@ -106,7 +107,7 @@ func TestRefreshRateLimit(t *testing.T) {
 		}
 	}
 
-	req := httptest.NewRequest(http.MethodGet, "/refresh", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/refresh", nil)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -149,7 +150,7 @@ func runStatusTests(t *testing.T, router *gin.Engine, tests []statusTestCase) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, tt.path, nil)
 			rec := httptest.NewRecorder()
 			router.ServeHTTP(rec, req)
 
@@ -175,7 +176,7 @@ func runHTTPTests(t *testing.T, router *gin.Engine, tests []httpTestCase) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(tt.method, tt.path, nil)
+			req := httptest.NewRequestWithContext(context.Background(), tt.method, tt.path, nil)
 			rec := httptest.NewRecorder()
 			router.ServeHTTP(rec, req)
 
@@ -262,7 +263,7 @@ func TestContentWithFile(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/test-file", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/test-file", nil)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -314,7 +315,7 @@ func TestContentWithDirectory(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/test-dir", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/test-dir", nil)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -436,7 +437,7 @@ func TestRefreshEndpointFailure(t *testing.T) {
 	server := NewServer(repo, searcher, logger, cache, false)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/refresh", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/refresh", nil)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -480,7 +481,7 @@ func TestSearchEndpointError(t *testing.T) {
 		server.handle500(c)
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/search?q=test", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/search?q=test", nil)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -494,7 +495,7 @@ func TestHandle500(t *testing.T) {
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 
-	req := httptest.NewRequest(http.MethodGet, "/error", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/error", nil)
 	rec := httptest.NewRecorder()
 
 	// Create gin context and call handle500 directly
@@ -610,7 +611,7 @@ func TestRenderFileWithCache(t *testing.T) {
 	router := newTestRouter(server)
 
 	// First request - renders and caches
-	req1 := httptest.NewRequest(http.MethodGet, "/cached-file", nil)
+	req1 := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/cached-file", nil)
 	rec1 := httptest.NewRecorder()
 	router.ServeHTTP(rec1, req1)
 
@@ -619,7 +620,7 @@ func TestRenderFileWithCache(t *testing.T) {
 	}
 
 	// Second request - should use cache
-	req2 := httptest.NewRequest(http.MethodGet, "/cached-file", nil)
+	req2 := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/cached-file", nil)
 	rec2 := httptest.NewRecorder()
 	router.ServeHTTP(rec2, req2)
 

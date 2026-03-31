@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -114,7 +115,7 @@ func BenchmarkServerCachedRequest(b *testing.B) {
 	router := newBenchmarkServer(b)
 
 	// Prime the cache with a request
-	req := httptest.NewRequest(http.MethodGet, "/file-0", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/file-0", nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -127,7 +128,7 @@ func runBenchmarkRequest(b *testing.B, router *gin.Engine, path string) {
 	b.ResetTimer()
 
 	for range b.N {
-		req := httptest.NewRequest(http.MethodGet, path, nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
 	}
@@ -155,7 +156,7 @@ func BenchmarkServerConcurrent(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		i := 0
 		for pb.Next() {
-			req := httptest.NewRequest(http.MethodGet, paths[i%len(paths)], nil)
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, paths[i%len(paths)], nil)
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
 
@@ -199,7 +200,7 @@ func BenchmarkServerMixedWorkload(b *testing.B) {
 			}
 		}
 
-		req := httptest.NewRequest(http.MethodGet, path, nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
 	}
