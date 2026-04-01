@@ -141,8 +141,6 @@ func configureGin(logLevel string) {
 func createRouter(svc *services) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Recovery())
-	router.Use(requestLogger(svc.logger))
-
 	svc.server.RegisterRoutes(router)
 
 	return router
@@ -202,37 +200,6 @@ func startFileWatcher(svc *services) {
 		liveReload := svc.server.LiveReload()
 		go watchForChanges(svc.config.RootDir, svc.repo, liveReload, svc.logger)
 		svc.logger.Info("file watcher started in dev mode")
-	}
-}
-
-// requestLogger is a gin middleware that logs HTTP requests.
-func requestLogger(logger *slog.Logger) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		start := time.Now()
-		path := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
-
-		// Process request
-		c.Next()
-
-		// Log after request
-		duration := time.Since(start)
-		clientIP := c.ClientIP()
-		method := c.Request.Method
-		statusCode := c.Writer.Status()
-
-		if raw != "" {
-			path = path + "?" + raw
-		}
-
-		logger.Info("http request",
-			slog.String("client_ip", clientIP),
-			slog.String("method", method),
-			slog.String("path", path),
-			slog.Int("status", statusCode),
-			slog.Duration("duration", duration),
-			slog.Int("errors", len(c.Errors)),
-		)
 	}
 }
 
