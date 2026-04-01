@@ -291,11 +291,11 @@ Possible criteria:
 
 ```json
 {
-  "status": "healthy",
-  "version": "dev",
-  "commit": "unknown",
-  "build_date": "unknown",
-  "timestamp": "2026-04-01T06:34:21Z"
+	"status": "healthy",
+	"version": "dev",
+	"commit": "unknown",
+	"build_date": "unknown",
+	"timestamp": "2026-04-01T06:34:21Z"
 }
 ```
 

@@ -16,48 +16,48 @@ The Mermaid.js implementation is **FULLY DONE** - it was already present in the 
 
 ### a) FULLY DONE ✅
 
-| Feature | Status | Notes |
-|---------|--------|-------|
+| Feature                    | Status        | Notes                                                        |
+| -------------------------- | ------------- | ------------------------------------------------------------ |
 | **Mermaid.js Integration** | ✅ FULLY DONE | Already implemented via CDN + `<pre class="mermaid">` blocks |
-| D2 Diagram Rendering | ✅ FULLY DONE | Server-side SVG rendering with D2 compiler |
-| Markdown Rendering | ✅ FULLY DONE | Goldmark + Chroma for syntax highlighting |
-| Templ Templates | ✅ FULLY DONE | Type-safe HTML generation |
-| Dependency Injection | ✅ FULLY DONE | samber/do/v2 container |
-| Content Caching | ✅ FULLY DONE | otterzap/otter cache |
-| File Watching (Dev Mode) | ✅ FULLY DONE | fsnotify-based live reload |
-| Rate Limiting | ✅ FULLY DONE | 10 refresh requests/minute per IP |
-| Health Endpoint | ✅ FULLY DONE | `/health` for monitoring |
-| Search | ✅ FULLY DONE | Full-text search with scoring |
-| Table of Contents | ✅ FULLY DONE | Auto-generated from headings |
-| Frontmatter Support | ✅ FULLY DONE | YAML frontmatter parsing |
-| Parallel Tests | ✅ FULLY DONE | All tests use `t.Parallel()` |
-| Linter Clean | ✅ FULLY DONE | 75 linters passing |
-| Git History | ✅ FULLY DONE | Clean, no large files |
-| CI/CD | ✅ FULLY DONE | GitHub Actions working |
-| Docker Build | ✅ FULLY DONE | Multi-stage, reproducible builds |
-| Graceful Shutdown | ✅ FULLY DONE | SIGINT/SIGTERM handling |
-| Error Handling | ✅ FULLY DONE | cockroachdb/errors with context |
-| Domain Types | ✅ FULLY DONE | URLPath validation prevents traversal |
-| Custom 404 | ✅ FULLY DONE | Suggestions for typos |
-| Live Reload | ✅ FULLY DONE | SSE-based in dev mode |
+| D2 Diagram Rendering       | ✅ FULLY DONE | Server-side SVG rendering with D2 compiler                   |
+| Markdown Rendering         | ✅ FULLY DONE | Goldmark + Chroma for syntax highlighting                    |
+| Templ Templates            | ✅ FULLY DONE | Type-safe HTML generation                                    |
+| Dependency Injection       | ✅ FULLY DONE | samber/do/v2 container                                       |
+| Content Caching            | ✅ FULLY DONE | otterzap/otter cache                                         |
+| File Watching (Dev Mode)   | ✅ FULLY DONE | fsnotify-based live reload                                   |
+| Rate Limiting              | ✅ FULLY DONE | 10 refresh requests/minute per IP                            |
+| Health Endpoint            | ✅ FULLY DONE | `/health` for monitoring                                     |
+| Search                     | ✅ FULLY DONE | Full-text search with scoring                                |
+| Table of Contents          | ✅ FULLY DONE | Auto-generated from headings                                 |
+| Frontmatter Support        | ✅ FULLY DONE | YAML frontmatter parsing                                     |
+| Parallel Tests             | ✅ FULLY DONE | All tests use `t.Parallel()`                                 |
+| Linter Clean               | ✅ FULLY DONE | 75 linters passing                                           |
+| Git History                | ✅ FULLY DONE | Clean, no large files                                        |
+| CI/CD                      | ✅ FULLY DONE | GitHub Actions working                                       |
+| Docker Build               | ✅ FULLY DONE | Multi-stage, reproducible builds                             |
+| Graceful Shutdown          | ✅ FULLY DONE | SIGINT/SIGTERM handling                                      |
+| Error Handling             | ✅ FULLY DONE | cockroachdb/errors with context                              |
+| Domain Types               | ✅ FULLY DONE | URLPath validation prevents traversal                        |
+| Custom 404                 | ✅ FULLY DONE | Suggestions for typos                                        |
+| Live Reload                | ✅ FULLY DONE | SSE-based in dev mode                                        |
 
 ### b) PARTIALLY DONE 🔄
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| None currently | - | All known features complete |
+| Feature        | Status | Notes                       |
+| -------------- | ------ | --------------------------- |
+| None currently | -      | All known features complete |
 
 ### c) NOT STARTED 🚫
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| None currently identified | - | - |
+| Feature                   | Status | Notes |
+| ------------------------- | ------ | ----- |
+| None currently identified | -      | -     |
 
 ### d) TOTALLY FUCKED UP 💀
 
-| Issue | Status | Notes |
-|-------|--------|-------|
-| None | ✅ Clean | Working tree is clean |
+| Issue | Status   | Notes                 |
+| ----- | -------- | --------------------- |
+| None  | ✅ Clean | Working tree is clean |
 
 ---
 
@@ -104,6 +104,7 @@ The Mermaid.js implementation is **FULLY DONE** - it was already present in the 
 ## Testing & Quality Metrics
 
 ### Test Results
+
 ```
 ok  	github.com/larsartmann/dynamic-markdown-site/internal/cache     	0.493s
 ok  	github.com/larsartmann/dynamic-markdown-site/internal/config     	0.916s
@@ -115,6 +116,7 @@ ok  	github.com/larsartmann/dynamic-markdown-site/internal/server    	4.579s
 ```
 
 ### Linter Status
+
 - **0 issues** in renderer package
 - All 75 linters passing
 - Only documented exclusions in `.golangci.yml`
@@ -152,11 +154,13 @@ templates/
 **How do we want to handle external image caching/proxying for security and performance?**
 
 Currently images are served directly. Should we:
+
 1. Proxy all images through the server (security, but adds latency)
 2. Cache images locally on first fetch (storage concerns)
 3. Keep as-is (fast, but dependent on external availability)
 
 This is a strategic decision that depends on:
+
 - Security requirements (hotlinking prevention)
 - Performance goals (speed vs reliability)
 - Storage constraints
@@ -185,4 +189,4 @@ nothing to commit, working tree clean
 
 ---
 
-*Generated: 2026-04-01 09:04 CEST*
+_Generated: 2026-04-01 09:04 CEST_
