@@ -30,6 +30,7 @@ type Config struct {
 	CacheEnabled bool
 	DevMode      bool
 	Timeout      time.Duration
+	SiteName     string
 }
 
 // DefaultConfig returns a new Config with default values.
@@ -42,6 +43,7 @@ func DefaultConfig() *Config {
 		CacheEnabled: true,
 		DevMode:      false,
 		Timeout:      30 * time.Second,
+		SiteName:     "Site",
 	}
 }
 
@@ -99,6 +101,10 @@ func Load() (*Config, error) {
 		if d, err := time.ParseDuration(timeout); err == nil {
 			cfg.Timeout = d
 		}
+	}
+
+	if siteName := os.Getenv("DYNAMIC_MARKDOWN_SITE_NAME"); siteName != "" {
+		cfg.SiteName = siteName
 	}
 
 	// Post-process configuration
@@ -174,6 +180,7 @@ func (c *Config) LogValue() slog.Value {
 		slog.Bool("cache_enabled", c.CacheEnabled),
 		slog.Bool("dev_mode", c.DevMode),
 		slog.Duration("timeout", c.Timeout),
+		slog.String("site_name", c.SiteName),
 	)
 }
 
@@ -207,6 +214,7 @@ func (c *Config) String() string {
 	fmt.Fprintf(&b, "  Cache:        %v\n", c.CacheEnabled)
 	fmt.Fprintf(&b, "  Dev Mode:     %v\n", c.DevMode)
 	fmt.Fprintf(&b, "  Timeout:      %v\n", c.Timeout)
+	fmt.Fprintf(&b, "  Site Name:    %s\n", c.SiteName)
 
 	return b.String()
 }

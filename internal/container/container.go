@@ -141,18 +141,28 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 
 	// Use blob storage if StorageURL is configured
 	if cfg.StorageURL != "" {
-		slog.Info("blob storage requested, creating repository with timeout")
-		// Use a timeout context for blob operations to prevent hanging on
-		// credential lookup (especially for GCS without Application Default Credentials)
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		slog.Info("opening blob bucket", slog.String("url", cfg.StorageURL))
-		repo, err := content.NewBlobRepository(ctx, cfg.StorageURL)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create blob repository: %w", err)
+		// Use a channel-based timeout since gocloud.dev's blob.OpenBucket doesn't
+		// respect context cancellation for GCS credential discovery
+		type result struct {
+			repo content.Repository
+			err  error
 		}
-		return repo, nil
+		resultCh := make(chan result, 1)
+
+		go func() {
+			repo, err := content.NewBlobRepository(context.Background(), cfg.StorageURL)
+			resultCh <- result{repo: repo, err: err}
+		}()
+
+		select {
+		case res := <-resultCh:
+			if res.err != nil {
+				return nil, fmt.Errorf("failed to create blob repository: %w", res.err)
+			}
+			return res.repo, nil
+		case <-time.After(10 * time.Second):
+			return nil, fmt.Errorf("blob repository creation timed out after 10 seconds (storage_url=%s)", cfg.StorageURL)
+		}
 	}
 
 	// Use filesystem repository as default
