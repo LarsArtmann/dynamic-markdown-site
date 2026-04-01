@@ -13,6 +13,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
+	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 )
 
 // Server holds all dependencies for HTTP handling.
@@ -54,6 +55,7 @@ func NewServer(
 func (s *Server) RegisterRoutes(router *gin.Engine) {
 	// Global middleware (order matters - first to last)
 	router.Use(requestIDMiddleware())
+	router.Use(securityHeadersMiddleware())
 	router.Use(s.staticAndContentMiddleware())
 	router.GET("/health", s.handleHealth)
 	router.GET("/refresh", s.handleRefresh)
@@ -94,6 +96,9 @@ func (s *Server) staticAndContentMiddleware() gin.HandlerFunc {
 func (s *Server) handleHealth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":    "healthy",
+		"version":   version.Version,
+		"commit":    version.Commit,
+		"build_date": version.BuildDate,
 		"timestamp": time.Now().UTC(),
 	})
 }

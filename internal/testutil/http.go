@@ -14,10 +14,6 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
 )
 
-func init() {
-	gin.SetMode(gin.TestMode)
-}
-
 // HTTPTestCase defines a single HTTP test case.
 type HTTPTestCase struct {
 	Name       string
@@ -35,6 +31,8 @@ type HTTPTestRunner struct {
 
 // NewHTTPTestRunner creates a new HTTP test runner with the given router.
 func NewHTTPTestRunner(router *gin.Engine) *HTTPTestRunner {
+	gin.SetMode(gin.TestMode)
+
 	return &HTTPTestRunner{Router: router}
 }
 

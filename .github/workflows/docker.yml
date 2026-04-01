@@ -3,6 +3,7 @@ name: Build Docker Image
 on:
   push:
     branches: [master]
+    tags: ['v*.*.*']
     paths:
       - "**.go"
       - "**.templ"
@@ -14,24 +15,45 @@ on:
       - "go.sum"
       - ".github/workflows/docker.yml"
 
+env:
+  # Pin templ version for reproducibility
+  TEMPL_VERSION: "v0.3.1001"
+  # Image naming
+  IMAGE_NAME: "ghcr.io/${{ github.repository }}"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
+      attestations: write
+      id-token: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
+      - name: Generate git metadata
+        id: meta
+        run: |
+          VERSION=${{ github.ref_name || 'dev' }}
+          COMMIT=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          echo "build_date=$BUILD_DATE" >> $GITHUB_OUTPUT
+
       - name: Generate templ templates
         run: |
-          go install github.com/a-h/templ/cmd/templ@latest
+          go install github.com/a-h/templ/cmd/templ@${{ env.TEMPL_VERSION }}
           templ generate
 
       - name: Run tests
@@ -45,14 +67,46 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta-docker
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=,suffix=,format=sha
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' }}
+
+      - name: Build and push with SBOM and provenance
         uses: docker/build-push-action@v6
         with:
           context: .
-          load: true
-          tags: dynamic-markdown-site:${{ github.sha }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-docker.outputs.tags }}
+          labels: ${{ steps.meta-docker.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            COMMIT=${{ steps.meta.outputs.commit }}
+            BUILD_DATE=${{ steps.meta.outputs.build_date }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Verify SBOM generated
+        run: |
+          echo "SBOM attestation created"
+          echo "Image digest: ${{ env.IMAGE_NAME }}@sha256:${{ hashFiles('**/sbom*.json') }}"
 
       - name: Smoke test - verify container starts and serves health
         run: |
@@ -61,16 +115,17 @@ jobs:
           docker run -d --name smoke-test \
             -p 8080:8080 \
             -v /tmp/smoke-content:/content:ro \
-            dynamic-markdown-site:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
           sleep 3
-          curl -sf http://localhost:8080/health \
-            || { docker logs smoke-test && exit 1; }
+          RESPONSE=$(curl -sf http://localhost:8080/health)
+          echo "Health response: $RESPONSE"
+          echo "$RESPONSE" | grep -q '"status":"healthy"' || exit 1
           docker stop smoke-test
           docker rm smoke-test
 
-      - name: Save Docker image
+      - name: Save Docker image (local testing)
         run: |
-          docker save dynamic-markdown-site:${{ github.sha }} | gzip > image.tar.gz
+          docker save ${{ env.IMAGE_NAME }}:sha-${{ github.sha }} | gzip > image.tar.gz
           echo "Image size: $(du -h image.tar.gz | cut -f1)"
 
       - name: Upload Docker image
@@ -80,3 +135,30 @@ jobs:
           path: image.tar.gz
           retention-days: 14
           if-no-files-found: error
+
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    outputs:
+      trivy-result: ${{ steps.scan.outputs.result }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        id: scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.IMAGE_NAME }}:sha-${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+        if: always()

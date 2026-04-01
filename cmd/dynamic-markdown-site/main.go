@@ -20,6 +20,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/container"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
+	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 )
 
 // Server timeouts.
@@ -40,6 +41,9 @@ type services struct {
 }
 
 func main() {
+	if version.Version == "dev" {
+		slog.Info("running in development mode (version not set)")
+	}
 	err := run()
 	if err != nil {
 		slog.Error("application failed", slog.Any("error", err))
@@ -94,6 +98,9 @@ func logStartupInfo(svc *services) {
 		slog.Bool("cache_enabled", svc.config.CacheEnabled),
 		slog.Bool("dev_mode", svc.config.DevMode),
 		slog.Duration("timeout", svc.config.Timeout),
+		slog.String("version", version.Version),
+		slog.String("commit", version.Commit),
+		slog.String("build_date", version.BuildDate),
 	)
 
 	svc.logger.Info("configuration", slog.String("config", svc.config.String()))

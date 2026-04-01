@@ -5,16 +5,16 @@
 
 ## 🔴 HIGH Priority
 
-- [ ] Fix 2 broken `executeRequest` call sites (source: 2026-03-31_20-34_comprehensive-status-report.md)
+- [x] Fix 2 broken `executeRequest` call sites (source: 2026-03-31_20-34_comprehensive-status-report.md) ✅ Already fixed in codebase
 - [ ] Address GitHub security vulnerabilities in dependencies (source: 2026-03-30_16-57_comprehensive-status-report.md)
-- [ ] Add security headers middleware (source: 2026-03-30_17-44_clone-elimination-complete.md)
+- [x] Add security headers middleware (source: 2026-03-30_17-44_clone-elimination-complete.md) ✅ Done: created security.go + wired into handlers.go
 
 ## 🟡 MEDIUM Priority
 
 - [ ] Fix golines formatting errors in `suggestions.go`, `suggestions_test.go`, and 2 other files (source: multiple reports)
-- [ ] Fix 17 `noctx` errors: replace `httptest.NewRequest` → `httptest.NewRequestWithContext` in test files (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md)
+- [x] Fix 17 `noctx` errors: replace `httptest.NewRequest` → `httptest.NewRequestWithContext` in test files (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md) ✅ Already fixed in codebase
 - [ ] Fix 6 `exhaustruct` errors: add missing struct fields in testutil and test helpers (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md)
-- [ ] Fix 1 `gochecknoinits` error in `testutil/http.go` — replace `init()` with explicit setup (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md)
+- [x] Fix 1 `gochecknoinits` error in `testutil/http.go` — replace `init()` with explicit setup (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md) ✅ Done: moved gin.SetMode to NewHTTPTestRunner
 - [ ] Fix 1 `cyclop` error (complexity 12 in `cmd/dynamic-markdown-site/main.go`) (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md)
 - [ ] Fix Go 1.26.1 environment mismatch for BuildFlow (source: 2026-03-28_03-55_linter-cleanup-complete.md)
 - [ ] Push fix → get CI green again (source: 2026-03-31_20-34_comprehensive-status-report.md)
@@ -64,7 +64,7 @@
 - [ ] Increase container package test coverage (source: 2026-03-31_14-57_comprehensive-status-report.md)
 - [ ] Add suggestions edge case tests (source: 2026-03-31_14-57_comprehensive-status-report.md)
 - [ ] Remove dead `addError` method from `treeStats` (source: 2026-03-30_17-44_clone-elimination-complete.md)
-- [ ] Reduce complexity in `run()` in main.go (cyclop: 12) (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md)
+- [x] Reduce complexity in `run()` in main.go (cyclop: 12) (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md) ✅ Done: decomposed watchForChanges
 - [ ] Apply staticcheck tagged switch suggestion in `errors.go` (source: 2026-03-30_17-44_clone-elimination-complete.md)
 - [ ] Remove `pkg/errors` package (conflicts with stdlib name, flagged by `revive`) (source: 2026-03-31_14-56_ci-pipeline-health-full-report.md)
 - [ ] Add Prometheus metrics endpoint (source: 2026-03-31_20-34_comprehensive-status-report.md)
@@ -102,7 +102,7 @@
 - [ ] Add request logging middleware (source: 2026-03-31_17-59_comprehensive-status-report.md)
 - [ ] Add response time histograms (source: 2026-03-31_17-59_comprehensive-status-report.md)
 - [ ] Implement content validation middleware (source: 2026-03-31_17-59_comprehensive-status-report.md)
-- [ ] Decompose `watchForChanges` (source: 2026-03-30_17-44_clone-elimination-complete.md)
+- [x] Decompose `watchForChanges` (source: 2026-03-30_17-44_clone-elimination-complete.md) ✅ Done: extracted handleFileEvent and scheduleRefresh functions
 - [ ] Add search result highlighting (source: 2026-03-30_15-56_comprehensive-project-status.md)
 - [ ] Add pagination for directories (source: 2026-03-30_17-44_clone-elimination-complete.md)
 - [ ] Implement breadcrumbs for deep directory navigation (source: 2026-03-30_15-56_linter-fixes.md)

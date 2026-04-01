@@ -66,11 +66,39 @@ func TestHealthEndpoint(t *testing.T) {
 
 	runHTTPTests(t, router, []httpTestCase{
 		{
-			name:       "GET /health returns 200",
+			name:       "GET /health returns 200 with status",
 			method:     http.MethodGet,
 			path:       "/health",
 			wantStatus: http.StatusOK,
 			wantBody:   `"status":"healthy"`,
+		},
+		{
+			name:       "GET /health returns version info",
+			method:     http.MethodGet,
+			path:       "/health",
+			wantStatus: http.StatusOK,
+			wantBody:   `"version":"dev"`,
+		},
+		{
+			name:       "GET /health returns commit",
+			method:     http.MethodGet,
+			path:       "/health",
+			wantStatus: http.StatusOK,
+			wantBody:   `"commit":"unknown"`,
+		},
+		{
+			name:       "GET /health returns build_date",
+			method:     http.MethodGet,
+			path:       "/health",
+			wantStatus: http.StatusOK,
+			wantBody:   `"build_date":"unknown"`,
+		},
+		{
+			name:       "GET /health returns timestamp",
+			method:     http.MethodGet,
+			path:       "/health",
+			wantStatus: http.StatusOK,
+			wantBody:   `"timestamp"`,
 		},
 	})
 }
