@@ -52,6 +52,9 @@ func NewGoldmarkRendererWithDiagrams(diagramRenderer *DiagramRenderer) *Goldmark
 
 		// Frontmatter support
 		meta.Meta,
+
+		// Admonition blocks (GitHub-style alerts)
+		NewAdmonitionExtension(),
 	}
 
 	// Add diagram extension if renderer is provided
@@ -69,16 +72,8 @@ func NewGoldmarkRendererWithDiagrams(diagramRenderer *DiagramRenderer) *Goldmark
 	return &GoldmarkRenderer{md: md, diagramRenderer: diagramRenderer}
 }
 
-// RenderResult contains the result of rendering markdown.
-type RenderResult struct {
-	HTML       domain.HTML
-	TOC        []domain.TOCItem
-	Metadata   domain.Frontmatter
-	HasMermaid bool
-}
-
 // Render converts markdown to HTML and extracts metadata.
-func (r *GoldmarkRenderer) Render(source []byte) (RenderResult, error) {
+func (r *GoldmarkRenderer) Render(source []byte) (domain.RenderedContent, error) {
 	var buf bytes.Buffer
 
 	context := parser.NewContext()
@@ -96,13 +91,13 @@ func (r *GoldmarkRenderer) Render(source []byte) (RenderResult, error) {
 	// Render to HTML (syntax highlighting is handled by goldmark extension)
 	err := r.md.Renderer().Render(&buf, source, doc)
 	if err != nil {
-		return RenderResult{}, errors.Wrap(err, "render markdown")
+		return domain.RenderedContent{}, errors.Wrap(err, "render markdown")
 	}
 
 	// Check for mermaid diagrams
 	hasMermaid := HasMermaidDiagrams(string(source))
 
-	return RenderResult{
+	return domain.RenderedContent{
 		HTML:       domain.HTML(buf.String()),
 		TOC:        toc,
 		Metadata:   metadata,

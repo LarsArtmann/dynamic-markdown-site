@@ -95,17 +95,10 @@ func (s *Server) getOrRenderContent(path string, file *domain.FileNode) domain.R
 		return domain.RenderedContent{}
 	}
 
-	content := domain.RenderedContent{
-		HTML:       result.HTML,
-		TOC:        result.TOC,
-		Metadata:   result.Metadata,
-		HasMermaid: result.HasMermaid,
-	}
-
 	// Cache the rendered content
-	s.cache.Set(path, content)
+	s.cache.Set(path, result)
 
-	return content
+	return result
 }
 
 func (s *Server) renderSearch(c *gin.Context, query string, results []content.SearchResult) {
