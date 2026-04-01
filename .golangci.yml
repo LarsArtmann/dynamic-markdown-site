@@ -182,6 +182,9 @@ linters:
       - path: "internal/server/"
         linters: [revive]
         text: "should have a package comment"
+      # golines: robots_test.go struct alignment is intentionally aligned to longest field
+      - path: "internal/server/robots_test.go"
+        linters: [golines]
 formatters:
   enable:
     - golines

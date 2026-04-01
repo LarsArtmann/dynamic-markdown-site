@@ -25,9 +25,9 @@ func TestHandleRobotsTxt(t *testing.T) {
 		wantContentType string
 	}{
 		{
-			name:            "basic http request",
-			host:            "example.com",
-			wantStatus:      http.StatusOK,
+			name:       "basic http request",
+			host:       "example.com",
+			wantStatus: http.StatusOK,
 			wantContains: []string{
 				"User-agent: *",
 				"Allow: /",
@@ -37,19 +37,23 @@ func TestHandleRobotsTxt(t *testing.T) {
 			wantContentType: "text/plain; charset=utf-8",
 		},
 		{
-			name:            "https via X-Forwarded-Proto",
-			host:            "example.com",
-			forwardedProto:  "https",
-			wantStatus:      http.StatusOK,
-			wantContains:    []string{"Sitemap: https://example.com/sitemap.xml"},
+			name:           "https via X-Forwarded-Proto",
+			host:           "example.com",
+			forwardedProto: "https",
+			wantStatus:     http.StatusOK,
+			wantContains: []string{
+				"Sitemap: https://example.com/sitemap.xml",
+			},
 			wantCacheCtrl:   "public, max-age=86400",
 			wantContentType: "text/plain; charset=utf-8",
 		},
 		{
-			name:            "custom host with port",
-			host:            "localhost:8080",
-			wantStatus:      http.StatusOK,
-			wantContains:    []string{"Sitemap: http://localhost:8080/sitemap.xml"},
+			name:       "custom host with port",
+			host:       "localhost:8080",
+			wantStatus: http.StatusOK,
+			wantContains: []string{
+				"Sitemap: http://localhost:8080/sitemap.xml",
+			},
 			wantCacheCtrl:   "public, max-age=86400",
 			wantContentType: "text/plain; charset=utf-8",
 		},
