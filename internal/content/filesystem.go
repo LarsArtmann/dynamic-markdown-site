@@ -330,8 +330,16 @@ func (r *FileSystemRepository) processFile(
 
 	title := strings.TrimSuffix(d.Name(), filepath.Ext(d.Name()))
 
+	// Strip .md/.markdown extension from URL path for clean URLs
+	// (e.g., "/docs/readme.md" → "/docs/readme")
+	cleanPath := strings.TrimSuffix(urlPath.String(), filepath.Ext(d.Name()))
+	cleanURLPath, err := domain.NewURLPath(cleanPath)
+	if err != nil {
+		return
+	}
+
 	fileNode, err := domain.NewFileNode(
-		urlPath,
+		cleanURLPath,
 		title,
 		content,
 		info.ModTime(),

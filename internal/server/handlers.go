@@ -218,17 +218,6 @@ func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
 	node, err := s.repo.Get(urlPath)
 	if err != nil {
 		if errors.Is(err, content.ErrContentNotFound) {
-			// Files are stored with .md extension in the content tree.
-			// If the clean URL didn't match, try with .md appended.
-			mdPath, mdErr := domain.NewURLPath(filepath + ".md")
-			if mdErr == nil {
-				if mdNode, mdErr := s.repo.Get(mdPath); mdErr == nil {
-					s.renderFile(c, mdNode.(*domain.FileNode))
-
-					return
-				}
-			}
-
 			// If not a markdown page, try serving as a raw asset file (e.g. images, PDFs)
 			if rawFile, rawErr := s.repo.GetRaw(urlPath); rawErr == nil {
 				c.Header("Content-Type", rawFile.ContentType)

@@ -154,11 +154,11 @@ func TestFileSystemRepository_Get(t *testing.T) {
 			t.Fatalf("NewFileSystemRepository() error = %v", err)
 		}
 
-		path := domain.MustURLPath("/test.md")
+		path := domain.MustURLPath("/test")
 
 		node, err := repo.Get(path)
 		if err != nil {
-			t.Fatalf("Get(/test.md) error = %v", err)
+			t.Fatalf("Get(/test) error = %v", err)
 		}
 
 		if node == nil {
@@ -189,11 +189,11 @@ func TestFileSystemRepository_Get(t *testing.T) {
 			t.Fatalf("NewFileSystemRepository() error = %v", err)
 		}
 
-		path := domain.MustURLPath("/docs/guide.md")
+		path := domain.MustURLPath("/docs/guide")
 
 		node, err := repo.Get(path)
 		if err != nil {
-			t.Fatalf("Get(/docs/guide.md) error = %v", err)
+			t.Fatalf("Get(/docs/guide) error = %v", err)
 		}
 
 		if node == nil {
@@ -307,11 +307,11 @@ func TestFileSystemRepository_Refresh(t *testing.T) {
 			t.Errorf("LastModified() = %v, expected time after %v", newModified, initialModified)
 		}
 
-		path := domain.MustURLPath("/new.md")
+		path := domain.MustURLPath("/new")
 
 		node, err := repo.Get(path)
 		if err != nil {
-			t.Fatalf("Get(/new.md) error = %v", err)
+			t.Fatalf("Get(/new) error = %v", err)
 		}
 
 		if node == nil {
@@ -508,4 +508,181 @@ func TestFileSystemRepository_FiltersEmptyDirectories(t *testing.T) {
 			t.Error("empty directory should be filtered out")
 		}
 	}
+}
+
+func TestFileSystemRepository_GetRaw(t *testing.T) {
+	t.Run("serves SVG file from nested directory", func(t *testing.T) {
+		t.Parallel()
+		tmpDir := t.TempDir()
+
+		// Create nested directory structure like docs/assets/diagrams/
+		diagramsDir := filepath.Join(tmpDir, "docs", "assets", "diagrams")
+		if err := os.MkdirAll(diagramsDir, 0o755); err != nil {
+			t.Fatalf("failed to create nested directory: %v", err)
+		}
+
+		svgContent := []byte(`<svg xmlns="http://www.w3.org/2000/svg"><circle r="10"/></svg>`)
+		if err := os.WriteFile(
+			filepath.Join(diagramsDir, "workflow.svg"),
+			svgContent,
+			0o644,
+		); err != nil {
+			t.Fatalf("failed to write SVG file: %v", err)
+		}
+
+		// Need at least one markdown file so the tree doesn't filter the parent dirs
+		writeTestFile(t, tmpDir, "index.md", "# Index")
+
+		repo, err := NewFileSystemRepository(tmpDir)
+		if err != nil {
+			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		}
+
+		urlPath := domain.MustURLPath("/docs/assets/diagrams/workflow.svg")
+		raw, err := repo.GetRaw(urlPath)
+		if err != nil {
+			t.Fatalf("GetRaw() error = %v", err)
+		}
+
+		if raw.ContentType != "image/svg+xml" {
+			t.Errorf("ContentType = %q, want %q", raw.ContentType, "image/svg+xml")
+		}
+
+		if string(raw.Content) != string(svgContent) {
+			t.Errorf("Content = %q, want %q", string(raw.Content), string(svgContent))
+		}
+
+		if raw.Size == 0 {
+			t.Error("Size should be > 0")
+		}
+	})
+
+	t.Run("serves PNG image from root", func(t *testing.T) {
+		t.Parallel()
+		tmpDir := t.TempDir()
+
+		pngHeader := []byte{0x89, 0x50, 0x4E, 0x47} // PNG magic bytes
+		if err := os.WriteFile(
+			filepath.Join(tmpDir, "logo.png"),
+			pngHeader,
+			0o644,
+		); err != nil {
+			t.Fatalf("failed to write PNG file: %v", err)
+		}
+
+		writeTestFile(t, tmpDir, "index.md", "# Index")
+
+		repo, err := NewFileSystemRepository(tmpDir)
+		if err != nil {
+			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		}
+
+		urlPath := domain.MustURLPath("/logo.png")
+		raw, err := repo.GetRaw(urlPath)
+		if err != nil {
+			t.Fatalf("GetRaw() error = %v", err)
+		}
+
+		if raw.ContentType != "image/png" {
+			t.Errorf("ContentType = %q, want %q", raw.ContentType, "image/png")
+		}
+	})
+
+	t.Run("returns not found for non-existent file", func(t *testing.T) {
+		t.Parallel()
+		tmpDir := t.TempDir()
+		writeTestFile(t, tmpDir, "index.md", "# Index")
+
+		repo, err := NewFileSystemRepository(tmpDir)
+		if err != nil {
+			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		}
+
+		urlPath := domain.MustURLPath("/nonexistent.png")
+		_, err = repo.GetRaw(urlPath)
+		if err == nil {
+			t.Fatal("expected error for non-existent file")
+		}
+
+		if !errors.Is(err, ErrContentNotFound) {
+			t.Errorf("expected ErrContentNotFound, got %v", err)
+		}
+	})
+
+	t.Run("returns not found for markdown files", func(t *testing.T) {
+		t.Parallel()
+		tmpDir := t.TempDir()
+		writeTestFile(t, tmpDir, "doc.md", "# Doc")
+
+		repo, err := NewFileSystemRepository(tmpDir)
+		if err != nil {
+			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		}
+
+		urlPath := domain.MustURLPath("/doc.md")
+		_, err = repo.GetRaw(urlPath)
+		if err == nil {
+			t.Fatal("expected error for markdown file")
+		}
+
+		if !errors.Is(err, ErrContentNotFound) {
+			t.Errorf("expected ErrContentNotFound, got %v", err)
+		}
+	})
+
+	t.Run("returns not found for hidden files", func(t *testing.T) {
+		t.Parallel()
+		tmpDir := t.TempDir()
+		if err := os.WriteFile(
+			filepath.Join(tmpDir, ".secret"),
+			[]byte("secret"),
+			0o644,
+		); err != nil {
+			t.Fatalf("failed to write hidden file: %v", err)
+		}
+
+		writeTestFile(t, tmpDir, "index.md", "# Index")
+
+		repo, err := NewFileSystemRepository(tmpDir)
+		if err != nil {
+			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		}
+
+		urlPath := domain.MustURLPath("/.secret")
+		_, err = repo.GetRaw(urlPath)
+		if err == nil {
+			t.Fatal("expected error for hidden file")
+		}
+
+		if !errors.Is(err, ErrContentNotFound) {
+			t.Errorf("expected ErrContentNotFound, got %v", err)
+		}
+	})
+
+	t.Run("returns not found for directories", func(t *testing.T) {
+		t.Parallel()
+		tmpDir := t.TempDir()
+
+		subDir := filepath.Join(tmpDir, "assets")
+		if err := os.Mkdir(subDir, 0o755); err != nil {
+			t.Fatalf("failed to create subdirectory: %v", err)
+		}
+
+		writeTestFile(t, tmpDir, "index.md", "# Index")
+
+		repo, err := NewFileSystemRepository(tmpDir)
+		if err != nil {
+			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		}
+
+		urlPath := domain.MustURLPath("/assets")
+		_, err = repo.GetRaw(urlPath)
+		if err == nil {
+			t.Fatal("expected error for directory")
+		}
+
+		if !errors.Is(err, ErrContentNotFound) {
+			t.Errorf("expected ErrContentNotFound, got %v", err)
+		}
+	})
 }

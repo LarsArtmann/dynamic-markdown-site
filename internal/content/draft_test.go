@@ -81,10 +81,10 @@ func TestFileSystemRepositorySkipsDrafts(t *testing.T) {
 	repo, err := NewFileSystemRepository(tmpDir)
 	require.NoError(t, err)
 
-	_, err = repo.Get(domain.MustURLPath("/published.md"))
+	_, err = repo.Get(domain.MustURLPath("/published"))
 	require.NoError(t, err, "published file should be found")
 
-	_, err = repo.Get(domain.MustURLPath("/draft.md"))
+	_, err = repo.Get(domain.MustURLPath("/draft"))
 	require.ErrorIs(t, err, ErrContentNotFound, "draft file should be excluded")
 }
 
