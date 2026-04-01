@@ -40,16 +40,6 @@ func NewBlobRepository(ctx context.Context, bucketURL string) (*BlobRepository, 
 		prefix: "",
 	}
 
-	// Extract prefix from URL if present (e.g., s3://bucket/prefix -> prefix)
-	if _, after, ok := strings.Cut(bucketURL, "/"); ok {
-		rest := after
-		if len(rest) > 1 {
-			if _, after, ok := strings.Cut(rest, "/"); ok {
-				repo.prefix = after
-			}
-		}
-	}
-
 	if result := repo.Refresh(); !result.Success {
 		if result.Error != "" {
 			return nil, errors.Wrapf(errRefreshFailed, "refresh %s: %s", bucketURL, result.Error)
@@ -193,12 +183,6 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 			continue
 		}
 
-		urlPath, err := domain.NewURLPath("/" + blobPath)
-		if err != nil {
-			stats.recordError(blobPath, "invalid path", err)
-			continue
-		}
-
 		parentPath := path.Dir(blobPath)
 		if parentPath == "." {
 			parentPath = "/"
@@ -208,35 +192,43 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 
 		parentNode, exists := dirNodes[parentPath]
 		if !exists {
-			parentNode = r.findOrCreateParentDirs(parentPath, root, dirNodes, stats)
+			parentNode = r.findOrCreateParentDirs(
+				parentPath, root, dirNodes, stats,
+			)
 		}
 
-		if !isMarkdownFile(obj.Key) {
-			continue
+		if isMarkdownFile(blobPath) {
+			urlPath, err := domain.NewURLPath(
+				"/" + strings.TrimSuffix(blobPath, path.Ext(blobPath)),
+			)
+			if err != nil {
+				stats.recordError(blobPath, "invalid path", err)
+				continue
+			}
+
+			content, err := r.readBlobContent(obj.Key)
+			if err != nil {
+				stats.recordError(obj.Key, "read error", err)
+				continue
+			}
+
+			title := strings.TrimSuffix(path.Base(obj.Key), path.Ext(obj.Key))
+
+			fileNode, err := domain.NewFileNode(
+				urlPath,
+				title,
+				content,
+				obj.ModTime,
+				uint64(obj.Size),
+			)
+			if err != nil {
+				stats.recordError(obj.Key, "create node error", err)
+				continue
+			}
+
+			parentNode.AddChild(fileNode)
+			stats.files++
 		}
-
-		content, err := r.readBlobContent(obj.Key)
-		if err != nil {
-			stats.recordError(obj.Key, "read error", err)
-			continue
-		}
-
-		title := strings.TrimSuffix(path.Base(obj.Key), path.Ext(obj.Key))
-
-		fileNode, err := domain.NewFileNode(
-			urlPath,
-			title,
-			content,
-			obj.ModTime,
-			uint64(obj.Size),
-		)
-		if err != nil {
-			stats.recordError(obj.Key, "create node error", err)
-			continue
-		}
-
-		parentNode.AddChild(fileNode)
-		stats.files++
 	}
 
 	filterEmptyDirectories(root)
