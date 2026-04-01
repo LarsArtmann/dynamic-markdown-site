@@ -161,7 +161,10 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 			}
 			return res.repo, nil
 		case <-time.After(10 * time.Second):
-			return nil, fmt.Errorf("blob repository creation timed out after 10 seconds (storage_url=%s)", cfg.StorageURL)
+			return nil, fmt.Errorf(
+				"blob repository creation timed out after 10 seconds (storage_url=%s)",
+				cfg.StorageURL,
+			)
 		}
 	}
 
