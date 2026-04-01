@@ -35,12 +35,12 @@ func NewBlobRepository(ctx context.Context, bucketURL string) (*BlobRepository, 
 		return nil, errors.Wrapf(err, "failed to open blob bucket: %s", bucketURL)
 	}
 
-	repo := &BlobRepository{
+	repo := &BlobRepository{ //nolint:exhaustruct
 		bucket: bucket,
 		prefix: "",
 	}
 
-	if result := repo.Refresh(); !result.Success {
+	if result := repo.Refresh(); !result.Success { //nolint:contextcheck
 		if result.Error != "" {
 			return nil, errors.Wrapf(errRefreshFailed, "refresh %s: %s", bucketURL, result.Error)
 		}
@@ -111,11 +111,11 @@ func (r *BlobRepository) Refresh() domain.RefreshResult {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	stats := &blobTreeStats{}
+	stats := &blobTreeStats{} //nolint:exhaustruct
 
 	rootNode, err := r.buildTree(stats)
 	if err != nil {
-		return domain.RefreshResult{
+		return domain.RefreshResult{ //nolint:exhaustruct
 			Success:      false,
 			LastModified: r.lastModified,
 			Error:        err.Error(),
@@ -126,7 +126,7 @@ func (r *BlobRepository) Refresh() domain.RefreshResult {
 	r.tree = domain.NewContentTree(rootNode)
 	r.lastModified = time.Now()
 
-	return domain.RefreshResult{
+	return domain.RefreshResult{ //nolint:exhaustruct
 		Success:      true,
 		LastModified: r.lastModified,
 		TotalFiles:   stats.files,
@@ -158,7 +158,7 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 	dirNodes["/"] = root
 
 	// List all blobs under the prefix
-	iter := r.bucket.List(&blob.ListOptions{Prefix: r.prefix})
+	iter := r.bucket.List(&blob.ListOptions{Prefix: r.prefix}) //nolint:exhaustruct
 	for {
 		obj, err := iter.Next(context.Background())
 		if errors.Is(err, io.EOF) {
@@ -236,7 +236,12 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 	return root, nil
 }
 
-func (r *BlobRepository) findOrCreateParentDirs(blobPath string, root *domain.DirectoryNode, dirNodes map[string]*domain.DirectoryNode, stats *blobTreeStats) *domain.DirectoryNode {
+func (r *BlobRepository) findOrCreateParentDirs( //nolint:golines
+	blobPath string,
+	root *domain.DirectoryNode,
+	dirNodes map[string]*domain.DirectoryNode,
+	stats *blobTreeStats,
+) *domain.DirectoryNode {
 	parts := strings.Split(strings.Trim(blobPath, "/"), "/")
 
 	currentPath := ""
@@ -275,12 +280,14 @@ func (r *BlobRepository) readBlobContent(blobPath string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to read blob: %s", blobPath)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
-	return io.ReadAll(reader)
+	data, err := io.ReadAll(reader)
+
+	return data, errors.Wrapf(err, "read blob content: %s", blobPath)
 }
 
 // Close closes the underlying blob bucket.
 func (r *BlobRepository) Close() error {
-	return r.bucket.Close()
+	return errors.Wrap(r.bucket.Close(), "close blob bucket")
 }
