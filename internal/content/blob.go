@@ -35,7 +35,7 @@ func NewBlobRepository(ctx context.Context, bucketURL string) (*BlobRepository, 
 		return nil, errors.Wrapf(err, "failed to open blob bucket: %s", bucketURL)
 	}
 
-	repo := &BlobRepository{ //nolint:exhaustruct
+	repo := &BlobRepository{
 		bucket: bucket,
 		prefix: "",
 	}
@@ -111,11 +111,11 @@ func (r *BlobRepository) Refresh() domain.RefreshResult {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	stats := &blobTreeStats{} //nolint:exhaustruct
+	stats := &blobTreeStats{}
 
 	rootNode, err := r.buildTree(stats)
 	if err != nil {
-		return domain.RefreshResult{ //nolint:exhaustruct
+		return domain.RefreshResult{
 			Success:      false,
 			LastModified: r.lastModified,
 			Error:        err.Error(),
@@ -126,7 +126,7 @@ func (r *BlobRepository) Refresh() domain.RefreshResult {
 	r.tree = domain.NewContentTree(rootNode)
 	r.lastModified = time.Now()
 
-	return domain.RefreshResult{ //nolint:exhaustruct
+	return domain.RefreshResult{
 		Success:      true,
 		LastModified: r.lastModified,
 		TotalFiles:   stats.files,
@@ -158,7 +158,7 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 	dirNodes["/"] = root
 
 	// List all blobs under the prefix
-	iter := r.bucket.List(&blob.ListOptions{Prefix: r.prefix}) //nolint:exhaustruct
+	iter := r.bucket.List(&blob.ListOptions{Prefix: r.prefix})
 	for {
 		obj, err := iter.Next(context.Background())
 		if errors.Is(err, io.EOF) {
@@ -236,7 +236,7 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 	return root, nil
 }
 
-func (r *BlobRepository) findOrCreateParentDirs( //nolint:golines
+func (r *BlobRepository) findOrCreateParentDirs(
 	blobPath string,
 	root *domain.DirectoryNode,
 	dirNodes map[string]*domain.DirectoryNode,
