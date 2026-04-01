@@ -15,8 +15,8 @@ RUN apk add --no-cache ca-certificates git file
 ARG TARGETOS
 ARG TARGETARCH
 ARG VERSION=dev
-ARG COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-ARG BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+ARG COMMIT=unknown
+ARG BUILD_DATE=unknown
 
 # Install templ CLI - PINNED VERSION for reproducibility
 RUN go install github.com/a-h/templ/cmd/templ@v0.3.1001
