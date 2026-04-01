@@ -59,11 +59,6 @@ jobs:
       - name: Run tests
         run: go test ./... -cover -race
 
-      - name: Run linter
-        uses: golangci/golangci-lint-action@v7
-        with:
-          version: latest
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -135,6 +130,29 @@ jobs:
           path: image.tar.gz
           retention-days: 14
           if-no-files-found: error
+
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Generate templ templates
+        run: |
+          go install github.com/a-h/templ/cmd/templ@${{ env.TEMPL_VERSION }}
+          templ generate
+
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: latest
 
   security-scan:
     needs: [build]
