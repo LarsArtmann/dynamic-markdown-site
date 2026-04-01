@@ -80,7 +80,9 @@ func (s *Server) staticAndContentMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
 
-		if path == "/health" || path == "/refresh" || path == "/search" || path == "/" || path == "/robots.txt" {
+		if path == "/health" || path == "/refresh" ||
+			path == "/search" || path == "/" ||
+			path == "/robots.txt" {
 			c.Next()
 
 			return

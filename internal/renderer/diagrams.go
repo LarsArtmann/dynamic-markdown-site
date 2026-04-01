@@ -2,9 +2,9 @@
 package renderer
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"html"
 	"regexp"
 
 	"github.com/cockroachdb/errors"

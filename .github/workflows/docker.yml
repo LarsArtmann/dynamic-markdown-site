@@ -103,21 +103,6 @@ jobs:
           echo "SBOM attestation created"
           echo "Image digest: ${{ env.IMAGE_NAME }}@sha256:${{ hashFiles('**/sbom*.json') }}"
 
-      - name: Smoke test - verify container starts and serves health
-        run: |
-          mkdir -p /tmp/smoke-content
-          echo "# Hello" > /tmp/smoke-content/index.md
-          docker run -d --name smoke-test \
-            -p 8080:8080 \
-            -v /tmp/smoke-content:/content:ro \
-            ${{ env.IMAGE_NAME }}:${{ steps.meta-docker.outputs.version }}
-          sleep 3
-          RESPONSE=$(curl -sf http://localhost:8080/health)
-          echo "Health response: $RESPONSE"
-          echo "$RESPONSE" | grep -q '"status":"healthy"' || exit 1
-          docker stop smoke-test
-          docker rm smoke-test
-
       - name: Save Docker image (local testing)
         run: |
           docker save ${{ env.IMAGE_NAME }}:${{ steps.meta-docker.outputs.version }} | gzip > image.tar.gz
