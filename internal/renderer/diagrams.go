@@ -167,28 +167,8 @@ func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 // RenderMermaidToHTML returns HTML for client-side Mermaid rendering.
 func RenderMermaidToHTML(content string) string {
 	// Escape HTML entities to prevent XSS
-	escaped := escapeHTML(content)
+	escaped := html.EscapeString(content)
 	return fmt.Sprintf(`<pre class="mermaid">%s</pre>`, escaped)
-}
-
-// escapeHTML escapes special HTML characters.
-func escapeHTML(s string) string {
-	var buf bytes.Buffer
-	for _, r := range s {
-		switch r {
-		case '<':
-			buf.WriteString("&lt;")
-		case '>':
-			buf.WriteString("&gt;")
-		case '&':
-			buf.WriteString("&amp;")
-		case '"':
-			buf.WriteString("&quot;")
-		default:
-			buf.WriteRune(r)
-		}
-	}
-	return buf.String()
 }
 
 // ProcessMarkdown detects and renders diagrams in markdown content.

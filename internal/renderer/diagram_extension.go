@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"bytes"
+	"html"
 
 	"github.com/cockroachdb/errors"
 	"github.com/yuin/goldmark"
@@ -194,7 +195,7 @@ func wrapWriteError(err error, msg, content string) error {
 func (r *diagramNodeRenderer) renderD2(w util.BufWriter, content string) (ast.WalkStatus, error) {
 	svg, err := r.diagramRenderer.RenderD2(content)
 	if err != nil {
-		htmlContent := escapeHTML(content)
+		htmlContent := html.EscapeString(content)
 		if writeErr := writeStrings(
 			w,
 			"write D2 fallback",

@@ -229,33 +229,6 @@ func TestRenderMermaidToHTML(t *testing.T) {
 	}
 }
 
-func TestEscapeHTML(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"<", "&lt;"},
-		{">", "&gt;"},
-		{"&", "&amp;"},
-		{`"`, "&quot;"},
-		{"hello", "hello"},
-		{"<div>", "&lt;div&gt;"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			t.Parallel()
-
-			result := escapeHTML(tt.input)
-			if result != tt.expected {
-				t.Errorf("escapeHTML(%q) = %q, want %q", tt.input, result, tt.expected)
-			}
-		})
-	}
-}
-
 func TestRenderMermaidDiagramThroughGoldmark(t *testing.T) {
 	t.Parallel()
 
