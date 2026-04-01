@@ -59,6 +59,7 @@ func (s *Server) RegisterRoutes(router *gin.Engine) {
 	// Global middleware (order matters - first to last)
 	router.Use(requestIDMiddleware())
 	router.Use(securityHeadersMiddleware())
+	router.Use(s.accessLogMiddleware())
 	router.Use(s.staticAndContentMiddleware())
 	router.GET("/health", s.handleHealth)
 	router.GET("/refresh", s.handleRefresh)

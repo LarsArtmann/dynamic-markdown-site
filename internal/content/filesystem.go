@@ -263,6 +263,10 @@ func (r *FileSystemRepository) processFile(
 		return
 	}
 
+	if isDraft(content) {
+		return
+	}
+
 	title := strings.TrimSuffix(d.Name(), filepath.Ext(d.Name()))
 
 	fileNode, err := domain.NewFileNode(

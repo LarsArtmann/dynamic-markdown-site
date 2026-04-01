@@ -95,9 +95,8 @@ func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, _
 		}
 
 		diagram := &diagramNode{
-			BaseBlock: ast.BaseBlock{},
-			language:  lang,
-			content:   buf.String(),
+			language: lang,
+			content:  buf.String(),
 		}
 
 		replacements = append(replacements, diagramReplacement{

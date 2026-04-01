@@ -403,3 +403,51 @@ func TestConfigDevModeDisablesCache(t *testing.T) {
 		t.Error("DevMode should disable cache")
 	}
 }
+
+func TestDefaultSiteName(t *testing.T) {
+	t.Parallel()
+	cfg := DefaultConfig()
+
+	if cfg.SiteName != "Site" {
+		t.Errorf("default SiteName = %q, want %q", cfg.SiteName, "Site")
+	}
+}
+
+func TestConfigStringIncludesSiteName(t *testing.T) {
+	t.Parallel()
+	cfg := &Config{
+		Port:     8080,
+		RootDir:  ".",
+		LogLevel: "info",
+		SiteName: "My Custom Site",
+	}
+
+	result := cfg.String()
+	assertStringContains(t, result, "My Custom Site", "site name")
+	assertStringContains(t, result, "Site Name", "site name label")
+}
+
+func TestConfigLogValueIncludesSiteName(t *testing.T) {
+	t.Parallel()
+	cfg := DefaultConfig()
+	cfg.SiteName = "TestDocs"
+
+	logValue := cfg.LogValue()
+	if logValue.Kind() != slog.KindGroup {
+		t.Fatal("LogValue() kind should be Group")
+	}
+
+	attrs := logValue.Group()
+	found := false
+	for _, attr := range attrs {
+		if attr.Key == "site_name" && attr.Value.String() == "TestDocs" {
+			found = true
+
+			break
+		}
+	}
+
+	if !found {
+		t.Error("LogValue() should contain site_name=TestDocs")
+	}
+}

@@ -267,36 +267,36 @@ func TestRenderMermaidDiagramThroughGoldmark(t *testing.T) {
 	renderer := NewGoldmarkRendererWithDiagrams(diagramRenderer)
 
 	tests := []struct {
-		name              string
-		input             string
-		shouldContain     string
-		shouldNotContain  string
-		expectedHasMermaid bool
+		name             string
+		input            string
+		shouldContain    string
+		shouldNotContain string
+		expectHasMermaid bool
 	}{
 		{
-			name:              "simple mermaid flowchart",
-			input:             "```mermaid\ngraph TD;\n    A-->B;\n```",
-			shouldContain:     `<pre class="mermaid">`,
-			shouldNotContain:  "chroma",
-			expectedHasMermaid: true,
+			name:             "simple mermaid flowchart",
+			input:            "```mermaid\ngraph TD;\n    A-->B;\n```",
+			shouldContain:    `<pre class="mermaid">`,
+			shouldNotContain: "chroma",
+			expectHasMermaid: true,
 		},
 		{
-			name:              "mermaid with backticks in content",
-			input:             "```mermaid\ngraph TD\n    A[\"`text`\"]-->B\n```",
-			shouldContain:     `<pre class="mermaid">`,
-			expectedHasMermaid: true,
+			name:             "mermaid with backticks in content",
+			input:            "```mermaid\ngraph TD\n    A[\"`text`\"]-->B\n```",
+			shouldContain:    `<pre class="mermaid">`,
+			expectHasMermaid: true,
 		},
 		{
-			name:              "mermaid with HTML-like content",
-			input:             "```mermaid\ngraph TD\n    A[<div>]-->B\n```",
-			shouldContain:     "&lt;div&gt;",
-			expectedHasMermaid: true,
+			name:             "mermaid with HTML-like content",
+			input:            "```mermaid\ngraph TD\n    A[<div>]-->B\n```",
+			shouldContain:    "&lt;div&gt;",
+			expectHasMermaid: true,
 		},
 		{
-			name:              "regular code block unaffected",
-			input:             "```go\nfmt.Println(\"hello\")\n```",
-			shouldNotContain:  `<pre class="mermaid">`,
-			expectedHasMermaid: false,
+			name:             "regular code block unaffected",
+			input:            "```go\nfmt.Println(\"hello\")\n```",
+			shouldNotContain: `<pre class="mermaid">`,
+			expectHasMermaid: false,
 		},
 	}
 
@@ -319,8 +319,8 @@ func TestRenderMermaidDiagramThroughGoldmark(t *testing.T) {
 				t.Errorf("expected HTML NOT to contain %q, got: %s", tt.shouldNotContain, html)
 			}
 
-			if result.HasMermaid != tt.expectedHasMermaid {
-				t.Errorf("HasMermaid = %v, want %v", result.HasMermaid, tt.expectedHasMermaid)
+			if result.HasMermaid != tt.expectHasMermaid {
+				t.Errorf("HasMermaid = %v, want %v", result.HasMermaid, tt.expectHasMermaid)
 			}
 		})
 	}

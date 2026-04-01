@@ -30,6 +30,13 @@ templ Layout(props LayoutProps) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<meta name="description" content={ props.Description }/>
 			<title>{ props.Title }</title>
+			<meta property="og:title" content={ props.Title }/>
+			<meta property="og:description" content={ props.Description }/>
+			<meta property="og:type" content="article"/>
+			<meta property="og:site_name" content={ props.SiteName }/>
+			<meta name="twitter:card" content="summary"/>
+			<meta name="twitter:title" content={ props.Title }/>
+			<meta name="twitter:description" content={ props.Description }/>
 			<link rel="stylesheet" href="/static/css/site.css"/>
 			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 		</head>
