@@ -1,11 +1,9 @@
-// Package renderer handles diagram rendering for D2 and Mermaid.
 package renderer
 
 import (
 	"context"
 	"fmt"
 	"html"
-	"regexp"
 
 	"github.com/cockroachdb/errors"
 	"oss.terrastruct.com/d2/d2graph"
@@ -29,83 +27,6 @@ func NewDiagramRenderer() (*DiagramRenderer, error) {
 	}
 
 	return &DiagramRenderer{ruler: ruler}, nil
-}
-
-// DiagramType represents the type of diagram.
-type DiagramType int
-
-const (
-	// DiagramTypeD2 is a D2 diagram.
-	DiagramTypeD2 DiagramType = iota
-	// DiagramTypeMermaid is a Mermaid diagram.
-	DiagramTypeMermaid
-)
-
-// String returns the string representation of the diagram type.
-func (d DiagramType) String() string {
-	switch d {
-	case DiagramTypeD2:
-		return "d2"
-	case DiagramTypeMermaid:
-		return "mermaid"
-	default:
-		return "unknown"
-	}
-}
-
-// DetectedDiagram represents a detected diagram in markdown content.
-type DetectedDiagram struct {
-	Type    DiagramType
-	Content string
-	Start   int
-	End     int
-}
-
-// CodeBlock represents a code block with its language and content.
-type CodeBlock struct {
-	Language string
-	Content  string
-	Start    int
-	End      int
-}
-
-var codeBlockRegex = regexp.MustCompile("(?s)```([a-zA-Z0-9_-]*)\\s*\\n(.*?)\\n?```")
-
-// DetectDiagrams finds D2 and Mermaid diagrams in markdown content.
-func DetectDiagrams(content string) []DetectedDiagram {
-	var diagrams []DetectedDiagram
-
-	matches := codeBlockRegex.FindAllStringSubmatchIndex(content, -1)
-	for _, match := range matches {
-		if len(match) < 6 {
-			continue
-		}
-
-		// match[0], match[1] = full match
-		// match[2], match[3] = language
-		// match[4], match[5] = content
-		lang := content[match[2]:match[3]]
-		diagramContent := content[match[4]:match[5]]
-
-		var diagramType DiagramType
-		switch lang {
-		case "d2":
-			diagramType = DiagramTypeD2
-		case "mermaid":
-			diagramType = DiagramTypeMermaid
-		default:
-			continue
-		}
-
-		diagrams = append(diagrams, DetectedDiagram{
-			Type:    diagramType,
-			Content: diagramContent,
-			Start:   match[0],
-			End:     match[1],
-		})
-	}
-
-	return diagrams
 }
 
 // d2Error wraps an error with D2 rendering context.
@@ -166,51 +87,6 @@ func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 
 // RenderMermaidToHTML returns HTML for client-side Mermaid rendering.
 func RenderMermaidToHTML(content string) string {
-	// Escape HTML entities to prevent XSS
 	escaped := html.EscapeString(content)
 	return fmt.Sprintf(`<pre class="mermaid">%s</pre>`, escaped)
-}
-
-// ProcessMarkdown detects and renders diagrams in markdown content.
-// Returns the processed markdown with diagrams replaced.
-func (r *DiagramRenderer) ProcessMarkdown(content string) (string, error) {
-	diagrams := DetectDiagrams(content)
-	if len(diagrams) == 0 {
-		return content, nil
-	}
-
-	// Process from end to start to preserve positions
-	result := content
-	for i := len(diagrams) - 1; i >= 0; i-- {
-		d := diagrams[i]
-		var replacement string
-
-		switch d.Type {
-		case DiagramTypeD2:
-			svg, err := r.RenderD2(d.Content)
-			if err != nil {
-				// If rendering fails, keep original code block
-				replacement = fmt.Sprintf("```d2\n%s\n```", d.Content)
-			} else {
-				replacement = fmt.Sprintf("<div class=\"diagram d2-diagram\">%s</div>", string(svg))
-			}
-		case DiagramTypeMermaid:
-			replacement = RenderMermaidToHTML(d.Content)
-		}
-
-		result = result[:d.Start] + replacement + result[d.End:]
-	}
-
-	return result, nil
-}
-
-// HasMermaidDiagrams checks if content contains Mermaid diagrams.
-func HasMermaidDiagrams(content string) bool {
-	diagrams := DetectDiagrams(content)
-	for _, d := range diagrams {
-		if d.Type == DiagramTypeMermaid {
-			return true
-		}
-	}
-	return false
 }
