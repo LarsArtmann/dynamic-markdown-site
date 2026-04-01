@@ -15,6 +15,7 @@ type rateLimiter struct {
 	window      time.Duration
 	cleanupTick time.Duration
 	stopCleanup chan struct{}
+	stopOnce    sync.Once
 }
 
 func newRateLimiter(maxRequests int, window time.Duration) *rateLimiter {
@@ -63,9 +64,9 @@ func (rl *rateLimiter) cleanup() {
 	}
 }
 
-// Stop stops the cleanup goroutine.
+// Stop stops the cleanup goroutine. Safe to call multiple times.
 func (rl *rateLimiter) Stop() {
-	close(rl.stopCleanup)
+	rl.stopOnce.Do(func() { close(rl.stopCleanup) })
 }
 
 func (rl *rateLimiter) checkRateLimit(ip string) bool {
