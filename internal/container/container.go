@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"charm.land/log/v2"
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
@@ -140,7 +141,12 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 
 	// Use blob storage if StorageURL is configured
 	if cfg.StorageURL != "" {
-		repo, err := content.NewBlobRepository(context.Background(), cfg.StorageURL)
+		// Use a timeout context for blob operations to prevent hanging on
+		// credential lookup (especially for GCS without Application Default Credentials)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		repo, err := content.NewBlobRepository(ctx, cfg.StorageURL)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create blob repository: %w", err)
 		}
