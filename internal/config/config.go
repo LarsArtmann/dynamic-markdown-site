@@ -51,89 +51,94 @@ func DefaultConfig() *Config {
 func Load() (*Config, error) {
 	cfg := DefaultConfig()
 
-	// Define flags
-	portFlag := flag.Int("port", int(cfg.Port), "Port to run the server on")
-	flag.StringVar(&cfg.RootDir, "root", cfg.RootDir, "Root directory containing markdown files")
-	flag.StringVar(&cfg.RootDir, "r", cfg.RootDir, "Root directory (shorthand)")
-	flag.StringVar(&cfg.LogLevel, "log-level", cfg.LogLevel, "Log level (debug, info, warn, error)")
-	flag.StringVar(&cfg.StorageURL, "storage-url", cfg.StorageURL,
-		"Blob storage URL (e.g., file:///path, s3://bucket/prefix, gs://bucket/prefix)")
-	flag.BoolVar(&cfg.CacheEnabled, "cache", cfg.CacheEnabled, "Enable response caching")
-	flag.BoolVar(&cfg.DevMode, "dev", cfg.DevMode, "Development mode (disables caching)")
-	flag.DurationVar(&cfg.Timeout, "timeout", cfg.Timeout, "Request timeout")
+	cfg.defineAndParseFlags()
+	cfg.applyEnvironmentOverrides()
 
-	// Parse flags
-	flag.Parse()
-
-	// Apply parsed flags
-	if *portFlag > 0 && *portFlag <= 65535 {
-		cfg.Port = uint16(*portFlag)
+	if err := cfg.validate(); err != nil {
+		return nil, err
 	}
 
-	// Override with environment variables
+	cfg.applyDerivedSettings()
+
+	return cfg, nil
+}
+
+// defineAndParseFlags registers and parses command-line flags.
+func (c *Config) defineAndParseFlags() {
+	portFlag := flag.Int("port", int(c.Port), "Port to run the server on")
+	flag.StringVar(&c.RootDir, "root", c.RootDir, "Root directory containing markdown files")
+	flag.StringVar(&c.RootDir, "r", c.RootDir, "Root directory (shorthand)")
+	flag.StringVar(&c.LogLevel, "log-level", c.LogLevel, "Log level (debug, info, warn, error)")
+	flag.StringVar(&c.StorageURL, "storage-url", c.StorageURL,
+		"Blob storage URL (e.g., file:///path, s3://bucket/prefix, gs://bucket/prefix)")
+	flag.BoolVar(&c.CacheEnabled, "cache", c.CacheEnabled, "Enable response caching")
+	flag.BoolVar(&c.DevMode, "dev", c.DevMode, "Development mode (disables caching)")
+	flag.DurationVar(&c.Timeout, "timeout", c.Timeout, "Request timeout")
+
+	flag.Parse()
+
+	if *portFlag > 0 && *portFlag <= 65535 {
+		c.Port = uint16(*portFlag)
+	}
+}
+
+// applyEnvironmentOverrides applies environment variable values to the config.
+func (c *Config) applyEnvironmentOverrides() {
 	if port := os.Getenv("DYNAMIC_MARKDOWN_PORT"); port != "" {
 		if p, err := parseUint16(port); err == nil {
-			cfg.Port = p
+			c.Port = p
 		}
 	}
 
 	if root := os.Getenv("DYNAMIC_MARKDOWN_ROOT"); root != "" {
-		cfg.RootDir = root
+		c.RootDir = root
 	}
 
 	if level := os.Getenv("DYNAMIC_MARKDOWN_LOG_LEVEL"); level != "" {
-		cfg.LogLevel = level
+		c.LogLevel = level
 	}
 
 	if storageURL := os.Getenv("DYNAMIC_MARKDOWN_STORAGE_URL"); storageURL != "" {
-		cfg.StorageURL = storageURL
+		c.StorageURL = storageURL
 	}
 
 	if cache := os.Getenv("DYNAMIC_MARKDOWN_CACHE"); cache != "" {
-		cfg.CacheEnabled = parseBool(cache)
+		c.CacheEnabled = parseBool(cache)
 	}
 
 	if dev := os.Getenv("DYNAMIC_MARKDOWN_DEV"); dev != "" {
-		cfg.DevMode = parseBool(dev)
+		c.DevMode = parseBool(dev)
 	}
 
 	if timeout := os.Getenv("DYNAMIC_MARKDOWN_TIMEOUT"); timeout != "" {
 		if d, err := time.ParseDuration(timeout); err == nil {
-			cfg.Timeout = d
+			c.Timeout = d
 		}
 	}
 
 	if siteName := os.Getenv("DYNAMIC_MARKDOWN_SITE_NAME"); siteName != "" {
-		cfg.SiteName = siteName
+		c.SiteName = siteName
+	}
+}
+
+// applyDerivedSettings applies settings derived from other configuration values.
+func (c *Config) applyDerivedSettings() {
+	if c.DevMode {
+		c.CacheEnabled = false
 	}
 
-	// Post-process configuration
-	err := cfg.validate()
-	if err != nil {
-		return nil, err
-	}
-
-	// Apply derived settings
-	if cfg.DevMode {
-		cfg.CacheEnabled = false
-	}
-
-	// Convert relative root dir to absolute and normalize (only for filesystem)
-	if cfg.StorageURL == "" && !filepath.IsAbs(cfg.RootDir) {
-		abs, err := filepath.Abs(cfg.RootDir)
+	if c.StorageURL == "" && !filepath.IsAbs(c.RootDir) {
+		abs, err := filepath.Abs(c.RootDir)
 		if err != nil {
-			return nil, errors.Wrap(err, "resolve root directory")
+			panic(errors.Wrap(err, "resolve root directory"))
 		}
 
-		cfg.RootDir = abs
+		c.RootDir = abs
 	}
 
-	// Normalize path to remove trailing slashes and clean up (only for filesystem)
-	if cfg.StorageURL == "" {
-		cfg.RootDir = filepath.Clean(cfg.RootDir)
+	if c.StorageURL == "" {
+		c.RootDir = filepath.Clean(c.RootDir)
 	}
-
-	return cfg, nil
 }
 
 // validate checks that configuration is valid.

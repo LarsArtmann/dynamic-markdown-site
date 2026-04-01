@@ -67,7 +67,7 @@ func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, _
 	source := reader.Source()
 	var replacements []diagramReplacement
 
-	ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+	if err := ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
 			return ast.WalkContinue, nil
 		}
@@ -95,8 +95,9 @@ func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, _
 		}
 
 		diagram := &diagramNode{
-			language: lang,
-			content:  buf.String(),
+			BaseBlock: ast.BaseBlock{},
+			language:  lang,
+			content:   buf.String(),
 		}
 
 		replacements = append(replacements, diagramReplacement{
@@ -106,7 +107,9 @@ func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, _
 		})
 
 		return ast.WalkContinue, nil
-	})
+	}); err != nil {
+		return
+	}
 
 	for _, r := range replacements {
 		r.parent.ReplaceChild(r.parent, r.old, r.new)

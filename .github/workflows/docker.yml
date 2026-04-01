@@ -110,7 +110,7 @@ jobs:
           docker run -d --name smoke-test \
             -p 8080:8080 \
             -v /tmp/smoke-content:/content:ro \
-            ${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:${{ steps.meta-docker.outputs.version }}
           sleep 3
           RESPONSE=$(curl -sf http://localhost:8080/health)
           echo "Health response: $RESPONSE"
@@ -120,7 +120,7 @@ jobs:
 
       - name: Save Docker image (local testing)
         run: |
-          docker save ${{ env.IMAGE_NAME }}:sha-${{ github.sha }} | gzip > image.tar.gz
+          docker save ${{ env.IMAGE_NAME }}:${{ steps.meta-docker.outputs.version }} | gzip > image.tar.gz
           echo "Image size: $(du -h image.tar.gz | cut -f1)"
 
       - name: Upload Docker image
