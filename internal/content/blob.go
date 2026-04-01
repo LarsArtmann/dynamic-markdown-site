@@ -212,6 +212,10 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 				continue
 			}
 
+			if isDraft(content) {
+				continue
+			}
+
 			title := strings.TrimSuffix(path.Base(obj.Key), path.Ext(obj.Key))
 
 			fileNode, err := domain.NewFileNode(
