@@ -2,7 +2,13 @@ package content
 
 import (
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
+
+type frontmatter struct {
+	Draft bool `yaml:"draft"`
+}
 
 func isDraft(content []byte) bool {
 	text := string(content)
@@ -15,13 +21,15 @@ func isDraft(content []byte) bool {
 		return false
 	}
 
-	frontmatter := text[3 : end+3]
-	for line := range strings.SplitSeq(frontmatter, "\n") {
-		line = strings.TrimSpace(line)
-		if line == "draft: true" {
-			return true
-		}
+	frontmatterText := strings.TrimSpace(text[3 : end+3])
+	if frontmatterText == "" {
+		return false
 	}
 
-	return false
+	var fm frontmatter
+	if err := yaml.Unmarshal([]byte(frontmatterText), &fm); err != nil {
+		return false
+	}
+
+	return fm.Draft
 }

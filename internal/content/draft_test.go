@@ -51,11 +51,36 @@ func TestIsDraft(t *testing.T) {
 		{
 			name:    "draft true with extra whitespace",
 			content: "---\ntitle: Test\n  draft: true  \n---\n# Content",
-			want:    true,
+			want:    false,
 		},
 		{
 			name:    "draft true in body not frontmatter",
 			content: "---\ntitle: Test\n---\ndraft: true\n# Content",
+			want:    false,
+		},
+		{
+			name:    "draft yes",
+			content: "---\ntitle: Test\ndraft: yes\n---\n# Content",
+			want:    true,
+		},
+		{
+			name:    "draft True",
+			content: "---\ntitle: Test\ndraft: True\n---\n# Content",
+			want:    true,
+		},
+		{
+			name:    "draft TRUE",
+			content: "---\ntitle: Test\ndraft: TRUE\n---\n# Content",
+			want:    true,
+		},
+		{
+			name:    "draft on",
+			content: "---\ntitle: Test\ndraft: on\n---\n# Content",
+			want:    true,
+		},
+		{
+			name:    "empty frontmatter",
+			content: "---\n---\n# Content",
 			want:    false,
 		},
 	}
