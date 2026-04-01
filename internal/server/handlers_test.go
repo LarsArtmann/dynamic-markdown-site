@@ -422,7 +422,10 @@ func TestSearchEndpoint(t *testing.T) {
 	repo.Add(file)
 
 	// Also add as child of root so searcher can find it
-	root, _ := repo.Root()
+	root, err := repo.Root()
+	if err != nil {
+		t.Fatalf("failed to get root: %v", err)
+	}
 	root.AddChild(file)
 
 	server := newTestServer(t, repo)
@@ -500,7 +503,7 @@ func TestSearchEndpointError(t *testing.T) {
 	// Use failing searcher
 	server := &Server{
 		repo:        repo,
-		searcher:    nil, // Will cause search to fail via the FailingSearcher pattern
+		searcher:    nil, // nil searcher forces search failure path
 		renderer:    nil,
 		logger:      logger,
 		rateLimiter: newRateLimiter(10, time.Minute),
@@ -591,7 +594,7 @@ func TestStaticPathTraversal(t *testing.T) {
 
 func TestRateLimiterCleanupTriggered(t *testing.T) {
 	t.Parallel()
-	_ = t // Unused but kept for test function signature
+
 	// Create rate limiter with very short cleanup interval
 	rl := newRateLimiter(10, 10*time.Millisecond)
 
@@ -731,11 +734,3 @@ func (f *FailingRepository) Search(_ string) ([]content.SearchResult, error) {
 	return nil, errors.New("search error")
 }
 
-// FailingSearcher wraps a searcher to force errors.
-type FailingSearcher struct {
-	_ content.Repository
-}
-
-func (f *FailingSearcher) Search(_ string) ([]content.SearchResult, error) {
-	return nil, errors.New("search failed")
-}

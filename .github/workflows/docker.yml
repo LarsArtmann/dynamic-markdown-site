@@ -100,6 +100,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Generate artifact attestation
+        if: github.event_name != 'pull_request'
         uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26
         with:
           subject-name: ${{ env.IMAGE_NAME }}
@@ -107,11 +108,13 @@ jobs:
           push-to-registry: true
 
       - name: Save Docker image (local testing)
+        if: github.event_name != 'pull_request'
         run: |
           docker save ${{ env.IMAGE_NAME }}:${{ steps.meta-docker.outputs.version }} | gzip > image.tar.gz
           echo "Image size: $(du -h image.tar.gz | cut -f1)"
 
       - name: Upload Docker image
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: dynamic-markdown-site-${{ github.sha }}

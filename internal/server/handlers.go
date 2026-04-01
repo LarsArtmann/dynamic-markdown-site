@@ -72,6 +72,11 @@ func (s *Server) RegisterRoutes(router *gin.Engine) {
 	router.NoRoute(s.handle404)
 }
 
+// Shutdown stops background goroutines owned by the server.
+func (s *Server) Shutdown() {
+	s.rateLimiter.Stop()
+}
+
 // LiveReload returns the LiveReload instance for external notification.
 func (s *Server) LiveReload() *LiveReload {
 	return s.liveReload
