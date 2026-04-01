@@ -189,5 +189,5 @@ func provideServer(i do.Injector) (*server.Server, error) {
 	cache := do.MustInvoke[*cache.HTMLCache](i)
 	cfg := do.MustInvoke[*config.Config](i)
 
-	return server.NewServer(repo, searcher, logger, cache, cfg.DevMode), nil
+	return server.NewServer(repo, searcher, logger, cache, cfg.DevMode, cfg.SiteName), nil
 }

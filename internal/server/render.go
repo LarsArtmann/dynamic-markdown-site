@@ -20,6 +20,7 @@ func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 		ActivePath:  dir.Path(),
 		ShowNav:     true,
 		DevMode:     s.devMode,
+		SiteName:    s.siteName,
 	}
 
 	dirProps := templates.DirectoryViewProps{
@@ -66,6 +67,7 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 		ActivePath:  file.Path(),
 		ShowNav:     true,
 		HasMermaid:  renderedFile.HasMermaid(),
+		SiteName:    s.siteName,
 	}
 
 	fileProps := templates.FileViewProps{
@@ -115,6 +117,7 @@ func (s *Server) renderSearch(c *gin.Context, query string, results []content.Se
 		Breadcrumbs: crumbs,
 		ActivePath:  domain.MustURLPath("/search"),
 		ShowNav:     false,
+		SiteName:    s.siteName,
 	}
 
 	searchProps := templates.SearchViewProps{

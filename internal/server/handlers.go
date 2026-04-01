@@ -26,6 +26,7 @@ type Server struct {
 	cache       *cache.HTMLCache
 	liveReload  *LiveReload
 	devMode     bool
+	siteName    string
 }
 
 // NewServer creates a new HTTP server with dependencies.
@@ -35,6 +36,7 @@ func NewServer(
 	log *slog.Logger,
 	cache *cache.HTMLCache,
 	devMode bool,
+	siteName string,
 ) *Server {
 	rl := newRateLimiter(10, time.Minute)
 	lr := NewLiveReload(log)
@@ -48,6 +50,7 @@ func NewServer(
 		cache:       cache,
 		liveReload:  lr,
 		devMode:     devMode,
+		siteName:    siteName,
 	}
 }
 

@@ -80,7 +80,7 @@ func NewServerFixture(t *testing.T) *ServerFixture {
 	c := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
 	logger := slog.New(slog.DiscardHandler)
-	s := server.NewServer(repo, searcher, logger, c, false)
+	s := server.NewServer(repo, searcher, logger, c, false, "Site")
 
 	return &ServerFixture{
 		Repository: repo,

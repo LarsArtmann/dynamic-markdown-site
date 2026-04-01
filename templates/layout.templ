@@ -18,6 +18,7 @@ type LayoutProps struct {
 	ShowNav     bool
 	DevMode     bool
 	HasMermaid  bool
+	SiteName    string
 }
 
 // Layout is the base layout for all pages.
@@ -126,7 +127,7 @@ templ Header(props LayoutProps) {
 		<div class="header-container">
 			<a href="/" class="logo">
 				<span class="logo-icon">◈</span>
-				<span class="logo-text">Site</span>
+				<span class="logo-text">{ props.SiteName }</span>
 			</a>
 			if len(props.Breadcrumbs) > 0 {
 				@Breadcrumbs(props.Breadcrumbs)
@@ -292,6 +293,7 @@ type ErrorViewProps struct {
 	StatusCode  int
 	RequestPath string
 	Suggestions []SuggestedPath
+	SiteName    string
 }
 
 // ErrorView renders an error page.
@@ -300,6 +302,7 @@ templ ErrorView(props ErrorViewProps) {
 		Title:       props.Title,
 		Description: props.Message,
 		ShowNav:     false,
+		SiteName:    props.SiteName,
 	}) {
 		<div class="error-view">
 			<div class="error-container">
