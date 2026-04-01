@@ -51,6 +51,9 @@ func (n *diagramNode) Dump(source []byte, level int) {
 	}, nil)
 }
 
+// hasMermaidKey is a parser context key for tracking mermaid diagram presence.
+var hasMermaidKey = parser.NewContextKey()
+
 // diagramReplacement tracks a node to replace in the AST.
 type diagramReplacement struct {
 	parent ast.Node
@@ -64,7 +67,8 @@ type diagramTransformer struct{}
 
 // Transform walks the AST and replaces mermaid/d2 fenced code blocks with diagramNodes.
 // Nodes are collected during the walk and replaced afterwards to avoid unsafe mutation during iteration.
-func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, _ parser.Context) {
+// It also sets a flag on the parser context when mermaid diagrams are detected.
+func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, pctx parser.Context) {
 	source := reader.Source()
 	var replacements []diagramReplacement
 
@@ -93,6 +97,10 @@ func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, _
 					lang,
 				)
 			}
+		}
+
+		if lang == diagramTypeMermaid {
+			pctx.Set(hasMermaidKey, true)
 		}
 
 		diagram := &diagramNode{

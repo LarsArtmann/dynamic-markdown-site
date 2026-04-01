@@ -94,8 +94,8 @@ func (r *GoldmarkRenderer) Render(source []byte) (domain.RenderedContent, error)
 		return domain.RenderedContent{}, errors.Wrap(err, "render markdown")
 	}
 
-	// Check for mermaid diagrams
-	hasMermaid := HasMermaidDiagrams(string(source))
+	// Check for mermaid diagrams (set by diagramTransformer during AST walk)
+	hasMermaid, _ := context.Get(hasMermaidKey).(bool)
 
 	return domain.RenderedContent{
 		HTML:       domain.HTML(buf.String()),
