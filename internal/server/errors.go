@@ -32,6 +32,7 @@ func (s *Server) renderNotFound(c *gin.Context, requestPath string, suggestions 
 		StatusCode:  404,
 		RequestPath: requestPath,
 		Suggestions: convertToTemplateSuggestions(suggestions),
+		SiteName:    s.siteName,
 	}
 
 	component := templates.ErrorView(props)
@@ -67,6 +68,7 @@ func (s *Server) renderError(c *gin.Context, statusCode int, title, message stri
 		StatusCode:  statusCode,
 		RequestPath: "",
 		Suggestions: nil,
+		SiteName:    s.siteName,
 	}
 
 	component := templates.ErrorView(props)
