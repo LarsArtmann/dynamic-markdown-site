@@ -127,12 +127,13 @@ type RenderedFile struct {
 }
 
 // NewRenderedFile creates a new immutable RenderedFile from a FileNode and render result.
-func NewRenderedFile(file *FileNode, html HTML, toc []TOCItem, metadata Frontmatter) *RenderedFile {
+func NewRenderedFile(file *FileNode, html HTML, toc []TOCItem, metadata Frontmatter, hasMermaid bool) *RenderedFile {
 	return &RenderedFile{
-		file:     file,
-		html:     html,
-		toc:      toc,
-		metadata: metadata,
+		file:       file,
+		html:       html,
+		toc:        toc,
+		metadata:   metadata,
+		hasMermaid: hasMermaid,
 	}
 }
 
