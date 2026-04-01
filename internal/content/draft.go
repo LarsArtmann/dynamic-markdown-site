@@ -16,7 +16,7 @@ func isDraft(content []byte) bool {
 	}
 
 	frontmatter := text[3 : end+3]
-	for _, line := range strings.Split(frontmatter, "\n") {
+	for line := range strings.SplitSeq(frontmatter, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "draft: true" {
 			return true

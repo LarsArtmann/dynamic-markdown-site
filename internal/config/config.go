@@ -86,40 +86,41 @@ func (c *Config) defineAndParseFlags() {
 
 // applyEnvironmentOverrides applies environment variable values to the config.
 func (c *Config) applyEnvironmentOverrides() {
-	if port := os.Getenv("DYNAMIC_MARKDOWN_PORT"); port != "" {
-		if p, err := parseUint16(port); err == nil {
-			c.Port = p
+	c.applyEnvUint16("DYNAMIC_MARKDOWN_PORT", func(v uint16) { c.Port = v })
+	c.applyEnvString("DYNAMIC_MARKDOWN_ROOT", func(v string) { c.RootDir = v })
+	c.applyEnvString("DYNAMIC_MARKDOWN_LOG_LEVEL", func(v string) { c.LogLevel = v })
+	c.applyEnvString("DYNAMIC_MARKDOWN_STORAGE_URL", func(v string) { c.StorageURL = v })
+	c.applyEnvBool("DYNAMIC_MARKDOWN_CACHE", func(v bool) { c.CacheEnabled = v })
+	c.applyEnvBool("DYNAMIC_MARKDOWN_DEV", func(v bool) { c.DevMode = v })
+	c.applyEnvDuration("DYNAMIC_MARKDOWN_TIMEOUT", func(v time.Duration) { c.Timeout = v })
+	c.applyEnvString("DYNAMIC_MARKDOWN_SITE_NAME", func(v string) { c.SiteName = v })
+}
+
+func (c *Config) applyEnvUint16(key string, apply func(uint16)) {
+	if val := os.Getenv(key); val != "" {
+		if p, err := parseUint16(val); err == nil {
+			apply(p)
 		}
 	}
+}
 
-	if root := os.Getenv("DYNAMIC_MARKDOWN_ROOT"); root != "" {
-		c.RootDir = root
+func (c *Config) applyEnvString(key string, apply func(string)) {
+	if val := os.Getenv(key); val != "" {
+		apply(val)
 	}
+}
 
-	if level := os.Getenv("DYNAMIC_MARKDOWN_LOG_LEVEL"); level != "" {
-		c.LogLevel = level
+func (c *Config) applyEnvBool(key string, apply func(bool)) {
+	if val := os.Getenv(key); val != "" {
+		apply(parseBool(val))
 	}
+}
 
-	if storageURL := os.Getenv("DYNAMIC_MARKDOWN_STORAGE_URL"); storageURL != "" {
-		c.StorageURL = storageURL
-	}
-
-	if cache := os.Getenv("DYNAMIC_MARKDOWN_CACHE"); cache != "" {
-		c.CacheEnabled = parseBool(cache)
-	}
-
-	if dev := os.Getenv("DYNAMIC_MARKDOWN_DEV"); dev != "" {
-		c.DevMode = parseBool(dev)
-	}
-
-	if timeout := os.Getenv("DYNAMIC_MARKDOWN_TIMEOUT"); timeout != "" {
-		if d, err := time.ParseDuration(timeout); err == nil {
-			c.Timeout = d
+func (c *Config) applyEnvDuration(key string, apply func(time.Duration)) {
+	if val := os.Getenv(key); val != "" {
+		if d, err := time.ParseDuration(val); err == nil {
+			apply(d)
 		}
-	}
-
-	if siteName := os.Getenv("DYNAMIC_MARKDOWN_SITE_NAME"); siteName != "" {
-		c.SiteName = siteName
 	}
 }
 
