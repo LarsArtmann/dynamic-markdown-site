@@ -830,3 +830,7 @@ func (f *FailingRepository) AllPaths() []domain.URLPath {
 func (f *FailingRepository) Search(_ string) ([]content.SearchResult, error) {
 	return nil, errors.New("search error")
 }
+
+func (f *FailingRepository) GetRaw(_ domain.URLPath) (*content.RawFile, error) {
+	return nil, content.ErrContentNotFound
+}
