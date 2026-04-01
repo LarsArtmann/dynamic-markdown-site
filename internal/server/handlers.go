@@ -62,6 +62,7 @@ func (s *Server) RegisterRoutes(router *gin.Engine) {
 	router.Use(s.accessLogMiddleware())
 	router.Use(s.staticAndContentMiddleware())
 	router.GET("/health", s.handleHealth)
+	router.GET("/robots.txt", s.handleRobotsTxt)
 	router.GET("/refresh", s.handleRefresh)
 	router.POST("/refresh", s.handleRefresh)
 	router.GET("/search", s.handleSearch)
@@ -79,7 +80,7 @@ func (s *Server) staticAndContentMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
 
-		if path == "/health" || path == "/refresh" || path == "/search" || path == "/" {
+		if path == "/health" || path == "/refresh" || path == "/search" || path == "/" || path == "/robots.txt" {
 			c.Next()
 
 			return
