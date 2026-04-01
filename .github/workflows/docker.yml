@@ -137,6 +137,7 @@ jobs:
           if-no-files-found: error
 
   security-scan:
+    needs: [build]
     runs-on: ubuntu-latest
     permissions:
       security-events: write

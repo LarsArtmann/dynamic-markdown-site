@@ -6,6 +6,8 @@
 package version
 
 // Version information injected at build time via ldflags.
+//
+//nolint:gochecknoglobals // These are intentionally global for ldflags injection.
 var (
 	// Version is the semantic version string.
 	Version = "dev"

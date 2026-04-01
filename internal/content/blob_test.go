@@ -124,7 +124,7 @@ func TestBlobRepositoryWithContent(t *testing.T) {
 
 		fileNode, ok := node.(*domain.FileNode)
 		require.True(t, ok, "expected *FileNode")
-		assert.Equal(t, "index", fileNode.Title)
+		assert.Equal(t, "index", fileNode.Title())
 	})
 
 	t.Run("Get nested file", func(t *testing.T) {
@@ -136,7 +136,7 @@ func TestBlobRepositoryWithContent(t *testing.T) {
 
 		fileNode, ok := node.(*domain.FileNode)
 		require.True(t, ok, "expected *FileNode")
-		assert.Equal(t, "guide", fileNode.Title)
+		assert.Equal(t, "guide", fileNode.Title())
 	})
 
 	t.Run("Get directory", func(t *testing.T) {
