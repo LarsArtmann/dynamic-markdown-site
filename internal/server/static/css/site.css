@@ -357,6 +357,101 @@ body {
 	margin-top: var(--space-xs);
 }
 
+/* Admonition / Alert Blocks */
+.markdown-content .admonition {
+	margin: var(--space-lg) 0;
+	padding: 0;
+	border-radius: var(--radius-md);
+	border: 1px solid var(--color-border);
+	overflow: hidden;
+}
+
+.markdown-content .admonition-title {
+	padding: var(--space-sm) var(--space-lg);
+	font-weight: 700;
+	font-size: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
+}
+
+.markdown-content .admonition-content {
+	padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+
+.markdown-content .admonition-content p:last-child {
+	margin-bottom: 0;
+}
+
+.markdown-content .admonition-content ul:last-child,
+.markdown-content .admonition-content ol:last-child {
+	margin-bottom: 0;
+}
+
+/* Note — blue/cyan */
+.markdown-content .admonition-note {
+	border-color: #2563eb;
+	background-color: rgba(37, 99, 235, 0.08);
+}
+.markdown-content .admonition-note .admonition-title {
+	background-color: rgba(37, 99, 235, 0.2);
+	color: #60a5fa;
+}
+
+/* Tip — green */
+.markdown-content .admonition-tip {
+	border-color: #059669;
+	background-color: rgba(5, 150, 105, 0.08);
+}
+.markdown-content .admonition-tip .admonition-title {
+	background-color: rgba(5, 150, 105, 0.2);
+	color: #34d399;
+}
+
+/* Important — purple */
+.markdown-content .admonition-important {
+	border-color: #7c3aed;
+	background-color: rgba(124, 58, 237, 0.08);
+}
+.markdown-content .admonition-important .admonition-title {
+	background-color: rgba(124, 58, 237, 0.2);
+	color: #a78bfa;
+}
+
+/* Warning — amber/yellow */
+.markdown-content .admonition-warning {
+	border-color: #d97706;
+	background-color: rgba(217, 119, 6, 0.08);
+}
+.markdown-content .admonition-warning .admonition-title {
+	background-color: rgba(217, 119, 6, 0.2);
+	color: #fbbf24;
+}
+
+/* Caution — red */
+.markdown-content .admonition-caution {
+	border-color: #dc2626;
+	background-color: rgba(220, 38, 38, 0.08);
+}
+.markdown-content .admonition-caution .admonition-title {
+	background-color: rgba(220, 38, 38, 0.2);
+	color: #f87171;
+}
+
+/* Critical — intense red with glow */
+.markdown-content .admonition-critical {
+	border-color: #ff0040;
+	background-color: rgba(255, 0, 64, 0.06);
+	box-shadow: 0 0 15px rgba(255, 0, 64, 0.1);
+}
+.markdown-content .admonition-critical .admonition-title {
+	background-color: rgba(255, 0, 64, 0.18);
+	color: #ff4d6d;
+	font-size: 0.95rem;
+}
+
 /* Markdown Content Styles */
 .markdown-content h1,
 .markdown-content h2,

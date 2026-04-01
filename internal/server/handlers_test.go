@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -793,6 +795,82 @@ func TestStaticFileDirectoryReturns404(t *testing.T) {
 			wantStatus: http.StatusNotFound,
 		},
 	})
+}
+
+func TestRawFileServing(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+
+	// Create nested directory with SVG file
+	diagramsDir := filepath.Join(tmpDir, "docs", "assets", "diagrams")
+	if err := os.MkdirAll(diagramsDir, 0o755); err != nil {
+		t.Fatalf("failed to create directory: %v", err)
+	}
+
+	svgContent := `<svg xmlns="http://www.w3.org/2000/svg"><circle r="10"/></svg>`
+	if err := os.WriteFile(
+		filepath.Join(diagramsDir, "01-workflow.svg"),
+		[]byte(svgContent),
+		0o644,
+	); err != nil {
+		t.Fatalf("failed to write SVG: %v", err)
+	}
+
+	// Need at least one markdown file so tree doesn't get filtered
+	if err := os.WriteFile(
+		filepath.Join(tmpDir, "index.md"),
+		[]byte("# Home"),
+		0o644,
+	); err != nil {
+		t.Fatalf("failed to write index: %v", err)
+	}
+
+	repo, err := content.NewFileSystemRepository(tmpDir)
+	if err != nil {
+		t.Fatalf("NewFileSystemRepository() error = %v", err)
+	}
+
+	server := newTestServer(t, repo)
+	router := newTestRouter(server)
+
+	tests := []httpTestCase{
+		{
+			name:       "SVG in nested directory returns 200 with correct content type",
+			method:     http.MethodGet,
+			path:       "/docs/assets/diagrams/01-workflow.svg",
+			wantStatus: http.StatusOK,
+			wantBody:   svgContent,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequestWithContext(context.Background(), tt.method, tt.path, nil)
+			rec := httptest.NewRecorder()
+			router.ServeHTTP(rec, req)
+
+			if rec.Code != tt.wantStatus {
+				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
+			}
+
+			if !strings.Contains(rec.Body.String(), tt.wantBody) {
+				t.Errorf("body = %s, want to contain %s", rec.Body.String(), tt.wantBody)
+			}
+
+			// Check content-type header
+			contentType := rec.Header().Get("Content-Type")
+			if contentType != "image/svg+xml" {
+				t.Errorf("Content-Type = %q, want %q", contentType, "image/svg+xml")
+			}
+
+			// Check cache-control header
+			cacheControl := rec.Header().Get("Cache-Control")
+			if cacheControl != "public, max-age=86400" {
+				t.Errorf("Cache-Control = %q, want %q", cacheControl, "public, max-age=86400")
+			}
+		})
+	}
 }
 
 // FailingRepository is a test helper that always returns errors.
