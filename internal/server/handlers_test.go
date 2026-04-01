@@ -319,6 +319,103 @@ func TestContentWithFile(t *testing.T) {
 	}
 }
 
+func TestContentRedirectFromMDExtension(t *testing.T) {
+	t.Parallel()
+	repo := content.NewInMemoryRepository()
+
+	// Create a file at /test-page (without .md in the URL path)
+	filePath := domain.MustURLPath("/test-page")
+	fileContent := []byte("# Test Page\n\nThis is test content.\n")
+
+	file, err := domain.NewFileNode(
+		filePath,
+		"Test Page",
+		fileContent,
+		time.Now(),
+		uint64(len(fileContent)),
+	)
+	if err != nil {
+		t.Fatalf("failed to create file node: %v", err)
+	}
+
+	repo.Add(file)
+
+	server := newTestServer(t, repo)
+	router := newTestRouter(server)
+
+	// Request with .md extension should redirect to clean URL
+	req := httptest.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		"/test-page.md",
+		nil,
+	)
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusMovedPermanently {
+		t.Errorf("status = %d, want %d", rec.Code, http.StatusMovedPermanently)
+	}
+
+	// Check the Location header
+	location := rec.Header().Get("Location")
+	if location != "/test-page" {
+		t.Errorf("Location header = %q, want %q", location, "/test-page")
+	}
+}
+
+func TestContentRedirectFromMDExtensionWithPath(t *testing.T) {
+	t.Parallel()
+	repo := content.NewInMemoryRepository()
+
+	// Create a nested directory structure
+	dirPath := domain.MustURLPath("/docs")
+	dir, err := domain.NewDirectoryNode(dirPath, "docs", time.Now())
+	if err != nil {
+		t.Fatalf("failed to create directory node: %v", err)
+	}
+
+	// Create a file in the directory
+	filePath := domain.MustURLPath("/docs/readme")
+	fileContent := []byte("# Readme\n\nDocumentation here.\n")
+
+	file, err := domain.NewFileNode(
+		filePath,
+		"readme",
+		fileContent,
+		time.Now(),
+		uint64(len(fileContent)),
+	)
+	if err != nil {
+		t.Fatalf("failed to create file node: %v", err)
+	}
+
+	repo.Add(dir)
+	repo.Add(file)
+
+	server := newTestServer(t, repo)
+	router := newTestRouter(server)
+
+	// Request with .md extension in nested path should redirect
+	req := httptest.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		"/docs/readme.md",
+		nil,
+	)
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusMovedPermanently {
+		t.Errorf("status = %d, want %d", rec.Code, http.StatusMovedPermanently)
+	}
+
+	location := rec.Header().Get("Location")
+	if location != "/docs/readme" {
+		t.Errorf("Location header = %q, want %q", location, "/docs/readme")
+	}
+}
+
 func TestContentWithDirectory(t *testing.T) {
 	t.Parallel()
 	repo := content.NewInMemoryRepository()
@@ -733,4 +830,3 @@ func (f *FailingRepository) AllPaths() []domain.URLPath {
 func (f *FailingRepository) Search(_ string) ([]content.SearchResult, error) {
 	return nil, errors.New("search error")
 }
-

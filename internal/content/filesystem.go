@@ -102,6 +102,67 @@ func (r *FileSystemRepository) AllPaths() []domain.URLPath {
 	return r.tree.AllPaths()
 }
 
+// GetRaw retrieves a non-markdown file directly from the filesystem.
+func (r *FileSystemRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	// Convert URL path to filesystem path
+	fsPath := filepath.Join(r.rootDir, filepath.FromSlash(urlPath.String()))
+
+	// Security check: ensure the path is within rootDir
+	absPath, err := filepath.Abs(fsPath)
+	if err != nil {
+		return nil, errors.Wrapf(ErrContentNotFound, "invalid path: %s", urlPath)
+	}
+
+	absRoot, err := filepath.Abs(r.rootDir)
+	if err != nil {
+		return nil, errors.Wrapf(ErrContentNotFound, "invalid root: %s", r.rootDir)
+	}
+
+	if !strings.HasPrefix(absPath, absRoot) {
+		return nil, errors.Wrapf(ErrContentNotFound, "path outside root: %s", urlPath)
+	}
+
+	// Check if file exists and is not a directory
+	info, err := os.Stat(absPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, errors.Wrapf(ErrContentNotFound, "file not found: %s", urlPath)
+		}
+
+		return nil, errors.Wrapf(err, "stat failed: %s", urlPath)
+	}
+
+	if info.IsDir() {
+		return nil, errors.Wrapf(ErrContentNotFound, "path is directory: %s", urlPath)
+	}
+
+	// Skip markdown files - they should be served via Get
+	if isMarkdownFile(info.Name()) {
+		return nil, errors.Wrapf(ErrContentNotFound, "markdown files served via Get: %s", urlPath)
+	}
+
+	// Skip hidden files
+	if strings.HasPrefix(info.Name(), ".") {
+		return nil, errors.Wrapf(ErrContentNotFound, "hidden file: %s", urlPath)
+	}
+
+	// Read file content
+	content, err := os.ReadFile(absPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "read failed: %s", urlPath)
+	}
+
+	return &RawFile{
+		Content:     content,
+		ContentType: getContentType(info.Name()),
+		ModTime:     info.ModTime(),
+		Size:        uint64(info.Size()),
+	}, nil
+}
+
 // Refresh rebuilds the content tree from the filesystem and returns statistics.
 func (r *FileSystemRepository) Refresh() domain.RefreshResult {
 	start := time.Now()

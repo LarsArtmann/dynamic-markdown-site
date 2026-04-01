@@ -48,3 +48,30 @@ func isMarkdownFile(name string) bool {
 
 	return ext == ".md" || ext == ".markdown"
 }
+
+func getContentType(name string) string {
+	ext := strings.ToLower(filepath.Ext(name))
+
+	switch ext {
+	case ".svg":
+		return "image/svg+xml"
+	case ".png":
+		return "image/png"
+	case ".jpg", ".jpeg":
+		return "image/jpeg"
+	case ".gif":
+		return "image/gif"
+	case ".webp":
+		return "image/webp"
+	case ".css":
+		return "text/css"
+	case ".js":
+		return "application/javascript"
+	case ".json":
+		return "application/json"
+	case ".pdf":
+		return "application/pdf"
+	default:
+		return "application/octet-stream"
+	}
+}

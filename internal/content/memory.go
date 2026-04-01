@@ -98,3 +98,8 @@ func (r *InMemoryRepository) AllPaths() []domain.URLPath {
 
 	return paths
 }
+
+// GetRaw is not supported for in-memory repository.
+func (r *InMemoryRepository) GetRaw(_ domain.URLPath) (*RawFile, error) {
+	return nil, ErrContentNotFound
+}

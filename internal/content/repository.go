@@ -7,6 +7,14 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
+// RawFile represents a non-markdown file for direct serving.
+type RawFile struct {
+	Content     []byte
+	ContentType string
+	ModTime     time.Time
+	Size        uint64
+}
+
 var (
 	// ErrContentNotFound indicates requested content does not exist.
 	ErrContentNotFound = errors.New("content not found")
@@ -18,6 +26,8 @@ var (
 type Repository interface {
 	// Get retrieves a content node by its URL path
 	Get(path domain.URLPath) (domain.ContentNode, error)
+	// GetRaw retrieves a non-markdown file by its URL path for direct serving
+	GetRaw(path domain.URLPath) (*RawFile, error)
 	// Root returns the root directory of the content tree
 	Root() (*domain.DirectoryNode, error)
 	// Refresh rebuilds the content tree from filesystem and returns statistics

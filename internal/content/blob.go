@@ -291,6 +291,54 @@ func (r *BlobRepository) readBlobContent(blobPath string) ([]byte, error) {
 	return data, errors.Wrapf(err, "read blob content: %s", blobPath)
 }
 
+// GetRaw retrieves a non-markdown file directly from blob storage.
+func (r *BlobRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	// Convert URL path to blob path
+	blobPath := strings.TrimPrefix(urlPath.String(), "/")
+
+	// Skip markdown files - they should be served via Get
+	if isMarkdownFile(blobPath) {
+		return nil, errors.Wrapf(ErrContentNotFound, "markdown files served via Get: %s", urlPath)
+	}
+
+	// Skip hidden files
+	if strings.HasPrefix(path.Base(blobPath), ".") {
+		return nil, errors.Wrapf(ErrContentNotFound, "hidden file: %s", urlPath)
+	}
+
+	// Check if blob exists
+	exists, err := r.bucket.Exists(context.Background(), blobPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "check existence failed: %s", urlPath)
+	}
+
+	if !exists {
+		return nil, errors.Wrapf(ErrContentNotFound, "blob not found: %s", urlPath)
+	}
+
+	// Get blob attributes
+	attrs, err := r.bucket.Attributes(context.Background(), blobPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "get attributes failed: %s", urlPath)
+	}
+
+	// Read blob content
+	content, err := r.readBlobContent(blobPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "read failed: %s", urlPath)
+	}
+
+	return &RawFile{
+		Content:     content,
+		ContentType: getContentType(blobPath),
+		ModTime:     attrs.ModTime,
+		Size:        uint64(attrs.Size),
+	}, nil
+}
+
 // Close closes the underlying blob bucket.
 func (r *BlobRepository) Close() error {
 	return errors.Wrap(r.bucket.Close(), "close blob bucket")
