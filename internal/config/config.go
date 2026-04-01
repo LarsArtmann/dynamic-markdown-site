@@ -54,7 +54,8 @@ func Load() (*Config, error) {
 	flag.StringVar(&cfg.RootDir, "root", cfg.RootDir, "Root directory containing markdown files")
 	flag.StringVar(&cfg.RootDir, "r", cfg.RootDir, "Root directory (shorthand)")
 	flag.StringVar(&cfg.LogLevel, "log-level", cfg.LogLevel, "Log level (debug, info, warn, error)")
-	flag.StringVar(&cfg.StorageURL, "storage-url", cfg.StorageURL, "Blob storage URL (e.g., file:///path, s3://bucket/prefix, gs://bucket/prefix)")
+	flag.StringVar(&cfg.StorageURL, "storage-url", cfg.StorageURL,
+		"Blob storage URL (e.g., file:///path, s3://bucket/prefix, gs://bucket/prefix)")
 	flag.BoolVar(&cfg.CacheEnabled, "cache", cfg.CacheEnabled, "Enable response caching")
 	flag.BoolVar(&cfg.DevMode, "dev", cfg.DevMode, "Development mode (disables caching)")
 	flag.DurationVar(&cfg.Timeout, "timeout", cfg.Timeout, "Request timeout")
