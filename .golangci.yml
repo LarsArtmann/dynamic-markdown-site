@@ -141,6 +141,9 @@ linters:
       # exhaustruct: Third-party D2 library types have many optional fields
       - path: "internal/renderer/diagrams.go"
         linters: [exhaustruct]
+      # exhaustruct: ast.BaseBlock has unexported fields, cannot fully initialize
+      - path: "internal/renderer/diagram_extension.go"
+        linters: [exhaustruct]
       # funlen: Complex test functions with many table-driven cases
       - path: "internal/renderer/markdown_bench_test.go"
         linters: [funlen]
