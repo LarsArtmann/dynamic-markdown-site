@@ -28,7 +28,11 @@ func TestHandleRobotsTxt(t *testing.T) {
 			name:            "basic http request",
 			host:            "example.com",
 			wantStatus:      http.StatusOK,
-			wantContains:    []string{"User-agent: *", "Allow: /", "Sitemap: http://example.com/sitemap.xml"},
+			wantContains: []string{
+				"User-agent: *",
+				"Allow: /",
+				"Sitemap: http://example.com/sitemap.xml",
+			},
 			wantCacheCtrl:   "public, max-age=86400",
 			wantContentType: "text/plain; charset=utf-8",
 		},
