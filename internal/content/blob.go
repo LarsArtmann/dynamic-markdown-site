@@ -41,11 +41,11 @@ func NewBlobRepository(ctx context.Context, bucketURL string) (*BlobRepository, 
 	}
 
 	// Extract prefix from URL if present (e.g., s3://bucket/prefix -> prefix)
-	if idx := strings.IndexByte(bucketURL, '/'); idx >= 0 {
-		rest := bucketURL[idx+1:]
+	if _, after, ok := strings.Cut(bucketURL, "/"); ok {
+		rest := after
 		if len(rest) > 1 {
-			if slashIdx := strings.IndexByte(rest, '/'); slashIdx >= 0 {
-				repo.prefix = rest[slashIdx+1:]
+			if _, after, ok := strings.Cut(rest, "/"); ok {
+				repo.prefix = after
 			}
 		}
 	}
