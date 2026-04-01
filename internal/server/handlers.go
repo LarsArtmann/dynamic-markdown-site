@@ -63,6 +63,7 @@ func (s *Server) RegisterRoutes(router *gin.Engine) {
 	router.Use(s.staticAndContentMiddleware())
 	router.GET("/health", s.handleHealth)
 	router.GET("/robots.txt", s.handleRobotsTxt)
+	router.GET("/sitemap.xml", s.handleSitemapXML)
 	router.GET("/refresh", s.handleRefresh)
 	router.POST("/refresh", s.handleRefresh)
 	router.GET("/search", s.handleSearch)
