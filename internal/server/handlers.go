@@ -88,7 +88,7 @@ func (s *Server) staticAndContentMiddleware() gin.HandlerFunc {
 
 		if path == "/health" || path == "/refresh" ||
 			path == "/search" || path == "/" ||
-			path == "/robots.txt" {
+			path == "/robots.txt" || path == "/sitemap.xml" {
 			c.Next()
 
 			return
