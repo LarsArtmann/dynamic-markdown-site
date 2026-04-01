@@ -14,6 +14,8 @@ on:
       - "go.mod"
       - "go.sum"
       - ".github/workflows/docker.yml"
+  pull_request:
+    branches: [master]
 
 env:
   # Pin templ version for reproducibility
@@ -87,7 +89,7 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta-docker.outputs.tags }}
           labels: ${{ steps.meta-docker.outputs.labels }}
           build-args: |
