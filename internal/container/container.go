@@ -141,11 +141,13 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 
 	// Use blob storage if StorageURL is configured
 	if cfg.StorageURL != "" {
+		slog.Info("blob storage requested, creating repository with timeout")
 		// Use a timeout context for blob operations to prevent hanging on
 		// credential lookup (especially for GCS without Application Default Credentials)
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
+		slog.Info("opening blob bucket", slog.String("url", cfg.StorageURL))
 		repo, err := content.NewBlobRepository(ctx, cfg.StorageURL)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create blob repository: %w", err)
