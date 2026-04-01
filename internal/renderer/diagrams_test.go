@@ -256,6 +256,144 @@ func TestEscapeHTML(t *testing.T) {
 	}
 }
 
+func TestRenderMermaidDiagramThroughGoldmark(t *testing.T) {
+	t.Parallel()
+
+	diagramRenderer, err := NewDiagramRenderer()
+	if err != nil {
+		t.Fatalf("failed to create diagram renderer: %v", err)
+	}
+
+	renderer := NewGoldmarkRendererWithDiagrams(diagramRenderer)
+
+	tests := []struct {
+		name              string
+		input             string
+		shouldContain     string
+		shouldNotContain  string
+		expectedHasMermaid bool
+	}{
+		{
+			name:              "simple mermaid flowchart",
+			input:             "```mermaid\ngraph TD;\n    A-->B;\n```",
+			shouldContain:     `<pre class="mermaid">`,
+			shouldNotContain:  "chroma",
+			expectedHasMermaid: true,
+		},
+		{
+			name:              "mermaid with backticks in content",
+			input:             "```mermaid\ngraph TD\n    A[\"`text`\"]-->B\n```",
+			shouldContain:     `<pre class="mermaid">`,
+			expectedHasMermaid: true,
+		},
+		{
+			name:              "mermaid with HTML-like content",
+			input:             "```mermaid\ngraph TD\n    A[<div>]-->B\n```",
+			shouldContain:     "&lt;div&gt;",
+			expectedHasMermaid: true,
+		},
+		{
+			name:              "regular code block unaffected",
+			input:             "```go\nfmt.Println(\"hello\")\n```",
+			shouldNotContain:  `<pre class="mermaid">`,
+			expectedHasMermaid: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result, err := renderer.Render([]byte(tt.input))
+			if err != nil {
+				t.Fatalf("Render() error: %v", err)
+			}
+
+			html := string(result.HTML)
+
+			if tt.shouldContain != "" && !contains(html, tt.shouldContain) {
+				t.Errorf("expected HTML to contain %q, got: %s", tt.shouldContain, html)
+			}
+
+			if tt.shouldNotContain != "" && contains(html, tt.shouldNotContain) {
+				t.Errorf("expected HTML NOT to contain %q, got: %s", tt.shouldNotContain, html)
+			}
+
+			if result.HasMermaid != tt.expectedHasMermaid {
+				t.Errorf("HasMermaid = %v, want %v", result.HasMermaid, tt.expectedHasMermaid)
+			}
+		})
+	}
+}
+
+func TestRenderD2DiagramThroughGoldmark(t *testing.T) {
+	t.Parallel()
+
+	diagramRenderer, err := NewDiagramRenderer()
+	if err != nil {
+		t.Fatalf("failed to create diagram renderer: %v", err)
+	}
+
+	renderer := NewGoldmarkRendererWithDiagrams(diagramRenderer)
+
+	input := "```d2\nx -> y\n```"
+
+	result, err := renderer.Render([]byte(input))
+	if err != nil {
+		t.Fatalf("Render() error: %v", err)
+	}
+
+	html := string(result.HTML)
+
+	if !contains(html, `<div class="diagram d2-diagram">`) {
+		t.Errorf("expected HTML to contain d2 diagram div, got: %s", html)
+	}
+
+	if !contains(html, "<svg") {
+		t.Errorf("expected HTML to contain SVG, got: %s", html)
+	}
+
+	if result.HasMermaid {
+		t.Error("expected HasMermaid to be false for D2-only content")
+	}
+}
+
+func TestMixedCodeBlocksAndDiagrams(t *testing.T) {
+	t.Parallel()
+
+	diagramRenderer, err := NewDiagramRenderer()
+	if err != nil {
+		t.Fatalf("failed to create diagram renderer: %v", err)
+	}
+
+	renderer := NewGoldmarkRendererWithDiagrams(diagramRenderer)
+
+	input := "# Document\n\n```go\nfmt.Println(\"hello\")\n```\n\n```mermaid\ngraph TD;\n    A-->B;\n```\n\n```d2\nx -> y\n```"
+
+	result, err := renderer.Render([]byte(input))
+	if err != nil {
+		t.Fatalf("Render() error: %v", err)
+	}
+
+	html := string(result.HTML)
+
+	if !contains(html, `<pre class="mermaid">`) {
+		t.Errorf("expected mermaid diagram in HTML, got: %s", html)
+	}
+
+	if !contains(html, "d2-diagram") && !contains(html, "language-d2") {
+		t.Errorf("expected D2 diagram (or fallback) in HTML, got: %s", html)
+	}
+
+	if !contains(html, "color:#") {
+		t.Error("expected syntax highlighting for Go code block")
+	}
+
+	if !result.HasMermaid {
+		t.Error("expected HasMermaid to be true")
+	}
+}
+
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || containsInternal(s, substr))
 }

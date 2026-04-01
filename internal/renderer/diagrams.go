@@ -69,7 +69,7 @@ type CodeBlock struct {
 	End      int
 }
 
-var codeBlockRegex = regexp.MustCompile("```([a-zA-Z0-9_-]*)\\s*\\n([^`]*?)\\n?```")
+var codeBlockRegex = regexp.MustCompile("(?s)```([a-zA-Z0-9_-]*)\\s*\\n(.*?)\\n?```")
 
 // DetectDiagrams finds D2 and Mermaid diagrams in markdown content.
 func DetectDiagrams(content string) []DetectedDiagram {
