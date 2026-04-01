@@ -199,6 +199,14 @@ func (s *Server) handleSearch(c *gin.Context) {
 }
 
 func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
+	// Redirect .md URLs to clean URLs (e.g., /page.md -> /page)
+	if strings.HasSuffix(filepath, ".md") {
+		cleanPath := strings.TrimSuffix(filepath, ".md")
+		c.Redirect(http.StatusMovedPermanently, cleanPath)
+
+		return
+	}
+
 	urlPath, err := domain.NewURLPath(filepath)
 	if err != nil {
 		s.logger.Warn("invalid path requested", "path", filepath, "error", err)
