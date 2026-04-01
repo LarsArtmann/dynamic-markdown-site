@@ -58,7 +58,9 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
-	cfg.applyDerivedSettings()
+	if err := cfg.applyDerivedSettings(); err != nil {
+		return nil, err
+	}
 
 	return cfg, nil
 }
@@ -122,7 +124,7 @@ func (c *Config) applyEnvironmentOverrides() {
 }
 
 // applyDerivedSettings applies settings derived from other configuration values.
-func (c *Config) applyDerivedSettings() {
+func (c *Config) applyDerivedSettings() error {
 	if c.DevMode {
 		c.CacheEnabled = false
 	}
@@ -130,7 +132,7 @@ func (c *Config) applyDerivedSettings() {
 	if c.StorageURL == "" && !filepath.IsAbs(c.RootDir) {
 		abs, err := filepath.Abs(c.RootDir)
 		if err != nil {
-			panic(errors.Wrap(err, "resolve root directory"))
+			return errors.Wrap(err, "resolve root directory")
 		}
 
 		c.RootDir = abs
@@ -139,6 +141,8 @@ func (c *Config) applyDerivedSettings() {
 	if c.StorageURL == "" {
 		c.RootDir = filepath.Clean(c.RootDir)
 	}
+
+	return nil
 }
 
 // validate checks that configuration is valid.
