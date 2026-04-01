@@ -12,6 +12,10 @@ run-dev:
 test:
     go test ./... -cover
 
+# Run tests with race detector
+test-race:
+    go test ./... -race -cover
+
 # Run tests verbosely
 test-v:
     go test ./... -v
@@ -19,6 +23,10 @@ test-v:
 # Run linter
 lint:
     golangci-lint run ./...
+
+# Fix formatting issues (golines)
+fix:
+    golines -w .
 
 # Generate templ templates
 generate:
@@ -35,3 +43,16 @@ clean:
 # Run benchmarks
 bench:
     go test ./... -bench=. -benchmem
+
+# Run everything needed before pushing (lint + test + race)
+pre-push: lint test test-race
+    @echo "All checks passed - safe to push"
+
+# Generate templates then build
+gen-build: generate build
+
+# Run tests with coverage report
+cover:
+    go test ./... -coverprofile=coverage.out
+    go tool cover -html=coverage.out -o coverage.html
+    @echo "Coverage report: coverage.html"

@@ -265,8 +265,6 @@ func (r *BlobRepository) findOrCreateParentDirs(blobPath string, root *domain.Di
 		currentNode.AddChild(dirNode)
 		currentNode = dirNode
 		stats.dirs++
-
-		_ = i
 	}
 
 	return currentNode

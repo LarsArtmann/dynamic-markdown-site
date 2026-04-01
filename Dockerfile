@@ -1,6 +1,6 @@
 # Multi-stage build for dynamic-markdown-site
 # OCI Image Specification v1.1 compliant
-# SPDX: MIT
+# SPDX: Proprietary
 
 # =============================================================================
 # STAGE 1: Builder
@@ -9,7 +9,7 @@
 FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache ca-certificates git
+RUN apk add --no-cache ca-certificates git file
 
 # Build arguments for cross-compilation
 ARG TARGETOS
@@ -68,12 +68,17 @@ RUN file dynamic-markdown-site && \
 # Pin exact version - do not use floating tags
 FROM gcr.io/distroless/static-debian13:nonroot@sha256:e3f945647ffb95b5839c07038d64f9811adf17308b9121d8a2b87b6a22a80a39
 
+# Re-declare ARGs (they don't persist across FROM stages)
+ARG VERSION=dev
+ARG COMMIT=unknown
+ARG BUILD_DATE=unknown
+
 # OCI Image Specification v1.1 labels
 # See: https://specs.opencontainers.org/image-spec/
 LABEL org.opencontainers.image.authors="Lars Artmann <lars@larsartmann.com>" \
       org.opencontainers.image.source="https://github.com/larsartmann/dynamic-markdown-site" \
       org.opencontainers.image.description="Type-safe, high-performance markdown-to-website converter with syntax highlighting, diagrams, and full-text search" \
-      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.licenses="Proprietary" \
       org.opencontainers.image.title="dynamic-markdown-site" \
       org.opencontainers.image.vendor="larsartmann" \
       org.opencontainers.image.version="${VERSION}" \
@@ -84,7 +89,7 @@ LABEL org.opencontainers.image.authors="Lars Artmann <lars@larsartmann.com>" \
       org.opencontainers.artifact.type="application/vnd.go" \
       org.opencontainers.artifact.version="${VERSION}" \
       org.opencontainers.software.spec.version="1.0" \
-      org.opencontainers软件.name="dynamic-markdown-site" \
+      org.opencontainers.image.name="dynamic-markdown-site" \
       maintainer="Lars Artmann <lars@larsartmann.com>"
 
 # Set working directory
@@ -109,11 +114,9 @@ ENV PORT=8080 \
 # Volume for markdown content (mount your content here)
 VOLUME ["/content"]
 
-# Healthcheck - OCI Runtime Specification recommended
-# Uses wget (available in distroless) or falls back to basic check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || \
-    wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
+# Healthcheck omitted - distroless/static has no shell or utilities.
+# Use external health checks: k8s livenessProbe, docker-compose healthcheck, etc.
+# Example: curl http://localhost:8080/health
 
 # Entrypoint using exec form (required for proper signal handling)
 ENTRYPOINT ["/app/dynamic-markdown-site"]
