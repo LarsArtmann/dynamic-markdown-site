@@ -242,7 +242,7 @@ func (r *BlobRepository) findOrCreateParentDirs(blobPath string, root *domain.Di
 	currentPath := ""
 	currentNode := root
 
-	for i, part := range parts {
+	for _, part := range parts {
 		if currentPath == "" {
 			currentPath = "/" + part
 		} else {
