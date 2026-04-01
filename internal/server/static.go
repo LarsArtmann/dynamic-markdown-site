@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//go:embed static/* static/css/*
+//go:embed all:static
 var staticFS embed.FS
 
 func (s *Server) serveStaticFile(c *gin.Context) {
