@@ -96,13 +96,13 @@ LABEL org.opencontainers.image.authors="Lars Artmann <lars@larsartmann.com>" \
 WORKDIR /app
 
 # Copy the compiled binary (static assets embedded via //go:embed)
-COPY --link --chown=nonroot:nonroot --from=builder /build/dynamic-markdown-site .
+COPY --link --chown=65532:65532 --from=builder /build/dynamic-markdown-site .
 
 # Expose port
 EXPOSE 8080
 
 # Run as non-root user (distroless:nonroot is UID 65532)
-USER nonroot:nonroot
+USER 65532:65532
 
 # Environment variables with sensible defaults
 ENV PORT=8080 \
