@@ -1,7 +1,8 @@
 // Package version contains build-time version information injected via ldflags.
 //
 // Usage in build:
-//   -X main.version=${VERSION} -X main.commit=${COMMIT} -X main.buildDate=${BUILD_DATE}
+//
+//	-X main.version=${VERSION} -X main.commit=${COMMIT} -X main.buildDate=${BUILD_DATE}
 package version
 
 // Version information injected at build time via ldflags.

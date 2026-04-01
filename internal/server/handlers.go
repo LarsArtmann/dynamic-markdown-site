@@ -95,11 +95,11 @@ func (s *Server) staticAndContentMiddleware() gin.HandlerFunc {
 
 func (s *Server) handleHealth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"status":    "healthy",
-		"version":   version.Version,
-		"commit":    version.Commit,
+		"status":     "healthy",
+		"version":    version.Version,
+		"commit":     version.Commit,
 		"build_date": version.BuildDate,
-		"timestamp": time.Now().UTC(),
+		"timestamp":  time.Now().UTC(),
 	})
 }
 

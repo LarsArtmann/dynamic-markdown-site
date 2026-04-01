@@ -2,6 +2,7 @@
 package container
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -137,6 +138,16 @@ func provideRenderer(_ do.Injector) (*renderer.GoldmarkRenderer, error) {
 func provideRepository(i do.Injector) (content.Repository, error) {
 	cfg := do.MustInvoke[*config.Config](i)
 
+	// Use blob storage if StorageURL is configured
+	if cfg.StorageURL != "" {
+		repo, err := content.NewBlobRepository(context.Background(), cfg.StorageURL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create blob repository: %w", err)
+		}
+		return repo, nil
+	}
+
+	// Use filesystem repository as default
 	repo, err := content.NewFileSystemRepository(cfg.RootDir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create filesystem repository: %w", err)

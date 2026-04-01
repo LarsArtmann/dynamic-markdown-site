@@ -25,6 +25,7 @@ var (
 type Config struct {
 	Port         uint16
 	RootDir      string
+	StorageURL   string
 	LogLevel     string
 	CacheEnabled bool
 	DevMode      bool
@@ -36,6 +37,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		Port:         8080,
 		RootDir:      ".",
+		StorageURL:   "",
 		LogLevel:     "info",
 		CacheEnabled: true,
 		DevMode:      false,
@@ -52,6 +54,7 @@ func Load() (*Config, error) {
 	flag.StringVar(&cfg.RootDir, "root", cfg.RootDir, "Root directory containing markdown files")
 	flag.StringVar(&cfg.RootDir, "r", cfg.RootDir, "Root directory (shorthand)")
 	flag.StringVar(&cfg.LogLevel, "log-level", cfg.LogLevel, "Log level (debug, info, warn, error)")
+	flag.StringVar(&cfg.StorageURL, "storage-url", cfg.StorageURL, "Blob storage URL (e.g., file:///path, s3://bucket/prefix, gs://bucket/prefix)")
 	flag.BoolVar(&cfg.CacheEnabled, "cache", cfg.CacheEnabled, "Enable response caching")
 	flag.BoolVar(&cfg.DevMode, "dev", cfg.DevMode, "Development mode (disables caching)")
 	flag.DurationVar(&cfg.Timeout, "timeout", cfg.Timeout, "Request timeout")
@@ -79,6 +82,10 @@ func Load() (*Config, error) {
 		cfg.LogLevel = level
 	}
 
+	if storageURL := os.Getenv("DYNAMIC_MARKDOWN_STORAGE_URL"); storageURL != "" {
+		cfg.StorageURL = storageURL
+	}
+
 	if cache := os.Getenv("DYNAMIC_MARKDOWN_CACHE"); cache != "" {
 		cfg.CacheEnabled = parseBool(cache)
 	}
@@ -104,8 +111,8 @@ func Load() (*Config, error) {
 		cfg.CacheEnabled = false
 	}
 
-	// Convert relative root dir to absolute and normalize
-	if !filepath.IsAbs(cfg.RootDir) {
+	// Convert relative root dir to absolute and normalize (only for filesystem)
+	if cfg.StorageURL == "" && !filepath.IsAbs(cfg.RootDir) {
 		abs, err := filepath.Abs(cfg.RootDir)
 		if err != nil {
 			return nil, errors.Wrap(err, "resolve root directory")
@@ -114,8 +121,10 @@ func Load() (*Config, error) {
 		cfg.RootDir = abs
 	}
 
-	// Normalize path to remove trailing slashes and clean up
-	cfg.RootDir = filepath.Clean(cfg.RootDir)
+	// Normalize path to remove trailing slashes and clean up (only for filesystem)
+	if cfg.StorageURL == "" {
+		cfg.RootDir = filepath.Clean(cfg.RootDir)
+	}
 
 	return cfg, nil
 }
@@ -127,14 +136,17 @@ func (c *Config) validate() error {
 		return errors.Wrap(errInvalidPort, fmt.Sprintf("port=%d", c.Port))
 	}
 
-	// Validate root directory exists
-	info, err := os.Stat(c.RootDir)
-	if err != nil {
-		return errors.Wrap(err, "root directory does not exist")
-	}
+	// Validate storage - either StorageURL (blob) or RootDir (filesystem)
+	if c.StorageURL == "" {
+		// Using filesystem storage
+		info, err := os.Stat(c.RootDir)
+		if err != nil {
+			return errors.Wrap(err, "root directory does not exist")
+		}
 
-	if !info.IsDir() {
-		return errors.Wrap(errInvalidRootDir, "path="+c.RootDir)
+		if !info.IsDir() {
+			return errors.Wrap(errInvalidRootDir, "path="+c.RootDir)
+		}
 	}
 
 	// Validate log level
@@ -156,6 +168,7 @@ func (c *Config) LogValue() slog.Value {
 	return slog.GroupValue(
 		slog.Uint64("port", uint64(c.Port)),
 		slog.String("root_dir", c.RootDir),
+		slog.String("storage_url", c.StorageURL),
 		slog.String("log_level", c.LogLevel),
 		slog.Bool("cache_enabled", c.CacheEnabled),
 		slog.Bool("dev_mode", c.DevMode),
@@ -184,7 +197,11 @@ func (c *Config) String() string {
 	var b strings.Builder
 	b.WriteString("Configuration:\n")
 	fmt.Fprintf(&b, "  Port:         %d\n", c.Port)
-	fmt.Fprintf(&b, "  Root Dir:     %s\n", c.RootDir)
+	if c.StorageURL != "" {
+		fmt.Fprintf(&b, "  Storage URL:  %s\n", c.StorageURL)
+	} else {
+		fmt.Fprintf(&b, "  Root Dir:     %s\n", c.RootDir)
+	}
 	fmt.Fprintf(&b, "  Log Level:    %s\n", c.LogLevel)
 	fmt.Fprintf(&b, "  Cache:        %v\n", c.CacheEnabled)
 	fmt.Fprintf(&b, "  Dev Mode:     %v\n", c.DevMode)

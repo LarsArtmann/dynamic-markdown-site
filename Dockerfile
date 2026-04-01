@@ -6,7 +6,7 @@
 # STAGE 1: Builder
 # =============================================================================
 # Pin exact versions for reproducibility
-FROM --platform=$BUILDPLATFORM golang:1.26.1-alpine3.20 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache ca-certificates git
@@ -66,7 +66,7 @@ RUN file dynamic-markdown-site && \
 # STAGE 2: Runtime (distroless Debian 13)
 # =============================================================================
 # Pin exact version - do not use floating tags
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:fe9d4b46e7b7c5d1e0c5c7e0e0c5c7e0e0c5c7e0e0c5c7e0e0c5c7e0e0c5c7e
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:e3f945647ffb95b5839c07038d64f9811adf17308b9121d8a2b87b6a22a80a39
 
 # OCI Image Specification v1.1 labels
 # See: https://specs.opencontainers.org/image-spec/
