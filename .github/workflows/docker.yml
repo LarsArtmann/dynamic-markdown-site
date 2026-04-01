@@ -3,7 +3,7 @@ name: Build Docker Image
 on:
   push:
     branches: [master]
-    tags: ['v*.*.*']
+    tags: ["v*.*.*"]
     paths:
       - "**.go"
       - "**.templ"
@@ -151,14 +151,14 @@ jobs:
         id: scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ env.IMAGE_NAME }}:sha-${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '1'
+          image-ref: "${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
         if: always()

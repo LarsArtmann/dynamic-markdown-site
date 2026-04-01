@@ -34,9 +34,9 @@ func main() {
 
 ### Diagrams
 
-| Engine | Rendering | Syntax |
-|---|---|---|
-| [D2](https://d2lang.com/) | Server-side SVG | ` ```d2 ` fenced code block |
+| Engine                             | Rendering                          | Syntax                           |
+| ---------------------------------- | ---------------------------------- | -------------------------------- |
+| [D2](https://d2lang.com/)          | Server-side SVG                    | ` ```d2 ` fenced code block      |
 | [Mermaid](https://mermaid.js.org/) | Client-side via Mermaid.js v11 CDN | ` ```mermaid ` fenced code block |
 
 D2 diagrams are compiled to SVG at render time. Mermaid diagrams load the library on-demand — only when the page contains ` ```mermaid ` blocks.
@@ -154,14 +154,14 @@ Compiled with `CGO_ENABLED=0`, `-tags netgo`, and static linking — zero runtim
 
 ## Configuration
 
-| Option | Flag | Env Var | Default |
-|---|---|---|---|
-| Port | `-port` | `DYNAMIC_MARKDOWN_PORT` | `8080` |
-| Content root | `-root` | `DYNAMIC_MARKDOWN_ROOT` | `.` |
-| Log level | `-log-level` | `DYNAMIC_MARKDOWN_LOG_LEVEL` | `info` |
-| Caching | `-cache` | `DYNAMIC_MARKDOWN_CACHE` | `true` |
-| Dev mode | `-dev` | `DYNAMIC_MARKDOWN_DEV` | `false` |
-| Request timeout | `-timeout` | `DYNAMIC_MARKDOWN_TIMEOUT` | `30s` |
+| Option          | Flag         | Env Var                      | Default |
+| --------------- | ------------ | ---------------------------- | ------- |
+| Port            | `-port`      | `DYNAMIC_MARKDOWN_PORT`      | `8080`  |
+| Content root    | `-root`      | `DYNAMIC_MARKDOWN_ROOT`      | `.`     |
+| Log level       | `-log-level` | `DYNAMIC_MARKDOWN_LOG_LEVEL` | `info`  |
+| Caching         | `-cache`     | `DYNAMIC_MARKDOWN_CACHE`     | `true`  |
+| Dev mode        | `-dev`       | `DYNAMIC_MARKDOWN_DEV`       | `false` |
+| Request timeout | `-timeout`   | `DYNAMIC_MARKDOWN_TIMEOUT`   | `30s`   |
 
 Dev mode (`-dev`) automatically disables caching and enables file watching + live reload.
 
@@ -169,15 +169,15 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 
 ## HTTP API
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/` | GET | Root directory listing |
-| `/*path` | GET | Markdown file or subdirectory listing |
-| `/health` | GET | Health check — returns `{"status":"healthy"}` |
-| `/refresh` | GET/POST | Reload content from disk (rate limited) |
-| `/search` | GET | Full-text search — `?q=query` |
-| `/static/*` | GET | Embedded static assets (CSS, favicon) |
-| `/api/live-reload` | GET | SSE stream for live reload (dev mode) |
+| Endpoint           | Method   | Description                                   |
+| ------------------ | -------- | --------------------------------------------- |
+| `/`                | GET      | Root directory listing                        |
+| `/*path`           | GET      | Markdown file or subdirectory listing         |
+| `/health`          | GET      | Health check — returns `{"status":"healthy"}` |
+| `/refresh`         | GET/POST | Reload content from disk (rate limited)       |
+| `/search`          | GET      | Full-text search — `?q=query`                 |
+| `/static/*`        | GET      | Embedded static assets (CSS, favicon)         |
+| `/api/live-reload` | GET      | SSE stream for live reload (dev mode)         |
 
 ---
 
@@ -207,14 +207,14 @@ draft: false
 ---
 ```
 
-| Field | Effect |
-|---|---|
-| `title` | Overrides filename as the page title |
+| Field         | Effect                                           |
+| ------------- | ------------------------------------------------ |
+| `title`       | Overrides filename as the page title             |
 | `description` | Meta description tag and directory card subtitle |
-| `author` | Stored in metadata (available for templates) |
-| `date` | Stored in metadata (available for templates) |
-| `tags` | Stored in metadata (available for templates) |
-| `draft` | Stored in metadata (not yet used for filtering) |
+| `author`      | Stored in metadata (available for templates)     |
+| `date`        | Stored in metadata (available for templates)     |
+| `tags`        | Stored in metadata (available for templates)     |
+| `draft`       | Stored in metadata (not yet used for filtering)  |
 
 ---
 
