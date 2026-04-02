@@ -18,10 +18,7 @@ on:
     branches: [master]
 
 env:
-  # Pin templ version for reproducibility
   TEMPL_VERSION: "v0.3.1001"
-  # Image naming
-  IMAGE_NAME: "ghcr.io/larsartmann/dynamic-markdown-site"
 
 jobs:
   build:
@@ -32,11 +29,19 @@ jobs:
       attestations: write
       id-token: write
 
+    outputs:
+      image-digest: ${{ steps.push.outputs.digest }}
+      image-name: ${{ steps.image-name.outputs.value }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
+
+      - name: Resolve image name (lowercase)
+        id: image-name
+        run: echo "value=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Set up Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
@@ -49,9 +54,9 @@ jobs:
           VERSION=${{ github.ref_name || 'dev' }}
           COMMIT=$(git rev-parse --short HEAD)
           BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
-          echo "build_date=$BUILD_DATE" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "commit=$COMMIT" >> "$GITHUB_OUTPUT"
+          echo "build_date=$BUILD_DATE" >> "$GITHUB_OUTPUT"
 
       - name: Generate templ templates
         run: |
@@ -65,6 +70,7 @@ jobs:
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
 
       - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
         with:
           registry: ghcr.io
@@ -75,9 +81,9 @@ jobs:
         id: meta-docker
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ steps.image-name.outputs.value }}
           tags: |
-            type=sha,prefix=,suffix=
+            type=sha,prefix=sha-,format=long
             type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -103,14 +109,15 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26
         with:
-          subject-name: ${{ env.IMAGE_NAME }}
+          subject-name: ${{ steps.image-name.outputs.value }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
       - name: Save Docker image (local testing)
         if: github.event_name != 'pull_request'
         run: |
-          docker save ${{ env.IMAGE_NAME }}:${{ steps.meta-docker.outputs.version }} | gzip > image.tar.gz
+          TAG=$(echo '${{ steps.meta-docker.outputs.tags }}' | head -1)
+          docker save "$TAG" | gzip > image.tar.gz
           echo "Image size: $(du -h image.tar.gz | cut -f1)"
 
       - name: Upload Docker image
@@ -147,21 +154,28 @@ jobs:
 
   security-scan:
     needs: [build]
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-    outputs:
-      trivy-result: ${{ steps.scan.outputs.result }}
+      packages: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run Trivy vulnerability scanner
         id: scan
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
         with:
-          image-ref: "${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          image-ref: "${{ needs.build.outputs.image-name }}@${{ needs.build.outputs.image-digest }}"
           format: "sarif"
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
