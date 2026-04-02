@@ -21,7 +21,7 @@ env:
   # Pin templ version for reproducibility
   TEMPL_VERSION: "v0.3.1001"
   # Image naming
-  IMAGE_NAME: "ghcr.io/${{ github.repository }}"
+  IMAGE_NAME: "ghcr.io/larsartmann/dynamic-markdown-site"
 
 jobs:
   build:
