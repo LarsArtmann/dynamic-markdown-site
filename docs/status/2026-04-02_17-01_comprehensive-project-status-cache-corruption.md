@@ -10,10 +10,12 @@
 ## a) FULLY DONE ✅
 
 ### Code Changes Completed
+
 1. **Fixed `types_test.go:449`** — Updated `domain.NewRenderedFile(...)` to `domain.NewRenderedFileWithContent(node, domain.RenderedContent{...})` to match new Renderer interface architecture (commit `4233fdc`)
 2. **Docker workflow fix** — Changed `IMAGE_NAME` from `${{ github.repository }}` to explicit `ghcr.io/larsartmann/dynamic-markdown-site` for reproducibility
 
 ### Recent Commits (All Clean)
+
 ```
 6372ec6 feat(renderer): add markdown rendering engine
 ef17bfe docs(status): add comprehensive project health report
@@ -26,6 +28,7 @@ d7358d3 docs(features): add admonition blocks, sitemap, robots.txt, and fix draf
 ```
 
 ### Architecture Improvements Delivered
+
 - `domain.Renderer` interface introduced in `internal/domain/types.go`
 - `RenderedContent` struct with `HTML`, `TOC`, `Metadata`, `HasMermaid` fields
 - `NewRenderedFileWithContent()` constructor pattern
@@ -36,11 +39,13 @@ d7358d3 docs(features): add admonition blocks, sitemap, robots.txt, and fix draf
 ## b) PARTIALLY DONE ⚠️
 
 ### Test Suite Verification
+
 - **Status:** Attempted but blocked by cache corruption
 - **Last successful:** Domain package tests (`ok`)
 - **Failed:** Full suite due to `go-build` cache corruption from OOM kills
 
 ### Lint Verification
+
 - **Status:** Not yet run
 - **Previous:** All lint errors resolved in commits up to `24b0195`
 
@@ -61,18 +66,21 @@ d7358d3 docs(features): add admonition blocks, sitemap, robots.txt, and fix draf
 ### Critical Issue: Go Build Cache Corruption
 
 **Symptoms:**
+
 - `go test ./...` fails with missing cache files (`vet.cfg`, `_pkg_.a`)
 - Error: `can't create $WORK/bXXX/_pkg_.a: open $WORK/bXXX/_pkg_.a: no such file or directory`
 - Multiple packages failing: `internal/content`, `internal/renderer`, `internal/server`
 - Cache directories locked, cannot delete: `rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/XX': Directory not empty`
 
 **Root Cause:**
+
 - Previous `go test ./... -race` was OOM killed (exit code 137)
 - OOM kill corrupted the build cache mid-write
 - Partial files and broken symlinks now exist
 - Some cache directories are locked by zombie processes
 
 **Evidence:**
+
 ```
 FAIL	github.com/larsartmann/dynamic-markdown-site/internal/content [build failed]
 FAIL	github.com/larsartmann/dynamic-markdown-site/internal/renderer [build failed]
@@ -81,6 +89,7 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 ```
 
 **Impact:**
+
 - ALL further Go operations blocked
 - Cannot run tests
 - Cannot build
@@ -92,12 +101,14 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 ## e) WHAT WE SHOULD IMPROVE 📝
 
 ### Immediate Actions
+
 1. **Fix build cache** — Top priority, blocks everything
 2. **Add `just cache-clean` command** — Documented way to fix this
 3. **Add memory limits** — Prevent future OOM during race tests
 4. **Document troubleshooting** — Cache corruption recovery steps
 
 ### Process Improvements
+
 5. Run race tests on smaller packages individually, not full suite
 6. Add pre-flight cache check before long-running operations
 7. Consider using `GOTMPDIR` for isolation
@@ -107,6 +118,7 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 ## f) Top #25 Things To Get Done Next 🔥
 
 ### Critical (P0)
+
 1. Fix Go build cache corruption
 2. Verify `go build ./...` passes
 3. Run `go test ./...` successfully
@@ -114,6 +126,7 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 5. Commit docker.yml change with detailed message
 
 ### High Priority (P1)
+
 6. Push all changes to origin/master
 7. Verify CI passes
 8. Clean up status report files (8 already exist)
@@ -121,6 +134,7 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 10. Archive old status reports
 
 ### Medium Priority (P2)
+
 11. Add `just cache-clean` command to justfile
 12. Document cache troubleshooting in AGENTS.md
 13. Add memory profiling for race tests
@@ -128,6 +142,7 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 15. Add integration test for full server startup
 
 ### Lower Priority (P3)
+
 16. Add benchmarks for admonition extension
 17. Review TODO comments in codebase
 18. Add more edge case tests for diagram extension
@@ -135,6 +150,7 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 20. Add frontend performance tests
 
 ### Future/Optional (P4)
+
 21. Add GitHub Actions for automated releases
 22. Implement search index caching
 23. Add OpenTelemetry tracing
@@ -146,6 +162,7 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 ## g) My Top #1 Question I Cannot Figure Out ❓
 
 ### How do I fix the corrupted Go build cache when:
+
 - `rm -rf ~/Library/Caches/go-build` fails with "Directory not empty"
 - `lsof` shows no processes holding the directories open
 - Some directories appear empty but still can't be deleted
@@ -153,12 +170,14 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 - Even `find -delete` fails on certain directories
 
 **Attempted:**
+
 - Killed gopls and golangci-lint processes
 - `go clean -cache`
 - `rm -rf` (partially failed)
 - `find -delete` (partially failed)
 
 **Theories:**
+
 - macOS filesystem metadata issue?
 - Damaged directory entries?
 - Permission edge case?
@@ -170,17 +189,18 @@ A reliable command or approach to fully nuke and recreate the Go build cache wit
 
 ## Current Blockers
 
-| Blocker | Severity | Impact |
-|---------|----------|--------|
-| Build cache corruption | **CRITICAL** | Blocks all Go operations |
-| Cannot run tests | **HIGH** | Cannot verify fixes |
-| Cannot run lint | **MEDIUM** | Cannot verify code quality |
+| Blocker                | Severity     | Impact                     |
+| ---------------------- | ------------ | -------------------------- |
+| Build cache corruption | **CRITICAL** | Blocks all Go operations   |
+| Cannot run tests       | **HIGH**     | Cannot verify fixes        |
+| Cannot run lint        | **MEDIUM**   | Cannot verify code quality |
 
 ---
 
 ## Next Action Required
 
 **Fix the Go build cache corruption**, then resume with:
+
 1. `go test ./...`
 2. `golangci-lint run ./...`
 3. Commit docker.yml change
@@ -188,4 +208,4 @@ A reliable command or approach to fully nuke and recreate the Go build cache wit
 
 ---
 
-*Report generated: 2026-04-02 17:01:43*
+_Report generated: 2026-04-02 17:01:43_

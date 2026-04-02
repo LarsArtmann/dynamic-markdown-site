@@ -268,5 +268,3 @@ func findTOCParent(orderedItems []*domain.TOCItem, level int) *domain.TOCItem {
 
 	return nil
 }
-
-
