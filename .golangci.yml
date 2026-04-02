@@ -119,9 +119,6 @@ linters:
       # exhaustruct: Test structs often don't need all fields - exclude all test files
       - path: "(.*)_test\\.go"
         linters: [exhaustruct]
-      # exhaustruct: Testutil package provides fixtures with minimal initialization
-      - path: "internal/testutil/"
-        linters: [exhaustruct]
       # exhaustruct: Production code - partial struct initialization is intentional design
       - path: "internal/content/filesystem.go"
         linters: [exhaustruct]
@@ -162,9 +159,6 @@ linters:
         text: "Function 'TestFileSystemRepository_GetRaw' is too long"
       # gochecknoinits: Test init functions for benchmark setup
       - path: "(.*)_test\\.go"
-        linters: [gochecknoinits]
-      # gochecknoinits: testutil uses init to set gin test mode
-      - path: "internal/testutil/"
         linters: [gochecknoinits]
       # gochecknoglobals: intentional const maps and parser context keys
       - path: "internal/renderer/admonition_extension.go"
