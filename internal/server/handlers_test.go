@@ -676,9 +676,9 @@ func TestGetContentType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.path, func(t *testing.T) {
 			t.Parallel()
-			result := getContentType(tt.path)
+			result := staticContentType(tt.path)
 			if result != tt.expected {
-				t.Errorf("getContentType(%s) = %q, want %q", tt.path, result, tt.expected)
+				t.Errorf("staticContentType(%s) = %q, want %q", tt.path, result, tt.expected)
 			}
 		})
 	}

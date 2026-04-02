@@ -15,6 +15,8 @@ type InMemoryRepository struct {
 	modified time.Time
 }
 
+var _ Repository = (*InMemoryRepository)(nil)
+
 // NewInMemoryRepository creates a new in-memory repository.
 func NewInMemoryRepository() *InMemoryRepository {
 	root, _ := domain.NewDirectoryNode(domain.MustURLPath("/"), "Home", time.Now())

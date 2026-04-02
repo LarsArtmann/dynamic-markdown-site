@@ -22,6 +22,8 @@ type BlobRepository struct {
 	lastModified time.Time
 }
 
+var _ Repository = (*BlobRepository)(nil)
+
 // NewBlobRepository creates a new repository using a go-cloud blob.Bucket URL.
 // The URL can be:
 //   - file:///path/to/dir (local filesystem)

@@ -21,6 +21,8 @@ type FileSystemRepository struct {
 	lastModified time.Time
 }
 
+var _ Repository = (*FileSystemRepository)(nil)
+
 var errRefreshFailed = errors.New("content refresh failed")
 
 // NewFileSystemRepository creates a new repository for the given root directory.

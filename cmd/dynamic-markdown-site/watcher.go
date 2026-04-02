@@ -131,13 +131,8 @@ func addDirectoriesRecursive(watcher *fsnotify.Watcher, root string, logger *slo
 				return filepath.SkipDir
 			}
 
-			skipDirs := []string{"node_modules", ".git", "vendor", "dist", "build", "tmp", "temp"}
-
-			baseName := filepath.Base(path)
-			for _, skip := range skipDirs {
-				if strings.EqualFold(baseName, skip) {
-					return filepath.SkipDir
-				}
+			if content.ShouldSkipDir(filepath.Base(path)) {
+				return filepath.SkipDir
 			}
 
 			err := watcher.Add(path)
@@ -162,9 +157,7 @@ func addDirectoriesRecursive(watcher *fsnotify.Watcher, root string, logger *slo
 
 // shouldTriggerRefresh returns true if the file change should trigger a repository refresh.
 func shouldTriggerRefresh(path string) bool {
-	ext := strings.ToLower(filepath.Ext(path))
-
-	return ext == ".md" || ext == ".markdown"
+	return content.IsMarkdownFile(path)
 }
 
 // isDirectory returns true if the path exists and is a directory.
