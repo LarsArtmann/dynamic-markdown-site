@@ -8,13 +8,14 @@ import (
 	"github.com/samber/lo"
 )
 
-// skipDirs contains directory names to skip during content discovery.
+// SkipDirs contains directory names to skip during content discovery.
 //
 //nolint:gochecknoglobals
-var skipDirs = []string{"node_modules", ".git", "vendor", "dist", "build", "tmp", "temp"}
+var SkipDirs = []string{"node_modules", ".git", "vendor", "dist", "build", "tmp", "temp"}
 
-func shouldSkipDir(name string) bool {
-	return lo.ContainsBy(skipDirs, func(skip string) bool {
+// ShouldSkipDir returns true if the directory should be skipped during traversal.
+func ShouldSkipDir(name string) bool {
+	return lo.ContainsBy(SkipDirs, func(skip string) bool {
 		return strings.EqualFold(name, skip)
 	})
 }
@@ -43,32 +44,36 @@ func filterEmptyDirectories(dir *domain.DirectoryNode) bool {
 	return hasMarkdown
 }
 
-func isMarkdownFile(name string) bool {
+// IsMarkdownFile returns true if the filename has a markdown extension.
+func IsMarkdownFile(name string) bool {
 	ext := strings.ToLower(filepath.Ext(name))
 
 	return ext == ".md" || ext == ".markdown"
 }
 
-// contentTypes maps file extensions to MIME types.
+// ContentTypes maps file extensions to MIME types.
 //
 //nolint:gochecknoglobals
-var contentTypes = map[string]string{
-	".svg":  "image/svg+xml",
-	".png":  "image/png",
-	".jpg":  "image/jpeg",
-	".jpeg": "image/jpeg",
-	".gif":  "image/gif",
-	".webp": "image/webp",
-	".css":  "text/css",
-	".js":   "application/javascript",
-	".json": "application/json",
-	".pdf":  "application/pdf",
+var ContentTypes = map[string]string{
+	".svg":   "image/svg+xml",
+	".png":   "image/png",
+	".jpg":   "image/jpeg",
+	".jpeg":  "image/jpeg",
+	".gif":   "image/gif",
+	".webp":  "image/webp",
+	".css":   "text/css",
+	".js":    "application/javascript",
+	".json":  "application/json",
+	".pdf":   "application/pdf",
+	".woff":  "font/woff",
+	".woff2": "font/woff2",
 }
 
-func getContentType(name string) string {
+// GetContentType returns the MIME type for a file based on its extension.
+func GetContentType(name string) string {
 	ext := strings.ToLower(filepath.Ext(name))
 
-	if ct, ok := contentTypes[ext]; ok {
+	if ct, ok := ContentTypes[ext]; ok {
 		return ct
 	}
 

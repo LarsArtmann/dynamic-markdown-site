@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 )
 
 //go:embed all:static
@@ -30,7 +31,7 @@ func (s *Server) serveStaticFile(c *gin.Context) {
 		return
 	}
 
-	contentType := getContentType(relativePath)
+	contentType := staticContentType(relativePath)
 	if contentType != "" {
 		c.Header("Content-Type", contentType)
 	}
@@ -38,25 +39,14 @@ func (s *Server) serveStaticFile(c *gin.Context) {
 	c.Data(http.StatusOK, contentType, data)
 }
 
-func getContentType(path string) string {
-	switch {
-	case strings.HasSuffix(path, ".css"):
-		return "text/css"
-	case strings.HasSuffix(path, ".js"):
-		return "application/javascript"
-	case strings.HasSuffix(path, ".svg"):
-		return "image/svg+xml"
-	case strings.HasSuffix(path, ".png"):
-		return "image/png"
-	case strings.HasSuffix(path, ".jpg"), strings.HasSuffix(path, ".jpeg"):
-		return "image/jpeg"
-	case strings.HasSuffix(path, ".gif"):
-		return "image/gif"
-	case strings.HasSuffix(path, ".woff2"):
-		return "font/woff2"
-	case strings.HasSuffix(path, ".woff"):
-		return "font/woff"
-	default:
-		return ""
+// staticContentType returns the content type for static assets.
+// Falls back to the shared content.GetContentType for known MIME types.
+func staticContentType(path string) string {
+	ct := content.GetContentType(path)
+
+	if ct != "" && ct != "application/octet-stream" {
+		return ct
 	}
+
+	return ""
 }

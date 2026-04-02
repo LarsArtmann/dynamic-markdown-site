@@ -140,7 +140,7 @@ func (r *FileSystemRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) 
 	}
 
 	// Skip markdown files - they should be served via Get
-	if isMarkdownFile(info.Name()) {
+	if IsMarkdownFile(info.Name()) {
 		return nil, errors.Wrapf(ErrContentNotFound, "markdown files served via Get: %s", urlPath)
 	}
 
@@ -157,7 +157,7 @@ func (r *FileSystemRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) 
 
 	return &RawFile{
 		Content:     content,
-		ContentType: getContentType(info.Name()),
+		ContentType: GetContentType(info.Name()),
 		ModTime:     info.ModTime(),
 		Size:        uint64(info.Size()),
 	}, nil
@@ -258,7 +258,7 @@ func (r *FileSystemRepository) walkEntry(
 		return nil
 	}
 
-	if d.IsDir() && shouldSkipDir(d.Name()) {
+	if d.IsDir() && ShouldSkipDir(d.Name()) {
 		return fs.SkipDir
 	}
 
@@ -315,7 +315,7 @@ func (r *FileSystemRepository) processFile(
 	fsPath string, d fs.DirEntry, info fs.FileInfo,
 	urlPath domain.URLPath, parentNode *domain.DirectoryNode, stats *treeStats,
 ) {
-	if !isMarkdownFile(d.Name()) {
+	if !IsMarkdownFile(d.Name()) {
 		return
 	}
 

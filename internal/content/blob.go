@@ -197,7 +197,7 @@ func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode,
 			)
 		}
 
-		if isMarkdownFile(blobPath) {
+		if IsMarkdownFile(blobPath) {
 			urlPath, err := domain.NewURLPath(
 				"/" + strings.TrimSuffix(blobPath, path.Ext(blobPath)),
 			)
@@ -300,7 +300,7 @@ func (r *BlobRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) {
 	blobPath := strings.TrimPrefix(urlPath.String(), "/")
 
 	// Skip markdown files - they should be served via Get
-	if isMarkdownFile(blobPath) {
+	if IsMarkdownFile(blobPath) {
 		return nil, errors.Wrapf(ErrContentNotFound, "markdown files served via Get: %s", urlPath)
 	}
 
@@ -333,7 +333,7 @@ func (r *BlobRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) {
 
 	return &RawFile{
 		Content:     content,
-		ContentType: getContentType(blobPath),
+		ContentType: GetContentType(blobPath),
 		ModTime:     attrs.ModTime,
 		Size:        uint64(attrs.Size),
 	}, nil
