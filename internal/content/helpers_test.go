@@ -32,7 +32,7 @@ func TestShouldSkipDir(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := shouldSkipDir(tt.dir)
+			got := ShouldSkipDir(tt.dir)
 			if got != tt.want {
 				t.Errorf("shouldSkipDir(%q) = %v, want %v", tt.dir, got, tt.want)
 			}
@@ -63,7 +63,7 @@ func TestIsMarkdownFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := isMarkdownFile(tt.file)
+			got := IsMarkdownFile(tt.file)
 			if got != tt.want {
 				t.Errorf("isMarkdownFile(%q) = %v, want %v", tt.file, got, tt.want)
 			}

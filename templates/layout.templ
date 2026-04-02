@@ -286,20 +286,13 @@ templ TOCItem(item domain.TOCItem) {
 	</li>
 }
 
-// SuggestedPath represents a suggested path for 404 pages.
-type SuggestedPath struct {
-	Path  domain.URLPath
-	Title string
-	Score float64
-}
-
 // ErrorViewProps contains properties for error pages.
 type ErrorViewProps struct {
 	Title       string
 	Message     string
 	StatusCode  int
 	RequestPath string
-	Suggestions []SuggestedPath
+	Suggestions []domain.SuggestedPath
 	SiteName    string
 }
 
@@ -397,6 +390,9 @@ templ SearchResultCard(result content.SearchResult) {
 			<h3 class="result-title">
 				@templ.Raw(result.Highlighted)
 			</h3>
+			if result.Snippet != "" {
+				<p class="result-snippet">@templ.Raw(result.Snippet)</p>
+			}
 			<div class="result-meta">
 				<span class="result-type">{ result.Node.Kind().String() }</span>
 				<span class="result-path">{ result.Node.Path().String() }</span>

@@ -77,3 +77,10 @@ type RenderedContent struct {
 type Renderer interface {
 	Render(source []byte) (RenderedContent, error)
 }
+
+// SuggestedPath represents a path suggestion with similarity score for 404 pages.
+type SuggestedPath struct {
+	Path  URLPath
+	Title string
+	Score float64
+}

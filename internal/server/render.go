@@ -1,9 +1,11 @@
 package server
 
 import (
+	"context"
 	"net/http"
 
 	templ "github.com/a-h/templ"
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
@@ -12,6 +14,15 @@ import (
 
 func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 	crumbs := domain.BuildBreadcrumbs(dir.Path())
+
+	hasReadme := false
+	for _, child := range dir.Children() {
+		if child.Kind() == domain.NodeKindFile && child.Path().Filename() == "README.md" {
+			hasReadme = true
+
+			break
+		}
+	}
 
 	props := templates.LayoutProps{
 		Title:       dir.Title(),
@@ -26,7 +37,7 @@ func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 	dirProps := templates.DirectoryViewProps{
 		Layout:    props,
 		Directory: dir,
-		HasReadme: false,
+		HasReadme: hasReadme,
 	}
 
 	component := templates.DirectoryView(dirProps)
@@ -43,7 +54,7 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 	path := file.Path().String()
 
 	// Get or render content
-	renderedContent := s.getOrRenderContent(path, file)
+	renderedContent := s.getOrRenderContent(c.Request.Context(), path, file)
 
 	// Create immutable RenderedFile combining FileNode with rendered content
 	renderedFile := domain.NewRenderedFileWithContent(file, renderedContent)
@@ -80,25 +91,26 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 }
 
 // getOrRenderContent returns cached content or renders and caches it.
-func (s *Server) getOrRenderContent(path string, file *domain.FileNode) domain.RenderedContent {
-	// Check cache first
-	if cached := s.cache.Get(path); cached != nil {
-		return *cached
-	}
+func (s *Server) getOrRenderContent(
+	ctx context.Context, path string, file *domain.FileNode,
+) domain.RenderedContent {
+	result, err := s.cache.GetOrCompute(ctx, path, func() (domain.RenderedContent, error) {
+		res, renderErr := s.renderer.Render(file.Content())
+		if renderErr != nil {
+			s.logger.Error("failed to render markdown", "path", path, "error", renderErr)
 
-	// Render the content
-	result, err := s.renderer.Render(file.Content())
+			return domain.RenderedContent{}, errors.Wrapf(renderErr, "render markdown at %s", path)
+		}
+
+		return res, nil
+	})
 	if err != nil {
-		// Return empty content on error - handler will deal with it
-		s.logger.Error("failed to render markdown", "path", path, "error", err)
+		s.logger.Error("cache get failed for path", "path", path, "error", err)
 
 		return domain.RenderedContent{}
 	}
 
-	// Cache the rendered content
-	s.cache.Set(path, result)
-
-	return result
+	return *result
 }
 
 func (s *Server) renderSearch(c *gin.Context, query string, results []content.SearchResult) {

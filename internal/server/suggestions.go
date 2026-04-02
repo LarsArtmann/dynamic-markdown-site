@@ -10,23 +10,18 @@ import (
 // minScoreThreshold is the minimum score for a suggestion to be considered relevant.
 const minScoreThreshold = 0.3
 
-// SuggestedPath represents a path suggestion with similarity score.
-type SuggestedPath struct {
-	Path  domain.URLPath
-	Title string
-	Score float64
-}
-
 // findSuggestions returns similar paths based on Levenshtein distance.
 // It returns up to maxSuggestions paths, sorted by similarity (highest first).
 // Only suggestions with score >= minScoreThreshold are returned.
-func findSuggestions(requested string, paths []domain.URLPath, maxSuggestions int) []SuggestedPath {
+func findSuggestions(
+	requested string, paths []domain.URLPath, maxSuggestions int,
+) []domain.SuggestedPath {
 	if len(paths) == 0 || requested == "" {
 		return nil
 	}
 
 	requestedLower := strings.ToLower(requested)
-	var suggestions []SuggestedPath
+	var suggestions []domain.SuggestedPath
 
 	for _, path := range paths {
 		pathStr := path.String()
@@ -60,7 +55,7 @@ func findSuggestions(requested string, paths []domain.URLPath, maxSuggestions in
 
 		// Only include suggestions above threshold
 		if score >= minScoreThreshold {
-			suggestions = append(suggestions, SuggestedPath{
+			suggestions = append(suggestions, domain.SuggestedPath{
 				Path:  path,
 				Title: path.Filename(),
 				Score: score,
