@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- Admonition/Alert blocks — GitHub-style `> [!TYPE]` blockquote syntax with 6 types (NOTE, TIP, IMPORTANT, WARNING, CAUTION, CRITICAL) and themed CSS styling
+- Custom Goldmark AST transformer for parsing alert markers across split text nodes
+- `/sitemap.xml` endpoint for search engine crawlers with priority and changefreq metadata
+- Raw asset serving for non-markdown files (images, PDFs, JSON, etc.) alongside markdown content
+- URL fallback handling: `.md` extension redirects, case-insensitive path matching, trailing slash normalization
+- AST-based Mermaid detection via Goldmark parser context (replaces regex-based approach)
+- Comprehensive sitemap tests covering directories, files, HTTPS detection, and priority calculation
+
+### Changed
+
+- Refactored frontmatter draft parsing to use `yaml.v3` for proper boolean handling
+- Simplified static file embedding pattern using `//go:embed`
+- Refactored `getContentType` from switch statement to map lookup
+- Improved sitemap test quality: `NewRequestWithContext`, extracted test host constant, `InEpsilon` for float comparisons
+- Added godoc comments on exported admonition extension types
+- Silence `fmt.Fprintf` return value warnings in admonition renderer
+- Add linter exclusions for exhaustruct and gochecknoglobals in Goldmark extensions
+
+### Fixed
+
+- Fixed panic on double `Stop()` call in rate limiter
+- Fixed `hasMermaid` not propagating through `NewRenderedFile` constructor
+- Removed dead regex-based diagram detection code
+- Stripped `.md` extension from URL paths for clean URLs
+
 ## [0.1.0] - 2026-04-01
 
 ### Added
