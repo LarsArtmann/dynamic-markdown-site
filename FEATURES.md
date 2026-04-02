@@ -41,6 +41,31 @@ func main() {
 
 D2 diagrams are compiled to SVG at render time. Mermaid diagrams load the library on-demand — only when the page contains ` ```mermaid ` blocks.
 
+### Admonition / Alert Blocks
+
+GitHub-style callout blocks using blockquote syntax:
+
+```markdown
+> [!NOTE]
+> Useful information that users should be aware of.
+
+> [!WARNING]
+> Critical content that needs extra attention.
+```
+
+Six alert types with distinct colors:
+
+| Type       | Color    | Use case                         |
+| ---------- | -------- | -------------------------------- |
+| `NOTE`     | Blue     | Informational notes              |
+| `TIP`      | Green    | Helpful suggestions              |
+| `IMPORTANT`| Purple   | Key information                  |
+| `WARNING`  | Amber    | Cautionary advice                |
+| `CAUTION`  | Red      | Potential risks                  |
+| `CRITICAL` | Intense red | Urgent/essential information  |
+
+Supports multiline content, inline formatting (bold, code, links), and lists inside alert blocks. Regular blockquotes without a `[!TYPE]` marker are unaffected.
+
 ### Table of Contents
 
 Auto-generated from headings (h2+) with:
@@ -177,6 +202,8 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/refresh`         | GET/POST | Reload content from disk (rate limited)       |
 | `/search`          | GET      | Full-text search — `?q=query`                 |
 | `/static/*`        | GET      | Embedded static assets (CSS, favicon)         |
+| `/sitemap.xml`    | GET      | XML sitemap for search engine crawlers         |
+| `/robots.txt`     | GET      | robots.txt with sitemap reference              |
 | `/api/live-reload` | GET      | SSE stream for live reload (dev mode)         |
 
 ---
@@ -214,7 +241,7 @@ draft: false
 | `author`      | Stored in metadata (available for templates)     |
 | `date`        | Stored in metadata (available for templates)     |
 | `tags`        | Stored in metadata (available for templates)     |
-| `draft`       | Stored in metadata (not yet used for filtering)  |
+| `draft`       | When `true`, file is excluded from the site entirely |
 
 ---
 
