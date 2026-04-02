@@ -148,6 +148,9 @@ linters:
       # funlen: Complex test functions with many table-driven cases
       - path: "internal/renderer/markdown_bench_test.go"
         linters: [funlen]
+      - path: "internal/renderer/admonition_extension_test.go"
+        linters: [funlen]
+        text: "Function 'TestAdmonitionExtension' is too long"
       - path: "internal/content/search_test.go"
         linters: [funlen]
         text: "Function 'TestSearcher_Search' is too long"

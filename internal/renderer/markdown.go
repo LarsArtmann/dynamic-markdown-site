@@ -25,6 +25,8 @@ type GoldmarkRenderer struct {
 	diagramRenderer *DiagramRenderer
 }
 
+var _ domain.Renderer = (*GoldmarkRenderer)(nil)
+
 // NewGoldmarkRenderer creates a new configured goldmark renderer.
 func NewGoldmarkRenderer() *GoldmarkRenderer {
 	return NewGoldmarkRendererWithDiagrams(nil)

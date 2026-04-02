@@ -16,6 +16,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
+	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 )
 
 func init() {
@@ -34,10 +35,11 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 	t.Helper()
 
 	logger := slog.New(slog.DiscardHandler)
-	cache := cache.NewHTMLCache(100)
+	htmlCache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
+	rndr := renderer.NewGoldmarkRenderer()
 
-	return NewServer(repo, searcher, logger, cache, false, "Site")
+	return NewServer(repo, searcher, logger, htmlCache, rndr, false, "Site")
 }
 
 func newTestRouter(s *Server) *gin.Engine {
@@ -54,7 +56,10 @@ func newFailingTestServer(t *testing.T) *gin.Engine {
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
-	server := NewServer(repo, searcher, logger, cache, false, "Site")
+	server := NewServer(
+		repo, searcher, logger, cache,
+		renderer.NewGoldmarkRenderer(), false, "Site",
+	)
 	router := newTestRouter(server)
 
 	return router
@@ -569,7 +574,10 @@ func TestRefreshEndpointFailure(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
-	server := NewServer(repo, searcher, logger, cache, false, "Site")
+	server := NewServer(
+		repo, searcher, logger, cache,
+		renderer.NewGoldmarkRenderer(), false, "Site",
+	)
 	router := newTestRouter(server)
 
 	rec := executeRequest(router, "/refresh")

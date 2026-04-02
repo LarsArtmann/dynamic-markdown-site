@@ -29,15 +29,11 @@ const wordsPerMinute = 200
 // FileNode represents a markdown file that can be rendered.
 // Rendering produces a RenderedFile which combines the FileNode with rendered content.
 type FileNode struct {
-	path       URLPath
-	title      string
-	content    []byte
-	html       HTML
-	toc        []TOCItem
-	metadata   Frontmatter
-	modified   time.Time
-	size       uint64
-	hasMermaid bool // True if file contains mermaid diagrams
+	path     URLPath
+	title    string
+	content  []byte
+	modified time.Time
+	size     uint64
 }
 
 // NewFileNode creates a new FileNode with validation.
@@ -83,26 +79,6 @@ func (f *FileNode) Size() uint64 { return f.size }
 // Content returns the raw file content.
 func (f *FileNode) Content() []byte { return f.content }
 
-// HTML returns the rendered HTML (empty until rendered).
-func (f *FileNode) HTML() HTML {
-	return f.html
-}
-
-// TOC returns the table of contents (empty until rendered).
-func (f *FileNode) TOC() []TOCItem {
-	return f.toc
-}
-
-// Metadata returns the extracted frontmatter (empty until rendered).
-func (f *FileNode) Metadata() Frontmatter {
-	return f.metadata
-}
-
-// HasMermaid returns true if the file contains mermaid diagrams (false until rendered).
-func (f *FileNode) HasMermaid() bool {
-	return f.hasMermaid
-}
-
 // ReadingTime returns estimated reading time in minutes.
 func (f *FileNode) ReadingTime() uint {
 	wordCount := uint(len(strings.Fields(string(f.content))))
@@ -124,17 +100,6 @@ type RenderedFile struct {
 	toc        []TOCItem
 	metadata   Frontmatter
 	hasMermaid bool
-}
-
-// NewRenderedFile creates a new immutable RenderedFile from a FileNode and render result.
-func NewRenderedFile(file *FileNode, html HTML, toc []TOCItem, metadata Frontmatter, hasMermaid bool) *RenderedFile {
-	return &RenderedFile{
-		file:       file,
-		html:       html,
-		toc:        toc,
-		metadata:   metadata,
-		hasMermaid: hasMermaid,
-	}
 }
 
 // NewRenderedFileWithContent creates a RenderedFile from a FileNode and RenderedContent.

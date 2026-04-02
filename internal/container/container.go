@@ -186,8 +186,9 @@ func provideServer(i do.Injector) (*server.Server, error) {
 	repo := do.MustInvoke[content.Repository](i)
 	searcher := do.MustInvoke[*content.Searcher](i)
 	logger := do.MustInvoke[*slog.Logger](i)
-	cache := do.MustInvoke[*cache.HTMLCache](i)
+	htmlCache := do.MustInvoke[*cache.HTMLCache](i)
+	rndr := do.MustInvoke[*renderer.GoldmarkRenderer](i)
 	cfg := do.MustInvoke[*config.Config](i)
 
-	return server.NewServer(repo, searcher, logger, cache, cfg.DevMode, cfg.SiteName), nil
+	return server.NewServer(repo, searcher, logger, htmlCache, rndr, cfg.DevMode, cfg.SiteName), nil
 }

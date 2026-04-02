@@ -12,6 +12,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
+	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 )
 
 func init() {
@@ -47,7 +48,10 @@ func newBenchmarkServer(b *testing.B) *gin.Engine {
 	logger := slog.New(slog.DiscardHandler)
 	htmlCache := cache.NewHTMLCache(1000)
 	searcher := content.NewSearcher(repo)
-	srv := NewServer(repo, searcher, logger, htmlCache, false, "Site")
+	srv := NewServer(
+		repo, searcher, logger, htmlCache,
+		renderer.NewGoldmarkRenderer(), false, "Site",
+	)
 
 	router := gin.New()
 	srv.RegisterRoutes(router)

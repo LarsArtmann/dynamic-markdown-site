@@ -12,7 +12,6 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
-	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 )
 
@@ -20,7 +19,7 @@ import (
 type Server struct {
 	repo        content.Repository
 	searcher    *content.Searcher
-	renderer    *renderer.GoldmarkRenderer
+	renderer    domain.Renderer
 	logger      *slog.Logger
 	rateLimiter *rateLimiter
 	cache       *cache.HTMLCache
@@ -35,6 +34,7 @@ func NewServer(
 	searcher *content.Searcher,
 	log *slog.Logger,
 	cache *cache.HTMLCache,
+	renderer domain.Renderer,
 	devMode bool,
 	siteName string,
 ) *Server {
@@ -44,7 +44,7 @@ func NewServer(
 	return &Server{
 		repo:        repo,
 		searcher:    searcher,
-		renderer:    renderer.NewGoldmarkRenderer(),
+		renderer:    renderer,
 		logger:      log,
 		rateLimiter: rl,
 		cache:       cache,

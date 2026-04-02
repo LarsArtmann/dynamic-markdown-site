@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
+	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
 )
 
@@ -80,7 +81,7 @@ func NewServerFixture(t *testing.T) *ServerFixture {
 	c := cache.NewHTMLCache(100)
 	searcher := content.NewSearcher(repo)
 	logger := slog.New(slog.DiscardHandler)
-	s := server.NewServer(repo, searcher, logger, c, false, "Site")
+	s := server.NewServer(repo, searcher, logger, c, renderer.NewGoldmarkRenderer(), false, "Site")
 
 	return &ServerFixture{
 		Repository: repo,

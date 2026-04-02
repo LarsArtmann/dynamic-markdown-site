@@ -72,3 +72,8 @@ type RenderedContent struct {
 	Metadata   Frontmatter
 	HasMermaid bool
 }
+
+// Renderer converts raw markdown content into rendered HTML with metadata.
+type Renderer interface {
+	Render(source []byte) (RenderedContent, error)
+}
