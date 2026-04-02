@@ -40,6 +40,18 @@ build:
 clean:
     rm -f dynamic-markdown-site
 
+# Clean Go build cache (use when having build issues)
+cache-clean:
+    go clean -cache
+    go clean -testcache
+    @echo "Go cache cleaned. If issues persist, try: sudo rm -rf ~/Library/Caches/go-build"
+
+# Clean Go modules and re-download
+cache-clean-full:
+    go clean -cache -modcache -testcache
+    go mod download
+    @echo "Full cache clean complete"
+
 # Run benchmarks
 bench:
     go test ./... -bench=. -benchmem
