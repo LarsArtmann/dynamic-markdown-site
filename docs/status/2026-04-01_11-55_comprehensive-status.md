@@ -19,41 +19,41 @@ The `dynamic-markdown-site` project is in **good working shape**. All recent com
 
 ### CI Pipeline Fixes (Primary Objective — COMPLETE)
 
-| What | Commit | Detail |
-|------|--------|--------|
+| What                           | Commit    | Detail                                                                                           |
+| ------------------------------ | --------- | ------------------------------------------------------------------------------------------------ |
 | `.golangci.yml` exclusion gaps | `06de1c8` | Fixed config.go cyclop, blob.go gocognit, version.go revive; removed dead `pkg/errors` exclusion |
-| `diagramNode` exhaustruct fix | `6c0423c` | Added `BaseBlock: ast.BaseBlock{}` initialization |
-| `config.go` cyclop reduction | `fd89f13` | Decomposed `Load()` into 4 focused methods |
-| `pkg/errors` dead code removal | `21c9ecf` | Removed entire `pkg/errors/` package |
-| All remaining lint issues | `09ff07a` | forcetypeassert + golines fixes |
-| Duplicate request logger | `360dc47` | Removed from main.go; accesslog middleware handles it |
-| Docker CI: PR trigger | `bf7859c` | Added `pull_request` trigger, conditional push |
-| Stale status cleanup | `b24f2e5` | Removed 33 outdated status docs |
+| `diagramNode` exhaustruct fix  | `6c0423c` | Added `BaseBlock: ast.BaseBlock{}` initialization                                                |
+| `config.go` cyclop reduction   | `fd89f13` | Decomposed `Load()` into 4 focused methods                                                       |
+| `pkg/errors` dead code removal | `21c9ecf` | Removed entire `pkg/errors/` package                                                             |
+| All remaining lint issues      | `09ff07a` | forcetypeassert + golines fixes                                                                  |
+| Duplicate request logger       | `360dc47` | Removed from main.go; accesslog middleware handles it                                            |
+| Docker CI: PR trigger          | `bf7859c` | Added `pull_request` trigger, conditional push                                                   |
+| Stale status cleanup           | `b24f2e5` | Removed 33 outdated status docs                                                                  |
 
 ### Features Added and Verified Working
 
-| Feature | Files | Status |
-|---------|-------|--------|
-| robots.txt endpoint | `server/robots.go`, `server/robots_test.go` | ✅ Dynamic sitemap URL |
-| sitemap.xml endpoint | `server/sitemap.go` | ✅ Priority/changetime heuristics |
-| Draft content filtering | `content/draft.go`, `content/filesystem.go` | ✅ YAML `draft: true` |
-| Access logging middleware | `server/accesslog.go` | ✅ With request IDs |
-| Blob storage support | `content/blob.go`, `content/drivers.go` | ✅ S3/GCS/Azure via go-cloud |
-| Site name config | `config/config.go` | ✅ Flag + env var |
-| Live reload (SSE) | `server/livereload.go` | ✅ Dev mode |
+| Feature                   | Files                                       | Status                            |
+| ------------------------- | ------------------------------------------- | --------------------------------- |
+| robots.txt endpoint       | `server/robots.go`, `server/robots_test.go` | ✅ Dynamic sitemap URL            |
+| sitemap.xml endpoint      | `server/sitemap.go`                         | ✅ Priority/changetime heuristics |
+| Draft content filtering   | `content/draft.go`, `content/filesystem.go` | ✅ YAML `draft: true`             |
+| Access logging middleware | `server/accesslog.go`                       | ✅ With request IDs               |
+| Blob storage support      | `content/blob.go`, `content/drivers.go`     | ✅ S3/GCS/Azure via go-cloud      |
+| Site name config          | `config/config.go`                          | ✅ Flag + env var                 |
+| Live reload (SSE)         | `server/livereload.go`                      | ✅ Dev mode                       |
 
 ### Code Quality Metrics
 
-| Metric | Value |
-|--------|-------|
-| Production LOC | 4,607 |
-| Test LOC | 6,716 |
-| Test/Code ratio | 1.46:1 |
-| Production Go files | 37 |
-| golangci-lint issues | **0** |
-| Test packages | 8 (all pass) |
-| Coverage (approx) | 75-80% across core packages |
-| Linters enabled | ~75 |
+| Metric               | Value                       |
+| -------------------- | --------------------------- |
+| Production LOC       | 4,607                       |
+| Test LOC             | 6,716                       |
+| Test/Code ratio      | 1.46:1                      |
+| Production Go files  | 37                          |
+| golangci-lint issues | **0**                       |
+| Test packages        | 8 (all pass)                |
+| Coverage (approx)    | 75-80% across core packages |
+| Linters enabled      | ~75                         |
 
 ---
 
@@ -115,7 +115,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 - **Commits appear between sessions** — other agents change HEAD
 - **33 stale status reports** accumulated before cleanup
 
-**Impact:** ~60% of debugging work was *reactive* — fixing other agents' mistakes.
+**Impact:** ~60% of debugging work was _reactive_ — fixing other agents' mistakes.
 
 ### Disk Space Crisis
 
@@ -136,75 +136,75 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 ### Process
 
-| # | Improvement | Impact | Effort |
-|---|------------|--------|--------|
-| 1 | Pre-push hook (lint + test) | Prevents broken CI | 30min |
-| 2 | `just pre-push` and `just fix` commands | Standardized verification | 15min |
-| 3 | Separate fast test workflow from Docker build | Faster PR feedback | Medium |
-| 4 | Coverage threshold ≥75% in CI | Prevents regression | 15min |
-| 5 | Disk space monitoring | Prevents build failures | 30min |
+| #   | Improvement                                   | Impact                    | Effort |
+| --- | --------------------------------------------- | ------------------------- | ------ |
+| 1   | Pre-push hook (lint + test)                   | Prevents broken CI        | 30min  |
+| 2   | `just pre-push` and `just fix` commands       | Standardized verification | 15min  |
+| 3   | Separate fast test workflow from Docker build | Faster PR feedback        | Medium |
+| 4   | Coverage threshold ≥75% in CI                 | Prevents regression       | 15min  |
+| 5   | Disk space monitoring                         | Prevents build failures   | 30min  |
 
 ### Architecture
 
-| # | Improvement | Impact | Effort |
-|---|------------|--------|--------|
-| 6 | Rename `version` → `buildinfo` | Eliminates revive exclusion | 30min |
-| 7 | Immutable FileNode (remove setters) | Thread safety | 2hr |
-| 8 | Split Repository into Reader + Refresher | Cleaner concerns | 1hr |
-| 9 | Structured errors with Is/As/Unwrap | Better error matching | 2hr |
-| 10 | Frontmatter typed struct (not `map[string]any`) | Type safety | 1hr |
+| #   | Improvement                                     | Impact                      | Effort |
+| --- | ----------------------------------------------- | --------------------------- | ------ |
+| 6   | Rename `version` → `buildinfo`                  | Eliminates revive exclusion | 30min  |
+| 7   | Immutable FileNode (remove setters)             | Thread safety               | 2hr    |
+| 8   | Split Repository into Reader + Refresher        | Cleaner concerns            | 1hr    |
+| 9   | Structured errors with Is/As/Unwrap             | Better error matching       | 2hr    |
+| 10  | Frontmatter typed struct (not `map[string]any`) | Type safety                 | 1hr    |
 
 ### Library Considerations
 
-| # | Current | Alternative | Why |
-|---|---------|-------------|-----|
-| 11 | `samber/do/v2` | `wire` (compile-time) | Catch DI errors at build time |
-| 12 | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` + custom types | One less dependency; stdlib sufficient |
-| 13 | `charm.land/log` | `slog` directly | stdlib; one less dependency |
-| 14 | Custom search | `bleve` | Fuzzy matching, ranking, pagination |
-| 15 | Manual middleware | `gin-contrib` packages | Rate limit, CORS already exist |
+| #   | Current              | Alternative                              | Why                                    |
+| --- | -------------------- | ---------------------------------------- | -------------------------------------- |
+| 11  | `samber/do/v2`       | `wire` (compile-time)                    | Catch DI errors at build time          |
+| 12  | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` + custom types | One less dependency; stdlib sufficient |
+| 13  | `charm.land/log`     | `slog` directly                          | stdlib; one less dependency            |
+| 14  | Custom search        | `bleve`                                  | Fuzzy matching, ranking, pagination    |
+| 15  | Manual middleware    | `gin-contrib` packages                   | Rate limit, CORS already exist         |
 
 ### Type Model Improvements
 
-| # | Improvement | Detail |
-|---|------------|--------|
-| 16 | `domain.HTML` with methods | `String()`, `Len()`, `IsZero()` |
-| 17 | `RenderedContent` as immutable | Return interface, prevent mutation |
-| 18 | `ContentNode` with `Children()` on both dirs and files | Eliminate type switches |
-| 19 | `Frontmatter` as typed struct | Replace `map[string]any` |
-| 20 | Sealed interface for node kinds | Prevent invalid implementations |
+| #   | Improvement                                            | Detail                             |
+| --- | ------------------------------------------------------ | ---------------------------------- |
+| 16  | `domain.HTML` with methods                             | `String()`, `Len()`, `IsZero()`    |
+| 17  | `RenderedContent` as immutable                         | Return interface, prevent mutation |
+| 18  | `ContentNode` with `Children()` on both dirs and files | Eliminate type switches            |
+| 19  | `Frontmatter` as typed struct                          | Replace `map[string]any`           |
+| 20  | Sealed interface for node kinds                        | Prevent invalid implementations    |
 
 ---
 
 ## F. TOP 25 NEXT ITEMS (Impact/Effort Sort)
 
-| # | Item | Impact | Effort | Cat |
-|---|------|--------|--------|-----|
-| 1 | Pre-push hook (lint + test) | 🔴 Critical | 30min | Process |
-| 2 | `just pre-push` + `just fix` commands | 🔴 High | 15min | Process |
-| 3 | Verify CI green on GitHub (3 jobs) | 🔴 Critical | 10min | CI |
-| 4 | Write sitemap.go tests | 🔴 High | 1hr | Testing |
-| 5 | Rename `version` → `buildinfo` | 🟡 Medium | 30min | Arch |
-| 6 | Split `handlers_test.go` (667 lines) | 🟡 Medium | 1hr | Quality |
-| 7 | Split `search_test.go` (685 lines) | 🟡 Medium | 1hr | Quality |
-| 8 | Coverage threshold ≥75% in CI | 🟡 Medium | 15min | CI |
-| 9 | ADR for DI choice (do vs wire) | 🟡 Medium | 30min | Docs |
-| 10 | Immutable FileNode (remove setters) | 🟡 Medium | 2hr | Arch |
-| 11 | Replace `cockroachdb/errors` with stdlib | 🟡 Medium | 2hr | Deps |
-| 12 | Frontmatter typed struct | 🟡 Medium | 1hr | Types |
-| 13 | Split Repository: Reader + Refresher | 🟡 Medium | 1hr | Arch |
-| 14 | HTTP integration tests | 🟢 High | 3hr | Testing |
-| 15 | Disk space monitoring | 🟢 Low | 30min | Tooling |
-| 16 | Middleware chain as slice | 🟢 Low | 30min | Arch |
-| 17 | `errgroup` for concurrent ops | 🟢 Low | 1hr | Perf |
-| 18 | RSS/Atom feed generation | 🟢 Low | 2hr | Feature |
-| 19 | Dark mode CSS toggle | 🟢 Low | 2hr | UX |
-| 20 | Prometheus metrics endpoint | 🟢 Low | 2hr | Observability |
-| 21 | Rate limit search endpoint | 🟢 Low | 30min | Security |
-| 22 | gzip/brotli compression | 🟢 Low | 30min | Perf |
-| 23 | Graceful shutdown tests | 🟢 Low | 1hr | Testing |
-| 24 | ETag/If-None-Match | 🟢 Low | 1hr | Perf |
-| 25 | Evaluate `wire` as DI replacement | 🟢 Low | 2hr | Arch |
+| #   | Item                                     | Impact      | Effort | Cat           |
+| --- | ---------------------------------------- | ----------- | ------ | ------------- |
+| 1   | Pre-push hook (lint + test)              | 🔴 Critical | 30min  | Process       |
+| 2   | `just pre-push` + `just fix` commands    | 🔴 High     | 15min  | Process       |
+| 3   | Verify CI green on GitHub (3 jobs)       | 🔴 Critical | 10min  | CI            |
+| 4   | Write sitemap.go tests                   | 🔴 High     | 1hr    | Testing       |
+| 5   | Rename `version` → `buildinfo`           | 🟡 Medium   | 30min  | Arch          |
+| 6   | Split `handlers_test.go` (667 lines)     | 🟡 Medium   | 1hr    | Quality       |
+| 7   | Split `search_test.go` (685 lines)       | 🟡 Medium   | 1hr    | Quality       |
+| 8   | Coverage threshold ≥75% in CI            | 🟡 Medium   | 15min  | CI            |
+| 9   | ADR for DI choice (do vs wire)           | 🟡 Medium   | 30min  | Docs          |
+| 10  | Immutable FileNode (remove setters)      | 🟡 Medium   | 2hr    | Arch          |
+| 11  | Replace `cockroachdb/errors` with stdlib | 🟡 Medium   | 2hr    | Deps          |
+| 12  | Frontmatter typed struct                 | 🟡 Medium   | 1hr    | Types         |
+| 13  | Split Repository: Reader + Refresher     | 🟡 Medium   | 1hr    | Arch          |
+| 14  | HTTP integration tests                   | 🟢 High     | 3hr    | Testing       |
+| 15  | Disk space monitoring                    | 🟢 Low      | 30min  | Tooling       |
+| 16  | Middleware chain as slice                | 🟢 Low      | 30min  | Arch          |
+| 17  | `errgroup` for concurrent ops            | 🟢 Low      | 1hr    | Perf          |
+| 18  | RSS/Atom feed generation                 | 🟢 Low      | 2hr    | Feature       |
+| 19  | Dark mode CSS toggle                     | 🟢 Low      | 2hr    | UX            |
+| 20  | Prometheus metrics endpoint              | 🟢 Low      | 2hr    | Observability |
+| 21  | Rate limit search endpoint               | 🟢 Low      | 30min  | Security      |
+| 22  | gzip/brotli compression                  | 🟢 Low      | 30min  | Perf          |
+| 23  | Graceful shutdown tests                  | 🟢 Low      | 1hr    | Testing       |
+| 24  | ETag/If-None-Match                       | 🟢 Low      | 1hr    | Perf          |
+| 25  | Evaluate `wire` as DI replacement        | 🟢 Low      | 2hr    | Arch          |
 
 ---
 
@@ -212,13 +212,13 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 **Should this project stay with `samber/do/v2` or migrate to Google `wire` for compile-time DI?**
 
-| `samber/do/v2` (current) | `wire` (alternative) |
-|---------------------------|----------------------|
-| Runtime DI — flexible | **Compile-time** — errors at build |
-| No code gen step | Requires `wire` code gen |
-| Graceful shutdown built-in | Manual shutdown orchestration |
-| Already working, 7 providers | Would catch arg count mismatches |
-| Less boilerplate | More type-safe |
+| `samber/do/v2` (current)     | `wire` (alternative)               |
+| ---------------------------- | ---------------------------------- |
+| Runtime DI — flexible        | **Compile-time** — errors at build |
+| No code gen step             | Requires `wire` code gen           |
+| Graceful shutdown built-in   | Manual shutdown orchestration      |
+| Already working, 7 providers | Would catch arg count mismatches   |
+| Less boilerplate             | More type-safe                     |
 
 **I cannot decide:** depends on team preference for runtime flexibility vs. compile-time safety, and whether code generation is acceptable in the build pipeline.
 
@@ -226,13 +226,13 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 ## Environment
 
-| Item | Value |
-|------|-------|
-| Go | 1.26.1 darwin/arm64 |
-| Disk | 6.9GB free / 229GB |
-| Branch | `master` (up to date with origin) |
-| Head | `4c21153` |
-| Uncommitted | None |
-| Linter | 0 issues |
-| Tests | All pass |
-| Build | All pass |
+| Item        | Value                             |
+| ----------- | --------------------------------- |
+| Go          | 1.26.1 darwin/arm64               |
+| Disk        | 6.9GB free / 229GB                |
+| Branch      | `master` (up to date with origin) |
+| Head        | `4c21153`                         |
+| Uncommitted | None                              |
+| Linter      | 0 issues                          |
+| Tests       | All pass                          |
+| Build       | All pass                          |

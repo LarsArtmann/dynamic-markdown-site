@@ -55,14 +55,14 @@ GitHub-style callout blocks using blockquote syntax:
 
 Six alert types with distinct colors:
 
-| Type       | Color    | Use case                         |
-| ---------- | -------- | -------------------------------- |
-| `NOTE`     | Blue     | Informational notes              |
-| `TIP`      | Green    | Helpful suggestions              |
-| `IMPORTANT`| Purple   | Key information                  |
-| `WARNING`  | Amber    | Cautionary advice                |
-| `CAUTION`  | Red      | Potential risks                  |
-| `CRITICAL` | Intense red | Urgent/essential information  |
+| Type        | Color       | Use case                     |
+| ----------- | ----------- | ---------------------------- |
+| `NOTE`      | Blue        | Informational notes          |
+| `TIP`       | Green       | Helpful suggestions          |
+| `IMPORTANT` | Purple      | Key information              |
+| `WARNING`   | Amber       | Cautionary advice            |
+| `CAUTION`   | Red         | Potential risks              |
+| `CRITICAL`  | Intense red | Urgent/essential information |
 
 Supports multiline content, inline formatting (bold, code, links), and lists inside alert blocks. Regular blockquotes without a `[!TYPE]` marker are unaffected.
 
@@ -202,8 +202,8 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/refresh`         | GET/POST | Reload content from disk (rate limited)       |
 | `/search`          | GET      | Full-text search — `?q=query`                 |
 | `/static/*`        | GET      | Embedded static assets (CSS, favicon)         |
-| `/sitemap.xml`    | GET      | XML sitemap for search engine crawlers         |
-| `/robots.txt`     | GET      | robots.txt with sitemap reference              |
+| `/sitemap.xml`     | GET      | XML sitemap for search engine crawlers        |
+| `/robots.txt`      | GET      | robots.txt with sitemap reference             |
 | `/api/live-reload` | GET      | SSE stream for live reload (dev mode)         |
 
 ---
@@ -234,13 +234,13 @@ draft: false
 ---
 ```
 
-| Field         | Effect                                           |
-| ------------- | ------------------------------------------------ |
-| `title`       | Overrides filename as the page title             |
-| `description` | Meta description tag and directory card subtitle |
-| `author`      | Stored in metadata (available for templates)     |
-| `date`        | Stored in metadata (available for templates)     |
-| `tags`        | Stored in metadata (available for templates)     |
+| Field         | Effect                                               |
+| ------------- | ---------------------------------------------------- |
+| `title`       | Overrides filename as the page title                 |
+| `description` | Meta description tag and directory card subtitle     |
+| `author`      | Stored in metadata (available for templates)         |
+| `date`        | Stored in metadata (available for templates)         |
+| `tags`        | Stored in metadata (available for templates)         |
 | `draft`       | When `true`, file is excluded from the site entirely |
 
 ---

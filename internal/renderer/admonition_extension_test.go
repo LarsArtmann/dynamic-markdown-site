@@ -15,7 +15,7 @@ func TestAdmonitionExtension(t *testing.T) {
 		shouldNotMatch string
 	}{
 		{
-			name: "critical alert",
+			name:  "critical alert",
 			input: "> [!CRITICAL]\n> Never manually add users via Google Cloud Console.",
 			shouldContain: []string{
 				`class="admonition admonition-critical"`,
@@ -25,7 +25,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "note alert",
+			name:  "note alert",
 			input: "> [!NOTE]\n> This is a note.",
 			shouldContain: []string{
 				`class="admonition admonition-note"`,
@@ -34,7 +34,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "warning alert",
+			name:  "warning alert",
 			input: "> [!WARNING]\n> Be careful!",
 			shouldContain: []string{
 				`class="admonition admonition-warning"`,
@@ -43,7 +43,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "tip alert",
+			name:  "tip alert",
 			input: "> [!TIP]\n> Use Terraform.",
 			shouldContain: []string{
 				`class="admonition admonition-tip"`,
@@ -52,7 +52,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "important alert",
+			name:  "important alert",
 			input: "> [!IMPORTANT]\n> Read this first.",
 			shouldContain: []string{
 				`class="admonition admonition-important"`,
@@ -61,7 +61,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "caution alert",
+			name:  "caution alert",
 			input: "> [!CAUTION]\n> Proceed with caution.",
 			shouldContain: []string{
 				`class="admonition admonition-caution"`,
@@ -70,7 +70,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "multiline alert",
+			name:  "multiline alert",
 			input: "> [!WARNING]\n> First line.\n> Second line.",
 			shouldContain: []string{
 				`class="admonition admonition-warning"`,
@@ -79,12 +79,12 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "regular blockquote unchanged",
-			input: "> This is just a regular blockquote.",
+			name:           "regular blockquote unchanged",
+			input:          "> This is just a regular blockquote.",
 			shouldNotMatch: `class="admonition`,
 		},
 		{
-			name: "alert with inline code",
+			name:  "alert with inline code",
 			input: "> [!NOTE]\n> Use `terraform apply` to deploy.",
 			shouldContain: []string{
 				`class="admonition admonition-note"`,
@@ -92,7 +92,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "empty alert with no body",
+			name:  "empty alert with no body",
 			input: "> [!NOTE]",
 			shouldContain: []string{
 				`class="admonition admonition-note"`,
@@ -105,7 +105,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			shouldNotMatch: `class="admonition`,
 		},
 		{
-			name: "alert with list content",
+			name:  "alert with list content",
 			input: "> [!TIP]\n> - First item\n> - Second item\n> - Third item",
 			shouldContain: []string{
 				`class="admonition admonition-tip"`,
@@ -114,7 +114,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			},
 		},
 		{
-			name: "alert followed by regular blockquote",
+			name:  "alert followed by regular blockquote",
 			input: "> [!WARNING]\n> Alert text.\n\n> Normal blockquote.",
 			shouldContain: []string{
 				`class="admonition admonition-warning"`,
@@ -123,7 +123,7 @@ func TestAdmonitionExtension(t *testing.T) {
 			shouldNotMatch: `admonition-content">Normal`,
 		},
 		{
-			name: "alert with bold and italic",
+			name:  "alert with bold and italic",
 			input: "> [!IMPORTANT]\n> This is **bold** and *italic* text.",
 			shouldContain: []string{
 				`class="admonition admonition-important"`,

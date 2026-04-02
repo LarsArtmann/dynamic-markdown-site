@@ -18,12 +18,12 @@ var alertPattern = regexp.MustCompile(`\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION|CR
 type alertKind string
 
 const (
-	alertNote       alertKind = "note"
-	alertTip        alertKind = "tip"
-	alertImportant  alertKind = "important"
-	alertWarning    alertKind = "warning"
-	alertCaution    alertKind = "caution"
-	alertCritical   alertKind = "critical"
+	alertNote      alertKind = "note"
+	alertTip       alertKind = "tip"
+	alertImportant alertKind = "important"
+	alertWarning   alertKind = "warning"
+	alertCaution   alertKind = "caution"
+	alertCritical  alertKind = "critical"
 )
 
 var alertTitles = map[alertKind]string{

@@ -60,18 +60,18 @@
 
 ### g) Ghost Systems Found
 
-| Ghost System | Location | Value? | Action |
-|-------------|----------|--------|--------|
-| `testutil` package (3 files) | `internal/testutil/` | **Has value** — good test infrastructure, just unused | Integrate or delete |
-| `cache.GetOrCompute()` | `cache/html.go:47` | **Has value** — atomic cache-or-render, prevents stampede | Integrate into `render.go` |
-| `SimpleRenderer` | `renderer/markdown.go:270` | **No value** — only used in own test | Delete |
-| `FileNode` dead fields | `domain/file.go:35-40` | **No value** — misleading, never populated | Delete fields + accessors |
-| `NewRenderedFile()` | `domain/file.go:130` | **No value** — superseded by `NewRenderedFileWithContent` | Delete |
-| `HasReadme` feature flag | `render.go:29` | **Has value** — README auto-display is a real feature | Implement or delete field |
-| `SearchResult.Snippet` | `content/search.go:98` | **Has value** — search result context | Render in template |
-| DI Renderer | `container.go:126-137` | **CRITICAL** — diagram support | Must integrate into server |
-| `config.Timeout` | `config/config.go` | **Has value** — request timeout is important | Apply to HTTP server |
-| Cache stats methods | `cache/html.go` | **Has value** — observability | Expose via admin endpoint later |
+| Ghost System                 | Location                   | Value?                                                    | Action                          |
+| ---------------------------- | -------------------------- | --------------------------------------------------------- | ------------------------------- |
+| `testutil` package (3 files) | `internal/testutil/`       | **Has value** — good test infrastructure, just unused     | Integrate or delete             |
+| `cache.GetOrCompute()`       | `cache/html.go:47`         | **Has value** — atomic cache-or-render, prevents stampede | Integrate into `render.go`      |
+| `SimpleRenderer`             | `renderer/markdown.go:270` | **No value** — only used in own test                      | Delete                          |
+| `FileNode` dead fields       | `domain/file.go:35-40`     | **No value** — misleading, never populated                | Delete fields + accessors       |
+| `NewRenderedFile()`          | `domain/file.go:130`       | **No value** — superseded by `NewRenderedFileWithContent` | Delete                          |
+| `HasReadme` feature flag     | `render.go:29`             | **Has value** — README auto-display is a real feature     | Implement or delete field       |
+| `SearchResult.Snippet`       | `content/search.go:98`     | **Has value** — search result context                     | Render in template              |
+| DI Renderer                  | `container.go:126-137`     | **CRITICAL** — diagram support                            | Must integrate into server      |
+| `config.Timeout`             | `config/config.go`         | **Has value** — request timeout is important              | Apply to HTTP server            |
+| Cache stats methods          | `cache/html.go`            | **Has value** — observability                             | Expose via admin endpoint later |
 
 ### h) Scope Creep Check
 
@@ -84,13 +84,13 @@
 
 ### j) Split Brains Found
 
-| Split Brain | Location A | Location B | Fix |
-|-------------|-----------|-----------|-----|
-| `SuggestedPath` type | `server/suggestions.go:14` | `templates/layout.templ:290` | Single type in `domain/` |
-| `skipDirs` list | `content/helpers.go:14` | `watcher.go:134` | Export from `content/` |
-| `isMarkdownFile` | `content/helpers.go:46` | `watcher.go:164` | Already exported from `content/` |
-| `getContentType` | `content/helpers.go:52` | `server/static.go:41` | Single function in `domain/` or `content/` |
-| Error wrapping style | Mixed across 3 packages | N/A | Standardize on `errors.Wrapf` |
+| Split Brain          | Location A                 | Location B                   | Fix                                        |
+| -------------------- | -------------------------- | ---------------------------- | ------------------------------------------ |
+| `SuggestedPath` type | `server/suggestions.go:14` | `templates/layout.templ:290` | Single type in `domain/`                   |
+| `skipDirs` list      | `content/helpers.go:14`    | `watcher.go:134`             | Export from `content/`                     |
+| `isMarkdownFile`     | `content/helpers.go:46`    | `watcher.go:164`             | Already exported from `content/`           |
+| `getContentType`     | `content/helpers.go:52`    | `server/static.go:41`        | Single function in `domain/` or `content/` |
+| Error wrapping style | Mixed across 3 packages    | N/A                          | Standardize on `errors.Wrapf`              |
 
 ### k) Test Quality
 
@@ -153,32 +153,32 @@ graph TD
 
 Sorted by importance/impact/effort/customer-value.
 
-| # | Task | Effort | Impact | Customer Value |
-|---|------|--------|--------|---------------|
-| 1 | Fix all 18 local lint errors (noctx, golines, revive, errcheck, exhaustruct, goconst, funlen, testifylint, gochecknoglobals, cyclop) | 45 min | 🔴 Unblocks CI | Users get working diagrams |
-| 2 | Wire DI renderer into server: NewServer accepts `Renderer` interface, container passes diagram-enabled renderer | 60 min | 🔴 Fixes broken diagrams | Diagrams work in production |
-| 3 | Add E2E test: HTTP → diagram markdown → rendered SVG/mermaid output | 45 min | 🔴 Prevents regression | Confidence in diagram feature |
-| 4 | Delete `FileNode` dead fields (html, toc, metadata, hasMermaid) + accessors | 30 min | 🟠 Removes misleading API | Cleaner domain model |
-| 5 | Delete `SimpleRenderer` (28 lines dead code) | 15 min | 🟠 Removes dead code | Less confusion |
-| 6 | Delete `NewRenderedFile()` individual-params constructor | 15 min | 🟠 Removes dead code | One way to create RenderedFile |
-| 7 | Unify `skipDirs`: export from `content/helpers.go`, use in `watcher.go` | 30 min | 🟠 Eliminates split brain | Single source of truth |
-| 8 | Unify `isMarkdownFile`: watcher uses exported function from content | 20 min | 🟠 Eliminates split brain | Single source of truth |
-| 9 | Unify `getContentType`: single function with configurable default | 30 min | 🟠 Eliminates split brain | Consistent MIME types |
-| 10 | Unify `SuggestedPath`: move to `domain/`, both server and templates use it | 45 min | 🟠 Eliminates split brain + converter | Clean architecture |
-| 11 | Integrate `GetOrCompute` from cache into `render.go` | 30 min | 🟡 Atomic cache-or-render | Prevents cache stampede |
-| 12 | Apply `config.Timeout` to HTTP server | 20 min | 🟡 Real config enforcement | Request timeouts work |
-| 13 | Render `SearchResult.Snippet` in template | 20 min | 🟡 User-visible feature | Better search results |
-| 14 | Decide on testutil: delete or adopt across all test files | 60 min | 🟡 Test consistency | Better developer DX |
-| 15 | Delete or implement `HasReadme` feature flag | 30 min | 🟡 Remove dead feature flag | Clean codebase |
-| 16 | Standardize error wrapping: use `errors.Wrapf` consistently | 30 min | 🟡 Code quality | Consistent error messages |
-| 17 | Add graceful shutdown tests | 45 min | 🟡 Coverage | Confidence in production |
-| 18 | Add rate limiter tests | 45 min | 🟡 Coverage | Confidence in production |
-| 19 | Add container integration test (verifies all DI wiring) | 60 min | 🟡 Coverage from 0% | Catches DI bypass bugs |
-| 20 | Define `Renderer` interface in server package | 30 min | 🟢 Architecture | Testability |
-| 21 | Split `Repository` interface into `ContentReader` + `ContentRefresher` | 60 min | 🟢 Architecture | ISP compliance |
-| 22 | Extract search view models from templates | 45 min | 🟢 Architecture | Layer separation |
-| 23 | Add git pre-push hook (`just pre-push`) | 15 min | 🟢 Process | Prevents CI breakage |
-| 24 | Fix Dependabot critical alert (gRPC auth bypass) | 15 min | 🔴 Security | No known vulnerabilities |
+| #   | Task                                                                                                                                 | Effort | Impact                                | Customer Value                 |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------------------------------------- | ------------------------------ |
+| 1   | Fix all 18 local lint errors (noctx, golines, revive, errcheck, exhaustruct, goconst, funlen, testifylint, gochecknoglobals, cyclop) | 45 min | 🔴 Unblocks CI                        | Users get working diagrams     |
+| 2   | Wire DI renderer into server: NewServer accepts `Renderer` interface, container passes diagram-enabled renderer                      | 60 min | 🔴 Fixes broken diagrams              | Diagrams work in production    |
+| 3   | Add E2E test: HTTP → diagram markdown → rendered SVG/mermaid output                                                                  | 45 min | 🔴 Prevents regression                | Confidence in diagram feature  |
+| 4   | Delete `FileNode` dead fields (html, toc, metadata, hasMermaid) + accessors                                                          | 30 min | 🟠 Removes misleading API             | Cleaner domain model           |
+| 5   | Delete `SimpleRenderer` (28 lines dead code)                                                                                         | 15 min | 🟠 Removes dead code                  | Less confusion                 |
+| 6   | Delete `NewRenderedFile()` individual-params constructor                                                                             | 15 min | 🟠 Removes dead code                  | One way to create RenderedFile |
+| 7   | Unify `skipDirs`: export from `content/helpers.go`, use in `watcher.go`                                                              | 30 min | 🟠 Eliminates split brain             | Single source of truth         |
+| 8   | Unify `isMarkdownFile`: watcher uses exported function from content                                                                  | 20 min | 🟠 Eliminates split brain             | Single source of truth         |
+| 9   | Unify `getContentType`: single function with configurable default                                                                    | 30 min | 🟠 Eliminates split brain             | Consistent MIME types          |
+| 10  | Unify `SuggestedPath`: move to `domain/`, both server and templates use it                                                           | 45 min | 🟠 Eliminates split brain + converter | Clean architecture             |
+| 11  | Integrate `GetOrCompute` from cache into `render.go`                                                                                 | 30 min | 🟡 Atomic cache-or-render             | Prevents cache stampede        |
+| 12  | Apply `config.Timeout` to HTTP server                                                                                                | 20 min | 🟡 Real config enforcement            | Request timeouts work          |
+| 13  | Render `SearchResult.Snippet` in template                                                                                            | 20 min | 🟡 User-visible feature               | Better search results          |
+| 14  | Decide on testutil: delete or adopt across all test files                                                                            | 60 min | 🟡 Test consistency                   | Better developer DX            |
+| 15  | Delete or implement `HasReadme` feature flag                                                                                         | 30 min | 🟡 Remove dead feature flag           | Clean codebase                 |
+| 16  | Standardize error wrapping: use `errors.Wrapf` consistently                                                                          | 30 min | 🟡 Code quality                       | Consistent error messages      |
+| 17  | Add graceful shutdown tests                                                                                                          | 45 min | 🟡 Coverage                           | Confidence in production       |
+| 18  | Add rate limiter tests                                                                                                               | 45 min | 🟡 Coverage                           | Confidence in production       |
+| 19  | Add container integration test (verifies all DI wiring)                                                                              | 60 min | 🟡 Coverage from 0%                   | Catches DI bypass bugs         |
+| 20  | Define `Renderer` interface in server package                                                                                        | 30 min | 🟢 Architecture                       | Testability                    |
+| 21  | Split `Repository` interface into `ContentReader` + `ContentRefresher`                                                               | 60 min | 🟢 Architecture                       | ISP compliance                 |
+| 22  | Extract search view models from templates                                                                                            | 45 min | 🟢 Architecture                       | Layer separation               |
+| 23  | Add git pre-push hook (`just pre-push`)                                                                                              | 15 min | 🟢 Process                            | Prevents CI breakage           |
+| 24  | Fix Dependabot critical alert (gRPC auth bypass)                                                                                     | 15 min | 🔴 Security                           | No known vulnerabilities       |
 
 ---
 
@@ -186,68 +186,68 @@ Sorted by importance/impact/effort/customer-value.
 
 Sorted by importance/impact/effort. Each task is a single self-contained commit.
 
-| # | Task | Parent | Est | Impact |
-|---|------|--------|-----|--------|
-| 1 | Fix `sitemap_test.go`: replace `NewRequest` → `NewRequestWithContext` (7 call sites) | T1 | 8 min | 🔴 |
-| 2 | Fix `golines` formatting: `file.go:130` | T1 | 3 min | 🔴 |
-| 3 | Fix `golines` formatting: `admonition_extension.go` | T1 | 3 min | 🔴 |
-| 4 | Fix `golines` formatting: `admonition_extension_test.go` | T1 | 3 min | 🔴 |
-| 5 | Fix `golines` formatting: `diagram_extension.go` | T1 | 3 min | 🔴 |
-| 6 | Fix `revive` comments on `AdmonitionExtension` exports | T1 | 5 min | 🔴 |
-| 7 | Fix `revive` unused param `source` in admonition_extension.go | T1 | 2 min | 🔴 |
-| 8 | Fix `errcheck` on `fmt.Fprintf` in admonition_extension.go (2 sites) | T1 | 5 min | 🔴 |
-| 9 | Fix `exhaustruct` on `ast.BaseBlock` in admonition_extension.go | T1 | 3 min | 🔴 |
-| 10 | Fix `exhaustruct` on `server.URLSet` in sitemap.go | T1 | 3 min | 🔴 |
-| 11 | Fix `gochecknoglobals`: add nolint for `hasMermaidKey` (intentional parser context key) | T1 | 2 min | 🔴 |
-| 12 | Fix `gochecknoglobals`: add nolint for `alertTitles` (intentional const map) | T1 | 2 min | 🔴 |
-| 13 | Fix `goconst`: extract `"example.com"` to const in sitemap_test.go | T1 | 3 min | 🔴 |
-| 14 | Fix `funlen`: split `TestFileSystemRepository_GetRaw` into subtests | T1 | 8 min | 🔴 |
-| 15 | Fix `testifylint`: use `assert.InEpsilon` in sitemap_test.go | T1 | 2 min | 🔴 |
-| 16 | Fix `cyclop`: reduce `getContentType` complexity below 10 | T1 | 8 min | 🔴 |
-| 17 | Add `.golangci.yml` exclusion for `gochecknoglobals` on parser context keys | T1 | 3 min | 🔴 |
-| 18 | Run `golangci-lint run ./...` and verify 0 issues | T1 | 5 min | 🔴 |
-| 19 | Define `Renderer` interface in server package (Render method) | T2 | 8 min | 🔴 |
-| 20 | Change `Server.renderer` field from `*GoldmarkRenderer` to `Renderer` | T2 | 8 min | 🔴 |
-| 21 | Change `NewServer` signature to accept `Renderer` parameter | T2 | 8 min | 🔴 |
-| 22 | Update `container.go` to pass DI renderer to `NewServer` | T2 | 5 min | 🔴 |
-| 23 | Update all test files that call `NewServer` with new signature | T2 | 10 min | 🔴 |
-| 24 | Write E2E test: POST markdown with `\`\`\`d2` block, verify SVG in output | T3 | 10 min | 🔴 |
-| 25 | Write E2E test: POST markdown with `\`\`\`mermaid` block, verify mermaid div | T3 | 8 min | 🔴 |
-| 26 | Delete `FileNode.html` field + `HTML()` accessor | T4 | 5 min | 🟠 |
-| 27 | Delete `FileNode.toc` field + `TOC()` accessor | T4 | 5 min | 🟠 |
-| 28 | Delete `FileNode.metadata` field + `Metadata()` accessor | T4 | 5 min | 🟠 |
-| 29 | Delete `FileNode.hasMermaid` field + `HasMermaid()` accessor | T4 | 5 min | 🟠 |
-| 30 | Delete `SimpleRenderer` + `NewSimpleRenderer` + test | T5 | 10 min | 🟠 |
-| 31 | Delete `NewRenderedFile()` constructor, keep `NewRenderedFileWithContent` | T6 | 5 min | 🟠 |
-| 32 | Update `types_test.go` to use `NewRenderedFileWithContent` | T6 | 5 min | 🟠 |
-| 33 | Export `skipDirs` from `content/helpers.go` as `SkipDirs` | T7 | 3 min | 🟠 |
-| 34 | Update `watcher.go` to use `content.SkipDirs` instead of inline list | T7 | 5 min | 🟠 |
-| 35 | Export `isMarkdownFile` as `IsMarkdownFile` from content (if not already) | T8 | 3 min | 🟠 |
-| 36 | Update `watcher.go` `shouldTriggerRefresh` to use `content.IsMarkdownFile` | T8 | 5 min | 🟠 |
-| 37 | Create `getContentType` in `content/helpers.go` with configurable default | T9 | 8 min | 🟠 |
-| 38 | Update `server/static.go` to use unified `getContentType` | T9 | 5 min | 🟠 |
-| 39 | Move `SuggestedPath` to `domain/suggestion.go` | T10 | 5 min | 🟠 |
-| 40 | Update `server/suggestions.go` to use `domain.SuggestedPath` | T10 | 5 min | 🟠 |
-| 41 | Update `layout.templ` to use `domain.SuggestedPath` | T10 | 8 min | 🟠 |
-| 42 | Delete `convertToTemplateSuggestions` function | T10 | 3 min | 🟠 |
-| 43 | Run `templ generate` after template change | T10 | 2 min | 🟠 |
-| 44 | Replace manual `Get`+`Set` in `render.go` with `cache.GetOrCompute` | T11 | 10 min | 🟡 |
-| 45 | Apply `config.Timeout` to HTTP server via `http.Server.ReadTimeout`/`WriteTimeout` | T12 | 10 min | 🟡 |
-| 46 | Add snippet rendering to `SearchResultCard` in `layout.templ` | T13 | 8 min | 🟡 |
-| 47 | Decide: delete testutil package OR refactor tests to use it | T14 | 10 min | 🟡 |
-| 48 | Delete `HasReadme` field from `DirectoryViewProps` (or implement) | T15 | 5 min | 🟡 |
-| 49 | Standardize error wrapping to `errors.Wrapf` in `config/config.go` | T16 | 5 min | 🟡 |
-| 50 | Standardize error wrapping in `content/filesystem.go` and `blob.go` | T16 | 5 min | 🟡 |
-| 51 | Write graceful shutdown test: SIGTERM → drain → stop | T17 | 10 min | 🟡 |
-| 52 | Write rate limiter test: exceed limit → 429 response | T18 | 10 min | 🟡 |
-| 53 | Write container integration test: verify all services resolve | T19 | 10 min | 🟡 |
-| 54 | Run `go mod tidy` to clean up unused deps | T24 | 3 min | 🟢 |
-| 55 | Fix Dependabot: update `google.golang.org/grpc` dependency | T24 | 5 min | 🔴 |
-| 56 | Add git pre-push hook via `just pre-push` | T23 | 5 min | 🟢 |
-| 57 | Run full test suite + lint after all changes | All | 5 min | 🔴 |
-| 58 | `git push` all commits to origin | All | 2 min | 🔴 |
-| 59 | Verify CI passes on pushed commit | All | 5 min | 🔴 |
-| 60 | Update TODO_LIST.md with completed items | All | 5 min | 🟢 |
+| #   | Task                                                                                    | Parent | Est    | Impact |
+| --- | --------------------------------------------------------------------------------------- | ------ | ------ | ------ |
+| 1   | Fix `sitemap_test.go`: replace `NewRequest` → `NewRequestWithContext` (7 call sites)    | T1     | 8 min  | 🔴     |
+| 2   | Fix `golines` formatting: `file.go:130`                                                 | T1     | 3 min  | 🔴     |
+| 3   | Fix `golines` formatting: `admonition_extension.go`                                     | T1     | 3 min  | 🔴     |
+| 4   | Fix `golines` formatting: `admonition_extension_test.go`                                | T1     | 3 min  | 🔴     |
+| 5   | Fix `golines` formatting: `diagram_extension.go`                                        | T1     | 3 min  | 🔴     |
+| 6   | Fix `revive` comments on `AdmonitionExtension` exports                                  | T1     | 5 min  | 🔴     |
+| 7   | Fix `revive` unused param `source` in admonition_extension.go                           | T1     | 2 min  | 🔴     |
+| 8   | Fix `errcheck` on `fmt.Fprintf` in admonition_extension.go (2 sites)                    | T1     | 5 min  | 🔴     |
+| 9   | Fix `exhaustruct` on `ast.BaseBlock` in admonition_extension.go                         | T1     | 3 min  | 🔴     |
+| 10  | Fix `exhaustruct` on `server.URLSet` in sitemap.go                                      | T1     | 3 min  | 🔴     |
+| 11  | Fix `gochecknoglobals`: add nolint for `hasMermaidKey` (intentional parser context key) | T1     | 2 min  | 🔴     |
+| 12  | Fix `gochecknoglobals`: add nolint for `alertTitles` (intentional const map)            | T1     | 2 min  | 🔴     |
+| 13  | Fix `goconst`: extract `"example.com"` to const in sitemap_test.go                      | T1     | 3 min  | 🔴     |
+| 14  | Fix `funlen`: split `TestFileSystemRepository_GetRaw` into subtests                     | T1     | 8 min  | 🔴     |
+| 15  | Fix `testifylint`: use `assert.InEpsilon` in sitemap_test.go                            | T1     | 2 min  | 🔴     |
+| 16  | Fix `cyclop`: reduce `getContentType` complexity below 10                               | T1     | 8 min  | 🔴     |
+| 17  | Add `.golangci.yml` exclusion for `gochecknoglobals` on parser context keys             | T1     | 3 min  | 🔴     |
+| 18  | Run `golangci-lint run ./...` and verify 0 issues                                       | T1     | 5 min  | 🔴     |
+| 19  | Define `Renderer` interface in server package (Render method)                           | T2     | 8 min  | 🔴     |
+| 20  | Change `Server.renderer` field from `*GoldmarkRenderer` to `Renderer`                   | T2     | 8 min  | 🔴     |
+| 21  | Change `NewServer` signature to accept `Renderer` parameter                             | T2     | 8 min  | 🔴     |
+| 22  | Update `container.go` to pass DI renderer to `NewServer`                                | T2     | 5 min  | 🔴     |
+| 23  | Update all test files that call `NewServer` with new signature                          | T2     | 10 min | 🔴     |
+| 24  | Write E2E test: POST markdown with `\`\`\`d2` block, verify SVG in output               | T3     | 10 min | 🔴     |
+| 25  | Write E2E test: POST markdown with `\`\`\`mermaid` block, verify mermaid div            | T3     | 8 min  | 🔴     |
+| 26  | Delete `FileNode.html` field + `HTML()` accessor                                        | T4     | 5 min  | 🟠     |
+| 27  | Delete `FileNode.toc` field + `TOC()` accessor                                          | T4     | 5 min  | 🟠     |
+| 28  | Delete `FileNode.metadata` field + `Metadata()` accessor                                | T4     | 5 min  | 🟠     |
+| 29  | Delete `FileNode.hasMermaid` field + `HasMermaid()` accessor                            | T4     | 5 min  | 🟠     |
+| 30  | Delete `SimpleRenderer` + `NewSimpleRenderer` + test                                    | T5     | 10 min | 🟠     |
+| 31  | Delete `NewRenderedFile()` constructor, keep `NewRenderedFileWithContent`               | T6     | 5 min  | 🟠     |
+| 32  | Update `types_test.go` to use `NewRenderedFileWithContent`                              | T6     | 5 min  | 🟠     |
+| 33  | Export `skipDirs` from `content/helpers.go` as `SkipDirs`                               | T7     | 3 min  | 🟠     |
+| 34  | Update `watcher.go` to use `content.SkipDirs` instead of inline list                    | T7     | 5 min  | 🟠     |
+| 35  | Export `isMarkdownFile` as `IsMarkdownFile` from content (if not already)               | T8     | 3 min  | 🟠     |
+| 36  | Update `watcher.go` `shouldTriggerRefresh` to use `content.IsMarkdownFile`              | T8     | 5 min  | 🟠     |
+| 37  | Create `getContentType` in `content/helpers.go` with configurable default               | T9     | 8 min  | 🟠     |
+| 38  | Update `server/static.go` to use unified `getContentType`                               | T9     | 5 min  | 🟠     |
+| 39  | Move `SuggestedPath` to `domain/suggestion.go`                                          | T10    | 5 min  | 🟠     |
+| 40  | Update `server/suggestions.go` to use `domain.SuggestedPath`                            | T10    | 5 min  | 🟠     |
+| 41  | Update `layout.templ` to use `domain.SuggestedPath`                                     | T10    | 8 min  | 🟠     |
+| 42  | Delete `convertToTemplateSuggestions` function                                          | T10    | 3 min  | 🟠     |
+| 43  | Run `templ generate` after template change                                              | T10    | 2 min  | 🟠     |
+| 44  | Replace manual `Get`+`Set` in `render.go` with `cache.GetOrCompute`                     | T11    | 10 min | 🟡     |
+| 45  | Apply `config.Timeout` to HTTP server via `http.Server.ReadTimeout`/`WriteTimeout`      | T12    | 10 min | 🟡     |
+| 46  | Add snippet rendering to `SearchResultCard` in `layout.templ`                           | T13    | 8 min  | 🟡     |
+| 47  | Decide: delete testutil package OR refactor tests to use it                             | T14    | 10 min | 🟡     |
+| 48  | Delete `HasReadme` field from `DirectoryViewProps` (or implement)                       | T15    | 5 min  | 🟡     |
+| 49  | Standardize error wrapping to `errors.Wrapf` in `config/config.go`                      | T16    | 5 min  | 🟡     |
+| 50  | Standardize error wrapping in `content/filesystem.go` and `blob.go`                     | T16    | 5 min  | 🟡     |
+| 51  | Write graceful shutdown test: SIGTERM → drain → stop                                    | T17    | 10 min | 🟡     |
+| 52  | Write rate limiter test: exceed limit → 429 response                                    | T18    | 10 min | 🟡     |
+| 53  | Write container integration test: verify all services resolve                           | T19    | 10 min | 🟡     |
+| 54  | Run `go mod tidy` to clean up unused deps                                               | T24    | 3 min  | 🟢     |
+| 55  | Fix Dependabot: update `google.golang.org/grpc` dependency                              | T24    | 5 min  | 🔴     |
+| 56  | Add git pre-push hook via `just pre-push`                                               | T23    | 5 min  | 🟢     |
+| 57  | Run full test suite + lint after all changes                                            | All    | 5 min  | 🔴     |
+| 58  | `git push` all commits to origin                                                        | All    | 2 min  | 🔴     |
+| 59  | Verify CI passes on pushed commit                                                       | All    | 5 min  | 🔴     |
+| 60  | Update TODO_LIST.md with completed items                                                | All    | 5 min  | 🟢     |
 
 ---
 
@@ -327,6 +327,7 @@ graph LR
 **Problem:** Server depends on `*renderer.GoldmarkRenderer` directly, preventing DI injection.
 
 **Decision:** Define a `Renderer` interface in the server package:
+
 ```go
 type Renderer interface {
     Render(content []byte) (domain.RenderedContent, error)
@@ -357,16 +358,16 @@ The `GoldmarkRenderer` already satisfies this interface. No wrapper needed.
 
 ## Customer Value Mapping
 
-| Task | How It Creates Customer Value |
-|------|-------------------------------|
-| Fix CI lint | Green CI → faster iteration → fewer bugs shipped |
-| Wire DI renderer | **Diagrams render in production** — the #1 advertised feature was broken |
-| Delete dead code | Faster builds, less confusion, easier onboarding |
-| Fix split brains | Single source of truth → fewer bugs from divergent lists |
-| Use GetOrCompute | No cache stampede under load → better performance |
-| Apply Timeout | Server respects configured timeouts → no hung connections |
-| Render Snippet | Search results show context → users find content faster |
-| Implement HasReadme | Directory views show README → better navigation UX |
-| E2E diagram tests | Prevents diagram regression → feature stays working |
-| Pre-push hook | Prevents broken pushes → CI always green |
-| Dependabot fix | No known vulnerabilities → secure deployment |
+| Task                | How It Creates Customer Value                                            |
+| ------------------- | ------------------------------------------------------------------------ |
+| Fix CI lint         | Green CI → faster iteration → fewer bugs shipped                         |
+| Wire DI renderer    | **Diagrams render in production** — the #1 advertised feature was broken |
+| Delete dead code    | Faster builds, less confusion, easier onboarding                         |
+| Fix split brains    | Single source of truth → fewer bugs from divergent lists                 |
+| Use GetOrCompute    | No cache stampede under load → better performance                        |
+| Apply Timeout       | Server respects configured timeouts → no hung connections                |
+| Render Snippet      | Search results show context → users find content faster                  |
+| Implement HasReadme | Directory views show README → better navigation UX                       |
+| E2E diagram tests   | Prevents diagram regression → feature stays working                      |
+| Pre-push hook       | Prevents broken pushes → CI always green                                 |
+| Dependabot fix      | No known vulnerabilities → secure deployment                             |
