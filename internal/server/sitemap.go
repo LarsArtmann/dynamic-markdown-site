@@ -35,7 +35,7 @@ func (s *Server) handleSitemapXML(c *gin.Context) {
 	entries := s.buildSitemapEntries(root, baseURL)
 
 	urlset := URLSet{
-		XMLName: xml.Name{Local: "urlset"},
+		XMLName: xml.Name{Space: "http://www.sitemaps.org/schemas/sitemap/0.9", Local: "urlset"},
 		URLs:    entries,
 	}
 

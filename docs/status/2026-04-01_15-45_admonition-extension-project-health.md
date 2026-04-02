@@ -75,18 +75,17 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 
 ## e) WHAT WE SHOULD IMPROVE 🎯
 
-1. **Restore `.golangci.yml`** — The linter config is foundational. Without it, CI runs with defaults, not the project's 75-linter strict config.
-2. **Integration tests** — No end-to-end tests exist. The renderer, server, and content packages are tested in isolation but never together.
-3. **Container package tests** — 0% coverage on DI wiring is a risk. A misconfigured container only fails at runtime.
-4. **Admonition edge cases** — Nested blockquotes in alerts, alert inside list items, `[!TYPE]` not at start of blockquote.
-5. **Update FEATURES.md** — Now 3 features behind: admonition blocks, sitemap.xml, and the recent AST-based mermaid detection.
-6. **Pre-push hooks** — `just pre-push` exists but isn't wired as a git hook. Easy win for CI safety.
-7. **CI golangci-lint version pinning** — Currently unpinned, could break on new releases.
-8. **Go module caching in CI** — Every run downloads all dependencies. Significant speed win available.
+1. **Integration tests** — No end-to-end tests exist. The renderer, server, and content packages are tested in isolation but never together.
+2. **Container package tests** — 0% coverage on DI wiring is a risk. A misconfigured container only fails at runtime.
+3. **Admonition edge cases** — Nested blockquotes in alerts, alert inside list items, `[!TYPE]` not at start of blockquote.
+4. **Update FEATURES.md** — Now 3 features behind: admonition blocks, sitemap.xml, and the recent AST-based mermaid detection.
+5. **Pre-push hooks** — `just pre-push` exists but isn't wired as a git hook. Easy win for CI safety.
+6. **CI golangci-lint version pinning** — Currently unpinned, could break on new releases.
+7. **Go module caching in CI** — Every run downloads all dependencies. Significant speed win available.
 
 ---
 
-## f) Top 25 Things We Should Get Done Next
+## f) Top 24 Things We Should Get Done Next
 
 | # | Priority | Item | Effort | Impact |
 |---|---|---|---|---|
@@ -118,17 +117,9 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 
 ---
 
-## g) Top #1 Question I Cannot Answer Myself
+## g) Resolved Questions
 
-**What happened to `.golangci.yml`?**
-
-The project's AGENTS.md, TODO_LIST.md, and multiple status reports reference a `.golangci.yml` with ~75 linters configured. It's supposed to contain exclusions for `exhaustruct`, `golines`, etc. But the file does not exist on disk and doesn't appear in recent git history (last 20 commits). Was it:
-- Removed intentionally?
-- Lost in a force-push?
-- Never committed to this branch?
-- In `.gitignore`?
-
-This is important because CI correctness depends on this file. Without it, golangci-lint runs with defaults, which means the "0 issues" claim may be false — it's just checking fewer things.
+**`.golangci.yml`** — Initially reported as missing during this session, but confirmed to exist on disk (193 lines, tracked by git, unchanged since commit `09ff07a`). The file configures 75+ linters and is actively used by CI. No action needed.
 
 ---
 

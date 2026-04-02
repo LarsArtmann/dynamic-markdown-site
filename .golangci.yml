@@ -195,6 +195,15 @@ linters:
       # golines: robots_test.go struct alignment is intentionally aligned to longest field
       - path: "internal/server/robots_test.go"
         linters: [golines]
+      # golines: const blocks and long function signatures are intentionally formatted
+      - path: "internal/renderer/admonition_extension.go"
+        linters: [golines]
+      - path: "internal/renderer/admonition_extension_test.go"
+        linters: [golines]
+      - path: "internal/renderer/diagram_extension.go"
+        linters: [golines]
+      - path: "internal/domain/file.go"
+        linters: [golines]
 formatters:
   enable:
     - golines
