@@ -446,7 +446,11 @@ func TestRenderedFile_Metadata(t *testing.T) {
 	}
 
 	// Create RenderedFile with metadata - this is the immutable pattern
-	renderedFile := domain.NewRenderedFile(node, "<p>content</p>", nil, meta, false)
+	renderedFile := domain.NewRenderedFileWithContent(node, domain.RenderedContent{
+		HTML:     domain.HTML("<p>content</p>"),
+		TOC:      nil,
+		Metadata: meta,
+	})
 
 	if renderedFile.Metadata().Title != "Actual Title" {
 		t.Errorf("Metadata().Title = %q, want %q", renderedFile.Metadata().Title, "Actual Title")
