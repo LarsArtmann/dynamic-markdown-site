@@ -89,32 +89,30 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 
 | # | Priority | Item | Effort | Impact |
 |---|---|---|---|---|
-| 1 | 🔴 | **Restore `.golangci.yml`** to repo (75-linter config) | Small | Critical — CI correctness |
-| 2 | 🔴 | **Address GitHub security vulnerabilities** in dependencies (`go vuln check`) | Small | Critical — supply chain |
-| 3 | 🔴 | **Fix local Go cache corruption** (reported in prior status) | Small | Developer experience |
-| 4 | 🔴 | **Add `templ generate` check to CI** — detect stale generated templates | Small | Prevents silent breakage |
-| 5 | 🟡 | **Write integration tests** for HTTP endpoints (full request lifecycle) | Medium | Confidence in shipping |
-| 6 | 🟡 | **Container package tests** — DI wiring, service lifecycle, shutdown order | Medium | Runtime safety |
-| 7 | 🟡 | **Add git pre-push hook** calling `just pre-push` | Small | Catch issues before CI |
-| 8 | 🟡 | **Pin golangci-lint version** in GitHub Actions workflow | Small | CI stability |
-| 9 | 🟡 | **Add Go module caching** in CI (`actions/cache` or `setup-go` cache) | Small | 2-5x CI speedup |
-| 10 | 🟡 | **Update FEATURES.md** with admonition blocks, sitemap, AST mermaid detection | Small | Documentation accuracy |
-| 11 | 🟡 | **Update CHANGELOG.md** with recent features since v0.1.0 | Small | Release tracking |
-| 12 | 🟡 | **Add Prometheus metrics endpoint** (`/metrics`) | Medium | Observability |
-| 13 | 🟡 | **Structured health check** with version, uptime, cache stats | Small | Production readiness |
-| 14 | 🟡 | **Add Docker HEALTHCHECK** instruction | Small | Container orchestration |
-| 15 | 🟡 | **Split large test files** (search_test.go 685 lines, handlers_test.go 667 lines) | Medium | Maintainability |
-| 16 | 🟡 | **Add coverage enforcement** to CI (≥75% threshold) | Small | Quality gate |
-| 17 | 🟡 | **Rate limit search endpoint** (currently only /refresh is rate-limited) | Small | Abuse prevention |
-| 18 | 🟡 | **Add gzip/brotli compression** middleware | Medium | Performance (30-70% size reduction) |
-| 19 | 🟡 | **Add ETag/If-None-Match** support | Medium | Bandwidth + caching |
-| 20 | 🟢 | **Kubernetes manifests** (Deployment + Service + ConfigMap) | Medium | Deployment flexibility |
-| 21 | 🟢 | **Add pprof profiling endpoint** (behind build tag or dev mode) | Small | Production debugging |
-| 22 | 🟢 | **Code copy button** on fenced code blocks | Small | UX improvement |
-| 23 | 🟢 | **Print stylesheet** | Small | UX improvement |
-| 24 | 🟢 | **RSS/Atom feed generation** | Medium | Content distribution |
-| 25 | 🟢 | **Dark/light mode toggle** (currently dark-only) | Medium | User preference |
-
+| 1 | 🔴 | **Address GitHub security vulnerabilities** in dependencies (`go vuln check`) | Small | Critical — supply chain |
+| 2 | 🔴 | **Fix local Go cache corruption** (reported in prior status) | Small | Developer experience |
+| 3 | 🔴 | **Add `templ generate` check to CI** — detect stale generated templates | Small | Prevents silent breakage |
+| 4 | 🟡 | **Write integration tests** for HTTP endpoints (full request lifecycle) | Medium | Confidence in shipping |
+| 5 | 🟡 | **Container package tests** — DI wiring, service lifecycle, shutdown order | Medium | Runtime safety |
+| 6 | 🟡 | **Add git pre-push hook** calling `just pre-push` | Small | Catch issues before CI |
+| 7 | 🟡 | **Pin golangci-lint version** in GitHub Actions workflow | Small | CI stability |
+| 8 | 🟡 | **Add Go module caching** in CI (`actions/cache` or `setup-go` cache) | Small | 2-5x CI speedup |
+| 9 | 🟡 | **Update FEATURES.md** with admonition blocks, sitemap, AST mermaid detection | Small | Documentation accuracy |
+| 10 | 🟡 | **Update CHANGELOG.md** with recent features since v0.1.0 | Small | Release tracking |
+| 11 | 🟡 | **Add Prometheus metrics endpoint** (`/metrics`) | Medium | Observability |
+| 12 | 🟡 | **Structured health check** with version, uptime, cache stats | Small | Production readiness |
+| 13 | 🟡 | **Add Docker HEALTHCHECK** instruction | Small | Container orchestration |
+| 14 | 🟡 | **Split large test files** (search_test.go 685 lines, handlers_test.go 667 lines) | Medium | Maintainability |
+| 15 | 🟡 | **Add coverage enforcement** to CI (≥75% threshold) | Small | Quality gate |
+| 16 | 🟡 | **Rate limit search endpoint** (currently only /refresh is rate-limited) | Small | Abuse prevention |
+| 17 | 🟡 | **Add gzip/brotli compression** middleware | Medium | Performance (30-70% size reduction) |
+| 18 | 🟡 | **Add ETag/If-None-Match** support | Medium | Bandwidth + caching |
+| 19 | 🟢 | **Kubernetes manifests** (Deployment + Service + ConfigMap) | Medium | Deployment flexibility |
+| 20 | 🟢 | **Add pprof profiling endpoint** (behind build tag or dev mode) | Small | Production debugging |
+| 21 | 🟢 | **Code copy button** on fenced code blocks | Small | UX improvement |
+| 22 | 🟢 | **Print stylesheet** | Small | UX improvement |
+| 23 | 🟢 | **RSS/Atom feed generation** | Medium | Content distribution |
+| 24 | 🟢 | **Dark/light mode toggle** (currently dark-only) | Medium | User preference |
 ---
 
 ## g) Resolved Questions
