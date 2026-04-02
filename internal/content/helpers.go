@@ -49,29 +49,28 @@ func isMarkdownFile(name string) bool {
 	return ext == ".md" || ext == ".markdown"
 }
 
+// contentTypes maps file extensions to MIME types.
+//
+//nolint:gochecknoglobals
+var contentTypes = map[string]string{
+	".svg":  "image/svg+xml",
+	".png":  "image/png",
+	".jpg":  "image/jpeg",
+	".jpeg": "image/jpeg",
+	".gif":  "image/gif",
+	".webp": "image/webp",
+	".css":  "text/css",
+	".js":   "application/javascript",
+	".json": "application/json",
+	".pdf":  "application/pdf",
+}
+
 func getContentType(name string) string {
 	ext := strings.ToLower(filepath.Ext(name))
 
-	switch ext {
-	case ".svg":
-		return "image/svg+xml"
-	case ".png":
-		return "image/png"
-	case ".jpg", ".jpeg":
-		return "image/jpeg"
-	case ".gif":
-		return "image/gif"
-	case ".webp":
-		return "image/webp"
-	case ".css":
-		return "text/css"
-	case ".js":
-		return "application/javascript"
-	case ".json":
-		return "application/json"
-	case ".pdf":
-		return "application/pdf"
-	default:
-		return "application/octet-stream"
+	if ct, ok := contentTypes[ext]; ok {
+		return ct
 	}
+
+	return "application/octet-stream"
 }

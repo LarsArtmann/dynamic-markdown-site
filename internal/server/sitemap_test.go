@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/xml"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +16,8 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
+const testHost = "example.com"
+
 func TestSitemapXMLEmptyRepo(t *testing.T) {
 	t.Parallel()
 
@@ -22,8 +25,8 @@ func TestSitemapXMLEmptyRepo(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -53,8 +56,8 @@ func TestSitemapXMLWithFiles(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -100,8 +103,8 @@ func TestSitemapXMLWithDirectories(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -123,8 +126,8 @@ func TestSitemapXMLSkipsRootPath(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -157,8 +160,8 @@ func TestSitemapXMLHasCleanURLs(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -189,8 +192,8 @@ func TestSitemapXMLHTTPSEnvironment(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	req.Header.Set("X-Forwarded-Proto", "https")
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -204,8 +207,8 @@ func TestSitemapXMLRepositoryError(t *testing.T) {
 
 	router := newFailingTestServer(t)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -241,7 +244,7 @@ func TestCalculatePriority(t *testing.T) {
 				path = domain.MustURLPath(strings.Repeat("/a", tt.segments))
 			}
 			result := server.calculatePriority(path)
-			assert.Equal(t, tt.expected, result)
+			assert.InEpsilon(t, tt.expected, result, 0.001)
 		})
 	}
 }
@@ -273,8 +276,8 @@ func TestSitemapXMLCacheHeaders(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequest(http.MethodGet, "/sitemap.xml", nil)
-	req.Host = "example.com"
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 

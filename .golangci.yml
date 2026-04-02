@@ -143,6 +143,8 @@ linters:
       # exhaustruct: ast.BaseBlock has unexported fields, cannot fully initialize
       - path: "internal/renderer/diagram_extension.go"
         linters: [exhaustruct]
+      - path: "internal/renderer/admonition_extension.go"
+        linters: [exhaustruct]
       # funlen: Complex test functions with many table-driven cases
       - path: "internal/renderer/markdown_bench_test.go"
         linters: [funlen]
@@ -152,12 +154,20 @@ linters:
       - path: "internal/content/filesystem_test.go"
         linters: [funlen]
         text: "Function 'TestFileSystemRepository_Get' is too long"
+      - path: "internal/content/filesystem_test.go"
+        linters: [funlen]
+        text: "Function 'TestFileSystemRepository_GetRaw' is too long"
       # gochecknoinits: Test init functions for benchmark setup
       - path: "(.*)_test\\.go"
         linters: [gochecknoinits]
       # gochecknoinits: testutil uses init to set gin test mode
       - path: "internal/testutil/"
         linters: [gochecknoinits]
+      # gochecknoglobals: intentional const maps and parser context keys
+      - path: "internal/renderer/admonition_extension.go"
+        linters: [gochecknoglobals]
+      - path: "internal/renderer/diagram_extension.go"
+        linters: [gochecknoglobals]
       # gocognit: buildTree has inherent complexity from path hierarchy processing
       - path: "internal/content/blob.go"
         linters: [gocognit]

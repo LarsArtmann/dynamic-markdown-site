@@ -230,12 +230,16 @@ func stripAlertNodes(para *ast.Paragraph, source []byte, consumed int) {
 	}
 }
 
+// AdmonitionExtension converts GitHub-style alert blocks ([!NOTE], [!TIP], etc.)
+// into styled HTML admonition components.
 type AdmonitionExtension struct{}
 
+// NewAdmonitionExtension creates a new AdmonitionExtension.
 func NewAdmonitionExtension() *AdmonitionExtension {
 	return &AdmonitionExtension{}
 }
 
+// Extend registers the admonition transformer and renderer with the Goldmark parser.
 func (ae *AdmonitionExtension) Extend(m goldmark.Markdown) {
 	m.Parser().AddOptions(parser.WithASTTransformers(
 		util.Prioritized(&admonitionTransformer{}, 99),
@@ -254,7 +258,7 @@ func (r *admonitionNodeRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegi
 
 func (r *admonitionNodeRenderer) renderAdmonition(
 	w util.BufWriter,
-	source []byte,
+	_ []byte,
 	node ast.Node,
 	entering bool,
 ) (ast.WalkStatus, error) {
@@ -271,8 +275,8 @@ func (r *admonitionNodeRenderer) renderAdmonition(
 	kind := string(admonition.kind)
 	title := alertTitles[admonition.kind]
 
-	fmt.Fprintf(w, "<div class=\"admonition admonition-%s\">\n", kind)
-	fmt.Fprintf(w, "<div class=\"admonition-title\">%s</div>\n", title)
+	_, _ = fmt.Fprintf(w, "<div class=\"admonition admonition-%s\">\n", kind)
+	_, _ = fmt.Fprintf(w, "<div class=\"admonition-title\">%s</div>\n", title)
 	_, _ = w.WriteString("<div class=\"admonition-content\">\n")
 
 	return ast.WalkContinue, nil

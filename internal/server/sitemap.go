@@ -34,7 +34,10 @@ func (s *Server) handleSitemapXML(c *gin.Context) {
 	baseURL := s.baseURL(c)
 	entries := s.buildSitemapEntries(root, baseURL)
 
-	urlset := URLSet{URLs: entries}
+	urlset := URLSet{
+		XMLName: xml.Name{Local: "urlset"},
+		URLs:    entries,
+	}
 
 	c.Header("Content-Type", "application/xml; charset=utf-8")
 	c.Header("Cache-Control", "public, max-age=3600")
