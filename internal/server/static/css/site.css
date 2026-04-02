@@ -32,6 +32,20 @@
 	--color-warning: #ffd166;
 	--color-success: #06d6a0;
 
+	/* Admonition Colors */
+	--admonition-note: #2563eb;
+	--admonition-note-light: #60a5fa;
+	--admonition-tip: #059669;
+	--admonition-tip-light: #34d399;
+	--admonition-important: #7c3aed;
+	--admonition-important-light: #a78bfa;
+	--admonition-warning-color: #d97706;
+	--admonition-warning-light: #fbbf24;
+	--admonition-caution: #dc2626;
+	--admonition-caution-light: #f87171;
+	--admonition-critical: #ff0040;
+	--admonition-critical-light: #ff4d6d;
+
 	/* Typography */
 	--font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
 	--font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -392,63 +406,63 @@ body {
 
 /* Note — blue/cyan */
 .markdown-content .admonition-note {
-	border-color: #2563eb;
-	background-color: rgba(37, 99, 235, 0.08);
+	border-color: var(--admonition-note);
+	background-color: color-mix(in srgb, var(--admonition-note) 8%, transparent);
 }
 .markdown-content .admonition-note .admonition-title {
-	background-color: rgba(37, 99, 235, 0.2);
-	color: #60a5fa;
+	background-color: color-mix(in srgb, var(--admonition-note) 20%, transparent);
+	color: var(--admonition-note-light);
 }
 
 /* Tip — green */
 .markdown-content .admonition-tip {
-	border-color: #059669;
-	background-color: rgba(5, 150, 105, 0.08);
+	border-color: var(--admonition-tip);
+	background-color: color-mix(in srgb, var(--admonition-tip) 8%, transparent);
 }
 .markdown-content .admonition-tip .admonition-title {
-	background-color: rgba(5, 150, 105, 0.2);
-	color: #34d399;
+	background-color: color-mix(in srgb, var(--admonition-tip) 20%, transparent);
+	color: var(--admonition-tip-light);
 }
 
 /* Important — purple */
 .markdown-content .admonition-important {
-	border-color: #7c3aed;
-	background-color: rgba(124, 58, 237, 0.08);
+	border-color: var(--admonition-important);
+	background-color: color-mix(in srgb, var(--admonition-important) 8%, transparent);
 }
 .markdown-content .admonition-important .admonition-title {
-	background-color: rgba(124, 58, 237, 0.2);
-	color: #a78bfa;
+	background-color: color-mix(in srgb, var(--admonition-important) 20%, transparent);
+	color: var(--admonition-important-light);
 }
 
 /* Warning — amber/yellow */
 .markdown-content .admonition-warning {
-	border-color: #d97706;
-	background-color: rgba(217, 119, 6, 0.08);
+	border-color: var(--admonition-warning-color);
+	background-color: color-mix(in srgb, var(--admonition-warning-color) 8%, transparent);
 }
 .markdown-content .admonition-warning .admonition-title {
-	background-color: rgba(217, 119, 6, 0.2);
-	color: #fbbf24;
+	background-color: color-mix(in srgb, var(--admonition-warning-color) 20%, transparent);
+	color: var(--admonition-warning-light);
 }
 
 /* Caution — red */
 .markdown-content .admonition-caution {
-	border-color: #dc2626;
-	background-color: rgba(220, 38, 38, 0.08);
+	border-color: var(--admonition-caution);
+	background-color: color-mix(in srgb, var(--admonition-caution) 8%, transparent);
 }
 .markdown-content .admonition-caution .admonition-title {
-	background-color: rgba(220, 38, 38, 0.2);
-	color: #f87171;
+	background-color: color-mix(in srgb, var(--admonition-caution) 20%, transparent);
+	color: var(--admonition-caution-light);
 }
 
 /* Critical — intense red with glow */
 .markdown-content .admonition-critical {
-	border-color: #ff0040;
-	background-color: rgba(255, 0, 64, 0.06);
-	box-shadow: 0 0 15px rgba(255, 0, 64, 0.1);
+	border-color: var(--admonition-critical);
+	background-color: color-mix(in srgb, var(--admonition-critical) 6%, transparent);
+	box-shadow: 0 0 15px color-mix(in srgb, var(--admonition-critical) 10%, transparent);
 }
 .markdown-content .admonition-critical .admonition-title {
-	background-color: rgba(255, 0, 64, 0.18);
-	color: #ff4d6d;
+	background-color: color-mix(in srgb, var(--admonition-critical) 18%, transparent);
+	color: var(--admonition-critical-light);
 	font-size: 0.95rem;
 }
 
