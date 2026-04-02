@@ -426,64 +426,6 @@ func TestRenderTable(t *testing.T) {
 	assertHTMLContains(t, html, "<tbody>", "table body")
 }
 
-// SimpleRenderer tests
-
-func TestNewSimpleRenderer(t *testing.T) {
-	t.Parallel()
-	renderer := NewSimpleRenderer()
-	if renderer == nil {
-		t.Fatal("NewSimpleRenderer() returned nil")
-	}
-
-	if renderer.md == nil {
-		t.Error("NewSimpleRenderer() renderer.md is nil")
-	}
-}
-
-func TestSimpleRendererRender(t *testing.T) {
-	t.Parallel()
-	input := "# Title\n\nParagraph with **bold**."
-
-	assertSimpleRendererContains(t, input, "<h1", "Should contain <h1> tag")
-	assertSimpleRendererContains(t, input, "<strong>", "Should contain <strong> tag")
-}
-
-// assertSimpleRendererContains renders markdown and asserts the result contains expected string.
-func assertSimpleRendererContains(t *testing.T, input, expected, errMsg string) {
-	t.Helper()
-
-	renderer := NewSimpleRenderer()
-
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("SimpleRenderer.Render() error: %v", err)
-	}
-
-	if !strings.Contains(string(result), expected) {
-		t.Error(errMsg)
-	}
-}
-
-func TestSimpleRendererTable(t *testing.T) {
-	t.Parallel()
-	assertSimpleRendererContains(
-		t,
-		"| A | B |\n|---|---|\n| 1 | 2 |",
-		"<table>",
-		"SimpleRenderer should support tables",
-	)
-}
-
-func TestSimpleRendererStrikethrough(t *testing.T) {
-	t.Parallel()
-	assertSimpleRendererContains(
-		t,
-		"~~strikethrough~~",
-		"<del>",
-		"SimpleRenderer should support strikethrough",
-	)
-}
-
 // Integration tests
 
 func TestRenderComplexDocument(t *testing.T) {

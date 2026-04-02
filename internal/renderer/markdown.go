@@ -269,31 +269,4 @@ func findTOCParent(orderedItems []*domain.TOCItem, level int) *domain.TOCItem {
 	return nil
 }
 
-// SimpleRenderer is a basic renderer without extensions, useful for previews.
-type SimpleRenderer struct {
-	md goldmark.Markdown
-}
 
-// NewSimpleRenderer creates a simple markdown renderer.
-func NewSimpleRenderer() *SimpleRenderer {
-	md := goldmark.New(
-		goldmark.WithExtensions(
-			extension.Table,
-			extension.Strikethrough,
-		),
-	)
-
-	return &SimpleRenderer{md: md}
-}
-
-// Render converts markdown to HTML without metadata extraction.
-func (r *SimpleRenderer) Render(source []byte) (domain.HTML, error) {
-	var buf bytes.Buffer
-
-	err := r.md.Convert(source, &buf)
-	if err != nil {
-		return "", errors.Wrap(err, "render markdown")
-	}
-
-	return domain.HTML(buf.String()), nil
-}
