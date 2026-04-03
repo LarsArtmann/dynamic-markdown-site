@@ -68,7 +68,11 @@ type diagramTransformer struct{}
 // Transform walks the AST and replaces mermaid/d2 fenced code blocks with diagramNodes.
 // Nodes are collected during the walk and replaced afterwards to avoid unsafe mutation during iteration.
 // It also sets a flag on the parser context when mermaid diagrams are detected.
-func (t *diagramTransformer) Transform(node *ast.Document, reader text.Reader, pctx parser.Context) {
+func (t *diagramTransformer) Transform(
+	node *ast.Document,
+	reader text.Reader,
+	pctx parser.Context,
+) {
 	source := reader.Source()
 	var replacements []diagramReplacement
 

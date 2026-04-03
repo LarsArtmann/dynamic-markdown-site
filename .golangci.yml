@@ -2,77 +2,127 @@ version: "2"
 run:
   timeout: 5m
   go: 1.26.1
-  build-tags: []
-  allow-parallel-runners: false
-  allow-serial-runners: false
+  build-tags:
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.simd
+  allow-parallel-runners: true
+  allow-serial-runners: true
   issues-exit-code: 1
   tests: true
 output:
   formats: {}
 linters:
   enable:
-    - maintidx
-    - mirror
-    - testifylint
-    - thelper
-    - loggercheck
-    - spancheck
-    - govet
-    - gosec
-    - gochecksumtype
-    - errchkjson
-    - unconvert
-    - gocritic
-    - errname
-    - usetesting
-    - sloglint
-    - wrapcheck
-    - nilnesserr
-    - nestif
-    - goconst
-    - predeclared
-    - wastedassign
-    - ginkgolinter
-    - funlen
-    - reassign
-    - gosmopolitan
-    - gochecknoglobals
-    - copyloopvar
-    - zerologlint
-    - interfacebloat
-    - cyclop
-    - gocognit
-    - sqlclosecheck
-    - nakedret
-    - staticcheck
-    - contextcheck
-    - dupl
-    - nilerr
-    - errcheck
-    - errorlint
-    - gochecknoinits
-    - prealloc
-    - protogetter
-    - unused
-    - recvcheck
-    - misspell
-    - revive
+    - arangolint
+    - asasalint
+    - asciicheck
+    - bidichk
     - bodyclose
-    - noctx
-    - unparam
-    - ineffassign
-    - nilnil
-    - nolintlint
-    - perfsprint
-    - rowserrcheck
-    - exhaustruct
-    - gocyclo
-    - intrange
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
     - durationcheck
-    - paralleltest
-    - musttag
-    - forcetypeassert
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
     - exhaustive
+    - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godoclint
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - modernize
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - noinlineerr
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
   settings:
     funlen:
       lines: 150
@@ -95,114 +145,139 @@ linters:
     generated: lax
     warn-unused: true
     rules:
-      # cyclop: config handling is inherently procedural with many conditionals
-      - path: "internal/config/config.go"
-        linters: [cyclop]
-      - path: "internal/content/blob.go"
-        linters: [cyclop]
-        text: "calculated cyclomatic complexity for function buildTree is"
-      - path: "internal/content/filesystem.go"
-        linters: [cyclop]
-        text: "calculated cyclomatic complexity for function walkEntry is 12"
-      - path: "cmd/dynamic-markdown-site/main.go"
-        linters: [cyclop]
-        text: "calculated cyclomatic complexity for function run is 12"
-      - path: "cmd/dynamic-markdown-site/watcher.go"
-        linters: [cyclop]
-        text: "calculated cyclomatic complexity for function watchForChanges is"
-      - path: "internal/server/suggestions.go"
-        linters: [cyclop]
-        text: "calculated cyclomatic complexity for function findSuggestions is"
-      # Test files often have complex table-driven tests
-      - path: "(.*)_test\\.go"
-        linters: [cyclop]
-      # exhaustruct: Test structs often don't need all fields - exclude all test files
-      - path: "(.*)_test\\.go"
-        linters: [exhaustruct]
-      # exhaustruct: Production code - partial struct initialization is intentional design
-      - path: "internal/content/filesystem.go"
-        linters: [exhaustruct]
-      - path: "internal/content/blob.go"
-        linters: [exhaustruct]
-      - path: "internal/content/memory.go"
-        linters: [exhaustruct]
-      - path: "internal/domain/file.go"
-        linters: [exhaustruct]
-      - path: "internal/renderer/markdown.go"
-        linters: [exhaustruct]
-      - path: "internal/server/ratelimit.go"
-        linters: [exhaustruct]
-      - path: "internal/server/render.go"
-        linters: [exhaustruct]
-      # exhaustruct: Third-party D2 library types have many optional fields
-      - path: "internal/renderer/diagrams.go"
-        linters: [exhaustruct]
-      # exhaustruct: ast.BaseBlock has unexported fields, cannot fully initialize
-      - path: "internal/renderer/diagram_extension.go"
-        linters: [exhaustruct]
-      - path: "internal/renderer/admonition_extension.go"
-        linters: [exhaustruct]
-      # funlen: Complex test functions with many table-driven cases
-      - path: "internal/renderer/markdown_bench_test.go"
-        linters: [funlen]
-      - path: "internal/renderer/admonition_extension_test.go"
-        linters: [funlen]
-        text: "Function 'TestAdmonitionExtension' is too long"
-      - path: "internal/content/search_test.go"
-        linters: [funlen]
-        text: "Function 'TestSearcher_Search' is too long"
-      - path: "internal/content/filesystem_test.go"
-        linters: [funlen]
-        text: "Function 'TestFileSystemRepository_Get' is too long"
-      - path: "internal/content/filesystem_test.go"
-        linters: [funlen]
-        text: "Function 'TestFileSystemRepository_GetRaw' is too long"
-      # gochecknoinits: Test init functions for benchmark setup
-      - path: "(.*)_test\\.go"
-        linters: [gochecknoinits]
-      # gochecknoglobals: intentional const maps and parser context keys
-      - path: "internal/renderer/admonition_extension.go"
-        linters: [gochecknoglobals]
-      - path: "internal/renderer/diagram_extension.go"
-        linters: [gochecknoglobals]
-      # gocognit: buildTree has inherent complexity from path hierarchy processing
-      - path: "internal/content/blob.go"
-        linters: [gocognit]
-      # gocognit: Complex functions that are inherently complex
-      - path: "(.*)_test\\.go"
-        linters: [gocognit]
-      - path: "cmd/dynamic-markdown-site/watcher.go"
-        linters: [gocognit]
-      # nestif: Complex control flow for file watching and debouncing
-      - path: "internal/container/container_test.go"
-        linters: [nestif]
-      - path: "cmd/dynamic-markdown-site/watcher.go"
-        linters: [nestif]
-      # paralleltest: Will be addressed separately - requires careful review
-      - path: "(.*)_test\\.go"
-        linters: [paralleltest]
-      # revive: Package name 'version' conflicts with go/version stdlib - ldflags require this path
-      - path: "internal/version/version.go"
-        linters: [revive]
-        text: "avoid package names that conflict with Go standard library package names"
-      # revive: Package comments not consistently enforced across codebase
-      - path: "internal/server/"
-        linters: [revive]
-        text: "should have a package comment"
-      # golines: robots_test.go struct alignment is intentionally aligned to longest field
-      - path: "internal/server/robots_test.go"
-        linters: [golines]
-      # golines: const blocks and long function signatures are intentionally formatted
-      - path: "internal/renderer/admonition_extension.go"
-        linters: [golines]
-      - path: "internal/renderer/admonition_extension_test.go"
-        linters: [golines]
-      - path: "internal/renderer/diagram_extension.go"
-        linters: [golines]
-      - path: "internal/domain/file.go"
-        linters: [golines]
+      - path: internal/config/config.go
+        linters:
+          - cyclop
+      - path: internal/content/blob.go
+        text: calculated cyclomatic complexity for function buildTree is
+        linters:
+          - cyclop
+      - path: internal/content/filesystem.go
+        text: calculated cyclomatic complexity for function walkEntry is 12
+        linters:
+          - cyclop
+      - path: cmd/dynamic-markdown-site/main.go
+        text: calculated cyclomatic complexity for function run is 12
+        linters:
+          - cyclop
+      - path: cmd/dynamic-markdown-site/watcher.go
+        text: calculated cyclomatic complexity for function watchForChanges is
+        linters:
+          - cyclop
+      - path: internal/server/suggestions.go
+        text: calculated cyclomatic complexity for function findSuggestions is
+        linters:
+          - cyclop
+      - path: (.*)_test\.go
+        linters:
+          - cyclop
+      - path: (.*)_test\.go
+        linters:
+          - exhaustruct
+      - path: internal/content/filesystem.go
+        linters:
+          - exhaustruct
+      - path: internal/content/blob.go
+        linters:
+          - exhaustruct
+      - path: internal/content/memory.go
+        linters:
+          - exhaustruct
+      - path: internal/domain/file.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/markdown.go
+        linters:
+          - exhaustruct
+      - path: internal/server/ratelimit.go
+        linters:
+          - exhaustruct
+      - path: internal/server/render.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/diagrams.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/diagram_extension.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/admonition_extension.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/markdown_bench_test.go
+        linters:
+          - funlen
+      - path: internal/renderer/admonition_extension_test.go
+        text: Function 'TestAdmonitionExtension' is too long
+        linters:
+          - funlen
+      - path: internal/content/search_test.go
+        text: Function 'TestSearcher_Search' is too long
+        linters:
+          - funlen
+      - path: internal/content/filesystem_test.go
+        text: Function 'TestFileSystemRepository_Get' is too long
+        linters:
+          - funlen
+      - path: internal/content/filesystem_test.go
+        text: Function 'TestFileSystemRepository_GetRaw' is too long
+        linters:
+          - funlen
+      - path: (.*)_test\.go
+        linters:
+          - gochecknoinits
+      - path: internal/renderer/admonition_extension.go
+        linters:
+          - gochecknoglobals
+      - path: internal/renderer/diagram_extension.go
+        linters:
+          - gochecknoglobals
+      - path: internal/content/blob.go
+        linters:
+          - gocognit
+      - path: (.*)_test\.go
+        linters:
+          - gocognit
+      - path: cmd/dynamic-markdown-site/watcher.go
+        linters:
+          - gocognit
+      - path: internal/container/container_test.go
+        linters:
+          - nestif
+      - path: cmd/dynamic-markdown-site/watcher.go
+        linters:
+          - nestif
+      - path: (.*)_test\.go
+        linters:
+          - paralleltest
+      - path: internal/version/version.go
+        text: avoid package names that conflict with Go standard library package names
+        linters:
+          - revive
+      - path: internal/server/
+        text: should have a package comment
+        linters:
+          - revive
+      - path: internal/server/robots_test.go
+        linters:
+          - golines
+      - path: internal/renderer/admonition_extension.go
+        linters:
+          - golines
+      - path: internal/renderer/admonition_extension_test.go
+        linters:
+          - golines
+      - path: internal/renderer/diagram_extension.go
+        linters:
+          - golines
+      - path: internal/domain/file.go
+        linters:
+          - golines
 formatters:
   enable:
+    - gci
+    - goimports
+    - gofumpt
     - golines
 issues:
   max-issues-per-linter: 100

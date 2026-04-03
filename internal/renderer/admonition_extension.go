@@ -75,7 +75,11 @@ func (n *admonitionNode) Dump(source []byte, level int) {
 
 type admonitionTransformer struct{}
 
-func (t *admonitionTransformer) Transform(node *ast.Document, reader text.Reader, _ parser.Context) {
+func (t *admonitionTransformer) Transform(
+	node *ast.Document,
+	reader text.Reader,
+	_ parser.Context,
+) {
 	source := reader.Source()
 	var replacements []struct {
 		parent ast.Node

@@ -67,7 +67,12 @@ func TestHandleRobotsTxt(t *testing.T) {
 			router := gin.New()
 			srv.RegisterRoutes(router)
 
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/robots.txt", nil)
+			req := httptest.NewRequestWithContext(
+				context.Background(),
+				http.MethodGet,
+				"/robots.txt",
+				nil,
+			)
 			req.Host = tt.host
 			if tt.forwardedProto != "" {
 				req.Header.Set("X-Forwarded-Proto", tt.forwardedProto)

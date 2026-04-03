@@ -7,6 +7,7 @@ import (
 
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/cockroachdb/errors"
+	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/samber/lo"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
@@ -15,8 +16,6 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
-
-	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
 // GoldmarkRenderer implements markdown rendering using goldmark.

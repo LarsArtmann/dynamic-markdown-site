@@ -16,16 +16,16 @@
 
 ### Committed & Pushed to origin/master
 
-| # | Commit | Task | Status |
-|---|--------|------|--------|
-| 1 | `8906c10` | Delete testutil package (ghost, 0 imports) | **DONE** |
-| 2 | Prior session | Unify skipDirs list (content vs watcher) | **DONE** |
-| 3 | Prior session | Unify isMarkdownFile (content vs watcher) | **DONE** |
-| 4 | Prior session | Unify getContentType (content vs server) | **DONE** |
-| 5 | `983431f` | Use cache.GetOrCompute in render.go | **DONE** |
-| 6 | `983431f` | Implement HasReadme properly (was hardcoded false) | **DONE** |
-| 7 | `983431f` | Render SearchResult.Snippet in template | **DONE** |
-| 8 | `983431f` | Unify SuggestedPath type into domain package | **DONE** |
+| #   | Commit        | Task                                               | Status   |
+| --- | ------------- | -------------------------------------------------- | -------- |
+| 1   | `8906c10`     | Delete testutil package (ghost, 0 imports)         | **DONE** |
+| 2   | Prior session | Unify skipDirs list (content vs watcher)           | **DONE** |
+| 3   | Prior session | Unify isMarkdownFile (content vs watcher)          | **DONE** |
+| 4   | Prior session | Unify getContentType (content vs server)           | **DONE** |
+| 5   | `983431f`     | Use cache.GetOrCompute in render.go                | **DONE** |
+| 6   | `983431f`     | Implement HasReadme properly (was hardcoded false) | **DONE** |
+| 7   | `983431f`     | Render SearchResult.Snippet in template            | **DONE** |
+| 8   | `983431f`     | Unify SuggestedPath type into domain package       | **DONE** |
 
 ### Earlier Completed (from TODO_LIST.md)
 
@@ -51,20 +51,22 @@
 
 ## b) PARTIALLY DONE
 
-| Task | What's Done | What's Missing |
-|------|-------------|----------------|
-| **grpc/Dependabot security fix** | go.mod changed from v1.77.0 to v1.68.1 | **DOWNGRADED instead of upgraded.** The Dependabot alert was for v1.77.0 or earlier. The fix should upgrade to latest (v1.80+). Current v1.68.1 is WORSE. Need `go get google.golang.org/grpc@latest && go mod tidy`. |
+| Task                             | What's Done                                                | What's Missing                                                                                                                                                                                                                 |
+| -------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **grpc/Dependabot security fix** | go.mod changed from v1.77.0 to v1.68.1                     | **DOWNGRADED instead of upgraded.** The Dependabot alert was for v1.77.0 or earlier. The fix should upgrade to latest (v1.80+). Current v1.68.1 is WORSE. Need `go get google.golang.org/grpc@latest && go mod tidy`.          |
 | **Build/Test/Lint verification** | Code changes compile-tested in prior session before commit | **Not verified this session.** Go build cache was corrupted then cleared. Disk at 99.9% prevents rebuilding (6.3GB module cache + 1.8GB build cache). No `go build`, `go test`, or `golangci-lint` has completed this session. |
-| **Status docs cleanup** | 17 status docs exist in `docs/status/` (3,759 lines) | Most are stale session artifacts. Only 2-3 have lasting value. Should be archived/deleted. |
+| **Status docs cleanup**          | 17 status docs exist in `docs/status/` (3,759 lines)       | Most are stale session artifacts. Only 2-3 have lasting value. Should be archived/deleted.                                                                                                                                     |
 
 ---
 
 ## c) NOT STARTED (from TODO_LIST.md, curated)
 
 ### HIGH Priority
+
 - Address GitHub security vulnerabilities in dependencies (grpc is WORSE now)
 
 ### MEDIUM Priority
+
 - Fix Go 1.26.1 environment mismatch for BuildFlow
 - Split large test files (search_test.go 685 lines, handlers_test.go 667 lines, markdown_test.go 609 lines)
 - Fix unused parameter warnings in container.go
@@ -78,6 +80,7 @@
 - Reading time estimates in UI
 
 ### CI/CD
+
 - Separate CI workflows: test.yml (fast) + docker.yml (build)
 - golangci-lint version pinning in workflow
 - `templ generate` check in CI
@@ -88,6 +91,7 @@
 - Pre-commit hook for golines
 
 ### Features (Not Started)
+
 - Dark mode / theme toggle
 - Syntax highlighting themes
 - Keyboard navigation
@@ -125,11 +129,11 @@ Additionally, `go mod tidy` pulled in gocloud.dev v0.40.0 (down from v0.45.0) an
 
 **Severity: ENVIRONMENT BLOCKER**
 
-| Path | Size |
-|------|------|
-| Go module cache (`~/go/pkg/mod/`) | 6.3GB |
-| Go build cache (`~/Library/Caches/go-build/`) | 1.8GB |
-| **Total recoverable** | **~8.1GB** |
+| Path                                          | Size       |
+| --------------------------------------------- | ---------- |
+| Go module cache (`~/go/pkg/mod/`)             | 6.3GB      |
+| Go build cache (`~/Library/Caches/go-build/`) | 1.8GB      |
+| **Total recoverable**                         | **~8.1GB** |
 
 Cannot build, test, or lint. Go compiler needs temporary space during compilation. The build cache was cleared earlier (`go clean -cache`) to fix corruption, which means every subsequent build recompiles from scratch, consuming even more disk during the process.
 
@@ -150,6 +154,7 @@ The code was committed and pushed to origin/master without verifying the build, 
 **Severity: MODERATE**
 
 The previous session's comprehensive context document is accurate but highlights a pattern:
+
 - Too many changes batched into one commit (8 files, 8 logical changes)
 - Should have been 8 small commits, verified independently
 - The grpc change should never have been bundled with the refactoring
@@ -187,33 +192,33 @@ The previous session's comprehensive context document is accurate but highlights
 
 Sorted by **impact × urgency / effort**:
 
-| # | Task | Impact | Effort | Why |
-|---|------|--------|--------|-----|
-| 1 | **Free disk space** (`go clean -modcache`) | CRITICAL | 1 min | Unblocks everything |
-| 2 | **Fix grpc dependency** — upgrade to latest, not downgrade | HIGH | 5 min | Security vulnerability is LIVE on master |
-| 3 | **Verify build passes** (`GOWORK=off go build ./...`) | HIGH | 5 min | Confirm code health |
-| 4 | **Verify tests pass** (`GOWORK=off go test ./... -count=1`) | HIGH | 2 min | Confirm correctness |
-| 5 | **Run linter** (`GOWORK=off golangci-lint run ./...`) | HIGH | 2 min | Confirm quality |
-| 6 | **Delete stale status docs** (15 of 17 files in `docs/status/`) | MEDIUM | 2 min | Reduce noise, save space |
-| 7 | **Install golines** (`go install github.com/segmentio/golines@latest`) | MEDIUM | 1 min | Fix formatting issues permanently |
-| 8 | **Remove unused `coverage.out`** (56KB) | LOW | 1 min | Stale artifact |
-| 9 | **Add git pre-push hook** (`just pre-push`) | MEDIUM | 5 min | Prevent future bad pushes |
-| 10 | **Split large test files** (3 files >600 lines each) | MEDIUM | 30 min | Maintainability |
-| 11 | **Separate CI workflows** (test.yml + docker.yml) | MEDIUM | 20 min | Faster feedback on PRs |
-| 12 | **Pin golangci-lint version in CI** | MEDIUM | 5 min | Reproducible linting |
-| 13 | **Add `templ generate` check to CI** | MEDIUM | 10 min | Catch template regression |
-| 14 | **Audit go.mod for unused deps** (gocloud.dev?) | HIGH | 15 min | 6.3GB module cache is 90% from transitive deps |
-| 15 | **Add gzip/brotli compression** | HIGH | 15 min | Major performance win for text-heavy site |
-| 16 | **Add ETag/If-None-Match** | MEDIUM | 15 min | Bandwidth savings |
-| 17 | **Dark mode CSS + theme toggle** | HIGH | 30 min | User-facing impact, high visibility |
-| 18 | **Add code copy button** to code blocks | HIGH | 15 min | UX staple for documentation sites |
-| 19 | **Split Repository interface** (Reader/Refresher) | MEDIUM | 20 min | Better abstraction |
-| 20 | **Add Docker HEALTHCHECK** | MEDIUM | 5 min | Production readiness |
-| 21 | **Add Prometheus/pprof endpoints** | MEDIUM | 20 min | Observability |
-| 22 | **RSS/Atom feed generation** | MEDIUM | 20 min | Content discoverability |
-| 23 | **Breadcrumbs for deep directory navigation** | MEDIUM | 15 min | Navigation UX |
-| 24 | **Rate limit search endpoint** | MEDIUM | 5 min | Security (refresh is limited, search isn't) |
-| 25 | **Content search autocomplete** | MEDIUM | 30 min | UX improvement |
+| #   | Task                                                                   | Impact   | Effort | Why                                            |
+| --- | ---------------------------------------------------------------------- | -------- | ------ | ---------------------------------------------- |
+| 1   | **Free disk space** (`go clean -modcache`)                             | CRITICAL | 1 min  | Unblocks everything                            |
+| 2   | **Fix grpc dependency** — upgrade to latest, not downgrade             | HIGH     | 5 min  | Security vulnerability is LIVE on master       |
+| 3   | **Verify build passes** (`GOWORK=off go build ./...`)                  | HIGH     | 5 min  | Confirm code health                            |
+| 4   | **Verify tests pass** (`GOWORK=off go test ./... -count=1`)            | HIGH     | 2 min  | Confirm correctness                            |
+| 5   | **Run linter** (`GOWORK=off golangci-lint run ./...`)                  | HIGH     | 2 min  | Confirm quality                                |
+| 6   | **Delete stale status docs** (15 of 17 files in `docs/status/`)        | MEDIUM   | 2 min  | Reduce noise, save space                       |
+| 7   | **Install golines** (`go install github.com/segmentio/golines@latest`) | MEDIUM   | 1 min  | Fix formatting issues permanently              |
+| 8   | **Remove unused `coverage.out`** (56KB)                                | LOW      | 1 min  | Stale artifact                                 |
+| 9   | **Add git pre-push hook** (`just pre-push`)                            | MEDIUM   | 5 min  | Prevent future bad pushes                      |
+| 10  | **Split large test files** (3 files >600 lines each)                   | MEDIUM   | 30 min | Maintainability                                |
+| 11  | **Separate CI workflows** (test.yml + docker.yml)                      | MEDIUM   | 20 min | Faster feedback on PRs                         |
+| 12  | **Pin golangci-lint version in CI**                                    | MEDIUM   | 5 min  | Reproducible linting                           |
+| 13  | **Add `templ generate` check to CI**                                   | MEDIUM   | 10 min | Catch template regression                      |
+| 14  | **Audit go.mod for unused deps** (gocloud.dev?)                        | HIGH     | 15 min | 6.3GB module cache is 90% from transitive deps |
+| 15  | **Add gzip/brotli compression**                                        | HIGH     | 15 min | Major performance win for text-heavy site      |
+| 16  | **Add ETag/If-None-Match**                                             | MEDIUM   | 15 min | Bandwidth savings                              |
+| 17  | **Dark mode CSS + theme toggle**                                       | HIGH     | 30 min | User-facing impact, high visibility            |
+| 18  | **Add code copy button** to code blocks                                | HIGH     | 15 min | UX staple for documentation sites              |
+| 19  | **Split Repository interface** (Reader/Refresher)                      | MEDIUM   | 20 min | Better abstraction                             |
+| 20  | **Add Docker HEALTHCHECK**                                             | MEDIUM   | 5 min  | Production readiness                           |
+| 21  | **Add Prometheus/pprof endpoints**                                     | MEDIUM   | 20 min | Observability                                  |
+| 22  | **RSS/Atom feed generation**                                           | MEDIUM   | 20 min | Content discoverability                        |
+| 23  | **Breadcrumbs for deep directory navigation**                          | MEDIUM   | 15 min | Navigation UX                                  |
+| 24  | **Rate limit search endpoint**                                         | MEDIUM   | 5 min  | Security (refresh is limited, search isn't)    |
+| 25  | **Content search autocomplete**                                        | MEDIUM   | 30 min | UX improvement                                 |
 
 ---
 
@@ -222,6 +227,7 @@ Sorted by **impact × urgency / effort**:
 **Is `gocloud.dev` actually used by this project?**
 
 The `go.mod` shows `gocloud.dev` as a dependency, which transitively pulls in:
+
 - `google.golang.org/grpc` (the security concern)
 - `google.golang.org/protobuf`
 - `go.opentelemetry.io/*` (multiple packages)
@@ -229,6 +235,7 @@ The `go.mod` shows `gocloud.dev` as a dependency, which transitively pulls in:
 - ~100+ other transitive dependencies
 
 For a **markdown-to-HTML web server**, this is enormous dependency overhead. The project has blob storage (`internal/content/blob.go`) which might use `gocloud.dev`, but if it's not in active use, removing it would:
+
 1. Eliminate the grpc security concern entirely
 2. Cut the module cache from 6.3GB to ~1-2GB
 3. Reduce Docker image size
@@ -240,35 +247,35 @@ For a **markdown-to-HTML web server**, this is enormous dependency overhead. The
 
 ## Environment State
 
-| Metric | Value |
-|--------|-------|
-| Disk free | **2.1GB / 229GB (99.9% full)** |
-| Go version | 1.26.1 darwin/arm64 |
-| Go module cache | 6.3GB |
-| Go build cache | 1.8GB |
-| Project size | 2.4MB |
-| Git status | **Clean** (nothing to commit) |
-| Branch | master (up to date with origin/master) |
-| Remote | `git@github.com:LarsArtmann/dynamic-markdown-site.git` |
-| Unpushed commits | **0** (everything is pushed) |
+| Metric           | Value                                                  |
+| ---------------- | ------------------------------------------------------ |
+| Disk free        | **2.1GB / 229GB (99.9% full)**                         |
+| Go version       | 1.26.1 darwin/arm64                                    |
+| Go module cache  | 6.3GB                                                  |
+| Go build cache   | 1.8GB                                                  |
+| Project size     | 2.4MB                                                  |
+| Git status       | **Clean** (nothing to commit)                          |
+| Branch           | master (up to date with origin/master)                 |
+| Remote           | `git@github.com:LarsArtmann/dynamic-markdown-site.git` |
+| Unpushed commits | **0** (everything is pushed)                           |
 
 ## Key Commits (Recent)
 
-| Hash | Message |
-|------|---------|
+| Hash      | Message                                                                       |
+| --------- | ----------------------------------------------------------------------------- |
 | `983431f` | refactor: consolidate domain types and improve content rendering architecture |
-| `8906c10` | refactor: remove testutil package and update linter config |
-| `ba6eae6` | docs(status): full comprehensive status |
-| `0192273` | refactor: deduplicate helpers, optimize ContentTree, add interface checks |
+| `8906c10` | refactor: remove testutil package and update linter config                    |
+| `ba6eae6` | docs(status): full comprehensive status                                       |
+| `0192273` | refactor: deduplicate helpers, optimize ContentTree, add interface checks     |
 
 ## Go Module State
 
-| Dependency | Version | Note |
-|------------|---------|------|
-| `google.golang.org/grpc` | v1.68.1 | **DOWNGRADED** from v1.77.0 — needs fix |
-| `gocloud.dev` | v0.40.0 | **DOWNGRADED** from v0.45.0 — investigate removal |
-| `go.opentelemetry.io/contrib/.../otelgrpc` | v0.58.0 | Updated transitively |
-| Go toolchain | 1.26.1 | Current |
+| Dependency                                 | Version | Note                                              |
+| ------------------------------------------ | ------- | ------------------------------------------------- |
+| `google.golang.org/grpc`                   | v1.68.1 | **DOWNGRADED** from v1.77.0 — needs fix           |
+| `gocloud.dev`                              | v0.40.0 | **DOWNGRADED** from v0.45.0 — investigate removal |
+| `go.opentelemetry.io/contrib/.../otelgrpc` | v0.58.0 | Updated transitively                              |
+| Go toolchain                               | 1.26.1  | Current                                           |
 
 ## What Is NOT Fucked Up
 

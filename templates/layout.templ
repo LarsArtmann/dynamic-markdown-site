@@ -391,7 +391,8 @@ templ SearchResultCard(result content.SearchResult) {
 				@templ.Raw(result.Highlighted)
 			</h3>
 			if result.Snippet != "" {
-				<p class="result-snippet">@templ.Raw(result.Snippet)</p>
+				<p class="result-snippet">@templ.Raw(result.Snippet)
+</p>
 			}
 			<div class="result-meta">
 				<span class="result-type">{ result.Node.Kind().String() }</span>
