@@ -152,22 +152,7 @@ func (r *FileSystemRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) 
 
 // Refresh rebuilds the content tree from the filesystem and returns statistics.
 func (r *FileSystemRepository) Refresh() domain.RefreshResult {
-	start := time.Now()
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	stats := newRefreshStats()
-
-	rootNode, err := r.buildTree(stats)
-	if err != nil {
-		return buildFailedRefreshResult(r.lastModified, start, err.Error())
-	}
-
-	r.tree = domain.NewContentTree(rootNode)
-	r.lastModified = time.Now()
-
-	return buildRefreshResult(stats, r.lastModified, start)
+	return doRefresh(&r.mu, &r.lastModified, &r.tree, r.buildTree)
 }
 
 func (r *FileSystemRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, error) {

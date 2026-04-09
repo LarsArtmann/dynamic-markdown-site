@@ -152,7 +152,7 @@ type buildTreeFunc func(stats *refreshStats) (*domain.DirectoryNode, error)
 // doRefresh performs the common refresh logic with proper locking.
 // It calls the provided buildTree function to construct the content tree.
 func doRefresh(
-	mu *sync.Mutex,
+	mu *sync.RWMutex,
 	lastModified *time.Time,
 	tree **domain.ContentTree,
 	buildTree buildTreeFunc,
