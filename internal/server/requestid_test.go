@@ -11,6 +11,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func newTestRequest() (*httptest.ResponseRecorder, *http.Request) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+	return w, req
+}
+
 func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 	t.Parallel()
 	gin.SetMode(gin.TestMode)
@@ -21,8 +27,7 @@ func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 		c.Status(http.StatusOK)
 	})
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+	w, req := newTestRequest()
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -39,8 +44,7 @@ func TestRequestIDMiddleware_UsesExistingHeader(t *testing.T) {
 		c.Status(http.StatusOK)
 	})
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+	w, req := newTestRequest()
 	existingID := "existing-request-id-12345"
 	req.Header.Set(RequestIDHeader, existingID)
 	router.ServeHTTP(w, req)
@@ -62,8 +66,7 @@ func TestRequestIDMiddleware_StoresInContext(t *testing.T) {
 		c.Status(http.StatusOK)
 	})
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+	w, req := newTestRequest()
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -84,8 +87,7 @@ func TestGetRequestID_NotSet(t *testing.T) {
 		c.Status(http.StatusOK)
 	})
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+	w, req := newTestRequest()
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -135,8 +137,7 @@ func TestGetRequestIDFromContext_WithID(t *testing.T) {
 		c.Status(http.StatusOK)
 	})
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+	w, req := newTestRequest()
 	router.ServeHTTP(w, req)
 
 	// Note: Gin context values don't propagate to request.Context() automatically
@@ -170,8 +171,7 @@ func TestRequestIDMiddleware_Chain(t *testing.T) {
 		c.Status(http.StatusOK)
 	})
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+	w, req := newTestRequest()
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)

@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/stretchr/testify/assert"
@@ -17,17 +18,29 @@ import (
 
 const testHost = "example.com"
 
+func serveSitemap(router *gin.Engine) *httptest.ResponseRecorder {
+	return serveSitemapWithProto(router, "")
+}
+
+func serveSitemapWithProto(router *gin.Engine, proto string) *httptest.ResponseRecorder {
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+	req.Host = testHost
+	if proto != "" {
+		req.Header.Set("X-Forwarded-Proto", proto)
+	}
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	return rec
+}
+
 func TestSitemapXMLEmptyRepo(t *testing.T) {
 	t.Parallel()
-
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemap(router)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Contains(t, rec.Header().Get("Content-Type"), "application/xml")
@@ -55,10 +68,7 @@ func TestSitemapXMLWithFiles(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemap(router)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -102,10 +112,7 @@ func TestSitemapXMLWithDirectories(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemap(router)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -125,10 +132,7 @@ func TestSitemapXMLSkipsRootPath(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemap(router)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -159,10 +163,7 @@ func TestSitemapXMLHasCleanURLs(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemap(router)
 
 	body := rec.Body.String()
 	assert.Contains(t, body, "http://example.com/my-page")
@@ -191,11 +192,7 @@ func TestSitemapXMLHTTPSEnvironment(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	req.Header.Set("X-Forwarded-Proto", "https")
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemapWithProto(router, "https")
 
 	body := rec.Body.String()
 	assert.Contains(t, body, "https://example.com/secure")
@@ -206,10 +203,7 @@ func TestSitemapXMLRepositoryError(t *testing.T) {
 
 	router := newFailingTestServer(t)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemap(router)
 
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 }
@@ -275,10 +269,7 @@ func TestSitemapXMLCacheHeaders(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
-	req.Host = testHost
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	rec := serveSitemap(router)
 
 	assert.Equal(t, "public, max-age=3600", rec.Header().Get("Cache-Control"))
 }

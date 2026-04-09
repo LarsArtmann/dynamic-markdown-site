@@ -117,6 +117,7 @@ func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, 
 		}
 		if err != nil {
 			stats.recordError(r.prefix, "list error", err)
+
 			continue
 		}
 
@@ -160,6 +161,7 @@ func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, 
 			content, err := r.readBlobContent(obj.Key)
 			if err != nil {
 				stats.recordError(obj.Key, "read error", err)
+
 				continue
 			}
 
@@ -178,6 +180,7 @@ func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, 
 			)
 			if err != nil {
 				stats.recordError(obj.Key, "create node error", err)
+
 				continue
 			}
 

@@ -189,6 +189,7 @@ func (r *FileSystemRepository) walkEntry(
 ) error {
 	if err != nil {
 		stats.recordError(fsPath, "walk error", err)
+
 		return nil
 	}
 
@@ -211,18 +212,21 @@ func (r *FileSystemRepository) walkEntry(
 	info, err := d.Info()
 	if err != nil {
 		stats.recordError(fsPath, "failed to get info", err)
+
 		return nil
 	}
 
 	relPath, err := filepath.Rel(r.rootDir, fsPath)
 	if err != nil {
 		stats.recordError(fsPath, "failed to get relative path", err)
+
 		return nil
 	}
 
 	urlPath, err := domain.NewURLPath("/" + filepath.ToSlash(relPath))
 	if err != nil {
 		stats.recordError(fsPath, "invalid path", err)
+
 		return nil
 	}
 
