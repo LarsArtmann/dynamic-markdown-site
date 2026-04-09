@@ -76,14 +76,7 @@ func (r *BlobRepository) Get(p domain.URLPath) (domain.ContentNode, error) {
 
 // Root returns the root directory.
 func (r *BlobRepository) Root() (*domain.DirectoryNode, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if r.tree == nil {
-		return nil, errors.Wrapf(ErrContentNotFound, "tree not initialized")
-	}
-
-	return r.tree.Root(), nil
+	return rootFromTree(r.tree, &r.mu)
 }
 
 // LastModified returns when the content was last indexed.
@@ -96,14 +89,7 @@ func (r *BlobRepository) LastModified() time.Time {
 
 // AllPaths returns all URL paths in the repository.
 func (r *BlobRepository) AllPaths() []domain.URLPath {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if r.tree == nil {
-		return []domain.URLPath{domain.MustURLPath("/")}
-	}
-
-	return r.tree.AllPaths()
+	return allPaths(r.tree, &r.mu)
 }
 
 // Refresh rebuilds the content tree from blob storage and returns statistics.

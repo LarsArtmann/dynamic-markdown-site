@@ -74,14 +74,7 @@ func (r *FileSystemRepository) Get(path domain.URLPath) (domain.ContentNode, err
 
 // Root returns the root directory.
 func (r *FileSystemRepository) Root() (*domain.DirectoryNode, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if r.tree == nil {
-		return nil, errors.Wrapf(ErrContentNotFound, "tree not initialized")
-	}
-
-	return r.tree.Root(), nil
+	return rootFromTree(r.tree, &r.mu)
 }
 
 // LastModified returns when the content was last indexed.
@@ -94,14 +87,7 @@ func (r *FileSystemRepository) LastModified() time.Time {
 
 // AllPaths returns all URL paths in the repository.
 func (r *FileSystemRepository) AllPaths() []domain.URLPath {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if r.tree == nil {
-		return []domain.URLPath{domain.MustURLPath("/")}
-	}
-
-	return r.tree.AllPaths()
+	return allPaths(r.tree, &r.mu)
 }
 
 // GetRaw retrieves a non-markdown file directly from the filesystem.

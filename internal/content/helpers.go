@@ -3,6 +3,7 @@ package content
 import (
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/samber/lo"
@@ -78,4 +79,28 @@ func GetContentType(name string) string {
 	}
 
 	return "application/octet-stream"
+}
+
+// allPaths returns all URL paths from a content tree with proper locking.
+func allPaths(tree *domain.ContentTree, mu *sync.RWMutex) []domain.URLPath {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	if tree == nil {
+		return []domain.URLPath{domain.MustURLPath("/")}
+	}
+
+	return tree.AllPaths()
+}
+
+// rootFromTree returns the root directory from a content tree with proper locking.
+func rootFromTree(tree *domain.ContentTree, mu *sync.RWMutex) (*domain.DirectoryNode, error) {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	if tree == nil {
+		return nil, errors.Wrapf(ErrContentNotFound, "tree not initialized")
+	}
+
+	return tree.Root(), nil
 }
