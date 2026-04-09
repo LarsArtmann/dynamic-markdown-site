@@ -4,7 +4,9 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/samber/lo"
 )
@@ -103,4 +105,43 @@ func rootFromTree(tree *domain.ContentTree, mu *sync.RWMutex) (*domain.Directory
 	}
 
 	return tree.Root(), nil
+}
+
+// refreshStats contains statistics collected during a repository refresh.
+type refreshStats struct {
+	files  int
+	dirs   int
+	errors []string
+}
+
+// newRefreshStats creates a new refresh stats instance.
+func newRefreshStats() *refreshStats {
+	return &refreshStats{}
+}
+
+// recordError records an error with the given path and operation.
+func (s *refreshStats) recordError(path, operation string, err error) {
+	s.errors = append(s.errors, operation+" at "+path+": "+err.Error())
+}
+
+// buildRefreshResult creates a success RefreshResult from the given stats.
+func buildRefreshResult(stats *refreshStats, lastModified time.Time, start time.Time) domain.RefreshResult {
+	return domain.RefreshResult{
+		Success:      true,
+		LastModified: lastModified,
+		TotalFiles:   stats.files,
+		TotalDirs:    stats.dirs,
+		Duration:     time.Since(start).String(),
+		Errors:       stats.errors,
+	}
+}
+
+// buildFailedRefreshResult creates a failed RefreshResult with an error.
+func buildFailedRefreshResult(lastModified time.Time, start time.Time, errMsg string) domain.RefreshResult {
+	return domain.RefreshResult{
+		Success:      false,
+		LastModified: lastModified,
+		Error:       errMsg,
+		Duration:    time.Since(start).String(),
+	}
 }

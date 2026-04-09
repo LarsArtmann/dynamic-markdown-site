@@ -1,7 +1,6 @@
 package content
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -158,47 +157,20 @@ func (r *FileSystemRepository) Refresh() domain.RefreshResult {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	stats := &treeStats{}
+	stats := newRefreshStats()
 
 	rootNode, err := r.buildTree(stats)
 	if err != nil {
-		return domain.RefreshResult{
-			Success:      false,
-			LastModified: r.lastModified,
-			Error:        err.Error(),
-			Duration:     time.Since(start).String(),
-		}
+		return buildFailedRefreshResult(r.lastModified, start, err.Error())
 	}
 
 	r.tree = domain.NewContentTree(rootNode)
 	r.lastModified = time.Now()
 
-	return domain.RefreshResult{
-		Success:      true,
-		LastModified: r.lastModified,
-		TotalFiles:   stats.files,
-		TotalDirs:    stats.dirs,
-		Duration:     time.Since(start).String(),
-		Errors:       stats.errors,
-	}
+	return buildRefreshResult(stats, r.lastModified, start)
 }
 
-type treeStats struct {
-	files  int
-	dirs   int
-	errors []string
-}
-
-func (s *treeStats) recordError(fsPath, operation string, err error) {
-	s.errors = append(s.errors, fmt.Sprintf("%s at %s: %v", operation, fsPath, err))
-}
-
-func (s *treeStats) recordAndSkip(fsPath, msg string, err error) error {
-	s.recordError(fsPath, msg, err)
-	return nil
-}
-
-func (r *FileSystemRepository) buildTree(stats *treeStats) (*domain.DirectoryNode, error) {
+func (r *FileSystemRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, error) {
 	rootPath := domain.MustURLPath("/")
 
 	rootInfo, err := os.Stat(r.rootDir)
@@ -228,10 +200,11 @@ func (r *FileSystemRepository) buildTree(stats *treeStats) (*domain.DirectoryNod
 
 func (r *FileSystemRepository) walkEntry(
 	fsPath string, d fs.DirEntry, err error,
-	dirNodes map[string]*domain.DirectoryNode, stats *treeStats,
+	dirNodes map[string]*domain.DirectoryNode, stats *refreshStats,
 ) error {
 	if err != nil {
-		return stats.recordAndSkip(fsPath, "walk error", err)
+		stats.recordError(fsPath, "walk error", err)
+		return nil
 	}
 
 	if fsPath == r.rootDir {
@@ -252,17 +225,20 @@ func (r *FileSystemRepository) walkEntry(
 
 	info, err := d.Info()
 	if err != nil {
-		return stats.recordAndSkip(fsPath, "failed to get info", err)
+		stats.recordError(fsPath, "failed to get info", err)
+		return nil
 	}
 
 	relPath, err := filepath.Rel(r.rootDir, fsPath)
 	if err != nil {
-		return stats.recordAndSkip(fsPath, "failed to get relative path", err)
+		stats.recordError(fsPath, "failed to get relative path", err)
+		return nil
 	}
 
 	urlPath, err := domain.NewURLPath("/" + filepath.ToSlash(relPath))
 	if err != nil {
-		return stats.recordAndSkip(fsPath, "invalid path", err)
+		stats.recordError(fsPath, "invalid path", err)
+		return nil
 	}
 
 	parentDir := filepath.Dir(fsPath)
@@ -286,7 +262,7 @@ func (r *FileSystemRepository) walkEntry(
 func (r *FileSystemRepository) processDirectory(
 	fsPath string, d fs.DirEntry, info fs.FileInfo,
 	urlPath domain.URLPath, parentNode *domain.DirectoryNode,
-	dirNodes map[string]*domain.DirectoryNode, stats *treeStats,
+	dirNodes map[string]*domain.DirectoryNode, stats *refreshStats,
 ) {
 	dirNode, err := domain.NewDirectoryNode(urlPath, d.Name(), info.ModTime())
 	if err != nil {
@@ -301,7 +277,7 @@ func (r *FileSystemRepository) processDirectory(
 
 func (r *FileSystemRepository) processFile(
 	fsPath string, d fs.DirEntry, info fs.FileInfo,
-	urlPath domain.URLPath, parentNode *domain.DirectoryNode, stats *treeStats,
+	urlPath domain.URLPath, parentNode *domain.DirectoryNode, stats *refreshStats,
 ) {
 	if !IsMarkdownFile(d.Name()) {
 		return

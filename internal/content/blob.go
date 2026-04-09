@@ -99,42 +99,20 @@ func (r *BlobRepository) Refresh() domain.RefreshResult {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	stats := &blobTreeStats{}
+	stats := newRefreshStats()
 
 	rootNode, err := r.buildTree(stats)
 	if err != nil {
-		return domain.RefreshResult{
-			Success:      false,
-			LastModified: r.lastModified,
-			Error:        err.Error(),
-			Duration:     time.Since(start).String(),
-		}
+		return buildFailedRefreshResult(r.lastModified, start, err.Error())
 	}
 
 	r.tree = domain.NewContentTree(rootNode)
 	r.lastModified = time.Now()
 
-	return domain.RefreshResult{
-		Success:      true,
-		LastModified: r.lastModified,
-		TotalFiles:   stats.files,
-		TotalDirs:    stats.dirs,
-		Duration:     time.Since(start).String(),
-		Errors:       stats.errors,
-	}
+	return buildRefreshResult(stats, r.lastModified, start)
 }
 
-type blobTreeStats struct {
-	files  int
-	dirs   int
-	errors []string
-}
-
-func (s *blobTreeStats) recordError(blobPath, operation string, err error) {
-	s.errors = append(s.errors, operation+" at "+blobPath+": "+err.Error())
-}
-
-func (r *BlobRepository) buildTree(stats *blobTreeStats) (*domain.DirectoryNode, error) {
+func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, error) {
 	rootPath := domain.MustURLPath("/")
 
 	root, err := domain.NewDirectoryNode(rootPath, "Home", time.Now())
@@ -232,7 +210,7 @@ func (r *BlobRepository) findOrCreateParentDirs(
 	blobPath string,
 	root *domain.DirectoryNode,
 	dirNodes map[string]*domain.DirectoryNode,
-	stats *blobTreeStats,
+	stats *refreshStats,
 ) *domain.DirectoryNode {
 	parts := strings.Split(strings.Trim(blobPath, "/"), "/")
 
