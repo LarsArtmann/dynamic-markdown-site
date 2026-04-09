@@ -94,22 +94,7 @@ func (r *BlobRepository) AllPaths() []domain.URLPath {
 
 // Refresh rebuilds the content tree from blob storage and returns statistics.
 func (r *BlobRepository) Refresh() domain.RefreshResult {
-	start := time.Now()
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	stats := newRefreshStats()
-
-	rootNode, err := r.buildTree(stats)
-	if err != nil {
-		return buildFailedRefreshResult(r.lastModified, start, err.Error())
-	}
-
-	r.tree = domain.NewContentTree(rootNode)
-	r.lastModified = time.Now()
-
-	return buildRefreshResult(stats, r.lastModified, start)
+	return doRefresh(&r.mu, &r.lastModified, &r.tree, r.buildTree)
 }
 
 func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, error) {

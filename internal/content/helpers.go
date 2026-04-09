@@ -145,3 +145,32 @@ func buildFailedRefreshResult(lastModified time.Time, start time.Time, errMsg st
 		Duration:    time.Since(start).String(),
 	}
 }
+
+// buildTreeFunc is a function type for building a content tree during refresh.
+type buildTreeFunc func(stats *refreshStats) (*domain.DirectoryNode, error)
+
+// doRefresh performs the common refresh logic with proper locking.
+// It calls the provided buildTree function to construct the content tree.
+func doRefresh(
+	mu *sync.Mutex,
+	lastModified *time.Time,
+	tree **domain.ContentTree,
+	buildTree buildTreeFunc,
+) domain.RefreshResult {
+	start := time.Now()
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	stats := newRefreshStats()
+
+	rootNode, err := buildTree(stats)
+	if err != nil {
+		return buildFailedRefreshResult(*lastModified, start, err.Error())
+	}
+
+	*tree = domain.NewContentTree(rootNode)
+	*lastModified = time.Now()
+
+	return buildRefreshResult(stats, *lastModified, start)
+}
