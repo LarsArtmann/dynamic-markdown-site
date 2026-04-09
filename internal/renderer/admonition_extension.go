@@ -81,11 +81,7 @@ func (t *admonitionTransformer) Transform(
 	_ parser.Context,
 ) {
 	source := reader.Source()
-	var replacements []struct {
-		parent ast.Node
-		old    ast.Node
-		new    ast.Node
-	}
+	var replacements []nodeReplacement
 
 	if err := ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
@@ -127,11 +123,7 @@ func (t *admonitionTransformer) Transform(
 			child = next
 		}
 
-		replacements = append(replacements, struct {
-			parent ast.Node
-			old    ast.Node
-			new    ast.Node
-		}{
+		replacements = append(replacements, nodeReplacement{
 			parent: blockquote.Parent(),
 			old:    blockquote,
 			new:    admonition,
@@ -142,9 +134,7 @@ func (t *admonitionTransformer) Transform(
 		return
 	}
 
-	for _, r := range replacements {
-		r.parent.ReplaceChild(r.parent, r.old, r.new)
-	}
+	applyReplacements(replacements)
 }
 
 func findFirstParagraph(blockquote *ast.Blockquote) *ast.Paragraph {

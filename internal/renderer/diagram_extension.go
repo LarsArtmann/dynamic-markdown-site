@@ -54,13 +54,6 @@ func (n *diagramNode) Dump(source []byte, level int) {
 // hasMermaidKey is a parser context key for tracking mermaid diagram presence.
 var hasMermaidKey = parser.NewContextKey()
 
-// diagramReplacement tracks a node to replace in the AST.
-type diagramReplacement struct {
-	parent ast.Node
-	old    ast.Node
-	new    ast.Node
-}
-
 // diagramTransformer converts mermaid/d2 fenced code blocks into diagramNodes
 // during the parse phase, before rendering begins.
 type diagramTransformer struct{}
@@ -74,7 +67,7 @@ func (t *diagramTransformer) Transform(
 	pctx parser.Context,
 ) {
 	source := reader.Source()
-	var replacements []diagramReplacement
+	var replacements []nodeReplacement
 
 	if err := ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
@@ -113,7 +106,7 @@ func (t *diagramTransformer) Transform(
 			content:   buf.String(),
 		}
 
-		replacements = append(replacements, diagramReplacement{
+		replacements = append(replacements, nodeReplacement{
 			parent: fenced.Parent(),
 			old:    fenced,
 			new:    diagram,
@@ -124,9 +117,7 @@ func (t *diagramTransformer) Transform(
 		return
 	}
 
-	for _, r := range replacements {
-		r.parent.ReplaceChild(r.parent, r.old, r.new)
-	}
+	applyReplacements(replacements)
 }
 
 // DiagramExtension is a goldmark extension for rendering diagrams.
