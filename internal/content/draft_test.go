@@ -123,13 +123,7 @@ func TestBlobRepositorySkipsDrafts(t *testing.T) {
 		"draft.md":     "---\ntitle: Draft\ndraft: true\n---\n# Draft",
 	}
 
-	for name, content := range testFiles {
-		fullPath := filepath.Join(tmpDir, name)
-		err := os.MkdirAll(filepath.Dir(fullPath), 0o755)
-		require.NoError(t, err)
-		err = os.WriteFile(fullPath, []byte(content), 0o644)
-		require.NoError(t, err)
-	}
+	writeTestFiles(t, tmpDir, testFiles)
 
 	repo, err := NewBlobRepository(t.Context(), "file://"+tmpDir)
 	require.NoError(t, err)
@@ -139,6 +133,16 @@ func TestBlobRepositorySkipsDrafts(t *testing.T) {
 
 	_, err = repo.Get(domain.MustURLPath("/draft"))
 	require.ErrorIs(t, err, ErrContentNotFound, "draft file should be excluded")
+}
+
+// writeTestFiles writes multiple files to a directory for testing.
+// It creates parent directories as needed and fails the test on any error.
+func writeTestFiles(t *testing.T, dir string, files map[string]string) {
+	t.Helper()
+
+	for name, content := range files {
+		writeFile(t, dir, name, content)
+	}
 }
 
 func writeFile(t *testing.T, dir, name, content string) {

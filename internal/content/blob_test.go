@@ -2,8 +2,6 @@ package content
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
@@ -100,13 +98,7 @@ func TestBlobRepositoryWithContent(t *testing.T) {
 		"docs/api.md":   "# API\n\nThis is the API reference.",
 	}
 
-	for name, content := range testFiles {
-		fullPath := filepath.Join(tmpDir, name)
-		err := os.MkdirAll(filepath.Dir(fullPath), 0o755)
-		require.NoError(t, err)
-		err = os.WriteFile(fullPath, []byte(content), 0o644)
-		require.NoError(t, err)
-	}
+	writeTestFiles(t, tmpDir, testFiles)
 
 	// Open as fileblob
 	ctx := context.Background()

@@ -17,6 +17,14 @@ func newTestRequest() (*httptest.ResponseRecorder, *http.Request) {
 	return w, req
 }
 
+// registerTestEndpoint registers a GET /test endpoint that captures the request ID into the provided pointer.
+func registerTestEndpoint(router *gin.Engine, capture *string) {
+	router.GET("/test", func(c *gin.Context) {
+		*capture = getRequestID(c)
+		c.Status(http.StatusOK)
+	})
+}
+
 func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 	t.Parallel()
 	gin.SetMode(gin.TestMode)

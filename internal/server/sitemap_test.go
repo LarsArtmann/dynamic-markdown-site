@@ -18,6 +18,47 @@ import (
 
 const testHost = "example.com"
 
+// newTestFileNode creates a new file node without adding it to the repository.
+// It fails the test if node creation fails.
+func newTestFileNode(t *testing.T, filePath, title string, contentBytes []byte, modTime time.Time) *domain.FileNode {
+	t.Helper()
+
+	file, err := domain.NewFileNode(domain.MustURLPath(filePath), title, contentBytes, modTime, uint64(len(contentBytes)))
+	require.NoError(t, err)
+
+	return file
+}
+
+// addTestFile creates a file node, adds it to the repository and the repository's root.
+// It fails the test if any operation fails.
+func addTestFile(t *testing.T, repo *content.InMemoryRepository, filePath, title string, contentBytes []byte, modTime time.Time) *domain.FileNode {
+	t.Helper()
+
+	file := newTestFileNode(t, filePath, title, contentBytes, modTime)
+	repo.Add(file)
+
+	root, err := repo.Root()
+	require.NoError(t, err)
+	root.AddChild(file)
+
+	return file
+}
+
+// addTestDir creates a directory node and adds it to the repository's root.
+// It fails the test if any operation fails.
+func addTestDir(t *testing.T, repo *content.InMemoryRepository, dirPath, title string, modTime time.Time) *domain.DirectoryNode {
+	t.Helper()
+
+	dir, err := domain.NewDirectoryNode(domain.MustURLPath(dirPath), title, modTime)
+	require.NoError(t, err)
+
+	root, err := repo.Root()
+	require.NoError(t, err)
+	root.AddChild(dir)
+
+	return dir
+}
+
 func serveSitemap(router *gin.Engine) *httptest.ResponseRecorder {
 	return serveSitemapWithProto(router, "")
 }
@@ -51,19 +92,7 @@ func TestSitemapXMLWithFiles(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 
-	file, err := domain.NewFileNode(
-		domain.MustURLPath("/guide"),
-		"Guide",
-		[]byte("# Guide"),
-		time.Date(2026, 3, 15, 10, 0, 0, 0, time.UTC),
-		100,
-	)
-	require.NoError(t, err)
-	repo.Add(file)
-
-	root, err := repo.Root()
-	require.NoError(t, err)
-	root.AddChild(file)
+	addTestFile(t, repo, "/guide", "Guide", []byte("# Guide"), time.Date(2026, 3, 15, 10, 0, 0, 0, time.UTC))
 
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -87,27 +116,11 @@ func TestSitemapXMLWithDirectories(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 
-	dir, err := domain.NewDirectoryNode(
-		domain.MustURLPath("/docs"),
-		"Docs",
-		time.Date(2026, 3, 10, 0, 0, 0, 0, time.UTC),
-	)
-	require.NoError(t, err)
+	dir := addTestDir(t, repo, "/docs", "Docs", time.Date(2026, 3, 10, 0, 0, 0, 0, time.UTC))
 
-	file, err := domain.NewFileNode(
-		domain.MustURLPath("/docs/guide"),
-		"Guide",
-		[]byte("# Guide"),
-		time.Date(2026, 3, 15, 0, 0, 0, 0, time.UTC),
-		100,
-	)
-	require.NoError(t, err)
-
+	file := newTestFileNode(t, "/docs/guide", "Guide", []byte("# Guide"), time.Date(2026, 3, 15, 0, 0, 0, 0, time.UTC))
+	repo.Add(file)
 	dir.AddChild(file)
-
-	root, err := repo.Root()
-	require.NoError(t, err)
-	root.AddChild(dir)
 
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -146,19 +159,7 @@ func TestSitemapXMLHasCleanURLs(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 
-	file, err := domain.NewFileNode(
-		domain.MustURLPath("/my-page"),
-		"My Page",
-		[]byte("# My Page"),
-		time.Now(),
-		50,
-	)
-	require.NoError(t, err)
-	repo.Add(file)
-
-	root, err := repo.Root()
-	require.NoError(t, err)
-	root.AddChild(file)
+	addTestFile(t, repo, "/my-page", "My Page", []byte("# My Page"), time.Now())
 
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -175,19 +176,7 @@ func TestSitemapXMLHTTPSEnvironment(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 
-	file, err := domain.NewFileNode(
-		domain.MustURLPath("/secure"),
-		"Secure",
-		[]byte("# Secure"),
-		time.Now(),
-		50,
-	)
-	require.NoError(t, err)
-	repo.Add(file)
-
-	root, err := repo.Root()
-	require.NoError(t, err)
-	root.AddChild(file)
+	addTestFile(t, repo, "/secure", "Secure", []byte("# Secure"), time.Now())
 
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
