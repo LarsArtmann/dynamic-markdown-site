@@ -125,7 +125,11 @@ func (s *refreshStats) recordError(path, operation string, err error) {
 }
 
 // buildRefreshResult creates a success RefreshResult from the given stats.
-func buildRefreshResult(stats *refreshStats, lastModified time.Time, start time.Time) domain.RefreshResult {
+func buildRefreshResult(
+	stats *refreshStats,
+	lastModified time.Time,
+	start time.Time,
+) domain.RefreshResult {
 	return domain.RefreshResult{
 		Success:      true,
 		LastModified: lastModified,
@@ -137,12 +141,16 @@ func buildRefreshResult(stats *refreshStats, lastModified time.Time, start time.
 }
 
 // buildFailedRefreshResult creates a failed RefreshResult with an error.
-func buildFailedRefreshResult(lastModified time.Time, start time.Time, errMsg string) domain.RefreshResult {
+func buildFailedRefreshResult(
+	lastModified time.Time,
+	start time.Time,
+	errMsg string,
+) domain.RefreshResult {
 	return domain.RefreshResult{
 		Success:      false,
 		LastModified: lastModified,
-		Error:       errMsg,
-		Duration:    time.Since(start).String(),
+		Error:        errMsg,
+		Duration:     time.Since(start).String(),
 	}
 }
 

@@ -20,10 +20,21 @@ const testHost = "example.com"
 
 // newTestFileNode creates a new file node without adding it to the repository.
 // It fails the test if node creation fails.
-func newTestFileNode(t *testing.T, filePath, title string, contentBytes []byte, modTime time.Time) *domain.FileNode {
+func newTestFileNode(
+	t *testing.T,
+	filePath, title string,
+	contentBytes []byte,
+	modTime time.Time,
+) *domain.FileNode {
 	t.Helper()
 
-	file, err := domain.NewFileNode(domain.MustURLPath(filePath), title, contentBytes, modTime, uint64(len(contentBytes)))
+	file, err := domain.NewFileNode(
+		domain.MustURLPath(filePath),
+		title,
+		contentBytes,
+		modTime,
+		uint64(len(contentBytes)),
+	)
 	require.NoError(t, err)
 
 	return file
@@ -31,7 +42,13 @@ func newTestFileNode(t *testing.T, filePath, title string, contentBytes []byte, 
 
 // addTestFile creates a file node, adds it to the repository and the repository's root.
 // It fails the test if any operation fails.
-func addTestFile(t *testing.T, repo *content.InMemoryRepository, filePath, title string, contentBytes []byte, modTime time.Time) *domain.FileNode {
+func addTestFile(
+	t *testing.T,
+	repo *content.InMemoryRepository,
+	filePath, title string,
+	contentBytes []byte,
+	modTime time.Time,
+) *domain.FileNode {
 	t.Helper()
 
 	file := newTestFileNode(t, filePath, title, contentBytes, modTime)
@@ -46,7 +63,12 @@ func addTestFile(t *testing.T, repo *content.InMemoryRepository, filePath, title
 
 // addTestDir creates a directory node and adds it to the repository's root.
 // It fails the test if any operation fails.
-func addTestDir(t *testing.T, repo *content.InMemoryRepository, dirPath, title string, modTime time.Time) *domain.DirectoryNode {
+func addTestDir(
+	t *testing.T,
+	repo *content.InMemoryRepository,
+	dirPath, title string,
+	modTime time.Time,
+) *domain.DirectoryNode {
 	t.Helper()
 
 	dir, err := domain.NewDirectoryNode(domain.MustURLPath(dirPath), title, modTime)
@@ -92,7 +114,14 @@ func TestSitemapXMLWithFiles(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 
-	addTestFile(t, repo, "/guide", "Guide", []byte("# Guide"), time.Date(2026, 3, 15, 10, 0, 0, 0, time.UTC))
+	addTestFile(
+		t,
+		repo,
+		"/guide",
+		"Guide",
+		[]byte("# Guide"),
+		time.Date(2026, 3, 15, 10, 0, 0, 0, time.UTC),
+	)
 
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -118,7 +147,13 @@ func TestSitemapXMLWithDirectories(t *testing.T) {
 
 	dir := addTestDir(t, repo, "/docs", "Docs", time.Date(2026, 3, 10, 0, 0, 0, 0, time.UTC))
 
-	file := newTestFileNode(t, "/docs/guide", "Guide", []byte("# Guide"), time.Date(2026, 3, 15, 0, 0, 0, 0, time.UTC))
+	file := newTestFileNode(
+		t,
+		"/docs/guide",
+		"Guide",
+		[]byte("# Guide"),
+		time.Date(2026, 3, 15, 0, 0, 0, 0, time.UTC),
+	)
 	repo.Add(file)
 	dir.AddChild(file)
 
