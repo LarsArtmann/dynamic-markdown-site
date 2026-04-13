@@ -147,7 +147,8 @@ func TestFileSystemRepository_Get(t *testing.T) {
 
 		path := domain.MustURLPath("/nonexistent")
 
-		assertNotFoundErr(t, repo.Get(path), "Get")
+		_, err = repo.Get(path)
+		assertNotFoundErr(t, err, "Get")
 	})
 
 	t.Run("get file node", func(t *testing.T) {

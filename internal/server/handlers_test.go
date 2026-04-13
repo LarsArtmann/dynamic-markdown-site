@@ -66,13 +66,7 @@ func newFailingTestServer(t *testing.T) *gin.Engine {
 }
 
 // sharedHTTPTestCases contains reusable HTTP test cases for health and refresh endpoints.
-var sharedHTTPTestCases = []struct {
-	name       string
-	method     string
-	path       string
-	wantStatus int
-	wantBody   string
-}{
+var sharedHTTPTestCases = []httpTestCase{
 	{name: "status", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"status":"healthy"`},
 	{name: "version", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"version":"dev"`},
 	{name: "commit", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"commit":"unknown"`},
@@ -509,8 +503,9 @@ func TestSearchEndpoint(t *testing.T) {
 
 	runHTTPTests(t, router, sharedSearchHTTPTestCases)
 }
+
+func TestRefreshEndpointError(t *testing.T) {
 	t.Parallel()
-	// Test when refresh fails
 	repo := &FailingRepository{refreshError: true}
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
