@@ -1,6 +1,7 @@
 package content
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -659,27 +660,13 @@ func TestExtractSnippet(t *testing.T) {
 				return
 			}
 
-			if !contains(result, tt.wantHas) {
+			if !strings.Contains(result, tt.wantHas) {
 				t.Errorf("snippet %q should contain %q", result, tt.wantHas)
 			}
 
-			if tt.wantNo != "" && contains(result, tt.wantNo) {
+			if tt.wantNo != "" && strings.Contains(result, tt.wantNo) {
 				t.Errorf("snippet %q should NOT contain %q", result, tt.wantNo)
 			}
 		})
 	}
-}
-
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsHelper(s, substr))
-}
-
-func containsHelper(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-
-	return false
 }

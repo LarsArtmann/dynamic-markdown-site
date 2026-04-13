@@ -100,6 +100,18 @@ func TestNewFileSystemRepository(t *testing.T) {
 	})
 }
 
+// assertNotFoundErr is a helper to assert an error is ErrContentNotFound.
+func assertNotFoundErr(t *testing.T, err error, msg string) {
+	t.Helper()
+	if err == nil {
+		t.Fatalf("%s: expected error, got nil", msg)
+	}
+
+	if !errors.Is(err, ErrContentNotFound) {
+		t.Errorf("%s: expected ErrContentNotFound, got %v", msg, err)
+	}
+}
+
 func TestFileSystemRepository_Get(t *testing.T) {
 	t.Run("get root path", func(t *testing.T) {
 		tmpDir := t.TempDir()
@@ -135,14 +147,7 @@ func TestFileSystemRepository_Get(t *testing.T) {
 
 		path := domain.MustURLPath("/nonexistent")
 
-		_, err = repo.Get(path)
-		if err == nil {
-			t.Fatal("expected error for non-existent path")
-		}
-
-		if !errors.Is(err, ErrContentNotFound) {
-			t.Errorf("expected ErrContentNotFound, got %v", err)
-		}
+		assertNotFoundErr(t, repo.Get(path), "Get")
 	})
 
 	t.Run("get file node", func(t *testing.T) {
@@ -600,13 +605,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 
 		urlPath := domain.MustURLPath("/nonexistent.png")
 		_, err = repo.GetRaw(urlPath)
-		if err == nil {
-			t.Fatal("expected error for non-existent file")
-		}
-
-		if !errors.Is(err, ErrContentNotFound) {
-			t.Errorf("expected ErrContentNotFound, got %v", err)
-		}
+		assertNotFoundErr(t, err, "GetRaw")
 	})
 
 	t.Run("returns not found for markdown files", func(t *testing.T) {
@@ -621,13 +620,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 
 		urlPath := domain.MustURLPath("/doc.md")
 		_, err = repo.GetRaw(urlPath)
-		if err == nil {
-			t.Fatal("expected error for markdown file")
-		}
-
-		if !errors.Is(err, ErrContentNotFound) {
-			t.Errorf("expected ErrContentNotFound, got %v", err)
-		}
+		assertNotFoundErr(t, err, "GetRaw")
 	})
 
 	t.Run("returns not found for hidden files", func(t *testing.T) {
@@ -650,13 +643,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 
 		urlPath := domain.MustURLPath("/.secret")
 		_, err = repo.GetRaw(urlPath)
-		if err == nil {
-			t.Fatal("expected error for hidden file")
-		}
-
-		if !errors.Is(err, ErrContentNotFound) {
-			t.Errorf("expected ErrContentNotFound, got %v", err)
-		}
+		assertNotFoundErr(t, err, "GetRaw")
 	})
 
 	t.Run("returns not found for directories", func(t *testing.T) {
@@ -677,12 +664,6 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 
 		urlPath := domain.MustURLPath("/assets")
 		_, err = repo.GetRaw(urlPath)
-		if err == nil {
-			t.Fatal("expected error for directory")
-		}
-
-		if !errors.Is(err, ErrContentNotFound) {
-			t.Errorf("expected ErrContentNotFound, got %v", err)
-		}
+		assertNotFoundErr(t, err, "GetRaw")
 	})
 }

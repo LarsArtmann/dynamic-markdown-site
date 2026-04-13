@@ -65,49 +65,30 @@ func newFailingTestServer(t *testing.T) *gin.Engine {
 	return router
 }
 
+// sharedHTTPTestCases contains reusable HTTP test cases for health and refresh endpoints.
+var sharedHTTPTestCases = []struct {
+	name       string
+	method     string
+	path       string
+	wantStatus int
+	wantBody   string
+}{
+	{name: "status", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"status":"healthy"`},
+	{name: "version", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"version":"dev"`},
+	{name: "commit", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"commit":"unknown"`},
+	{name: "build_date", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"build_date":"unknown"`},
+	{name: "timestamp", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"timestamp"`},
+	{name: "GET /refresh", method: http.MethodGet, path: "/refresh", wantStatus: http.StatusOK, wantBody: `"status":"success"`},
+	{name: "POST /refresh", method: http.MethodPost, path: "/refresh", wantStatus: http.StatusOK, wantBody: `"status":"success"`},
+}
+
 func TestHealthEndpoint(t *testing.T) {
 	t.Parallel()
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	runHTTPTests(t, router, []httpTestCase{
-		{
-			name:       "GET /health returns 200 with status",
-			method:     http.MethodGet,
-			path:       "/health",
-			wantStatus: http.StatusOK,
-			wantBody:   `"status":"healthy"`,
-		},
-		{
-			name:       "GET /health returns version info",
-			method:     http.MethodGet,
-			path:       "/health",
-			wantStatus: http.StatusOK,
-			wantBody:   `"version":"dev"`,
-		},
-		{
-			name:       "GET /health returns commit",
-			method:     http.MethodGet,
-			path:       "/health",
-			wantStatus: http.StatusOK,
-			wantBody:   `"commit":"unknown"`,
-		},
-		{
-			name:       "GET /health returns build_date",
-			method:     http.MethodGet,
-			path:       "/health",
-			wantStatus: http.StatusOK,
-			wantBody:   `"build_date":"unknown"`,
-		},
-		{
-			name:       "GET /health returns timestamp",
-			method:     http.MethodGet,
-			path:       "/health",
-			wantStatus: http.StatusOK,
-			wantBody:   `"timestamp"`,
-		},
-	})
+	runHTTPTests(t, router, sharedHTTPTestCases[:5])
 }
 
 func TestRefreshEndpoint(t *testing.T) {
@@ -116,22 +97,7 @@ func TestRefreshEndpoint(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	runHTTPTests(t, router, []httpTestCase{
-		{
-			name:       "GET /refresh returns 200",
-			method:     http.MethodGet,
-			path:       "/refresh",
-			wantStatus: http.StatusOK,
-			wantBody:   `"status":"success"`,
-		},
-		{
-			name:       "POST /refresh returns 200",
-			method:     http.MethodPost,
-			path:       "/refresh",
-			wantStatus: http.StatusOK,
-			wantBody:   `"status":"success"`,
-		},
-	})
+	runHTTPTests(t, router, sharedHTTPTestCases[5:])
 }
 
 func TestRefreshRateLimit(t *testing.T) {
@@ -504,11 +470,18 @@ func TestMethodNotAllowed(t *testing.T) {
 	})
 }
 
+// sharedSearchHTTPTestCases contains reusable search endpoint test cases.
+var sharedSearchHTTPTestCases = []httpTestCase{
+	{name: "no query", method: http.MethodGet, path: "/search", wantStatus: http.StatusOK, wantBody: "Search"},
+	{name: "empty query", method: http.MethodGet, path: "/search?q=", wantStatus: http.StatusOK, wantBody: "Search"},
+	{name: "matching query", method: http.MethodGet, path: "/search?q=Test", wantStatus: http.StatusOK, wantBody: "<mark>Test</mark>"},
+	{name: "non-matching query", method: http.MethodGet, path: "/search?q=nonexistent", wantStatus: http.StatusOK, wantBody: "No results found"},
+}
+
 func TestSearchEndpoint(t *testing.T) {
 	t.Parallel()
 	repo := content.NewInMemoryRepository()
 
-	// Add test files for search
 	filePath := domain.MustURLPath("/test-document")
 	fileContent := []byte("# Test Document\n\nThis is test content.\n")
 
@@ -525,7 +498,6 @@ func TestSearchEndpoint(t *testing.T) {
 
 	repo.Add(file)
 
-	// Also add as child of root so searcher can find it
 	root, err := repo.Root()
 	if err != nil {
 		t.Fatalf("failed to get root: %v", err)
@@ -535,39 +507,8 @@ func TestSearchEndpoint(t *testing.T) {
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
 
-	runHTTPTests(t, router, []httpTestCase{
-		{
-			name:       "GET /search without query returns page",
-			method:     http.MethodGet,
-			path:       "/search",
-			wantStatus: http.StatusOK,
-			wantBody:   "Search",
-		},
-		{
-			name:       "GET /search with empty query returns page",
-			method:     http.MethodGet,
-			path:       "/search?q=",
-			wantStatus: http.StatusOK,
-			wantBody:   "Search",
-		},
-		{
-			name:       "GET /search with matching query returns results",
-			method:     http.MethodGet,
-			path:       "/search?q=Test",
-			wantStatus: http.StatusOK,
-			wantBody:   "<mark>Test</mark>",
-		},
-		{
-			name:       "GET /search with non-matching query shows empty",
-			method:     http.MethodGet,
-			path:       "/search?q=nonexistent",
-			wantStatus: http.StatusOK,
-			wantBody:   "No results found",
-		},
-	})
+	runHTTPTests(t, router, sharedSearchHTTPTestCases)
 }
-
-func TestRefreshEndpointFailure(t *testing.T) {
 	t.Parallel()
 	// Test when refresh fails
 	repo := &FailingRepository{refreshError: true}
