@@ -112,6 +112,13 @@ func assertNotFoundErr(t *testing.T, err error, msg string) {
 	}
 }
 
+// assertGetRawNotFound creates a repo and asserts that GetRaw returns not found.
+func assertGetRawNotFound(t *testing.T, repo *FileSystemRepository, urlPath string) {
+	t.Helper()
+	_, err := repo.GetRaw(domain.MustURLPath(urlPath))
+	assertNotFoundErr(t, err, "GetRaw")
+}
+
 func TestFileSystemRepository_Get(t *testing.T) {
 	t.Run("get root path", func(t *testing.T) {
 		tmpDir := t.TempDir()
@@ -604,9 +611,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 			t.Fatalf("NewFileSystemRepository() error = %v", err)
 		}
 
-		urlPath := domain.MustURLPath("/nonexistent.png")
-		_, err = repo.GetRaw(urlPath)
-		assertNotFoundErr(t, err, "GetRaw")
+		assertGetRawNotFound(t, repo, "/nonexistent.png")
 	})
 
 	t.Run("returns not found for markdown files", func(t *testing.T) {
@@ -619,9 +624,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 			t.Fatalf("NewFileSystemRepository() error = %v", err)
 		}
 
-		urlPath := domain.MustURLPath("/doc.md")
-		_, err = repo.GetRaw(urlPath)
-		assertNotFoundErr(t, err, "GetRaw")
+		assertGetRawNotFound(t, repo, "/doc.md")
 	})
 
 	t.Run("returns not found for hidden files", func(t *testing.T) {

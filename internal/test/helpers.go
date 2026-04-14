@@ -119,3 +119,16 @@ func AssertChildKind(t *testing.T, child domain.ContentNode, want domain.NodeKin
 		t.Errorf("%s: got kind %v, want %v", msg, child.Kind(), want)
 	}
 }
+
+// AssertRefreshSuccess asserts that a refresh result is successful with expected file count.
+func AssertRefreshSuccess(t *testing.T, repo interface{ Refresh() domain.RefreshResult }, wantFiles int) domain.RefreshResult {
+	t.Helper()
+	result := repo.Refresh()
+	if !result.Success {
+		t.Errorf("Refresh() failed: %s", result.Error)
+	}
+	if result.TotalFiles != wantFiles {
+		t.Errorf("Refresh() TotalFiles = %d, want %d", result.TotalFiles, wantFiles)
+	}
+	return result
+}
