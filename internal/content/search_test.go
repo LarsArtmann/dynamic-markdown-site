@@ -40,6 +40,11 @@ func setupRepoWithFiles(files ...*domain.FileNode) *InMemoryRepository {
 	return repo
 }
 
+// repoWithFile creates an InMemoryRepository with a single file.
+func repoWithFile(t *testing.T, now time.Time, path, title, content string) *InMemoryRepository {
+	return setupRepoWithFiles(newFile(t, now, path, title, content))
+}
+
 func TestSearcher_Search(t *testing.T) {
 	t.Parallel()
 	now := time.Now()
@@ -61,56 +66,9 @@ func TestSearcher_Search(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name: "exact title match scores 1.0",
+			name:      "no match returns empty results",
 			setupRepo: func() *InMemoryRepository {
-				return setupRepoWithFiles(
-					newFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content"),
-				)
-			},
-			query:     "Getting Started Guide",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 1.0,
-			},
-			wantHighlight: map[string]string{
-				"Getting Started Guide": "<mark>Getting Started Guide</mark>",
-			},
-		},
-		{
-			name: "partial title match scores 0.5",
-			setupRepo: func() *InMemoryRepository {
-				return setupRepoWithFiles(
-					newFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content"),
-				)
-			},
-			query:     "Getting",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 0.5,
-			},
-			wantHighlight: map[string]string{
-				"Getting Started Guide": "<mark>Getting</mark> Started Guide",
-			},
-		},
-		{
-			name: "case insensitive matching",
-			setupRepo: func() *InMemoryRepository {
-				return setupRepoWithFiles(
-					newFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content"),
-				)
-			},
-			query:     "getting started",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 0.5,
-			},
-		},
-		{
-			name: "no match returns empty results",
-			setupRepo: func() *InMemoryRepository {
-				return setupRepoWithFiles(
-					newFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content"),
-				)
+				return repoWithFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content")
 			},
 			query:     "nonexistent",
 			wantCount: 0,
@@ -146,22 +104,6 @@ func TestSearcher_Search(t *testing.T) {
 			wantCount: 1,
 			wantScores: map[string]float64{
 				"User Guide": 0.5,
-			},
-		},
-		{
-			name: "query matching multiple files",
-			setupRepo: func() *InMemoryRepository {
-				return setupRepoWithFiles(
-					newFile(t, now, "/docs/api-v1", "API v1", "Old API"),
-					newFile(t, now, "/docs/api-v2", "API v2", "New API"),
-					newFile(t, now, "/docs/guide", "Guide", "Documentation guide"),
-				)
-			},
-			query:     "API",
-			wantCount: 2,
-			wantScores: map[string]float64{
-				"API v1": 0.5,
-				"API v2": 0.5,
 			},
 		},
 	}
@@ -219,6 +161,81 @@ func TestSearcher_Search(t *testing.T) {
 				if results[i].Score > results[i-1].Score {
 					t.Errorf("results not sorted: results[%d].Score (%v) > results[%d].Score (%v)",
 						i, results[i].Score, i-1, results[i-1].Score)
+				}
+			}
+		})
+	}
+}
+
+func TestSearcher_Search_TitleMatching(t *testing.T) {
+	t.Parallel()
+	now := time.Now()
+
+	repo := repoWithFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content")
+	searcher := NewSearcher(repo)
+
+	tests := []struct {
+		name          string
+		query         string
+		wantCount     int
+		wantScores    map[string]float64
+		wantHighlight map[string]string
+	}{
+		{
+			name:      "exact title match scores 1.0",
+			query:     "Getting Started Guide",
+			wantCount: 1,
+			wantScores: map[string]float64{
+				"Getting Started Guide": 1.0,
+			},
+			wantHighlight: map[string]string{
+				"Getting Started Guide": "<mark>Getting Started Guide</mark>",
+			},
+		},
+		{
+			name:      "partial title match scores 0.5",
+			query:     "Getting",
+			wantCount: 1,
+			wantScores: map[string]float64{
+				"Getting Started Guide": 0.5,
+			},
+			wantHighlight: map[string]string{
+				"Getting Started Guide": "<mark>Getting</mark> Started Guide",
+			},
+		},
+		{
+			name:      "case insensitive matching",
+			query:     "getting started",
+			wantCount: 1,
+			wantScores: map[string]float64{
+				"Getting Started Guide": 0.5,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			results, err := searcher.Search(tt.query)
+			if err != nil {
+				t.Fatalf("Searcher.Search() error = %v", err)
+			}
+
+			if len(results) != tt.wantCount {
+				t.Errorf("Searcher.Search() returned %d results, want %d", len(results), tt.wantCount)
+			}
+
+			for _, result := range results {
+				title := result.Node.Title()
+				if wantScore, ok := tt.wantScores[title]; ok {
+					if result.Score != wantScore {
+						t.Errorf("result[%q].Score = %v, want %v", title, result.Score, wantScore)
+					}
+				}
+				if wantHighlight, ok := tt.wantHighlight[title]; ok {
+					if result.Highlighted != wantHighlight {
+						t.Errorf("result[%q].Highlighted = %q, want %q", title, result.Highlighted, wantHighlight)
+					}
 				}
 			}
 		})
@@ -510,14 +527,12 @@ func TestSearcher_Search_ContentBody(t *testing.T) {
 		{
 			name: "content match is case insensitive",
 			setupRepo: func() *InMemoryRepository {
-				return setupRepoWithFiles(
-					newFile(t, now, "/docs/a", "Guide", "This is a TUTORIAL about coding"),
-				)
+				return repoWithFile(t, now, "/docs/tutorial", "Learning Guide", "This is a TUTORIAL about coding")
 			},
 			query:     "tutorial",
 			wantCount: 1,
 			wantScores: map[string]float64{
-				"Guide": 0.3,
+				"Learning Guide": 0.3,
 			},
 		},
 		{

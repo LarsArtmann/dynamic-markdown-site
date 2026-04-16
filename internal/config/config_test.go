@@ -206,9 +206,23 @@ func TestConfigValidate(t *testing.T) {
 		}
 	})
 
-	t.Run("zero port", func(t *testing.T) {
+	t.Run("invalid config values", func(t *testing.T) {
 		t.Parallel()
-		assertValidationError(t, 0, t.TempDir(), "info", "port")
+		tests := []struct {
+			name       string
+			port       uint16
+			rootDir    string
+			logLevel   string
+			errKeyword string
+		}{
+			{name: "zero port", port: 0, rootDir: t.TempDir(), logLevel: "info", errKeyword: "port"},
+			{name: "invalid log level", port: 8080, rootDir: t.TempDir(), logLevel: "invalid", errKeyword: "log level"},
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				assertValidationError(t, tt.port, tt.rootDir, tt.logLevel, tt.errKeyword)
+			})
+		}
 	})
 
 	t.Run("non-existent root dir", func(t *testing.T) {
@@ -250,11 +264,6 @@ func TestConfigValidate(t *testing.T) {
 		if !strings.Contains(err.Error(), "not a directory") {
 			t.Errorf("validate() error should mention 'not a directory', got: %v", err)
 		}
-	})
-
-	t.Run("invalid log level", func(t *testing.T) {
-		t.Parallel()
-		assertValidationError(t, 8080, t.TempDir(), "invalid", "log level")
 	})
 
 	t.Run("all valid log levels", func(t *testing.T) {

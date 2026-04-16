@@ -78,18 +78,14 @@ var sharedHTTPTestCases = []httpTestCase{
 
 func TestHealthEndpoint(t *testing.T) {
 	t.Parallel()
-	repo := content.NewInMemoryRepository()
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	router := newTestRouterForEndpointTests(t)
 
 	runHTTPTests(t, router, sharedHTTPTestCases[:5])
 }
 
 func TestRefreshEndpoint(t *testing.T) {
 	t.Parallel()
-	repo := content.NewInMemoryRepository()
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	router := newTestRouterForEndpointTests(t)
 
 	runHTTPTests(t, router, sharedHTTPTestCases[5:])
 }
@@ -184,14 +180,19 @@ func runHTTPTests(t *testing.T, router *gin.Engine, tests []httpTestCase) {
 			rec := httptest.NewRecorder()
 			router.ServeHTTP(rec, req)
 
-			if rec.Code != tt.wantStatus {
-				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
-			}
-
-			if !strings.Contains(rec.Body.String(), tt.wantBody) {
-				t.Errorf("body = %s, want to contain %s", rec.Body.String(), tt.wantBody)
-			}
+			assertHTTPResponse(t, rec, tt.wantStatus, tt.wantBody)
 		})
+	}
+}
+
+// assertHTTPResponse asserts the HTTP response status and body contain expected value.
+func assertHTTPResponse(t *testing.T, rec *httptest.ResponseRecorder, wantStatus int, wantBody string) {
+	t.Helper()
+	if rec.Code != wantStatus {
+		t.Errorf("status = %d, want %d", rec.Code, wantStatus)
+	}
+	if !strings.Contains(rec.Body.String(), wantBody) {
+		t.Errorf("body = %s, want to contain %s", rec.Body.String(), wantBody)
 	}
 }
 
@@ -204,6 +205,14 @@ func newTestRouterWithRepo(t *testing.T) (*gin.Engine, content.Repository) {
 	router := newTestRouter(server)
 
 	return router, repo
+}
+
+// newTestRouterForEndpointTests creates a test router for endpoint testing.
+func newTestRouterForEndpointTests(t *testing.T) *gin.Engine {
+	t.Helper()
+	repo := content.NewInMemoryRepository()
+	server := newTestServer(t, repo)
+	return newTestRouter(server)
 }
 
 // runStatusTestSuite creates a test router and runs status test cases.
@@ -794,13 +803,7 @@ func TestRawFileServing(t *testing.T) {
 			rec := httptest.NewRecorder()
 			router.ServeHTTP(rec, req)
 
-			if rec.Code != tt.wantStatus {
-				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
-			}
-
-			if !strings.Contains(rec.Body.String(), tt.wantBody) {
-				t.Errorf("body = %s, want to contain %s", rec.Body.String(), tt.wantBody)
-			}
+			assertHTTPResponse(t, rec, tt.wantStatus, tt.wantBody)
 
 			// Check content-type header
 			contentType := rec.Header().Get("Content-Type")

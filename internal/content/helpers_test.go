@@ -2,9 +2,9 @@ package content
 
 import (
 	"testing"
-	"time"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
+	"github.com/larsartmann/dynamic-markdown-site/internal/test"
 )
 
 func TestShouldSkipDir(t *testing.T) {
@@ -77,8 +77,8 @@ func TestFilterEmptyDirectories(t *testing.T) {
 	t.Run("directory with file is kept", func(t *testing.T) {
 		t.Parallel()
 
-		dir := newTestDir(t, "/docs")
-		file := newTestFile(t, "/docs/guide.md")
+		dir := test.NewTestDir(t, "/docs")
+		file := test.NewTestFile(t, "/docs/guide.md", "content")
 		dir.AddChild(file)
 
 		result := filterEmptyDirectories(dir)
@@ -95,9 +95,9 @@ func TestFilterEmptyDirectories(t *testing.T) {
 	t.Run("empty directory is pruned from parent", func(t *testing.T) {
 		t.Parallel()
 
-		parent := newTestDir(t, "/root")
-		emptyDir := newTestDir(t, "/root/empty")
-		file := newTestFile(t, "/root/readme.md")
+		parent := test.NewTestDir(t, "/root")
+		emptyDir := test.NewTestDir(t, "/root/empty")
+		file := test.NewTestFile(t, "/root/readme.md", "content")
 
 		parent.AddChild(emptyDir)
 		parent.AddChild(file)
@@ -116,9 +116,9 @@ func TestFilterEmptyDirectories(t *testing.T) {
 	t.Run("nested empty directories are pruned", func(t *testing.T) {
 		t.Parallel()
 
-		root := newTestDir(t, "/")
-		level1 := newTestDir(t, "/level1")
-		level2 := newTestDir(t, "/level1/level2")
+		root := test.NewTestDir(t, "/")
+		level1 := test.NewTestDir(t, "/level1")
+		level2 := test.NewTestDir(t, "/level1/level2")
 
 		root.AddChild(level1)
 		level1.AddChild(level2)
@@ -133,9 +133,9 @@ func TestFilterEmptyDirectories(t *testing.T) {
 	t.Run("nested dir with file keeps parent chain", func(t *testing.T) {
 		t.Parallel()
 
-		root := newTestDir(t, "/")
-		subdir := newTestDir(t, "/docs")
-		file := newTestFile(t, "/docs/guide.md")
+		root := test.NewTestDir(t, "/")
+		subdir := test.NewTestDir(t, "/docs")
+		file := test.NewTestFile(t, "/docs/guide.md", "content")
 
 		root.AddChild(subdir)
 		subdir.AddChild(file)
@@ -154,26 +154,4 @@ func TestFilterEmptyDirectories(t *testing.T) {
 			t.Errorf("subdir should keep 1 file, got %d", len(sub.Children()))
 		}
 	})
-}
-
-func newTestDir(t *testing.T, path string) *domain.DirectoryNode {
-	t.Helper()
-
-	dir, err := domain.NewDirectoryNode(domain.MustURLPath(path), "", time.Time{})
-	if err != nil {
-		t.Fatalf("failed to create test dir %q: %v", path, err)
-	}
-
-	return dir
-}
-
-func newTestFile(t *testing.T, path string) *domain.FileNode {
-	t.Helper()
-
-	file, err := domain.NewFileNode(domain.MustURLPath(path), "", []byte("content"), time.Time{}, 7)
-	if err != nil {
-		t.Fatalf("failed to create test file %q: %v", path, err)
-	}
-
-	return file
 }

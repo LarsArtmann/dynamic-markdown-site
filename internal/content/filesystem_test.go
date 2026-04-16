@@ -22,6 +22,20 @@ func writeTestFile(t *testing.T, dir, name, content string) {
 	}
 }
 
+// newFileSystemRepoWithFiles creates a repo with given files and asserts success.
+func newFileSystemRepoWithFiles(t *testing.T, files map[string]string) *FileSystemRepository {
+	t.Helper()
+	tmpDir := t.TempDir()
+	for name, content := range files {
+		writeTestFile(t, tmpDir, name, content)
+	}
+	repo, err := NewFileSystemRepository(tmpDir)
+	if err != nil {
+		t.Fatalf("NewFileSystemRepository() error = %v", err)
+	}
+	return repo
+}
+
 func TestNewFileSystemRepository(t *testing.T) {
 	t.Run("valid directory", func(t *testing.T) {
 		tmpDir := t.TempDir()
@@ -601,30 +615,30 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 		}
 	})
 
-	t.Run("returns not found for non-existent file", func(t *testing.T) {
+	t.Run("returns not found for non-existent and markdown paths", func(t *testing.T) {
 		t.Parallel()
-		tmpDir := t.TempDir()
-		writeTestFile(t, tmpDir, "index.md", "# Index")
-
-		repo, err := NewFileSystemRepository(tmpDir)
-		if err != nil {
-			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		tests := []struct {
+			name  string
+			files map[string]string
+			path  string
+		}{
+			{
+				name:  "non-existent file",
+				files: map[string]string{"index.md": "# Index"},
+				path:  "/nonexistent.png",
+			},
+			{
+				name:  "markdown file",
+				files: map[string]string{"doc.md": "# Doc"},
+				path:  "/doc.md",
+			},
 		}
-
-		assertGetRawNotFound(t, repo, "/nonexistent.png")
-	})
-
-	t.Run("returns not found for markdown files", func(t *testing.T) {
-		t.Parallel()
-		tmpDir := t.TempDir()
-		writeTestFile(t, tmpDir, "doc.md", "# Doc")
-
-		repo, err := NewFileSystemRepository(tmpDir)
-		if err != nil {
-			t.Fatalf("NewFileSystemRepository() error = %v", err)
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				repo := newFileSystemRepoWithFiles(t, tt.files)
+				assertGetRawNotFound(t, repo, tt.path)
+			})
 		}
-
-		assertGetRawNotFound(t, repo, "/doc.md")
 	})
 
 	t.Run("returns not found for hidden files", func(t *testing.T) {
