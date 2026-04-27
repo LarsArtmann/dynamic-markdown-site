@@ -107,6 +107,14 @@ func rootFromTree(tree *domain.ContentTree, mu *sync.RWMutex) (*domain.Directory
 	return tree.Root(), nil
 }
 
+// lastModifiedFromRepo returns the last modified time from a repository with proper locking.
+func lastModifiedFromRepo(lastModified *time.Time, mu *sync.RWMutex) time.Time {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	return *lastModified
+}
+
 // refreshStats contains statistics collected during a repository refresh.
 type refreshStats struct {
 	files  int

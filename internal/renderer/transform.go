@@ -16,3 +16,11 @@ func applyReplacements(replacements []nodeReplacement) {
 		r.parent.ReplaceChild(r.parent, r.old, r.new)
 	}
 }
+
+// walkAST walks the AST document and silently handles any walk errors.
+// This eliminates repetitive error handling boilerplate.
+func walkAST(node ast.Node, fn func(ast.Node, bool) (ast.WalkStatus, error)) {
+	if err := ast.Walk(node, fn); err != nil {
+		return
+	}
+}

@@ -69,7 +69,7 @@ func (t *diagramTransformer) Transform(
 	source := reader.Source()
 	var replacements []nodeReplacement
 
-	if err := ast.Walk(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+	walkAST(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
 			return ast.WalkContinue, nil
 		}
@@ -113,9 +113,7 @@ func (t *diagramTransformer) Transform(
 		})
 
 		return ast.WalkContinue, nil
-	}); err != nil {
-		return
-	}
+	})
 
 	applyReplacements(replacements)
 }

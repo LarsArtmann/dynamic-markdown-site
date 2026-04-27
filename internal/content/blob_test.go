@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
+	"github.com/larsartmann/dynamic-markdown-site/internal/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gocloud.dev/blob/memblob"
@@ -98,7 +99,7 @@ func TestBlobRepositoryWithContent(t *testing.T) {
 		"docs/api.md":   "# API\n\nThis is the API reference.",
 	}
 
-	writeTestFiles(t, tmpDir, testFiles)
+	test.WriteTestFiles(t, tmpDir, testFiles)
 
 	// Open as fileblob
 	ctx := context.Background()

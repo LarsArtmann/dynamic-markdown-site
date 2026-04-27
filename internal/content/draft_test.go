@@ -1,11 +1,10 @@
 package content
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
+	"github.com/larsartmann/dynamic-markdown-site/internal/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -100,8 +99,8 @@ func TestFileSystemRepositorySkipsDrafts(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	writeFile(t, tmpDir, "published.md", "---\ntitle: Published\n---\n# Published")
-	writeFile(t, tmpDir, "draft.md", "---\ntitle: Draft\ndraft: true\n---\n# Draft")
+	test.WriteTestFile(t, tmpDir, "published.md", "---\ntitle: Published\n---\n# Published")
+	test.WriteTestFile(t, tmpDir, "draft.md", "---\ntitle: Draft\ndraft: true\n---\n# Draft")
 
 	repo, err := NewFileSystemRepository(tmpDir)
 	require.NoError(t, err)
@@ -123,7 +122,7 @@ func TestBlobRepositorySkipsDrafts(t *testing.T) {
 		"draft.md":     "---\ntitle: Draft\ndraft: true\n---\n# Draft",
 	}
 
-	writeTestFiles(t, tmpDir, testFiles)
+	test.WriteTestFiles(t, tmpDir, testFiles)
 
 	repo, err := NewBlobRepository(t.Context(), "file://"+tmpDir)
 	require.NoError(t, err)
@@ -133,24 +132,4 @@ func TestBlobRepositorySkipsDrafts(t *testing.T) {
 
 	_, err = repo.Get(domain.MustURLPath("/draft"))
 	require.ErrorIs(t, err, ErrContentNotFound, "draft file should be excluded")
-}
-
-// writeTestFiles writes multiple files to a directory for testing.
-// It creates parent directories as needed and fails the test on any error.
-func writeTestFiles(t *testing.T, dir string, files map[string]string) {
-	t.Helper()
-
-	for name, content := range files {
-		writeFile(t, dir, name, content)
-	}
-}
-
-func writeFile(t *testing.T, dir, name, content string) {
-	t.Helper()
-
-	fullPath := filepath.Join(dir, name)
-	err := os.MkdirAll(filepath.Dir(fullPath), 0o755)
-	require.NoError(t, err)
-	err = os.WriteFile(fullPath, []byte(content), 0o644)
-	require.NoError(t, err)
 }

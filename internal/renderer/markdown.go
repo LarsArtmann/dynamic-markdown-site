@@ -174,7 +174,7 @@ func extractTOCFromAST(doc ast.Node, source []byte) []domain.TOCItem {
 	itemMap := make(map[ast.Node]*domain.TOCItem)
 
 	// Walk the AST to find headings
-	err := ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+	walkAST(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
 			return ast.WalkContinue, nil
 		}
@@ -214,9 +214,6 @@ func extractTOCFromAST(doc ast.Node, source []byte) []domain.TOCItem {
 
 		return ast.WalkContinue, nil
 	})
-	if err != nil {
-		return items
-	}
 
 	return items
 }

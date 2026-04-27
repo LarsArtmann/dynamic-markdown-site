@@ -78,10 +78,7 @@ func (r *FileSystemRepository) Root() (*domain.DirectoryNode, error) {
 
 // LastModified returns when the content was last indexed.
 func (r *FileSystemRepository) LastModified() time.Time {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	return r.lastModified
+	return lastModifiedFromRepo(&r.lastModified, &r.mu)
 }
 
 // AllPaths returns all URL paths in the repository.

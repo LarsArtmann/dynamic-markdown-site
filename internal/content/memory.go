@@ -80,10 +80,7 @@ func (r *InMemoryRepository) Refresh() domain.RefreshResult {
 
 // LastModified returns when the content was last modified.
 func (r *InMemoryRepository) LastModified() time.Time {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	return r.modified
+	return lastModifiedFromRepo(&r.modified, &r.mu)
 }
 
 // AllPaths returns all URL paths in the repository.
