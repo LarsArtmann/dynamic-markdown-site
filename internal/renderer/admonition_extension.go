@@ -60,6 +60,7 @@ const (
 
 type admonitionNode struct {
 	ast.BaseBlock
+
 	kind alertKind
 }
 
@@ -81,6 +82,7 @@ func (t *admonitionTransformer) Transform(
 	_ parser.Context,
 ) {
 	source := reader.Source()
+
 	var replacements []nodeReplacement
 
 	walkAST(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
@@ -141,6 +143,7 @@ func findFirstParagraph(blockquote *ast.Blockquote) *ast.Paragraph {
 			return p
 		}
 	}
+
 	return nil
 }
 
@@ -151,6 +154,7 @@ type textSpan struct {
 
 func collectTextSpans(para *ast.Paragraph, source []byte) []textSpan {
 	var spans []textSpan
+
 	for child := para.FirstChild(); child != nil; child = child.NextSibling() {
 		switch n := child.(type) {
 		case *ast.Text:
@@ -159,6 +163,7 @@ func collectTextSpans(para *ast.Paragraph, source []byte) []textSpan {
 			spans = append(spans, textSpan{node: n, value: string(n.Value)})
 		}
 	}
+
 	return spans
 }
 
@@ -188,9 +193,12 @@ func stripAlertNodes(para *ast.Paragraph, source []byte, consumed int) {
 	spans := collectTextSpans(para, source)
 
 	remaining := consumed
-	var toRemove []ast.Node
-	var toReplace ast.Node
-	var replaceValue string
+
+	var (
+		toRemove     []ast.Node
+		toReplace    ast.Node
+		replaceValue string
+	)
 
 	for _, s := range spans {
 		if remaining <= 0 {
@@ -256,6 +264,7 @@ func (r *admonitionNodeRenderer) renderAdmonition(
 ) (ast.WalkStatus, error) {
 	if !entering {
 		_, _ = w.WriteString("</div>\n</div>\n")
+
 		return ast.WalkContinue, nil
 	}
 

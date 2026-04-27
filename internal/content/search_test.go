@@ -47,6 +47,7 @@ func repoWithFile(t *testing.T, now time.Time, path, title, content string) *InM
 
 func TestSearcher_Search(t *testing.T) {
 	t.Parallel()
+
 	now := time.Now()
 
 	tests := []struct {
@@ -66,9 +67,15 @@ func TestSearcher_Search(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name:      "no match returns empty results",
+			name: "no match returns empty results",
 			setupRepo: func() *InMemoryRepository {
-				return repoWithFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content")
+				return repoWithFile(
+					t,
+					now,
+					"/docs/guide",
+					"Getting Started Guide",
+					"# Guide content",
+				)
 			},
 			query:     "nonexistent",
 			wantCount: 0,
@@ -111,6 +118,7 @@ func TestSearcher_Search(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			repo := tt.setupRepo()
 			searcher := NewSearcher(repo)
 
@@ -169,6 +177,7 @@ func TestSearcher_Search(t *testing.T) {
 
 func TestSearcher_Search_TitleMatching(t *testing.T) {
 	t.Parallel()
+
 	now := time.Now()
 
 	repo := repoWithFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content")
@@ -216,13 +225,18 @@ func TestSearcher_Search_TitleMatching(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			results, err := searcher.Search(tt.query)
 			if err != nil {
 				t.Fatalf("Searcher.Search() error = %v", err)
 			}
 
 			if len(results) != tt.wantCount {
-				t.Errorf("Searcher.Search() returned %d results, want %d", len(results), tt.wantCount)
+				t.Errorf(
+					"Searcher.Search() returned %d results, want %d",
+					len(results),
+					tt.wantCount,
+				)
 			}
 
 			for _, result := range results {
@@ -232,9 +246,15 @@ func TestSearcher_Search_TitleMatching(t *testing.T) {
 						t.Errorf("result[%q].Score = %v, want %v", title, result.Score, wantScore)
 					}
 				}
+
 				if wantHighlight, ok := tt.wantHighlight[title]; ok {
 					if result.Highlighted != wantHighlight {
-						t.Errorf("result[%q].Highlighted = %q, want %q", title, result.Highlighted, wantHighlight)
+						t.Errorf(
+							"result[%q].Highlighted = %q, want %q",
+							title,
+							result.Highlighted,
+							wantHighlight,
+						)
 					}
 				}
 			}
@@ -244,6 +264,7 @@ func TestSearcher_Search_TitleMatching(t *testing.T) {
 
 func TestSearcher_Search_NestedDirectories(t *testing.T) {
 	t.Parallel()
+
 	now := time.Now()
 
 	repo := NewInMemoryRepository()
@@ -298,6 +319,7 @@ func TestSearcher_Search_NestedDirectories(t *testing.T) {
 
 func TestHighlightMatch(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		text     string
@@ -357,6 +379,7 @@ func TestHighlightMatch(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := highlightMatch(tt.text, tt.query)
 			if result != tt.expected {
 				t.Errorf(
@@ -373,6 +396,7 @@ func TestHighlightMatch(t *testing.T) {
 
 func TestSearcher_Search_EmptyRepository(t *testing.T) {
 	t.Parallel()
+
 	repo := NewInMemoryRepository()
 	searcher := NewSearcher(repo)
 
@@ -388,6 +412,7 @@ func TestSearcher_Search_EmptyRepository(t *testing.T) {
 
 func TestSearcher_Search_WhitespaceQuery(t *testing.T) {
 	t.Parallel()
+
 	now := time.Now()
 	repo := NewInMemoryRepository()
 	file, _ := domain.NewFileNode(domain.MustURLPath("/test"), "Test", []byte("content"), now, 7)
@@ -419,6 +444,7 @@ func TestSearcher_Search_WhitespaceQuery(t *testing.T) {
 
 func TestSearcher_Search_SpecialCharacters(t *testing.T) {
 	t.Parallel()
+
 	now := time.Now()
 
 	repo := NewInMemoryRepository()
@@ -442,6 +468,7 @@ func TestSearcher_Search_SpecialCharacters(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			results, err := searcher.Search(tt.query)
 			if err != nil {
 				t.Errorf("Search(%q) error = %v", tt.query, err)
@@ -463,6 +490,7 @@ func TestSearcher_Search_SpecialCharacters(t *testing.T) {
 
 func TestSearcher_Search_ContentBody(t *testing.T) {
 	t.Parallel()
+
 	now := time.Now()
 
 	tests := []struct {
@@ -527,7 +555,13 @@ func TestSearcher_Search_ContentBody(t *testing.T) {
 		{
 			name: "content match is case insensitive",
 			setupRepo: func() *InMemoryRepository {
-				return repoWithFile(t, now, "/docs/tutorial", "Learning Guide", "This is a TUTORIAL about coding")
+				return repoWithFile(
+					t,
+					now,
+					"/docs/tutorial",
+					"Learning Guide",
+					"This is a TUTORIAL about coding",
+				)
 			},
 			query:     "tutorial",
 			wantCount: 1,
@@ -596,6 +630,7 @@ func TestSearcher_Search_ContentBody(t *testing.T) {
 
 func TestExtractSnippet(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name    string
 		content string
@@ -666,6 +701,7 @@ func TestExtractSnippet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := extractSnippet([]byte(tt.content), tt.query, tt.padding)
 			if tt.wantHas == "" {
 				if result != "" {

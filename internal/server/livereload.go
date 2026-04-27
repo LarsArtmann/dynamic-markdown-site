@@ -101,23 +101,29 @@ func (lr *LiveReload) handleSSE(c *gin.Context) {
 
 	// Stream events to client
 	clientGone := c.Request.Context().Done()
+
 	for {
 		select {
 		case <-clientGone:
 			lr.logger.Debug("live reload client disconnected")
+
 			return
 		case event, ok := <-clientChan:
 			if !ok {
 				return
 			}
+
 			data, err := json.Marshal(event)
 			if err != nil {
 				lr.logger.Error("failed to marshal live reload event", "error", err)
+
 				continue
 			}
+
 			if _, err := fmt.Fprintf(c.Writer, "event: reload\ndata: %s\n\n", data); err != nil {
 				lr.logger.Debug("failed to send live reload event", "error", err)
 			}
+
 			c.Writer.Flush()
 		}
 	}

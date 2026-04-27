@@ -28,6 +28,7 @@ func executeRequest(router *gin.Engine, path string) *httptest.ResponseRecorder 
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
+
 	return rec
 }
 
@@ -67,13 +68,55 @@ func newFailingTestServer(t *testing.T) *gin.Engine {
 
 // sharedHTTPTestCases contains reusable HTTP test cases for health and refresh endpoints.
 var sharedHTTPTestCases = []httpTestCase{
-	{name: "status", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"status":"healthy"`},
-	{name: "version", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"version":"dev"`},
-	{name: "commit", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"commit":"unknown"`},
-	{name: "build_date", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"build_date":"unknown"`},
-	{name: "timestamp", method: http.MethodGet, path: "/health", wantStatus: http.StatusOK, wantBody: `"timestamp"`},
-	{name: "GET /refresh", method: http.MethodGet, path: "/refresh", wantStatus: http.StatusOK, wantBody: `"status":"success"`},
-	{name: "POST /refresh", method: http.MethodPost, path: "/refresh", wantStatus: http.StatusOK, wantBody: `"status":"success"`},
+	{
+		name:       "status",
+		method:     http.MethodGet,
+		path:       "/health",
+		wantStatus: http.StatusOK,
+		wantBody:   `"status":"healthy"`,
+	},
+	{
+		name:       "version",
+		method:     http.MethodGet,
+		path:       "/health",
+		wantStatus: http.StatusOK,
+		wantBody:   `"version":"dev"`,
+	},
+	{
+		name:       "commit",
+		method:     http.MethodGet,
+		path:       "/health",
+		wantStatus: http.StatusOK,
+		wantBody:   `"commit":"unknown"`,
+	},
+	{
+		name:       "build_date",
+		method:     http.MethodGet,
+		path:       "/health",
+		wantStatus: http.StatusOK,
+		wantBody:   `"build_date":"unknown"`,
+	},
+	{
+		name:       "timestamp",
+		method:     http.MethodGet,
+		path:       "/health",
+		wantStatus: http.StatusOK,
+		wantBody:   `"timestamp"`,
+	},
+	{
+		name:       "GET /refresh",
+		method:     http.MethodGet,
+		path:       "/refresh",
+		wantStatus: http.StatusOK,
+		wantBody:   `"status":"success"`,
+	},
+	{
+		name:       "POST /refresh",
+		method:     http.MethodPost,
+		path:       "/refresh",
+		wantStatus: http.StatusOK,
+		wantBody:   `"status":"success"`,
+	},
 }
 
 func TestHealthEndpoint(t *testing.T) {
@@ -92,6 +135,7 @@ func TestRefreshEndpoint(t *testing.T) {
 
 func TestRefreshRateLimit(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -116,6 +160,7 @@ func TestRefreshRateLimit(t *testing.T) {
 // assertBodyContains asserts that body contains the given substring.
 func assertBodyContains(t *testing.T, body, substring string) {
 	t.Helper()
+
 	if !strings.Contains(body, substring) {
 		t.Errorf("body = %s, want to contain %q", body, substring)
 	}
@@ -186,11 +231,18 @@ func runHTTPTests(t *testing.T, router *gin.Engine, tests []httpTestCase) {
 }
 
 // assertHTTPResponse asserts the HTTP response status and body contain expected value.
-func assertHTTPResponse(t *testing.T, rec *httptest.ResponseRecorder, wantStatus int, wantBody string) {
+func assertHTTPResponse(
+	t *testing.T,
+	rec *httptest.ResponseRecorder,
+	wantStatus int,
+	wantBody string,
+) {
 	t.Helper()
+
 	if rec.Code != wantStatus {
 		t.Errorf("status = %d, want %d", rec.Code, wantStatus)
 	}
+
 	if !strings.Contains(rec.Body.String(), wantBody) {
 		t.Errorf("body = %s, want to contain %s", rec.Body.String(), wantBody)
 	}
@@ -210,8 +262,10 @@ func newTestRouterWithRepo(t *testing.T) (*gin.Engine, content.Repository) {
 // newTestRouterForEndpointTests creates a test router for endpoint testing.
 func newTestRouterForEndpointTests(t *testing.T) *gin.Engine {
 	t.Helper()
+
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
+
 	return newTestRouter(server)
 }
 
@@ -253,6 +307,7 @@ func TestContentNotFound(t *testing.T) {
 
 func TestContentWithFile(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 
 	filePath := domain.MustURLPath("/test-file")
@@ -297,6 +352,7 @@ func TestContentWithFile(t *testing.T) {
 
 func TestContentRedirectFromMDExtension(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 
 	// Create a file at /test-page (without .md in the URL path)
@@ -342,10 +398,12 @@ func TestContentRedirectFromMDExtension(t *testing.T) {
 
 func TestContentRedirectFromMDExtensionWithPath(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 
 	// Create a nested directory structure
 	dirPath := domain.MustURLPath("/docs")
+
 	dir, err := domain.NewDirectoryNode(dirPath, "docs", time.Now())
 	if err != nil {
 		t.Fatalf("failed to create directory node: %v", err)
@@ -394,6 +452,7 @@ func TestContentRedirectFromMDExtensionWithPath(t *testing.T) {
 
 func TestContentWithDirectory(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 
 	dirPath := domain.MustURLPath("/test-dir")
@@ -437,6 +496,7 @@ func TestContentWithDirectory(t *testing.T) {
 
 func TestStaticFileServing(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -453,6 +513,7 @@ func TestStaticFileServing(t *testing.T) {
 
 func TestMethodNotAllowed(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -475,14 +536,39 @@ func TestMethodNotAllowed(t *testing.T) {
 
 // sharedSearchHTTPTestCases contains reusable search endpoint test cases.
 var sharedSearchHTTPTestCases = []httpTestCase{
-	{name: "no query", method: http.MethodGet, path: "/search", wantStatus: http.StatusOK, wantBody: "Search"},
-	{name: "empty query", method: http.MethodGet, path: "/search?q=", wantStatus: http.StatusOK, wantBody: "Search"},
-	{name: "matching query", method: http.MethodGet, path: "/search?q=Test", wantStatus: http.StatusOK, wantBody: "<mark>Test</mark>"},
-	{name: "non-matching query", method: http.MethodGet, path: "/search?q=nonexistent", wantStatus: http.StatusOK, wantBody: "No results found"},
+	{
+		name:       "no query",
+		method:     http.MethodGet,
+		path:       "/search",
+		wantStatus: http.StatusOK,
+		wantBody:   "Search",
+	},
+	{
+		name:       "empty query",
+		method:     http.MethodGet,
+		path:       "/search?q=",
+		wantStatus: http.StatusOK,
+		wantBody:   "Search",
+	},
+	{
+		name:       "matching query",
+		method:     http.MethodGet,
+		path:       "/search?q=Test",
+		wantStatus: http.StatusOK,
+		wantBody:   "<mark>Test</mark>",
+	},
+	{
+		name:       "non-matching query",
+		method:     http.MethodGet,
+		path:       "/search?q=nonexistent",
+		wantStatus: http.StatusOK,
+		wantBody:   "No results found",
+	},
 }
 
 func TestSearchEndpoint(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 
 	filePath := domain.MustURLPath("/test-document")
@@ -505,6 +591,7 @@ func TestSearchEndpoint(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get root: %v", err)
 	}
+
 	root.AddChild(file)
 
 	server := newTestServer(t, repo)
@@ -515,6 +602,7 @@ func TestSearchEndpoint(t *testing.T) {
 
 func TestRefreshEndpointError(t *testing.T) {
 	t.Parallel()
+
 	repo := &FailingRepository{refreshError: true}
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
@@ -549,6 +637,7 @@ func TestRootEndpointError(t *testing.T) {
 
 func TestSearchEndpointError(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 	logger := slog.New(slog.DiscardHandler)
 	cache := cache.NewHTMLCache(100)
@@ -583,6 +672,7 @@ func TestSearchEndpointError(t *testing.T) {
 
 func TestHandle500(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 
@@ -601,6 +691,7 @@ func TestHandle500(t *testing.T) {
 
 func TestGetContentType(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		path     string
 		expected string
@@ -621,6 +712,7 @@ func TestGetContentType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.path, func(t *testing.T) {
 			t.Parallel()
+
 			result := staticContentType(tt.path)
 			if result != tt.expected {
 				t.Errorf("staticContentType(%s) = %q, want %q", tt.path, result, tt.expected)
@@ -631,6 +723,7 @@ func TestGetContentType(t *testing.T) {
 
 func TestStaticPathTraversal(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -680,6 +773,7 @@ func TestContentByPathNonNotFoundError(t *testing.T) {
 
 func TestRenderFileWithCache(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 
 	filePath := domain.MustURLPath("/cached-file")

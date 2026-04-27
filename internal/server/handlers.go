@@ -200,8 +200,8 @@ func (s *Server) handleSearch(c *gin.Context) {
 
 func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
 	// Redirect .md URLs to clean URLs (e.g., /page.md -> /page)
-	if strings.HasSuffix(filepath, ".md") {
-		cleanPath := strings.TrimSuffix(filepath, ".md")
+	if before, ok := strings.CutSuffix(filepath, ".md"); ok {
+		cleanPath := before
 		c.Redirect(http.StatusMovedPermanently, cleanPath)
 
 		return

@@ -133,6 +133,7 @@ func (r *RenderedFile) Title() string {
 	if r.metadata.Title != "" {
 		return r.metadata.Title
 	}
+
 	return r.file.Title()
 }
 

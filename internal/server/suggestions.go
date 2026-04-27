@@ -21,6 +21,7 @@ func findSuggestions(
 	}
 
 	requestedLower := strings.ToLower(requested)
+
 	var suggestions []domain.SuggestedPath
 
 	for _, path := range paths {

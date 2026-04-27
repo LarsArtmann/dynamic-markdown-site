@@ -14,6 +14,7 @@ import (
 // assertStringContains is a helper to assert a string contains a substring.
 func assertStringContains(t *testing.T, s, substr, msg string) {
 	t.Helper()
+
 	if !strings.Contains(s, substr) {
 		t.Errorf("%s: expected %q to contain %q", msg, s, substr)
 	}
@@ -30,6 +31,7 @@ func TestLoadSubprocess(t *testing.T) {
 		cfg, err := Load()
 		if err != nil {
 			_, _ = os.Stderr.WriteString("LOAD_ERROR:" + err.Error())
+
 			os.Exit(1)
 		}
 		// Output the config values for verification
@@ -38,6 +40,7 @@ func TestLoadSubprocess(t *testing.T) {
 		_, _ = os.Stdout.WriteString("LOG_LEVEL:" + cfg.LogLevel + "\n")
 		_, _ = os.Stdout.WriteString("CACHE:" + boolStr(cfg.CacheEnabled) + "\n")
 		_, _ = os.Stdout.WriteString("DEV:" + boolStr(cfg.DevMode) + "\n")
+
 		os.Exit(0)
 	}
 
@@ -86,6 +89,7 @@ func boolStr(b bool) string {
 
 func TestParseBool(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input    string
 		expected bool
@@ -111,6 +115,7 @@ func TestParseBool(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			t.Parallel()
+
 			result := parseBool(tt.input)
 			if result != tt.expected {
 				t.Errorf("parseBool(%q) = %v, want %v", tt.input, result, tt.expected)
@@ -121,6 +126,7 @@ func TestParseBool(t *testing.T) {
 
 func TestParseUint16(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name        string
 		input       string
@@ -141,6 +147,7 @@ func TestParseUint16(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result, err := parseUint16(tt.input)
 			if tt.expectError {
 				if err == nil {
@@ -208,6 +215,7 @@ func TestConfigValidate(t *testing.T) {
 
 	t.Run("invalid config values", func(t *testing.T) {
 		t.Parallel()
+
 		tests := []struct {
 			name       string
 			port       uint16
@@ -215,8 +223,20 @@ func TestConfigValidate(t *testing.T) {
 			logLevel   string
 			errKeyword string
 		}{
-			{name: "zero port", port: 0, rootDir: t.TempDir(), logLevel: "info", errKeyword: "port"},
-			{name: "invalid log level", port: 8080, rootDir: t.TempDir(), logLevel: "invalid", errKeyword: "log level"},
+			{
+				name:       "zero port",
+				port:       0,
+				rootDir:    t.TempDir(),
+				logLevel:   "info",
+				errKeyword: "port",
+			},
+			{
+				name:       "invalid log level",
+				port:       8080,
+				rootDir:    t.TempDir(),
+				logLevel:   "invalid",
+				errKeyword: "log level",
+			},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
@@ -227,6 +247,7 @@ func TestConfigValidate(t *testing.T) {
 
 	t.Run("non-existent root dir", func(t *testing.T) {
 		t.Parallel()
+
 		cfg := &Config{
 			Port:     8080,
 			RootDir:  "/non/existent/directory/12345",
@@ -245,6 +266,7 @@ func TestConfigValidate(t *testing.T) {
 
 	t.Run("root is file not directory", func(t *testing.T) {
 		t.Parallel()
+
 		tmpFile := filepath.Join(t.TempDir(), "testfile")
 		if err := os.WriteFile(tmpFile, []byte("test"), 0o644); err != nil {
 			t.Fatalf("Failed to create test file: %v", err)
@@ -301,6 +323,7 @@ func TestConfigValidate(t *testing.T) {
 
 func TestConfigLogValue(t *testing.T) {
 	t.Parallel()
+
 	cfg := DefaultConfig()
 	cfg.RootDir = "/test"
 	cfg.LogLevel = "debug"
@@ -313,6 +336,7 @@ func TestConfigLogValue(t *testing.T) {
 
 func TestConfigSlogLevel(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		logLevel string
 		expected slog.Level
@@ -332,6 +356,7 @@ func TestConfigSlogLevel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.logLevel, func(t *testing.T) {
 			t.Parallel()
+
 			cfg := &Config{LogLevel: tt.logLevel}
 
 			result := cfg.SlogLevel()
@@ -344,6 +369,7 @@ func TestConfigSlogLevel(t *testing.T) {
 
 func TestConfigString(t *testing.T) {
 	t.Parallel()
+
 	cfg := &Config{
 		Port:         8080,
 		RootDir:      "/test/path",
@@ -415,6 +441,7 @@ func TestConfigDevModeDisablesCache(t *testing.T) {
 
 func TestDefaultSiteName(t *testing.T) {
 	t.Parallel()
+
 	cfg := DefaultConfig()
 
 	if cfg.SiteName != "Site" {
@@ -424,6 +451,7 @@ func TestDefaultSiteName(t *testing.T) {
 
 func TestConfigStringIncludesSiteName(t *testing.T) {
 	t.Parallel()
+
 	cfg := &Config{
 		Port:     8080,
 		RootDir:  ".",
@@ -438,6 +466,7 @@ func TestConfigStringIncludesSiteName(t *testing.T) {
 
 func TestConfigLogValueIncludesSiteName(t *testing.T) {
 	t.Parallel()
+
 	cfg := DefaultConfig()
 	cfg.SiteName = "TestDocs"
 
@@ -448,6 +477,7 @@ func TestConfigLogValueIncludesSiteName(t *testing.T) {
 
 	attrs := logValue.Group()
 	found := false
+
 	for _, attr := range attrs {
 		if attr.Key == "site_name" && attr.Value.String() == "TestDocs" {
 			found = true

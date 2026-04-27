@@ -43,6 +43,7 @@ func TestRateLimiter_DifferentIPs(t *testing.T) {
 	if !rl.checkRateLimit("192.168.1.1") {
 		t.Error("IP1 first request should be allowed")
 	}
+
 	if !rl.checkRateLimit("192.168.1.1") {
 		t.Error("IP1 second request should be allowed")
 	}
@@ -51,6 +52,7 @@ func TestRateLimiter_DifferentIPs(t *testing.T) {
 	if !rl.checkRateLimit("192.168.1.2") {
 		t.Error("IP2 first request should be allowed")
 	}
+
 	if !rl.checkRateLimit("192.168.1.2") {
 		t.Error("IP2 second request should be allowed")
 	}
@@ -59,6 +61,7 @@ func TestRateLimiter_DifferentIPs(t *testing.T) {
 	if rl.checkRateLimit("192.168.1.1") {
 		t.Error("IP1 over limit should be denied")
 	}
+
 	if rl.checkRateLimit("192.168.1.2") {
 		t.Error("IP2 over limit should be denied")
 	}
@@ -71,6 +74,7 @@ func TestRateLimiter_Concurrent(t *testing.T) {
 	defer rl.Stop()
 
 	var wg sync.WaitGroup
+
 	allowed := make(chan bool, 200)
 
 	for range 200 {
@@ -83,6 +87,7 @@ func TestRateLimiter_Concurrent(t *testing.T) {
 	close(allowed)
 
 	allowedCount := 0
+
 	for a := range allowed {
 		if a {
 			allowedCount++

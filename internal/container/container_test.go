@@ -25,7 +25,9 @@ func runInSubprocess(t *testing.T) {
 // assertNoShutdownError checks that shutdown succeeds or has empty error.
 func assertNoShutdownError(t *testing.T, c *Container) {
 	t.Helper()
-	if err := c.Shutdown(); err != nil && err.Error() != "" {
+
+	err := c.Shutdown()
+	if err != nil && err.Error() != "" {
 		t.Errorf("Shutdown() error: %v", err)
 	}
 }
@@ -62,6 +64,7 @@ func TestContainerServices(t *testing.T) {
 		if err != nil {
 			t.Fatalf("New() error: %v", err)
 		}
+
 		defer func() { _ = container.Shutdown() }()
 
 		// Test Config accessor
@@ -144,6 +147,7 @@ func TestContainerMultipleAccess(t *testing.T) {
 		if err != nil {
 			t.Fatalf("New() error: %v", err)
 		}
+
 		defer func() { _ = container.Shutdown() }()
 
 		// Access services multiple times - should return same instances (singleton)
@@ -209,6 +213,7 @@ func TestContainerServiceOrder(t *testing.T) {
 		if err != nil {
 			t.Fatalf("New() error: %v", err)
 		}
+
 		defer func() { _ = container.Shutdown() }()
 
 		// Access services in different order than registration

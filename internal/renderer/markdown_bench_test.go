@@ -333,13 +333,16 @@ main();
 // buildTOCMarkdown generates markdown content with the specified number of headings.
 func buildTOCMarkdown(numHeadings int) string {
 	var sb strings.Builder
+
 	for i := range numHeadings {
 		depth := (i % 4) + 1
 		for range depth {
 			sb.WriteString("#")
 		}
+
 		sb.WriteString(" Heading " + string(rune('0'+i%10)) + "\n\nContent for section.\n\n")
 	}
+
 	return sb.String()
 }
 

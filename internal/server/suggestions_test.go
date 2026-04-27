@@ -12,6 +12,7 @@ func paths(paths ...string) []domain.URLPath {
 	for i, p := range paths {
 		result[i] = domain.MustURLPath(p)
 	}
+
 	return result
 }
 

@@ -42,7 +42,7 @@ func NewBlobRepository(ctx context.Context, bucketURL string) (*BlobRepository, 
 		prefix: "",
 	}
 
-	if result := repo.Refresh(); !result.Success { //nolint:contextcheck
+	if result := repo.Refresh(); !result.Success {
 		if result.Error != "" {
 			return nil, errors.Wrapf(errRefreshFailed, "refresh %s: %s", bucketURL, result.Error)
 		}
@@ -112,6 +112,7 @@ func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, 
 		if errors.Is(err, io.EOF) {
 			break
 		}
+
 		if err != nil {
 			stats.recordError(r.prefix, "list error", err)
 
@@ -122,6 +123,7 @@ func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, 
 		if r.prefix != "" && strings.HasPrefix(blobPath, r.prefix) {
 			blobPath = strings.TrimPrefix(blobPath, r.prefix)
 		}
+
 		blobPath = strings.TrimPrefix(blobPath, "/")
 
 		if blobPath == "" || strings.HasSuffix(blobPath, "/") {
@@ -152,6 +154,7 @@ func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, 
 			)
 			if err != nil {
 				stats.recordError(blobPath, "invalid path", err)
+
 				continue
 			}
 
@@ -182,6 +185,7 @@ func (r *BlobRepository) buildTree(stats *refreshStats) (*domain.DirectoryNode, 
 			}
 
 			parentNode.AddChild(fileNode)
+
 			stats.files++
 		}
 	}
@@ -211,13 +215,16 @@ func (r *BlobRepository) findOrCreateParentDirs(
 
 		if node, exists := dirNodes[currentPath]; exists {
 			currentNode = node
+
 			continue
 		}
 
 		urlPath := domain.MustURLPath(currentPath)
+
 		dirNode, err := domain.NewDirectoryNode(urlPath, part, time.Now())
 		if err != nil {
 			stats.recordError(blobPath, "create dir node error", err)
+
 			return currentNode
 		}
 
@@ -235,6 +242,7 @@ func (r *BlobRepository) readBlobContent(blobPath string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to read blob: %s", blobPath)
 	}
+
 	defer func() { _ = reader.Close() }()
 
 	data, err := io.ReadAll(reader)

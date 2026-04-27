@@ -16,6 +16,7 @@ func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 	crumbs := domain.BuildBreadcrumbs(dir.Path())
 
 	hasReadme := false
+
 	for _, child := range dir.Children() {
 		if child.Kind() == domain.NodeKindFile && child.Path().Filename() == "README.md" {
 			hasReadme = true

@@ -56,8 +56,10 @@ func TestDiagramRendererRenderD2(t *testing.T) {
 				if err == nil {
 					t.Error("expected error, got nil")
 				}
+
 				return
 			}
+
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}

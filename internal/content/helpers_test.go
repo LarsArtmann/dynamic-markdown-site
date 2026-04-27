@@ -150,6 +150,7 @@ func TestFilterEmptyDirectories(t *testing.T) {
 		if !ok {
 			t.Fatal("root child should be a DirectoryNode")
 		}
+
 		if len(sub.Children()) != 1 {
 			t.Errorf("subdir should keep 1 file, got %d", len(sub.Children()))
 		}

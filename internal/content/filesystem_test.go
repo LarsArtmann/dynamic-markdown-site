@@ -13,11 +13,13 @@ import (
 // writeTestFile creates a test markdown file with the given content.
 func writeTestFile(t *testing.T, dir, name, content string) {
 	t.Helper()
-	if err := os.WriteFile(
+
+	err := os.WriteFile(
 		filepath.Join(dir, name),
 		[]byte(content),
 		0o644,
-	); err != nil {
+	)
+	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
 	}
 }
@@ -25,14 +27,17 @@ func writeTestFile(t *testing.T, dir, name, content string) {
 // newFileSystemRepoWithFiles creates a repo with given files and asserts success.
 func newFileSystemRepoWithFiles(t *testing.T, files map[string]string) *FileSystemRepository {
 	t.Helper()
+
 	tmpDir := t.TempDir()
 	for name, content := range files {
 		writeTestFile(t, tmpDir, name, content)
 	}
+
 	repo, err := NewFileSystemRepository(tmpDir)
 	if err != nil {
 		t.Fatalf("NewFileSystemRepository() error = %v", err)
 	}
+
 	return repo
 }
 
@@ -117,6 +122,7 @@ func TestNewFileSystemRepository(t *testing.T) {
 // assertNotFoundErr is a helper to assert an error is ErrContentNotFound.
 func assertNotFoundErr(t *testing.T, err error, msg string) {
 	t.Helper()
+
 	if err == nil {
 		t.Fatalf("%s: expected error, got nil", msg)
 	}
@@ -129,6 +135,7 @@ func assertNotFoundErr(t *testing.T, err error, msg string) {
 // assertGetRawNotFound creates a repo and asserts that GetRaw returns not found.
 func assertGetRawNotFound(t *testing.T, repo *FileSystemRepository, urlPath string) {
 	t.Helper()
+
 	_, err := repo.GetRaw(domain.MustURLPath(urlPath))
 	assertNotFoundErr(t, err, "GetRaw")
 }
@@ -457,7 +464,8 @@ func TestFileSystemRepository_SkipsBlacklistedDirectories(t *testing.T) {
 	for _, skipDir := range []string{"node_modules", "vendor", "dist", "build", "tmp", "temp"} {
 		dir := filepath.Join(tmpDir, skipDir)
 
-		if err := os.Mkdir(dir, 0o755); err != nil {
+		err := os.Mkdir(dir, 0o755)
+		if err != nil {
 			t.Fatalf("failed to create %s directory: %v", skipDir, err)
 		}
 
@@ -566,6 +574,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 		}
 
 		urlPath := domain.MustURLPath("/docs/assets/diagrams/workflow.svg")
+
 		raw, err := repo.GetRaw(urlPath)
 		if err != nil {
 			t.Fatalf("GetRaw() error = %v", err)
@@ -605,6 +614,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 		}
 
 		urlPath := domain.MustURLPath("/logo.png")
+
 		raw, err := repo.GetRaw(urlPath)
 		if err != nil {
 			t.Fatalf("GetRaw() error = %v", err)
@@ -617,6 +627,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 
 	t.Run("returns not found for non-existent and markdown paths", func(t *testing.T) {
 		t.Parallel()
+
 		tests := []struct {
 			name  string
 			files map[string]string
@@ -643,6 +654,7 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 
 	t.Run("returns not found for hidden files", func(t *testing.T) {
 		t.Parallel()
+
 		tmpDir := t.TempDir()
 		if err := os.WriteFile(
 			filepath.Join(tmpDir, ".secret"),

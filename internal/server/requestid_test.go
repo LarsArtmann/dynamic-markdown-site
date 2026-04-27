@@ -14,6 +14,7 @@ import (
 func newTestRequest() (*httptest.ResponseRecorder, *http.Request) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test", nil)
+
 	return w, req
 }
 
@@ -69,6 +70,7 @@ func TestRequestIDMiddleware_StoresInContext(t *testing.T) {
 	router.Use(requestIDMiddleware())
 
 	var contextID string
+
 	router.GET("/test", func(c *gin.Context) {
 		contextID = getRequestID(c)
 		c.Status(http.StatusOK)
@@ -90,6 +92,7 @@ func TestGetRequestID_NotSet(t *testing.T) {
 	// Note: NOT using requestIDMiddleware
 
 	var contextID string
+
 	router.GET("/test", func(c *gin.Context) {
 		contextID = getRequestID(c)
 		c.Status(http.StatusOK)
@@ -120,6 +123,7 @@ func TestGenerateRequestID_Uniqueness(t *testing.T) {
 	t.Parallel()
 
 	ids := make(map[string]bool)
+
 	for range 100 {
 		id := generateRequestID()
 		assert.False(t, ids[id], "duplicate ID generated: %s", id)
@@ -140,6 +144,7 @@ func TestGetRequestIDFromContext_WithID(t *testing.T) {
 	router.Use(requestIDMiddleware())
 
 	var extractedID string
+
 	router.GET("/test", func(c *gin.Context) {
 		extractedID = getRequestIDFromContext(c.Request.Context())
 		c.Status(http.StatusOK)
@@ -170,12 +175,15 @@ func TestRequestIDMiddleware_Chain(t *testing.T) {
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
 		executionOrder = append(executionOrder, "before-middleware")
+
 		c.Next()
+
 		executionOrder = append(executionOrder, "after-middleware")
 	})
 	router.Use(requestIDMiddleware())
 	router.GET("/test", func(c *gin.Context) {
 		executionOrder = append(executionOrder, "handler")
+
 		c.Status(http.StatusOK)
 	})
 

@@ -54,11 +54,13 @@ func Load() (*Config, error) {
 	cfg.defineAndParseFlags()
 	cfg.applyEnvironmentOverrides()
 
-	if err := cfg.validate(); err != nil {
+	err := cfg.validate()
+	if err != nil {
 		return nil, err
 	}
 
-	if err := cfg.applyDerivedSettings(); err != nil {
+	err := cfg.applyDerivedSettings()
+	if err != nil {
 		return nil, err
 	}
 
@@ -215,11 +217,13 @@ func (c *Config) String() string {
 	var b strings.Builder
 	b.WriteString("Configuration:\n")
 	fmt.Fprintf(&b, "  Port:         %d\n", c.Port)
+
 	if c.StorageURL != "" {
 		fmt.Fprintf(&b, "  Storage URL:  %s\n", c.StorageURL)
 	} else {
 		fmt.Fprintf(&b, "  Root Dir:     %s\n", c.RootDir)
 	}
+
 	fmt.Fprintf(&b, "  Log Level:    %s\n", c.LogLevel)
 	fmt.Fprintf(&b, "  Cache:        %v\n", c.CacheEnabled)
 	fmt.Fprintf(&b, "  Dev Mode:     %v\n", c.DevMode)

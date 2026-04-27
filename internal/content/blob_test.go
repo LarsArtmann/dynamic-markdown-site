@@ -163,6 +163,7 @@ func TestBlobRepositoryMemblob(t *testing.T) {
 
 	// Create a memblob bucket for testing
 	bucket := memblob.OpenBucket(nil)
+
 	defer func() { _ = bucket.Close() }()
 
 	// Write test content

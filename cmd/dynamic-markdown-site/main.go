@@ -44,6 +44,7 @@ func main() {
 	if version.Version == "dev" {
 		slog.Info("running in development mode (version not set)")
 	}
+
 	err := run()
 	if err != nil {
 		slog.Error("application failed", slog.Any("error", err))
@@ -63,6 +64,7 @@ func run() error {
 
 	if err := serveHTTP(svc, httpServer, router); err != nil {
 		shutdownServices(svc)
+
 		return err
 	}
 
@@ -153,7 +155,8 @@ func serveHTTP(svc *services, httpServer *http.Server, _ *gin.Engine) error {
 	go func() {
 		svc.logger.Info("server starting", slog.String("address", httpServer.Addr))
 
-		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		err := httpServer.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errChan <- err
 		}
 	}()
@@ -166,6 +169,7 @@ func serveHTTP(svc *services, httpServer *http.Server, _ *gin.Engine) error {
 		return cockroachdberrors.Wrapf(err, "server error (addr: %s)", httpServer.Addr)
 	case <-ctx.Done():
 		svc.logger.Info("shutdown signal received")
+
 		return nil
 	}
 }
@@ -175,7 +179,8 @@ func gracefulShutdown(svc *services, httpServer *http.Server) error {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
 
-	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+	err := httpServer.Shutdown(shutdownCtx)
+	if err != nil {
 		return cockroachdberrors.Wrapf(err, "server shutdown failed (addr: %s)", httpServer.Addr)
 	}
 
@@ -201,6 +206,7 @@ func startFileWatcher(svc *services) {
 	if svc.config.DevMode {
 		liveReload := svc.server.LiveReload()
 		go watchForChanges(svc.config.RootDir, svc.repo, liveReload, svc.logger)
+
 		svc.logger.Info("file watcher started in dev mode")
 	}
 }

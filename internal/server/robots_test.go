@@ -73,10 +73,12 @@ func TestHandleRobotsTxt(t *testing.T) {
 				"/robots.txt",
 				nil,
 			)
+
 			req.Host = tt.host
 			if tt.forwardedProto != "" {
 				req.Header.Set("X-Forwarded-Proto", tt.forwardedProto)
 			}
+
 			rec := httptest.NewRecorder()
 			router.ServeHTTP(rec, req)
 

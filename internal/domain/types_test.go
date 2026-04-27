@@ -13,6 +13,7 @@ import (
 
 func assertTitle(t *testing.T, gotTitle, wantTitle, constructor string) {
 	t.Helper()
+
 	if gotTitle != wantTitle {
 		t.Errorf("%s().Title() = %q, want %q", constructor, gotTitle, wantTitle)
 	}
@@ -20,6 +21,7 @@ func assertTitle(t *testing.T, gotTitle, wantTitle, constructor string) {
 
 func TestURLPath_NewURLPath(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   string
@@ -44,6 +46,7 @@ func TestURLPath_NewURLPath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			got, err := domain.NewURLPath(tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewURLPath(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
@@ -60,6 +63,7 @@ func TestURLPath_NewURLPath(t *testing.T) {
 
 func TestURLPath_MustURLPath(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		input     string
@@ -74,6 +78,7 @@ func TestURLPath_MustURLPath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			defer func() {
 				if r := recover(); r != nil != tt.wantPanic {
 					t.Errorf("MustURLPath(%q) panic = %v, wantPanic %v", tt.input, r, tt.wantPanic)
@@ -100,6 +105,7 @@ func TestURLPath_MustURLPath(t *testing.T) {
 
 func TestURLPath_Join(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name    string
 		base    string
@@ -123,6 +129,7 @@ func TestURLPath_Join(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			base, _ := domain.NewURLPath(tt.base)
 
 			got, err := base.Join(tt.segment)
@@ -153,6 +160,7 @@ func TestURLPath_Join(t *testing.T) {
 
 func TestURLPath_Parent(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input string
 		want  string
@@ -178,6 +186,7 @@ func TestURLPath_Parent(t *testing.T) {
 
 func TestURLPath_Segments(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input string
 		want  []string
@@ -190,6 +199,7 @@ func TestURLPath_Segments(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			t.Parallel()
+
 			path, _ := domain.NewURLPath(tt.input)
 
 			got := path.Segments()
@@ -248,6 +258,7 @@ func testURLPathMethod[T comparable](t *testing.T, name string, tests []struct {
 
 func TestURLPath_Filename(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input string
 		want  string
@@ -266,6 +277,7 @@ func TestURLPath_Filename(t *testing.T) {
 
 func TestURLPath_IsRoot(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		input string
 		want  bool
@@ -285,6 +297,7 @@ func TestURLPath_IsRoot(t *testing.T) {
 
 func TestDirectoryNode_NewDirectoryNode(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name      string
 		path      string
@@ -301,6 +314,7 @@ func TestDirectoryNode_NewDirectoryNode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			path, _ := domain.NewURLPath(tt.path)
 
 			got, err := domain.NewDirectoryNode(path, tt.title, tt.modified)
@@ -351,6 +365,7 @@ func TestDirectoryNode_AddChild(t *testing.T) {
 
 func TestFileNode_NewFileNode(t *testing.T) {
 	t.Parallel()
+
 	content := []byte("# Hello World")
 	modified := time.Now()
 
@@ -381,6 +396,7 @@ func TestFileNode_NewFileNode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			path, _ := domain.NewURLPath(tt.path)
 
 			got, err := domain.NewFileNode(path, tt.title, tt.content, tt.modified, tt.size)
@@ -399,6 +415,7 @@ func TestFileNode_NewFileNode(t *testing.T) {
 
 func TestFileNode_ReadingTime(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name        string
 		content     string
@@ -412,6 +429,7 @@ func TestFileNode_ReadingTime(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			node, _ := domain.NewFileNode(
 				domain.MustURLPath("/test.md"),
 				"Test",
@@ -430,6 +448,7 @@ func TestFileNode_ReadingTime(t *testing.T) {
 
 func TestRenderedFile_Metadata(t *testing.T) {
 	t.Parallel()
+
 	node, _ := domain.NewFileNode(
 		domain.MustURLPath("/test.md"),
 		"Test",
@@ -477,6 +496,7 @@ func TestRenderedFile_Metadata(t *testing.T) {
 
 func TestContentTree_NewContentTree(t *testing.T) {
 	t.Parallel()
+
 	root, _ := domain.NewDirectoryNode(domain.MustURLPath("/"), "Root", time.Now())
 	tree := domain.NewContentTree(root)
 
@@ -487,6 +507,7 @@ func TestContentTree_NewContentTree(t *testing.T) {
 
 func TestContentTree_Find(t *testing.T) {
 	t.Parallel()
+
 	root, _ := domain.NewDirectoryNode(domain.MustURLPath("/"), "Root", time.Now())
 
 	// Add structure: /subdir/file.md
@@ -517,6 +538,7 @@ func TestContentTree_Find(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.path, func(t *testing.T) {
 			t.Parallel()
+
 			path, _ := domain.NewURLPath(tt.path)
 
 			_, found := tree.Find(path)
@@ -529,6 +551,7 @@ func TestContentTree_Find(t *testing.T) {
 
 func TestBuildBreadcrumbs(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		name     string
 		path     string
@@ -543,6 +566,7 @@ func TestBuildBreadcrumbs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			path, _ := domain.NewURLPath(tt.path)
 			crumbs := domain.BuildBreadcrumbs(path)
 
@@ -573,6 +597,7 @@ func TestBuildBreadcrumbs(t *testing.T) {
 
 func TestNodeKind_String(t *testing.T) {
 	t.Parallel()
+
 	tests := []struct {
 		kind domain.NodeKind
 		want string
@@ -585,6 +610,7 @@ func TestNodeKind_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			t.Parallel()
+
 			if got := tt.kind.String(); got != tt.want {
 				t.Errorf("NodeKind(%d).String() = %q, want %q", tt.kind, got, tt.want)
 			}

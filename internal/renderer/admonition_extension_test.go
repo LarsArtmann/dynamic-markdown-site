@@ -165,6 +165,7 @@ func TestAdmonitionMultipleAlerts(t *testing.T) {
 	input := "> [!NOTE]\n> First note.\n\n> [!WARNING]\n> Second warning.\n\n> [!TIP]\n> Third tip."
 
 	r := NewGoldmarkRenderer()
+
 	result, err := r.Render([]byte(input))
 	if err != nil {
 		t.Fatalf("Render() error = %v", err)

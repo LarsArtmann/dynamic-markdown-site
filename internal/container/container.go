@@ -85,6 +85,7 @@ func provideConfig(_ do.Injector) (*config.Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
+
 	return cfg, nil
 }
 
@@ -147,6 +148,7 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 			repo content.Repository
 			err  error
 		}
+
 		resultCh := make(chan result, 1)
 
 		go func() {
@@ -159,6 +161,7 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 			if res.err != nil {
 				return nil, fmt.Errorf("failed to create blob repository: %w", res.err)
 			}
+
 			return res.repo, nil
 		case <-time.After(10 * time.Second):
 			return nil, fmt.Errorf(
@@ -173,6 +176,7 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create filesystem repository: %w", err)
 	}
+
 	return repo, nil
 }
 

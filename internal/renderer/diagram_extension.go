@@ -26,6 +26,7 @@ func truncateForLog(content string) string {
 	if len(content) <= maxLogContentLen {
 		return content
 	}
+
 	return content[:maxLogContentLen] + "..."
 }
 
@@ -34,6 +35,7 @@ func truncateForLog(content string) string {
 // avoiding priority conflicts with the Chroma syntax highlighting renderer.
 type diagramNode struct {
 	ast.BaseBlock
+
 	language string
 	content  string
 }
@@ -67,6 +69,7 @@ func (t *diagramTransformer) Transform(
 	pctx parser.Context,
 ) {
 	source := reader.Source()
+
 	var replacements []nodeReplacement
 
 	walkAST(node, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
@@ -85,6 +88,7 @@ func (t *diagramTransformer) Transform(
 		}
 
 		var buf bytes.Buffer
+
 		for i := range fenced.Lines().Len() {
 			line := fenced.Lines().At(i)
 			if _, err := buf.Write(line.Value(source)); err != nil {
@@ -184,6 +188,7 @@ func writeStrings(w util.BufWriter, errMsg string, parts ...string) error {
 			return errors.Wrapf(err, "%s (writing %d parts)", errMsg, len(parts))
 		}
 	}
+
 	return nil
 }
 
@@ -197,32 +202,37 @@ func (r *diagramNodeRenderer) renderD2(w util.BufWriter, content string) (ast.Wa
 	svg, err := r.diagramRenderer.RenderD2(content)
 	if err != nil {
 		htmlContent := html.EscapeString(content)
-		if writeErr := writeStrings(
+		writeErr := writeStrings(
 			w,
 			"write D2 fallback",
 			"<pre><code class=\"language-d2\">",
 			htmlContent,
 			"</code></pre>",
-		); writeErr != nil {
+		)
+		if writeErr != nil {
 			return ast.WalkContinue, wrapWriteError(
 				writeErr,
 				"write D2 fallback for diagram",
 				content,
 			)
 		}
+
 		return ast.WalkContinue, nil
 	}
 
-	if writeErr := writeStrings(
+	writeErr := writeStrings(
 		w,
 		"write D2 output",
 		`<div class="diagram d2-diagram">`,
-	); writeErr != nil {
+	)
+	if writeErr != nil {
 		return ast.WalkStop, wrapWriteError(writeErr, "write D2 div start", content)
 	}
+
 	if _, writeErr := w.Write(svg); writeErr != nil {
 		return ast.WalkStop, wrapWriteError(writeErr, "write D2 SVG", content)
 	}
+
 	if _, writeErr := w.WriteString("</div>"); writeErr != nil {
 		return ast.WalkContinue, wrapWriteError(writeErr, "write D2 div end", content)
 	}

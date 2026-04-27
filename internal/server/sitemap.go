@@ -28,6 +28,7 @@ func (s *Server) handleSitemapXML(c *gin.Context) {
 	if err != nil {
 		s.logger.Error("failed to get root for sitemap", "error", err)
 		c.String(http.StatusInternalServerError, "Error generating sitemap")
+
 		return
 	}
 
@@ -48,6 +49,7 @@ func (s *Server) handleSitemapXML(c *gin.Context) {
 func (s *Server) buildSitemapEntries(root *domain.DirectoryNode, baseURL string) []SitemapEntry {
 	var entries []SitemapEntry
 	s.collectEntries(root, baseURL, &entries)
+
 	return entries
 }
 

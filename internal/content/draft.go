@@ -27,7 +27,8 @@ func isDraft(content []byte) bool {
 	}
 
 	var fm frontmatter
-	if err := yaml.Unmarshal([]byte(frontmatterText), &fm); err != nil {
+	err := yaml.Unmarshal([]byte(frontmatterText), &fm)
+	if err != nil {
 		return false
 	}
 

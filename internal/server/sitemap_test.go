@@ -87,10 +87,12 @@ func serveSitemap(router *gin.Engine) *httptest.ResponseRecorder {
 
 func serveSitemapWithProto(router *gin.Engine, proto string) *httptest.ResponseRecorder {
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
+
 	req.Host = testHost
 	if proto != "" {
 		req.Header.Set("X-Forwarded-Proto", proto)
 	}
+
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -99,6 +101,7 @@ func serveSitemapWithProto(router *gin.Engine, proto string) *httptest.ResponseR
 
 func TestSitemapXMLEmptyRepo(t *testing.T) {
 	t.Parallel()
+
 	repo := content.NewInMemoryRepository()
 	server := newTestServer(t, repo)
 	router := newTestRouter(server)
@@ -253,6 +256,7 @@ func TestCalculatePriority(t *testing.T) {
 		if tt.segments > 0 {
 			name = strings.Repeat("/a", tt.segments)
 		}
+
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -260,6 +264,7 @@ func TestCalculatePriority(t *testing.T) {
 			if tt.segments > 0 {
 				path = domain.MustURLPath(strings.Repeat("/a", tt.segments))
 			}
+
 			result := server.calculatePriority(path)
 			assert.InEpsilon(t, tt.expected, result, 0.001)
 		})

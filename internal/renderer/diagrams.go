@@ -88,5 +88,6 @@ func (r *DiagramRenderer) RenderD2(content string) ([]byte, error) {
 // RenderMermaidToHTML returns HTML for client-side Mermaid rendering.
 func RenderMermaidToHTML(content string) string {
 	escaped := html.EscapeString(content)
+
 	return fmt.Sprintf(`<pre class="mermaid">%s</pre>`, escaped)
 }
