@@ -32,3 +32,5 @@ node_modules/
 /coverage
 # Add pattern for Templ generated files
 *_templ.go
+# Copy/paste detection report
+/report/jscpd-report.json

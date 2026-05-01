@@ -21,7 +21,7 @@ func NewTestDir(t *testing.T, path string) *domain.DirectoryNode {
 }
 
 // NewTestFile creates a new file node for testing with default title.
-func NewTestFile(t *testing.T, path string, content string) *domain.FileNode {
+func NewTestFile(t *testing.T, path, content string) *domain.FileNode {
 	t.Helper()
 
 	file, err := domain.NewFileNode(
@@ -58,7 +58,7 @@ func NewTestFileWithTitle(t *testing.T, path, title, content string) *domain.Fil
 
 // NewTestFileWithTime creates a new file node for testing with a specific modified time.
 func NewTestFileWithTime(
-	t *testing.T, path string, content string, modified time.Time,
+	t *testing.T, path, content string, modified time.Time,
 ) *domain.FileNode {
 	t.Helper()
 
@@ -86,7 +86,7 @@ func AssertChildCount(t *testing.T, children []domain.ContentNode, want int, msg
 }
 
 // AssertChildTitle asserts a child's title.
-func AssertChildTitle(t *testing.T, child domain.ContentNode, want string, msg string) {
+func AssertChildTitle(t *testing.T, child domain.ContentNode, want, msg string) {
 	t.Helper()
 
 	if child.Title() != want {

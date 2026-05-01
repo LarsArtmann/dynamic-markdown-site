@@ -61,15 +61,15 @@ This project currently relies on manually installed tools (Go 1.26.1, `templ`, `
 
 The following tools are required to develop, build, and release this project:
 
-| Tool | Version | Source | Pinned Where |
-|---|---|---|---|
-| Go | 1.26.1 | `go.mod` directive | `go.mod` + CI `setup-go` |
-| `templ` CLI | v0.3.1001 | `go install` / Dockerfile | Dockerfile line 22, CI env var |
-| `golangci-lint` | latest | system install | CI action (latest), local: manual |
-| `golines` | latest | `go install` | justfile `fix` task |
-| `just` | latest | system install | README prerequisite |
-| `d2` (Terrastruct) | v0.7.1 (via go.mod) | Go dependency | `go.mod` (runtime dep, not CLI) |
-| Docker / BuildKit | any | system install | CI service |
+| Tool               | Version             | Source                    | Pinned Where                      |
+| ------------------ | ------------------- | ------------------------- | --------------------------------- |
+| Go                 | 1.26.1              | `go.mod` directive        | `go.mod` + CI `setup-go`          |
+| `templ` CLI        | v0.3.1001           | `go install` / Dockerfile | Dockerfile line 22, CI env var    |
+| `golangci-lint`    | latest              | system install            | CI action (latest), local: manual |
+| `golines`          | latest              | `go install`              | justfile `fix` task               |
+| `just`             | latest              | system install            | README prerequisite               |
+| `d2` (Terrastruct) | v0.7.1 (via go.mod) | Go dependency             | `go.mod` (runtime dep, not CLI)   |
+| Docker / BuildKit  | any                 | system install            | CI service                        |
 
 ### 2.2 Current Development Workflow
 
@@ -107,15 +107,15 @@ Jobs:
 
 ### 2.4 Pain Points
 
-| Pain Point | Impact |
-|---|---|
-| **templ version drift** — pinned in Dockerfile (line 22) and CI (`TEMPL_VERSION` env), but local installs use `@latest` or forget to pin | Broken builds when templ API changes |
-| **golangci-lint version drift** — CI uses `latest` via action, local may differ | Lint passes locally but fails in CI (or vice versa) |
-| **golines not pinned** — `just fix` calls `golines -w .` but no version constraint | Formatting differs across machines |
-| **Onboarding friction** — 5 tools to install manually before first contribution | New contributors give up |
-| **Dockerfile duplicates justfile** — build logic exists in both places | Maintenance burden, divergence risk |
-| **Cache corruption** (TODO_LIST.md) — Go build cache issues hard to reproduce | "Works on my machine" debugging |
-| **No `nix develop` equivalent** — can't enter a fully equipped shell instantly | Time wasted setting up environments |
+| Pain Point                                                                                                                               | Impact                                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **templ version drift** — pinned in Dockerfile (line 22) and CI (`TEMPL_VERSION` env), but local installs use `@latest` or forget to pin | Broken builds when templ API changes                |
+| **golangci-lint version drift** — CI uses `latest` via action, local may differ                                                          | Lint passes locally but fails in CI (or vice versa) |
+| **golines not pinned** — `just fix` calls `golines -w .` but no version constraint                                                       | Formatting differs across machines                  |
+| **Onboarding friction** — 5 tools to install manually before first contribution                                                          | New contributors give up                            |
+| **Dockerfile duplicates justfile** — build logic exists in both places                                                                   | Maintenance burden, divergence risk                 |
+| **Cache corruption** (TODO_LIST.md) — Go build cache issues hard to reproduce                                                            | "Works on my machine" debugging                     |
+| **No `nix develop` equivalent** — can't enter a fully equipped shell instantly                                                           | Time wasted setting up environments                 |
 
 ---
 
@@ -130,16 +130,16 @@ flake.lock        # Pinned dependency graph (auto-generated, committed)
 
 The flake will provide these outputs:
 
-| Output | Type | Purpose |
-|---|---|---|
-| `packages.default` | Go binary | The `dynamic-markdown-site` executable |
-| `packages.oci-image` | Docker/OCI tarball | Minimal container image (replaces Dockerfile) |
-| `devShells.default` | Shell env | All tools for development (Go, templ, golangci-lint, golines, just) |
-| `checks.test` | Nix check | Run `go test ./...` |
-| `checks.lint` | Nix check | Run `golangci-lint run ./...` |
-| `checks.templ-generate` | Nix check | Verify `templ generate` produces no diff |
-| `formatter` | Nix formatter | `nix fmt` runs `golines` |
-| `apps.run-dev` | Nix app | `nix run .#run-dev` starts dev server |
+| Output                  | Type               | Purpose                                                             |
+| ----------------------- | ------------------ | ------------------------------------------------------------------- |
+| `packages.default`      | Go binary          | The `dynamic-markdown-site` executable                              |
+| `packages.oci-image`    | Docker/OCI tarball | Minimal container image (replaces Dockerfile)                       |
+| `devShells.default`     | Shell env          | All tools for development (Go, templ, golangci-lint, golines, just) |
+| `checks.test`           | Nix check          | Run `go test ./...`                                                 |
+| `checks.lint`           | Nix check          | Run `golangci-lint run ./...`                                       |
+| `checks.templ-generate` | Nix check          | Verify `templ generate` produces no diff                            |
+| `formatter`             | Nix formatter      | `nix fmt` runs `golines`                                            |
+| `apps.run-dev`          | Nix app            | `nix run .#run-dev` starts dev server                               |
 
 ### 3.2 Package Outputs
 
@@ -179,6 +179,7 @@ packages.default = pkgs.buildGoModule {
 ```
 
 Key decisions:
+
 - `vendorHash` — computed by `nix build`, then pinned. Every `go.sum` change requires updating this hash (same pattern as all Go packages in nixpkgs).
 - `preBuild` runs `templ generate` so the Go compilation sees generated `_templ.go` files.
 - `ldflags` inject version information matching the current Dockerfile behavior (lines 51-56).
@@ -249,14 +250,14 @@ packages.oci-image = pkgs.dockerTools.buildLayeredImage {
 
 **Advantages over the Dockerfile:**
 
-| Aspect | Dockerfile | Nix OCI Image |
-|---|---|---|
-| Reproducibility | Depends on Alpine package state | Bit-for-bit reproducible (fixed-output derivations) |
-| Layer caching | Manual `COPY` ordering | Automatic optimal layer splitting |
-| Build time | Re-downloads deps on cache miss | Nix store caches every dependency |
-| Security | Alpine + ca-certificates install | Only what's explicitly listed in `contents` |
-| Cross-platform | Requires Docker/BuildKit | Pure Nix, no Docker daemon needed for build |
-| Size | distroless (~2MB base) | Comparable (only binary + certs + tzdata) |
+| Aspect          | Dockerfile                       | Nix OCI Image                                       |
+| --------------- | -------------------------------- | --------------------------------------------------- |
+| Reproducibility | Depends on Alpine package state  | Bit-for-bit reproducible (fixed-output derivations) |
+| Layer caching   | Manual `COPY` ordering           | Automatic optimal layer splitting                   |
+| Build time      | Re-downloads deps on cache miss  | Nix store caches every dependency                   |
+| Security        | Alpine + ca-certificates install | Only what's explicitly listed in `contents`         |
+| Cross-platform  | Requires Docker/BuildKit         | Pure Nix, no Docker daemon needed for build         |
+| Size            | distroless (~2MB base)           | Comparable (only binary + certs + tzdata)           |
 
 ### 3.5 Checks (CI Replacements)
 
@@ -319,27 +320,27 @@ Usage: `nix run .#run-dev`
 
 Files to **add**:
 
-| File | Purpose |
-|---|---|
-| `flake.nix` | All build/dev/ci definitions |
-| `flake.lock` | Pinned dependency versions (auto-generated) |
-| `.envrc` | direnv integration (optional but recommended) |
+| File         | Purpose                                       |
+| ------------ | --------------------------------------------- |
+| `flake.nix`  | All build/dev/ci definitions                  |
+| `flake.lock` | Pinned dependency versions (auto-generated)   |
+| `.envrc`     | direnv integration (optional but recommended) |
 
 Files to **modify**:
 
-| File | Change |
-|---|---|
-| `justfile` | Add `nix-` prefixed tasks, keep existing tasks for non-Nix users |
-| `.gitignore` | Add `result`, `result-*` (Nix build symlinks) |
+| File         | Change                                                           |
+| ------------ | ---------------------------------------------------------------- |
+| `justfile`   | Add `nix-` prefixed tasks, keep existing tasks for non-Nix users |
+| `.gitignore` | Add `result`, `result-*` (Nix build symlinks)                    |
 
 Files to **keep unchanged** (at least initially):
 
-| File | Reason |
-|---|---|
-| `Dockerfile` | Backwards compatibility; can be deprecated once Nix OCI image is proven in CI |
-| `.github/workflows/docker.yml` | Will be replaced by a Nix-based workflow in Phase 3 |
-| `go.mod` / `go.sum` | Nix reads these; no changes needed |
-| `.golangci.yml` | Used by `golangci-lint` regardless of how it's installed |
+| File                           | Reason                                                                        |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| `Dockerfile`                   | Backwards compatibility; can be deprecated once Nix OCI image is proven in CI |
+| `.github/workflows/docker.yml` | Will be replaced by a Nix-based workflow in Phase 3                           |
+| `go.mod` / `go.sum`            | Nix reads these; no changes needed                                            |
+| `.golangci.yml`                | Used by `golangci-lint` regardless of how it's installed                      |
 
 ---
 
@@ -562,6 +563,7 @@ This provides the full devShell automatically — no `nix develop` needed. Every
 ### 5.4 CI Migration Path
 
 **Phase 1** (additive — no disruption):
+
 ```yaml
 # .github/workflows/nix.yml
 name: Nix CI
@@ -582,11 +584,13 @@ jobs:
 ```
 
 **Phase 2** (dual pipeline):
+
 - Both `docker.yml` and `nix.yml` run in parallel
 - Compare outputs for equivalence
 - Build OCI image from Nix, push alongside Docker-built image
 
 **Phase 3** (full migration):
+
 - Remove `docker.yml`, replace with `nix.yml`
 - Dockerfile kept for reference but no longer used in CI
 - Nix builds the OCI image for all platforms
@@ -597,89 +601,89 @@ jobs:
 
 ### Phase 1: Foundation (Day 1)
 
-| Step | Action | Verify |
-|---|---|---|
-| 1.1 | Create `flake.nix` with `devShells.default` only | `nix develop` works |
-| 1.2 | Create `.envrc` with `use flake` | `direnv allow` loads tools |
-| 1.3 | Add `result` and `result-*` to `.gitignore` | Git ignores Nix symlinks |
-| 1.4 | Run `nix develop -c just test` | Tests pass in Nix shell |
-| 1.5 | Run `nix develop -c just lint` | Lint passes in Nix shell |
-| 1.6 | Commit `flake.nix`, `flake.lock`, `.envrc` | Repo has Nix support |
+| Step | Action                                           | Verify                     |
+| ---- | ------------------------------------------------ | -------------------------- |
+| 1.1  | Create `flake.nix` with `devShells.default` only | `nix develop` works        |
+| 1.2  | Create `.envrc` with `use flake`                 | `direnv allow` loads tools |
+| 1.3  | Add `result` and `result-*` to `.gitignore`      | Git ignores Nix symlinks   |
+| 1.4  | Run `nix develop -c just test`                   | Tests pass in Nix shell    |
+| 1.5  | Run `nix develop -c just lint`                   | Lint passes in Nix shell   |
+| 1.6  | Commit `flake.nix`, `flake.lock`, `.envrc`       | Repo has Nix support       |
 
 ### Phase 2: Package Build (Day 2)
 
-| Step | Action | Verify |
-|---|---|---|
-| 2.1 | Add `packages.default` to flake.nix | `nix build` produces binary |
-| 2.2 | Fix `vendorHash` (run build, copy reported hash) | Build succeeds |
-| 2.3 | Verify binary runs: `./result/bin/dynamic-markdown-site -help` | Output matches expected |
-| 2.4 | Add `checks.test` and `checks.lint` | `nix flake check` passes |
-| 2.5 | Add `formatter` and `apps.run-dev` | `nix fmt` and `nix run .#run-dev` work |
-| 2.6 | Update `justfile` with Nix tasks | `just nix-build` and `just nix-check` work |
+| Step | Action                                                         | Verify                                     |
+| ---- | -------------------------------------------------------------- | ------------------------------------------ |
+| 2.1  | Add `packages.default` to flake.nix                            | `nix build` produces binary                |
+| 2.2  | Fix `vendorHash` (run build, copy reported hash)               | Build succeeds                             |
+| 2.3  | Verify binary runs: `./result/bin/dynamic-markdown-site -help` | Output matches expected                    |
+| 2.4  | Add `checks.test` and `checks.lint`                            | `nix flake check` passes                   |
+| 2.5  | Add `formatter` and `apps.run-dev`                             | `nix fmt` and `nix run .#run-dev` work     |
+| 2.6  | Update `justfile` with Nix tasks                               | `just nix-build` and `just nix-check` work |
 
 ### Phase 3: OCI Image (Day 3)
 
-| Step | Action | Verify |
-|---|---|---|
-| 3.1 | Add `packages.oci-image` to flake.nix | `nix build .#oci-image` succeeds |
-| 3.2 | Load and test: `docker load < result` then `docker run` | Container serves on port 8080 |
-| 3.3 | Compare image size with Dockerfile-built image | Within 20% of current size |
-| 3.4 | Verify health endpoint works in container | `curl localhost:8080/health` returns 200 |
+| Step | Action                                                  | Verify                                   |
+| ---- | ------------------------------------------------------- | ---------------------------------------- |
+| 3.1  | Add `packages.oci-image` to flake.nix                   | `nix build .#oci-image` succeeds         |
+| 3.2  | Load and test: `docker load < result` then `docker run` | Container serves on port 8080            |
+| 3.3  | Compare image size with Dockerfile-built image          | Within 20% of current size               |
+| 3.4  | Verify health endpoint works in container               | `curl localhost:8080/health` returns 200 |
 
 ### Phase 4: CI Integration (Day 4-5)
 
-| Step | Action | Verify |
-|---|---|---|
-| 4.1 | Create `.github/workflows/nix.yml` | Runs alongside existing `docker.yml` |
-| 4.2 | Add `DeterminateSystems/nix-installer-action` | CI has Nix |
-| 4.3 | Add `magic-nix-cache-action` for caching | CI builds are fast |
-| 4.4 | Configure OCI image push from Nix build | Nix-built image pushed to GHCR |
-| 4.5 | Run both pipelines in parallel for 2 weeks | No discrepancies found |
-| 4.6 | Remove `docker.yml` and Dockerfile (or archive) | Single pipeline |
+| Step | Action                                          | Verify                               |
+| ---- | ----------------------------------------------- | ------------------------------------ |
+| 4.1  | Create `.github/workflows/nix.yml`              | Runs alongside existing `docker.yml` |
+| 4.2  | Add `DeterminateSystems/nix-installer-action`   | CI has Nix                           |
+| 4.3  | Add `magic-nix-cache-action` for caching        | CI builds are fast                   |
+| 4.4  | Configure OCI image push from Nix build         | Nix-built image pushed to GHCR       |
+| 4.5  | Run both pipelines in parallel for 2 weeks      | No discrepancies found               |
+| 4.6  | Remove `docker.yml` and Dockerfile (or archive) | Single pipeline                      |
 
 ### Phase 5: Polish (Day 6-7)
 
-| Step | Action | Verify |
-|---|---|---|
-| 5.1 | Update `README.md` with Nix instructions | Docs reflect new workflow |
-| 5.2 | Update `AGENTS.md` with Nix commands | AI agents use Nix |
-| 5.3 | Add `CONTRIBUTING.md` with `nix develop` as primary setup | New contributors use Nix |
-| 5.4 | Remove manual installation instructions from README | No conflicting docs |
-| 5.5 | Add `nix fmt` to git pre-commit hook (optional) | Formatting enforced |
+| Step | Action                                                    | Verify                    |
+| ---- | --------------------------------------------------------- | ------------------------- |
+| 5.1  | Update `README.md` with Nix instructions                  | Docs reflect new workflow |
+| 5.2  | Update `AGENTS.md` with Nix commands                      | AI agents use Nix         |
+| 5.3  | Add `CONTRIBUTING.md` with `nix develop` as primary setup | New contributors use Nix  |
+| 5.4  | Remove manual installation instructions from README       | No conflicting docs       |
+| 5.5  | Add `nix fmt` to git pre-commit hook (optional)           | Formatting enforced       |
 
 ---
 
 ## 7. What Gets Replaced vs. Kept
 
-| Component | Status | Notes |
-|---|---|---|
-| `Dockerfile` | **Archived** (Phase 4) | Kept in repo as `Dockerfile.legacy` for reference |
-| `.github/workflows/docker.yml` | **Replaced** (Phase 4) | By `nix.yml` |
-| `justfile` | **Kept + extended** | Nix tasks added; existing tasks work in devShell |
-| `go.mod` / `go.sum` | **Kept** | Nix reads these for `buildGoModule` |
-| `.golangci.yml` | **Kept** | Used by `golangci-lint` from devShell |
-| `.editorconfig` | **Kept** | Unrelated to Nix |
-| `.buildflow.yml` | **Kept** | Unrelated to Nix |
-| `.gitattributes` | **Kept** | Unrelated to Nix |
-| Manual tool installs | **Eliminated** | `nix develop` replaces all manual setup |
-| `templ` version pinning in Dockerfile | **Consolidated** | Single pin in `flake.nix` |
-| `TEMPL_VERSION` CI env var | **Eliminated** | Nix provides pinned `templ` |
+| Component                             | Status                 | Notes                                             |
+| ------------------------------------- | ---------------------- | ------------------------------------------------- |
+| `Dockerfile`                          | **Archived** (Phase 4) | Kept in repo as `Dockerfile.legacy` for reference |
+| `.github/workflows/docker.yml`        | **Replaced** (Phase 4) | By `nix.yml`                                      |
+| `justfile`                            | **Kept + extended**    | Nix tasks added; existing tasks work in devShell  |
+| `go.mod` / `go.sum`                   | **Kept**               | Nix reads these for `buildGoModule`               |
+| `.golangci.yml`                       | **Kept**               | Used by `golangci-lint` from devShell             |
+| `.editorconfig`                       | **Kept**               | Unrelated to Nix                                  |
+| `.buildflow.yml`                      | **Kept**               | Unrelated to Nix                                  |
+| `.gitattributes`                      | **Kept**               | Unrelated to Nix                                  |
+| Manual tool installs                  | **Eliminated**         | `nix develop` replaces all manual setup           |
+| `templ` version pinning in Dockerfile | **Consolidated**       | Single pin in `flake.nix`                         |
+| `TEMPL_VERSION` CI env var            | **Eliminated**         | Nix provides pinned `templ`                       |
 
 ---
 
 ## 8. Risks & Mitigations
 
-| Risk | Severity | Mitigation |
-|---|---|---|
-| `go_1_26` not yet in nixpkgs | High | Check `nixpkgs` for Go 1.26 availability; if missing, use `gotools` overlay or build Go from source via `pkgs.go_1_26.override` |
-| `templ` not in nixpkgs or wrong version | Medium | Package `templ` as a flake input or use `buildGoModule` to build it inline |
-| `golines` not in nixpkgs | Low | Build via `buildGoModule` inline or find in nixpkgs |
-| Nix learning curve for contributors | Medium | Keep justfile tasks; Nix is optional for development, not required |
-| `vendorHash` updates on every `go.mod` change | Low | Document the process; automate with `nix-update` or `nvfetcher` |
-| CI runner performance with Nix | Medium | Use `magic-nix-cache-action` and GitHub Actions cache |
-| macOS vs Linux differences | Low | `flake-utils.lib.eachDefaultSystem` handles both; CI runs on Linux |
-| D2 CLI not needed at build time (runtime dep) | None | D2 is a Go library dependency; `buildGoModule` handles it via `go.mod` |
-| Cross-compilation (amd64 + arm64) for OCI image | Medium | Use `pkgsCross.aarch64-multiplatform` for arm64, or keep Docker buildx for multi-arch |
+| Risk                                            | Severity | Mitigation                                                                                                                      |
+| ----------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `go_1_26` not yet in nixpkgs                    | High     | Check `nixpkgs` for Go 1.26 availability; if missing, use `gotools` overlay or build Go from source via `pkgs.go_1_26.override` |
+| `templ` not in nixpkgs or wrong version         | Medium   | Package `templ` as a flake input or use `buildGoModule` to build it inline                                                      |
+| `golines` not in nixpkgs                        | Low      | Build via `buildGoModule` inline or find in nixpkgs                                                                             |
+| Nix learning curve for contributors             | Medium   | Keep justfile tasks; Nix is optional for development, not required                                                              |
+| `vendorHash` updates on every `go.mod` change   | Low      | Document the process; automate with `nix-update` or `nvfetcher`                                                                 |
+| CI runner performance with Nix                  | Medium   | Use `magic-nix-cache-action` and GitHub Actions cache                                                                           |
+| macOS vs Linux differences                      | Low      | `flake-utils.lib.eachDefaultSystem` handles both; CI runs on Linux                                                              |
+| D2 CLI not needed at build time (runtime dep)   | None     | D2 is a Go library dependency; `buildGoModule` handles it via `go.mod`                                                          |
+| Cross-compilation (amd64 + arm64) for OCI image | Medium   | Use `pkgsCross.aarch64-multiplatform` for arm64, or keep Docker buildx for multi-arch                                           |
 
 ---
 
@@ -723,4 +727,4 @@ The migration is complete when:
 
 ---
 
-*This proposal is a living document. Update as implementation progresses and open questions are resolved.*
+_This proposal is a living document. Update as implementation progresses and open questions are resolved._
