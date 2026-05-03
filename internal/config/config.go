@@ -59,7 +59,7 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
-	err := cfg.applyDerivedSettings()
+	err = cfg.applyDerivedSettings()
 	if err != nil {
 		return nil, err
 	}

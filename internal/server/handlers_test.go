@@ -19,6 +19,11 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 )
 
+var (
+	errFailingRoot   = errors.New("root error")
+	errFailingSearch = errors.New("search error")
+)
+
 func init() {
 	gin.SetMode(gin.TestMode)
 }
@@ -924,7 +929,7 @@ func (f *FailingRepository) Get(_ domain.URLPath) (domain.ContentNode, error) {
 }
 
 func (f *FailingRepository) Root() (*domain.DirectoryNode, error) {
-	return nil, errors.New("root error")
+	return nil, errFailingRoot
 }
 
 func (f *FailingRepository) LastModified() time.Time {
@@ -947,7 +952,7 @@ func (f *FailingRepository) AllPaths() []domain.URLPath {
 }
 
 func (f *FailingRepository) Search(_ string) ([]content.SearchResult, error) {
-	return nil, errors.New("search error")
+	return nil, errFailingSearch
 }
 
 func (f *FailingRepository) GetRaw(_ domain.URLPath) (*content.RawFile, error) {

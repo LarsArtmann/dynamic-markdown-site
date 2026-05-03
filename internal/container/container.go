@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"charm.land/log/v2"
+	"github.com/cockroachdb/errors"
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/config"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
@@ -16,6 +17,8 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
 	"github.com/samber/do/v2"
 )
+
+var errBlobTimeout = errors.New("blob repository creation timed out after 10 seconds")
 
 // Container holds the DI injector and provides access to services.
 type Container struct {
@@ -164,10 +167,7 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 
 			return res.repo, nil
 		case <-time.After(10 * time.Second):
-			return nil, fmt.Errorf(
-				"blob repository creation timed out after 10 seconds (storage_url=%s)",
-				cfg.StorageURL,
-			)
+			return nil, errors.Wrap(errBlobTimeout, "storage_url="+cfg.StorageURL)
 		}
 	}
 

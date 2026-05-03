@@ -48,7 +48,7 @@ func addTestFile(
 	filePath, title string,
 	contentBytes []byte,
 	modTime time.Time,
-) *domain.FileNode {
+) {
 	t.Helper()
 
 	file := newTestFileNode(t, filePath, title, contentBytes, modTime)
@@ -57,8 +57,6 @@ func addTestFile(
 	root, err := repo.Root()
 	require.NoError(t, err)
 	root.AddChild(file)
-
-	return file
 }
 
 // addTestDir creates a directory node and adds it to the repository's root.

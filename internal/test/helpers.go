@@ -1,4 +1,3 @@
-// Package test provides shared test helpers for the dynamic-markdown-site project.
 package test
 
 import (

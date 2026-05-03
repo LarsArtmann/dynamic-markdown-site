@@ -124,7 +124,11 @@ type refreshStats struct {
 
 // newRefreshStats creates a new refresh stats instance.
 func newRefreshStats() *refreshStats {
-	return &refreshStats{}
+	return &refreshStats{
+		files:  0,
+		dirs:   0,
+		errors: nil,
+	}
 }
 
 // recordError records an error with the given path and operation.
@@ -144,6 +148,7 @@ func buildRefreshResult(
 		TotalFiles:   stats.files,
 		TotalDirs:    stats.dirs,
 		Duration:     time.Since(start).String(),
+		Error:        "",
 		Errors:       stats.errors,
 	}
 }
@@ -157,8 +162,11 @@ func buildFailedRefreshResult(
 	return domain.RefreshResult{
 		Success:      false,
 		LastModified: lastModified,
+		TotalFiles:   0,
+		TotalDirs:    0,
 		Error:        errMsg,
 		Duration:     time.Since(start).String(),
+		Errors:       nil,
 	}
 }
 

@@ -124,6 +124,50 @@ linters:
     - wsl_v5
     - zerologlint
   settings:
+    depguard:
+      rules:
+        main:
+          allow:
+            - $gostd
+            - $local
+            - github.com/cockroachdb/errors
+            - github.com/gin-gonic/gin
+            - github.com/larsartmann/dynamic-markdown-site
+            - github.com/samber/do/v2
+            - github.com/samber/lo
+            - github.com/fsnotify/fsnotify
+            - github.com/maypok86/otter/v2
+            - github.com/maypok86/otter/v2/stats
+            - charm.land/log/v2
+            - gocloud.dev/blob
+            - gocloud.dev/blob/fileblob
+            - gocloud.dev/blob/gcsblob
+            - gocloud.dev/blob/memblob
+            - gocloud.dev/blob/s3blob
+            - gopkg.in/yaml.v3
+            - github.com/yuin/goldmark
+            - github.com/yuin/goldmark/ast
+            - github.com/yuin/goldmark/extension
+            - github.com/yuin/goldmark/parser
+            - github.com/yuin/goldmark/renderer
+            - github.com/yuin/goldmark/text
+            - github.com/yuin/goldmark/util
+            - github.com/yuin/goldmark-highlighting/v2
+            - github.com/yuin/goldmark-meta
+            - github.com/alecthomas/chroma/v2
+            - github.com/alecthomas/chroma/v2/formatters/html
+            - github.com/a-h/templ
+            - github.com/a-h/templ/*
+            - oss.terrastruct.com/d2
+            - oss.terrastruct.com/d2/d2graph
+            - oss.terrastruct.com/d2/d2layouts/d2dagrelayout
+            - oss.terrastruct.com/d2/d2lib
+            - oss.terrastruct.com/d2/d2renderers/d2svg
+            - oss.terrastruct.com/d2/lib/log
+            - oss.terrastruct.com/d2/lib/textmeasure
+            - github.com/stretchr/testify
+            - github.com/stretchr/testify/assert
+            - github.com/stretchr/testify/require
     funlen:
       lines: 150
       statements: 80
@@ -273,6 +317,33 @@ linters:
       - path: internal/domain/file.go
         linters:
           - golines
+      - path: (.*)_test\.go
+        linters:
+          - testpackage
+          - gochecknoglobals
+          - tparallel
+          - noinlineerr
+      - path: (.*)_test\.go
+        text: .* is unused
+        linters:
+          - unused
+      - path: (.*)_test\.go
+        linters:
+          - varnamelen
+          - mnd
+      - path: internal/
+        linters:
+          - varnamelen
+          - mnd
+          - wsl_v5
+          - noinlineerr
+          - ireturn
+      - path: cmd/
+        linters:
+          - varnamelen
+          - mnd
+          - wsl_v5
+          - noinlineerr
 formatters:
   enable:
     - gci

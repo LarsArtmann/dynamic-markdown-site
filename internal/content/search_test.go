@@ -42,6 +42,8 @@ func setupRepoWithFiles(files ...*domain.FileNode) *InMemoryRepository {
 
 // repoWithFile creates an InMemoryRepository with a single file.
 func repoWithFile(t *testing.T, now time.Time, path, title, content string) *InMemoryRepository {
+	t.Helper()
+
 	return setupRepoWithFiles(newFile(t, now, path, title, content))
 }
 
