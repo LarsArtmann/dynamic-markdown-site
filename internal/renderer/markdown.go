@@ -3,6 +3,7 @@ package renderer
 
 import (
 	"bytes"
+	"slices"
 	"strings"
 
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
@@ -256,9 +257,9 @@ func generateAnchorID(text string) string {
 // It iterates backwards through ordered items to find the closest item with a lower level.
 func findTOCParent(orderedItems []*domain.TOCItem, level int) *domain.TOCItem {
 	// Iterate backwards to find the most recent item with a lower level
-	for i := len(orderedItems) - 1; i >= 0; i-- {
-		if orderedItems[i].Level < uint(level) {
-			return orderedItems[i]
+	for _, v := range slices.Backward(orderedItems) {
+		if v.Level < uint(level) {
+			return v
 		}
 	}
 
