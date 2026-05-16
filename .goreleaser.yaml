@@ -103,6 +103,27 @@ brews:
     test: |
       system "#{bin}/dynamic-markdown-site --version"
 
+
+nfpms:
+  - id: default
+    package_name: dynamic-markdown-site
+    file_name_template: "{"{"} .ConventionalFileName {"}"}"
+    homepage: https://github.com/LarsArtmann/dynamic-markdown-site
+    description: "Blazing-fast markdown site generator with live reload"
+    license: MIT
+    maintainer: "Lars Artmann <lars@larsartmann.com>"
+    formats:
+      - deb
+      - rpm
+      - apk
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/dynamic-markdown-site/LICENSE
+      - src: README.md
+        dst: /usr/share/doc/dynamic-markdown-site/README.md
+    deb:
+      fields:
+        Bugs: https://github.com/LarsArtmann/dynamic-markdown-site/issues
 nix:
   - name: dynamic-markdown-site
     repository:
@@ -111,10 +132,25 @@ nix:
     homepage: https://github.com/LarsArtmann/dynamic-markdown-site
     description: "Blazing-fast markdown site generator with live reload"
     license: mit
+    formatter: nixfmt
     path: pkgs/dynamic-markdown-site/default.nix
     install: |
       mkdir -p $out/bin
       cp -vr ./{binary} $out/bin/dynamic-markdown-site
+
+
+scoops:
+  - name: dynamic-markdown-site
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    folder: Scoop
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    homepage: "https://github.com/LarsArtmann/dynamic-markdown-site"
+    description: "Blazing-fast markdown site generator with live reload"
+    license: MIT
 
 release:
   github:
