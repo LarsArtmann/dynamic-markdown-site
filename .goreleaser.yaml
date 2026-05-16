@@ -1,0 +1,145 @@
+# GoReleaser configuration
+# Documentation: https://goreleaser.com
+
+version: 2
+
+project_name: dynamic-markdown-site
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: dynamic-markdown-site
+    main: ./cmd/dynamic-markdown-site
+    binary: dynamic-markdown-site
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: windows
+        goarch: arm64
+    tags:
+      - netgo
+      - osusergo
+    ldflags:
+      - -s -w
+      - -X github.com/larsartmann/dynamic-markdown-site/internal/version.Version={{.Version}}
+      - -X github.com/larsartmann/dynamic-markdown-site/internal/version.Commit={{.Commit}}
+      - -X github.com/larsartmann/dynamic-markdown-site/internal/version.BuildDate={{.Date}}
+
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_
+      {{ .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+        {{- else if eq .Arch "386" }}i386
+        {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--oidc-issuer=https://token.actions.githubusercontent.com"
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+    artifacts: all
+    output: true
+
+sboms:
+  - artifacts: archive
+
+brews:
+  - name: dynamic-markdown-site
+    homepage: https://github.com/LarsArtmann/dynamic-markdown-site
+    description: "Blazing-fast markdown site generator with live reload"
+    license: MIT
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    folder: Formula
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    install: |
+      bin.install "dynamic-markdown-site"
+    test: |
+      system "#{bin}/dynamic-markdown-site --version"
+
+nix:
+  - name: dynamic-markdown-site
+    repository:
+      owner: LarsArtmann
+      name: nur-packages
+    homepage: https://github.com/LarsArtmann/dynamic-markdown-site
+    description: "Blazing-fast markdown site generator with live reload"
+    license: mit
+    path: pkgs/dynamic-markdown-site/default.nix
+    install: |
+      mkdir -p $out/bin
+      cp -vr ./{binary} $out/bin/dynamic-markdown-site
+
+release:
+  github:
+    owner: LarsArtmann
+    name: dynamic-markdown-site
+  draft: false
+  prerelease: auto
+  name_template: "dynamic-markdown-site v{{.Version}}"
+  footer: |
+    ## Installation
+
+    **Homebrew:**
+    ```bash
+    brew tap LarsArtmann/tap
+    brew install dynamic-markdown-site
+    ```
+
+    **Nix:**
+    ```bash
+    nix run github:LarsArtmann/nur-packages#dynamic-markdown-site
+    ```
+
+    **Docker:**
+    ```bash
+    docker pull ghcr.io/larsartmann/dynamic-markdown-site:{{.Version}}
+    ```
+
+    Download the appropriate binary for your platform from the assets below.
