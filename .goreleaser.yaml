@@ -5,10 +5,6 @@ version: 2
 
 project_name: dynamic-markdown-site
 
-before:
-  hooks:
-    - go mod tidy
-
 builds:
   - id: dynamic-markdown-site
     main: ./cmd/dynamic-markdown-site
