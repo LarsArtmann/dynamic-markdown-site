@@ -105,7 +105,6 @@ brews:
     test: |
       system "#{bin}/dynamic-markdown-site --version"
 
-
 nfpms:
   - id: default
     package_name: dynamic-markdown-site
@@ -140,7 +139,6 @@ nix:
     install: |
       mkdir -p $out/bin
       cp -vr ./{binary} $out/bin/dynamic-markdown-site
-
 
 scoops:
   - name: dynamic-markdown-site

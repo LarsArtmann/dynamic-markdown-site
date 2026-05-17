@@ -34,3 +34,5 @@ node_modules/
 *_templ.go
 # Copy/paste detection report
 /report/jscpd-report.json
+# Sensitive files
+*.db
