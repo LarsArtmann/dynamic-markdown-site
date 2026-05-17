@@ -88,6 +88,7 @@ sboms:
 
 brews:
   - name: dynamic-markdown-site
+    skip_upload: auto
     homepage: https://github.com/LarsArtmann/dynamic-markdown-site
     description: "Blazing-fast markdown site generator with live reload"
     license: MIT
@@ -126,6 +127,7 @@ nfpms:
         Bugs: https://github.com/LarsArtmann/dynamic-markdown-site/issues
 nix:
   - name: dynamic-markdown-site
+    skip_upload: auto
     repository:
       owner: LarsArtmann
       name: nur-packages
@@ -141,6 +143,7 @@ nix:
 
 scoops:
   - name: dynamic-markdown-site
+    skip_upload: auto
     repository:
       owner: LarsArtmann
       name: homebrew-tap
