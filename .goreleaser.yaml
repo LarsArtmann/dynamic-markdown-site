@@ -95,7 +95,7 @@ brews:
     repository:
       owner: LarsArtmann
       name: homebrew-tap
-    folder: Formula
+    directory: Formula
     commit_author:
       name: goreleaserbot
       email: goreleaser@larsartmann.com
@@ -147,7 +147,7 @@ scoops:
     repository:
       owner: LarsArtmann
       name: homebrew-tap
-    folder: Scoop
+    directory: Scoop
     commit_author:
       name: goreleaserbot
       email: goreleaser@larsartmann.com
