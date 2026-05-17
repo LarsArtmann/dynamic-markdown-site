@@ -108,7 +108,7 @@ brews:
 nfpms:
   - id: default
     package_name: dynamic-markdown-site
-    file_name_template: "{{ .ConventionalFileName }}
+    file_name_template: "{{ .ConventionalFileName }}"
     homepage: https://github.com/LarsArtmann/dynamic-markdown-site
     description: "Blazing-fast markdown site generator with live reload"
     license: MIT
