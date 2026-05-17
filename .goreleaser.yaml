@@ -5,6 +5,11 @@ version: 2
 
 project_name: dynamic-markdown-site
 
+before:
+  hooks:
+    - go install github.com/a-h/templ/cmd/templ@v0.3.1001
+    - templ generate
+
 builds:
   - id: dynamic-markdown-site
     main: ./cmd/dynamic-markdown-site
