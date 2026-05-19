@@ -1,379 +1,379 @@
 version: "2"
 run:
-    timeout: 5m
-    go: 1.26.2
-    build-tags:
-        - goexperiment.arenas
-        - goexperiment.goroutineleakprofile
-        - goexperiment.jsonv2
-        - goexperiment.runtimesecret
-        - goexperiment.simd
-    allow-parallel-runners: true
-    allow-serial-runners: true
-    issues-exit-code: 1
-    tests: true
+  timeout: 5m
+  go: 1.26.2
+  build-tags:
+    - goexperiment.arenas
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.runtimesecret
+    - goexperiment.simd
+  allow-parallel-runners: true
+  allow-serial-runners: true
+  issues-exit-code: 1
+  tests: true
 output:
-    formats: {}
+  formats: {}
 linters:
-    enable:
-        - arangolint
-        - asasalint
-        - asciicheck
-        - bidichk
-        - bodyclose
-        - canonicalheader
-        - containedctx
-        - contextcheck
-        - copyloopvar
-        - cyclop
-        - decorder
-        - depguard
-        - dogsled
-        - dupl
-        - dupword
-        - durationcheck
-        - embeddedstructfieldcheck
-        - err113
-        - errcheck
-        - errchkjson
-        - errname
-        - errorlint
-        - exhaustive
-        - exhaustruct
-        - exptostd
-        - fatcontext
-        - forbidigo
-        - forcetypeassert
-        - funlen
-        - ginkgolinter
-        - gocheckcompilerdirectives
-        - gochecknoglobals
-        - gochecknoinits
-        - gochecksumtype
-        - gocognit
-        - goconst
-        - gocritic
-        - gocyclo
-        - godoclint
-        - godot
-        - godox
-        - goheader
-        - gomoddirectives
-        - gomodguard_v2
-        - goprintffuncname
-        - gosec
-        - gosmopolitan
-        - govet
-        - grouper
-        - iface
-        - importas
-        - inamedparam
-        - ineffassign
-        - interfacebloat
-        - intrange
-        - iotamixing
-        - ireturn
-        - loggercheck
-        - maintidx
-        - makezero
-        - mirror
-        - misspell
-        - mnd
-        - modernize
-        - musttag
-        - nakedret
-        - nestif
-        - nilerr
-        - nilnesserr
-        - nilnil
-        - nlreturn
-        - noctx
-        - noinlineerr
-        - nolintlint
-        - nonamedreturns
-        - nosprintfhostport
-        - paralleltest
-        - perfsprint
-        - prealloc
-        - predeclared
-        - promlinter
-        - protogetter
-        - reassign
-        - recvcheck
-        - revive
-        - rowserrcheck
-        - sloglint
-        - spancheck
-        - sqlclosecheck
-        - staticcheck
-        - tagalign
-        - tagliatelle
-        - testableexamples
-        - testifylint
-        - testpackage
-        - thelper
-        - tparallel
-        - unconvert
-        - unparam
-        - unqueryvet
-        - unused
-        - usestdlibvars
-        - usetesting
-        - varnamelen
-        - wastedassign
-        - whitespace
-        - wrapcheck
-        - wsl_v5
-        - zerologlint
-    settings:
-        depguard:
-            rules:
-                main:
-                    allow:
-                        - $gostd
-                        - $local
-                        - github.com/cockroachdb/errors
-                        - github.com/gin-gonic/gin
-                        - github.com/larsartmann/dynamic-markdown-site
-                        - github.com/samber/do/v2
-                        - github.com/samber/lo
-                        - github.com/fsnotify/fsnotify
-                        - github.com/maypok86/otter/v2
-                        - github.com/maypok86/otter/v2/stats
-                        - charm.land/log/v2
-                        - gocloud.dev/blob
-                        - gocloud.dev/blob/fileblob
-                        - gocloud.dev/blob/gcsblob
-                        - gocloud.dev/blob/memblob
-                        - gocloud.dev/blob/s3blob
-                        - gopkg.in/yaml.v3
-                        - github.com/yuin/goldmark
-                        - github.com/yuin/goldmark/ast
-                        - github.com/yuin/goldmark/extension
-                        - github.com/yuin/goldmark/parser
-                        - github.com/yuin/goldmark/renderer
-                        - github.com/yuin/goldmark/text
-                        - github.com/yuin/goldmark/util
-                        - github.com/yuin/goldmark-highlighting/v2
-                        - github.com/yuin/goldmark-meta
-                        - github.com/alecthomas/chroma/v2
-                        - github.com/alecthomas/chroma/v2/formatters/html
-                        - github.com/a-h/templ
-                        - github.com/a-h/templ/*
-                        - oss.terrastruct.com/d2
-                        - oss.terrastruct.com/d2/d2graph
-                        - oss.terrastruct.com/d2/d2layouts/d2dagrelayout
-                        - oss.terrastruct.com/d2/d2lib
-                        - oss.terrastruct.com/d2/d2renderers/d2svg
-                        - oss.terrastruct.com/d2/lib/log
-                        - oss.terrastruct.com/d2/lib/textmeasure
-                        - github.com/stretchr/testify
-                        - github.com/stretchr/testify/assert
-                        - github.com/stretchr/testify/require
-        exhaustruct:
-            exclude:
-                - os/exec.Cmd
-        funlen:
-            lines: 150
-            statements: 80
-        gocritic:
-            disabled-checks:
-                - dupImport
-                - ifElseChain
-                - octalLiteral
-                - whyNoLint
-        gosec:
-            excludes:
-                - G204
-                - G304
-                - G306
-                - G301
-                - G203
-                - G115
-                - G703
-                - G702
-        ireturn:
-            allow:
-                - error
-                - empty
-                - anon
-                - stdlib
-                - generic
-        staticcheck:
-            checks:
-                - all
-                - -SA1019
-    exclusions:
-        generated: lax
-        warn-unused: true
-        rules:
-            - path: internal/config/config.go
-              linters:
-                - cyclop
-            - path: internal/content/blob.go
-              text: calculated cyclomatic complexity for function buildTree is
-              linters:
-                - cyclop
-            - path: internal/content/filesystem.go
-              text: calculated cyclomatic complexity for function walkEntry is 12
-              linters:
-                - cyclop
-            - path: cmd/dynamic-markdown-site/main.go
-              text: calculated cyclomatic complexity for function run is 12
-              linters:
-                - cyclop
-            - path: cmd/dynamic-markdown-site/watcher.go
-              text: calculated cyclomatic complexity for function watchForChanges is
-              linters:
-                - cyclop
-            - path: internal/server/suggestions.go
-              text: calculated cyclomatic complexity for function findSuggestions is
-              linters:
-                - cyclop
-            - path: (.*)_test\.go
-              linters:
-                - cyclop
-            - path: (.*)_test\.go
-              linters:
-                - exhaustruct
-            - path: internal/content/filesystem.go
-              linters:
-                - exhaustruct
-            - path: internal/content/blob.go
-              linters:
-                - exhaustruct
-            - path: internal/content/memory.go
-              linters:
-                - exhaustruct
-            - path: internal/domain/file.go
-              linters:
-                - exhaustruct
-            - path: internal/renderer/markdown.go
-              linters:
-                - exhaustruct
-            - path: internal/server/ratelimit.go
-              linters:
-                - exhaustruct
-            - path: internal/server/render.go
-              linters:
-                - exhaustruct
-            - path: internal/renderer/diagrams.go
-              linters:
-                - exhaustruct
-            - path: internal/renderer/diagram_extension.go
-              linters:
-                - exhaustruct
-            - path: internal/renderer/admonition_extension.go
-              linters:
-                - exhaustruct
-            - path: internal/renderer/markdown_bench_test.go
-              linters:
-                - funlen
-            - path: internal/renderer/admonition_extension_test.go
-              text: Function 'TestAdmonitionExtension' is too long
-              linters:
-                - funlen
-            - path: internal/content/search_test.go
-              text: Function 'TestSearcher_Search' is too long
-              linters:
-                - funlen
-            - path: internal/content/filesystem_test.go
-              text: Function 'TestFileSystemRepository_Get' is too long
-              linters:
-                - funlen
-            - path: internal/content/filesystem_test.go
-              text: Function 'TestFileSystemRepository_GetRaw' is too long
-              linters:
-                - funlen
-            - path: (.*)_test\.go
-              linters:
-                - gochecknoinits
-            - path: internal/renderer/admonition_extension.go
-              linters:
-                - gochecknoglobals
-            - path: internal/renderer/diagram_extension.go
-              linters:
-                - gochecknoglobals
-            - path: internal/content/blob.go
-              linters:
-                - gocognit
-            - path: (.*)_test\.go
-              linters:
-                - gocognit
-            - path: cmd/dynamic-markdown-site/watcher.go
-              linters:
-                - gocognit
-            - path: internal/container/container_test.go
-              linters:
-                - nestif
-            - path: cmd/dynamic-markdown-site/watcher.go
-              linters:
-                - nestif
-            - path: (.*)_test\.go
-              linters:
-                - paralleltest
-            - path: internal/version/version.go
-              text: avoid package names that conflict with Go standard library package names
-              linters:
-                - revive
-            - path: internal/server/
-              text: should have a package comment
-              linters:
-                - revive
-            - path: internal/server/robots_test.go
-              linters:
-                - golines
-            - path: internal/renderer/admonition_extension.go
-              linters:
-                - golines
-            - path: internal/renderer/admonition_extension_test.go
-              linters:
-                - golines
-            - path: internal/renderer/diagram_extension.go
-              linters:
-                - golines
-            - path: internal/domain/file.go
-              linters:
-                - golines
-            - path: (.*)_test\.go
-              linters:
-                - testpackage
-                - gochecknoglobals
-                - tparallel
-                - noinlineerr
-            - path: (.*)_test\.go
-              text: .* is unused
-              linters:
-                - unused
-            - path: (.*)_test\.go
-              linters:
-                - varnamelen
-                - mnd
-            - path: internal/
-              linters:
-                - varnamelen
-                - mnd
-                - wsl_v5
-                - noinlineerr
-                - ireturn
-            - path: cmd/
-              linters:
-                - varnamelen
-                - mnd
-                - wsl_v5
-                - noinlineerr
-        paths:
-            - _templ\.go$
+  enable:
+    - arangolint
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godoclint
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard_v2
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - modernize
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - noinlineerr
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
+  settings:
+    depguard:
+      rules:
+        main:
+          allow:
+            - $gostd
+            - $local
+            - github.com/cockroachdb/errors
+            - github.com/gin-gonic/gin
+            - github.com/larsartmann/dynamic-markdown-site
+            - github.com/samber/do/v2
+            - github.com/samber/lo
+            - github.com/fsnotify/fsnotify
+            - github.com/maypok86/otter/v2
+            - github.com/maypok86/otter/v2/stats
+            - charm.land/log/v2
+            - gocloud.dev/blob
+            - gocloud.dev/blob/fileblob
+            - gocloud.dev/blob/gcsblob
+            - gocloud.dev/blob/memblob
+            - gocloud.dev/blob/s3blob
+            - gopkg.in/yaml.v3
+            - github.com/yuin/goldmark
+            - github.com/yuin/goldmark/ast
+            - github.com/yuin/goldmark/extension
+            - github.com/yuin/goldmark/parser
+            - github.com/yuin/goldmark/renderer
+            - github.com/yuin/goldmark/text
+            - github.com/yuin/goldmark/util
+            - github.com/yuin/goldmark-highlighting/v2
+            - github.com/yuin/goldmark-meta
+            - github.com/alecthomas/chroma/v2
+            - github.com/alecthomas/chroma/v2/formatters/html
+            - github.com/a-h/templ
+            - github.com/a-h/templ/*
+            - oss.terrastruct.com/d2
+            - oss.terrastruct.com/d2/d2graph
+            - oss.terrastruct.com/d2/d2layouts/d2dagrelayout
+            - oss.terrastruct.com/d2/d2lib
+            - oss.terrastruct.com/d2/d2renderers/d2svg
+            - oss.terrastruct.com/d2/lib/log
+            - oss.terrastruct.com/d2/lib/textmeasure
+            - github.com/stretchr/testify
+            - github.com/stretchr/testify/assert
+            - github.com/stretchr/testify/require
+    exhaustruct:
+      exclude:
+        - os/exec.Cmd
+    funlen:
+      lines: 150
+      statements: 80
+    gocritic:
+      disabled-checks:
+        - dupImport
+        - ifElseChain
+        - octalLiteral
+        - whyNoLint
+    gosec:
+      excludes:
+        - G204
+        - G304
+        - G306
+        - G301
+        - G203
+        - G115
+        - G703
+        - G702
+    ireturn:
+      allow:
+        - error
+        - empty
+        - anon
+        - stdlib
+        - generic
+    staticcheck:
+      checks:
+        - all
+        - -SA1019
+  exclusions:
+    generated: lax
+    warn-unused: true
+    rules:
+      - path: internal/config/config.go
+        linters:
+          - cyclop
+      - path: internal/content/blob.go
+        text: calculated cyclomatic complexity for function buildTree is
+        linters:
+          - cyclop
+      - path: internal/content/filesystem.go
+        text: calculated cyclomatic complexity for function walkEntry is 12
+        linters:
+          - cyclop
+      - path: cmd/dynamic-markdown-site/main.go
+        text: calculated cyclomatic complexity for function run is 12
+        linters:
+          - cyclop
+      - path: cmd/dynamic-markdown-site/watcher.go
+        text: calculated cyclomatic complexity for function watchForChanges is
+        linters:
+          - cyclop
+      - path: internal/server/suggestions.go
+        text: calculated cyclomatic complexity for function findSuggestions is
+        linters:
+          - cyclop
+      - path: (.*)_test\.go
+        linters:
+          - cyclop
+      - path: (.*)_test\.go
+        linters:
+          - exhaustruct
+      - path: internal/content/filesystem.go
+        linters:
+          - exhaustruct
+      - path: internal/content/blob.go
+        linters:
+          - exhaustruct
+      - path: internal/content/memory.go
+        linters:
+          - exhaustruct
+      - path: internal/domain/file.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/markdown.go
+        linters:
+          - exhaustruct
+      - path: internal/server/ratelimit.go
+        linters:
+          - exhaustruct
+      - path: internal/server/render.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/diagrams.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/diagram_extension.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/admonition_extension.go
+        linters:
+          - exhaustruct
+      - path: internal/renderer/markdown_bench_test.go
+        linters:
+          - funlen
+      - path: internal/renderer/admonition_extension_test.go
+        text: Function 'TestAdmonitionExtension' is too long
+        linters:
+          - funlen
+      - path: internal/content/search_test.go
+        text: Function 'TestSearcher_Search' is too long
+        linters:
+          - funlen
+      - path: internal/content/filesystem_test.go
+        text: Function 'TestFileSystemRepository_Get' is too long
+        linters:
+          - funlen
+      - path: internal/content/filesystem_test.go
+        text: Function 'TestFileSystemRepository_GetRaw' is too long
+        linters:
+          - funlen
+      - path: (.*)_test\.go
+        linters:
+          - gochecknoinits
+      - path: internal/renderer/admonition_extension.go
+        linters:
+          - gochecknoglobals
+      - path: internal/renderer/diagram_extension.go
+        linters:
+          - gochecknoglobals
+      - path: internal/content/blob.go
+        linters:
+          - gocognit
+      - path: (.*)_test\.go
+        linters:
+          - gocognit
+      - path: cmd/dynamic-markdown-site/watcher.go
+        linters:
+          - gocognit
+      - path: internal/container/container_test.go
+        linters:
+          - nestif
+      - path: cmd/dynamic-markdown-site/watcher.go
+        linters:
+          - nestif
+      - path: (.*)_test\.go
+        linters:
+          - paralleltest
+      - path: internal/version/version.go
+        text: avoid package names that conflict with Go standard library package names
+        linters:
+          - revive
+      - path: internal/server/
+        text: should have a package comment
+        linters:
+          - revive
+      - path: internal/server/robots_test.go
+        linters:
+          - golines
+      - path: internal/renderer/admonition_extension.go
+        linters:
+          - golines
+      - path: internal/renderer/admonition_extension_test.go
+        linters:
+          - golines
+      - path: internal/renderer/diagram_extension.go
+        linters:
+          - golines
+      - path: internal/domain/file.go
+        linters:
+          - golines
+      - path: (.*)_test\.go
+        linters:
+          - testpackage
+          - gochecknoglobals
+          - tparallel
+          - noinlineerr
+      - path: (.*)_test\.go
+        text: .* is unused
+        linters:
+          - unused
+      - path: (.*)_test\.go
+        linters:
+          - varnamelen
+          - mnd
+      - path: internal/
+        linters:
+          - varnamelen
+          - mnd
+          - wsl_v5
+          - noinlineerr
+          - ireturn
+      - path: cmd/
+        linters:
+          - varnamelen
+          - mnd
+          - wsl_v5
+          - noinlineerr
+    paths:
+      - _templ\.go$
 formatters:
-    enable:
-        - gci
-        - goimports
-        - gofumpt
-        - golines
-    exclusions:
-        generated: lax
-        paths:
-            - _templ\.go$
+  enable:
+    - gci
+    - goimports
+    - gofumpt
+    - golines
+  exclusions:
+    generated: lax
+    paths:
+      - _templ\.go$
 issues:
-    max-issues-per-linter: 100
-    max-same-issues: 20
+  max-issues-per-linter: 100
+  max-same-issues: 20
