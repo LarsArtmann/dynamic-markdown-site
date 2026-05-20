@@ -128,14 +128,32 @@ templ MermaidScript() {
 	</script>
 }
 
+// IconLinkProps contains properties for an icon link component.
+type IconLinkProps struct {
+	URL     string
+	Class   string
+	Icon    string
+	Text    string
+}
+
+// IconLink renders a link with an icon and text.
+templ IconLink(props IconLinkProps) {
+	<a href={ templ.SafeURL(props.URL) } class={ props.Class }>
+		<span class={ props.Class + "-icon" }>{ props.Icon }</span>
+		<span class={ props.Class + "-text" }>{ props.Text }</span>
+	</a>
+}
+
 // Header renders the site header with navigation.
 templ Header(props LayoutProps) {
 	<header class="site-header">
 		<div class="header-container">
-			<a href="/" class="logo">
-				<span class="logo-icon">◈</span>
-				<span class="logo-text">{ props.SiteName }</span>
-			</a>
+			@IconLink(IconLinkProps{
+				URL:   "/",
+				Class: "logo",
+				Icon:  "◈",
+				Text:  props.SiteName,
+			})
 			if len(props.Breadcrumbs) > 0 {
 				@Breadcrumbs(props.Breadcrumbs)
 			}
@@ -209,6 +227,11 @@ templ DirectoryView(props DirectoryViewProps) {
 	}
 }
 
+// MetaItem renders a single metadata item with text.
+templ MetaItem(text string) {
+	<span class="meta-item">{ text }</span>
+}
+
 // ContentCard renders a card for a directory or file.
 templ ContentCard(node domain.ContentNode) {
 	<a href={ templ.SafeURL(node.Path().String()) } class={ "content-card", cardClass(node.Kind()) }>
@@ -219,13 +242,14 @@ templ ContentCard(node domain.ContentNode) {
 				📄
 			}
 		</div>
-		<div class="card-content">
+		<section class="card-content">
 			<h3 class="card-title">{ node.Title() }</h3>
-			<div class="card-meta">
-				<span class="card-type">{ node.Kind().String() }</span>
-				<span class="card-date">{ formatDate(node.Modified()) }</span>
-			</div>
-		</div>
+			<p class="card-meta">
+				@MetaItem(node.Kind().String())
+				<span class="meta-separator">•</span>
+				@MetaItem(formatDate(node.Modified()))
+			</p>
+		</section>
 	</a>
 }
 
@@ -248,8 +272,8 @@ templ FileView(props FileViewProps) {
 				<header class="article-header">
 					<h1 class="article-title">{ props.Layout.Title }</h1>
 					<div class="article-meta">
-						<span class="reading-time">⏱️ { formatReadingTime(props.RenderedFile.ReadingTime()) } read</span>
-						<span class="last-modified">📅 { formatDate(props.RenderedFile.Modified()) }</span>
+						@MetaItem("⏱️ " + formatReadingTime(props.RenderedFile.ReadingTime()) + " read")
+						@MetaItem("📅 " + formatDate(props.RenderedFile.Modified()))
 					</div>
 				</header>
 				<div class="article-body">
@@ -317,10 +341,12 @@ templ ErrorView(props ErrorViewProps) {
 						<h2 class="suggestions-title">Did you mean?</h2>
 						<div class="suggestions-list">
 							for _, suggestion := range props.Suggestions {
-								<a href={ templ.SafeURL(suggestion.Path.String()) } class="suggestion-link">
-									<span class="suggestion-icon">→</span>
-									<span class="suggestion-path">{ suggestion.Path.String() }</span>
-								</a>
+								@IconLink(IconLinkProps{
+									URL:   suggestion.Path.String(),
+									Class: "suggestion-link",
+									Icon:  "→",
+									Text:  suggestion.Path.String(),
+								})
 							}
 						</div>
 					</div>
