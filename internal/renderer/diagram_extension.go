@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"bytes"
+	"fmt"
 	"html"
 
 	"github.com/cockroachdb/errors"
@@ -92,10 +93,11 @@ func (t *diagramTransformer) Transform(
 		for i := range fenced.Lines().Len() {
 			line := fenced.Lines().At(i)
 			if _, err := buf.Write(line.Value(source)); err != nil {
-				return ast.WalkContinue, errors.Wrapf(
-					err,
-					"read fenced code line (lang: %s)",
+				return ast.WalkContinue, fmt.Errorf(
+					"read fenced code line (lang: %s): pctx=%v: %w",
 					lang,
+					pctx,
+					err,
 				)
 			}
 		}
