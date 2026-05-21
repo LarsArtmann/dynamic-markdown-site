@@ -183,7 +183,10 @@ func (s *Server) handleSearch(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleContentByPath(w http.ResponseWriter, r *http.Request, filepath string) {
 	if before, ok := strings.CutSuffix(filepath, ".md"); ok {
-		cleanPath := "/" + strings.TrimLeft(before, "/") //nolint:gosec // G107: before comes from URL path, already validated
+		cleanPath := "/" + strings.TrimLeft(
+			before,
+			"/",
+		)
 		http.Redirect(w, r, cleanPath, http.StatusMovedPermanently)
 
 		return

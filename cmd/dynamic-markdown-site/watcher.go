@@ -72,7 +72,8 @@ func handleFileEvent(
 		return
 	}
 
-	logger.Debug("filesystem event",
+	logger.Debug(
+		"filesystem event",
 		slog.String("path", event.Name),
 		slog.String("op", event.Op.String()),
 	)
@@ -90,7 +91,8 @@ func handleFileEvent(
 
 		err := addDirectoriesRecursive(watcher, event.Name, logger)
 		if err != nil {
-			logger.Error("failed to add new directory to watcher",
+			logger.Error(
+				"failed to add new directory to watcher",
 				slog.String("path", event.Name),
 				slog.Any("error", err),
 			)
@@ -107,7 +109,8 @@ func scheduleRefresh(repo content.Repository, liveReload *server.LiveReload, log
 	if !result.Success {
 		logger.Error("failed to refresh repository", slog.String("error", result.Error))
 	} else {
-		logger.Info("content repository refreshed",
+		logger.Info(
+			"content repository refreshed",
 			slog.Time("last_modified", result.LastModified),
 			slog.Int("total_files", result.TotalFiles),
 			slog.Int("total_dirs", result.TotalDirs),
@@ -137,7 +140,8 @@ func addDirectoriesRecursive(watcher *fsnotify.Watcher, root string, logger *slo
 
 			err := watcher.Add(path)
 			if err != nil {
-				logger.Warn("failed to add directory to watcher",
+				logger.Warn(
+					"failed to add directory to watcher",
 					slog.String("path", path),
 					slog.Any("error", err),
 				)

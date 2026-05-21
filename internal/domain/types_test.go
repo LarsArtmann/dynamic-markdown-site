@@ -268,7 +268,8 @@ func TestURLPath_Filename(t *testing.T) {
 		{"/", "/"}, // Root path's filename is "/" itself
 	}
 
-	testURLPathMethod(t, "Filename", tests,
+	testURLPathMethod(
+		t, "Filename", tests,
 		func(p *domain.URLPath) string { return p.Filename() },
 		formatQuoted,
 		formatQuoted,
@@ -288,7 +289,8 @@ func TestURLPath_IsRoot(t *testing.T) {
 		{"/a/b", false},
 	}
 
-	testURLPathMethod(t, "IsRoot", tests,
+	testURLPathMethod(
+		t, "IsRoot", tests,
 		func(p *domain.URLPath) bool { return p.IsRoot() },
 		formatBool,
 		formatBool,
