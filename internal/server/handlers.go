@@ -8,14 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 )
 
-// Server holds all dependencies for HTTP handling.
 type Server struct {
 	repo        content.Repository
 	searcher    *content.Searcher
@@ -28,12 +26,11 @@ type Server struct {
 	siteName    string
 }
 
-// NewServer creates a new HTTP server with dependencies.
 func NewServer(
 	repo content.Repository,
 	searcher *content.Searcher,
 	log *slog.Logger,
-	cache *cache.HTMLCache,
+	htmlCache *cache.HTMLCache,
 	renderer domain.Renderer,
 	devMode bool,
 	siteName string,
@@ -47,67 +44,53 @@ func NewServer(
 		renderer:    renderer,
 		logger:      log,
 		rateLimiter: rl,
-		cache:       cache,
+		cache:       htmlCache,
 		liveReload:  lr,
 		devMode:     devMode,
 		siteName:    siteName,
 	}
 }
 
-// RegisterRoutes sets up all HTTP routes.
-func (s *Server) RegisterRoutes(router *gin.Engine) {
-	// Global middleware (order matters - first to last)
-	router.Use(requestIDMiddleware())
-	router.Use(securityHeadersMiddleware())
-	router.Use(s.accessLogMiddleware())
-	router.Use(s.staticAndContentMiddleware())
-	router.GET("/health", s.handleHealth)
-	router.GET("/robots.txt", s.handleRobotsTxt)
-	router.GET("/sitemap.xml", s.handleSitemapXML)
-	router.GET("/refresh", s.handleRefresh)
-	router.POST("/refresh", s.handleRefresh)
-	router.GET("/search", s.handleSearch)
-	router.GET("/", s.handleRoot)
-	s.liveReload.RegisterHandler(router)
-	router.NoRoute(s.handle404)
+// Handler returns the fully configured HTTP handler with all routes and middleware.
+func (s *Server) Handler() http.Handler {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("GET /health", s.handleHealth)
+	mux.HandleFunc("GET /robots.txt", s.handleRobotsTxt)
+	mux.HandleFunc("GET /sitemap.xml", s.handleSitemapXML)
+	mux.HandleFunc("GET /refresh", s.handleRefresh)
+	mux.HandleFunc("POST /refresh", s.handleRefresh)
+	mux.HandleFunc("GET /search", s.handleSearch)
+	mux.HandleFunc("GET /{$}", s.handleRoot)
+	mux.HandleFunc("GET /api/live-reload", s.liveReload.handleSSE)
+	mux.HandleFunc("GET /static/", s.serveStaticFile)
+	mux.HandleFunc("GET /", s.handleContentOr404)
+
+	var handler http.Handler = mux
+	handler = chain(
+		handler,
+		s.accessLogMiddleware(),
+		securityHeadersMiddleware(),
+		requestIDMiddleware(),
+	)
+
+	return handler
 }
 
-// Shutdown stops background goroutines owned by the server.
 func (s *Server) Shutdown() {
 	s.rateLimiter.Stop()
 }
 
-// LiveReload returns the LiveReload instance for external notification.
 func (s *Server) LiveReload() *LiveReload {
 	return s.liveReload
 }
 
-func (s *Server) staticAndContentMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		path := c.Request.URL.Path
-
-		if path == "/health" || path == "/refresh" ||
-			path == "/search" || path == "/" ||
-			path == "/robots.txt" || path == "/sitemap.xml" {
-			c.Next()
-
-			return
-		}
-
-		if strings.HasPrefix(path, "/static/") {
-			s.serveStaticFile(c)
-			c.Abort()
-
-			return
-		}
-
-		s.handleContentByPath(c, path)
-		c.Abort()
-	}
+func (s *Server) handleContentOr404(w http.ResponseWriter, r *http.Request) {
+	s.handleContentByPath(w, r, r.URL.Path)
 }
 
-func (s *Server) handleHealth(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func (s *Server) handleHealth(w http.ResponseWriter, _ *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{
 		"status":     "healthy",
 		"version":    version.Version,
 		"commit":     version.Commit,
@@ -116,11 +99,11 @@ func (s *Server) handleHealth(c *gin.Context) {
 	})
 }
 
-func (s *Server) handleRefresh(c *gin.Context) {
-	clientIP := c.ClientIP()
-	if !s.rateLimiter.checkRateLimit(clientIP) {
-		s.logger.Warn("rate limit exceeded for refresh endpoint", "client_ip", clientIP)
-		c.JSON(http.StatusTooManyRequests, gin.H{
+func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {
+	ip := clientIP(r)
+	if !s.rateLimiter.checkRateLimit(ip) {
+		s.logger.Warn("rate limit exceeded for refresh endpoint", "client_ip", ip)
+		writeJSON(w, http.StatusTooManyRequests, map[string]any{
 			"status":    "error",
 			"message":   "rate limit exceeded: too many refresh requests",
 			"limit":     "10 requests per minute per IP",
@@ -130,12 +113,12 @@ func (s *Server) handleRefresh(c *gin.Context) {
 		return
 	}
 
-	s.logger.Info("manual refresh requested", "client_ip", clientIP)
+	s.logger.Info("manual refresh requested", "client_ip", ip)
 
 	result := s.repo.Refresh()
 	if !result.Success {
 		s.logger.Error("failed to refresh repository", "error", result.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{
+		writeJSON(w, http.StatusInternalServerError, map[string]any{
 			"status":    "error",
 			"message":   "failed to refresh content repository",
 			"error":     result.Error,
@@ -145,17 +128,17 @@ func (s *Server) handleRefresh(c *gin.Context) {
 		return
 	}
 
-	// Invalidate HTML cache when content is refreshed
 	s.cache.InvalidateAll()
 
-	s.logger.Info("repository refreshed successfully",
+	s.logger.Info(
+		"repository refreshed successfully",
 		"last_modified", result.LastModified,
 		"total_files", result.TotalFiles,
 		"total_dirs", result.TotalDirs,
 		"duration", result.Duration,
 	)
 
-	c.JSON(http.StatusOK, gin.H{
+	writeJSON(w, http.StatusOK, map[string]any{
 		"status":        "success",
 		"message":       "content repository refreshed",
 		"last_modified": result.LastModified.UTC(),
@@ -166,23 +149,23 @@ func (s *Server) handleRefresh(c *gin.Context) {
 	})
 }
 
-func (s *Server) handleRoot(c *gin.Context) {
+func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 	root, err := s.repo.Root()
 	if err != nil {
 		s.logger.Error("failed to get root", "error", err, "path", "/")
-		s.handle500(c)
+		s.handle500(w, r)
 
 		return
 	}
 
-	s.renderDirectory(c, root)
+	s.renderDirectory(w, r, root)
 }
 
-func (s *Server) handleSearch(c *gin.Context) {
-	query := strings.TrimSpace(c.Query("q"))
+func (s *Server) handleSearch(w http.ResponseWriter, r *http.Request) {
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
 
 	if query == "" {
-		s.renderSearch(c, query, nil)
+		s.renderSearch(w, r, query, nil)
 
 		return
 	}
@@ -190,19 +173,18 @@ func (s *Server) handleSearch(c *gin.Context) {
 	results, err := s.searcher.Search(query)
 	if err != nil {
 		s.logger.Error("search failed", "query", query, "error", err, "path", "/search")
-		s.handle500(c)
+		s.handle500(w, r)
 
 		return
 	}
 
-	s.renderSearch(c, query, results)
+	s.renderSearch(w, r, query, results)
 }
 
-func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
-	// Redirect .md URLs to clean URLs (e.g., /page.md -> /page)
+func (s *Server) handleContentByPath(w http.ResponseWriter, r *http.Request, filepath string) {
 	if before, ok := strings.CutSuffix(filepath, ".md"); ok {
-		cleanPath := before
-		c.Redirect(http.StatusMovedPermanently, cleanPath)
+		cleanPath := "/" + strings.TrimLeft(before, "/") //nolint:gosec // G107: before comes from URL path, already validated
+		http.Redirect(w, r, cleanPath, http.StatusMovedPermanently)
 
 		return
 	}
@@ -210,7 +192,7 @@ func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
 	urlPath, err := domain.NewURLPath(filepath)
 	if err != nil {
 		s.logger.Warn("invalid path requested", "path", filepath, "error", err)
-		s.handle404(c)
+		s.handle404(w, r)
 
 		return
 	}
@@ -218,34 +200,34 @@ func (s *Server) handleContentByPath(c *gin.Context, filepath string) {
 	node, err := s.repo.Get(urlPath)
 	if err != nil {
 		if errors.Is(err, content.ErrContentNotFound) {
-			// If not a markdown page, try serving as a raw asset file (e.g. images, PDFs)
 			if rawFile, rawErr := s.repo.GetRaw(urlPath); rawErr == nil {
-				c.Header("Content-Type", rawFile.ContentType)
-				c.Header("Cache-Control", "public, max-age=86400")
-				c.Data(http.StatusOK, rawFile.ContentType, rawFile.Content)
+				w.Header().Set("Content-Type", rawFile.ContentType)
+				w.Header().Set("Cache-Control", "public, max-age=86400")
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write(rawFile.Content)
 
 				return
 			}
 
 			s.logger.Debug("content not found", "path", urlPath)
-			s.handle404(c)
+			s.handle404(w, r)
 
 			return
 		}
 
 		s.logger.Error("failed to get content", "path", urlPath, "error", err)
-		s.handle500(c)
+		s.handle500(w, r)
 
 		return
 	}
 
 	switch n := node.(type) {
 	case *domain.DirectoryNode:
-		s.renderDirectory(c, n)
+		s.renderDirectory(w, r, n)
 	case *domain.FileNode:
-		s.renderFile(c, n)
+		s.renderFile(w, r, n)
 	default:
 		s.logger.Error("unknown node type", "type", fmt.Sprintf("%T", node), "path", urlPath)
-		s.handle500(c)
+		s.handle500(w, r)
 	}
 }

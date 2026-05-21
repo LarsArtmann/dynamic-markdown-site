@@ -4,29 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
-// LiveReloadEvent represents an event sent to connected clients.
 type LiveReloadEvent struct {
 	Type      string `json:"type"`
 	Path      string `json:"path,omitempty"`
 	Timestamp string `json:"timestamp"`
 }
 
-// LiveReload manages Server-Sent Events connections for live reload functionality.
 type LiveReload struct {
-	logger *slog.Logger
-	mu     sync.RWMutex
-	// clients holds all connected SSE clients
+	logger  *slog.Logger
+	mu      sync.RWMutex
 	clients map[chan LiveReloadEvent]struct{}
 }
 
-// NewLiveReload creates a new LiveReload manager.
 func NewLiveReload(logger *slog.Logger) *LiveReload {
 	return &LiveReload{
 		logger:  logger,
@@ -35,12 +30,6 @@ func NewLiveReload(logger *slog.Logger) *LiveReload {
 	}
 }
 
-// RegisterHandler registers the SSE endpoint for live reload.
-func (lr *LiveReload) RegisterHandler(router *gin.Engine) {
-	router.GET("/api/live-reload", lr.handleSSE)
-}
-
-// Notify sends a reload event to all connected clients.
 func (lr *LiveReload) Notify(path string) {
 	event := LiveReloadEvent{
 		Type:      "reload",
@@ -57,17 +46,14 @@ func (lr *LiveReload) Notify(path string) {
 		select {
 		case client <- event:
 		default:
-			// Channel full, skip this client
 		}
 	}
 }
 
-func (lr *LiveReload) handleSSE(c *gin.Context) {
-	// Create buffered channel for this client
+func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 	clientChan := make(chan LiveReloadEvent, 100)
 	defer close(clientChan)
 
-	// Register client
 	lr.mu.Lock()
 	lr.clients[clientChan] = struct{}{}
 	clientCount := len(lr.clients)
@@ -81,30 +67,31 @@ func (lr *LiveReload) handleSSE(c *gin.Context) {
 
 	lr.logger.Info(
 		"live reload client connected",
-		"client_ip",
-		c.ClientIP(),
-		"total_clients",
-		clientCount,
+		"client_ip", clientIP(r),
+		"total_clients", clientCount,
 	)
 
-	// Set SSE headers
-	c.Header("Content-Type", "text/event-stream")
-	c.Header("Cache-Control", "no-cache")
-	c.Header("Connection", "keep-alive")
-	c.Header("Access-Control-Allow-Origin", "*")
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming not supported", http.StatusInternalServerError)
 
-	// Send initial connection event
-	c.SSEvent("connected", gin.H{
-		"message": "connected to live reload",
-	})
-	c.Writer.Flush()
+		return
+	}
 
-	// Stream events to client
-	clientGone := c.Request.Context().Done()
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	connectedData, _ := json.Marshal(map[string]string{"message": "connected to live reload"})
+	_, _ = fmt.Fprintf(w, "event: connected\ndata: %s\n\n", connectedData)
+	flusher.Flush()
+
+	ctx := r.Context()
 
 	for {
 		select {
-		case <-clientGone:
+		case <-ctx.Done():
 			lr.logger.Debug("live reload client disconnected")
 
 			return
@@ -120,16 +107,15 @@ func (lr *LiveReload) handleSSE(c *gin.Context) {
 				continue
 			}
 
-			if _, err := fmt.Fprintf(c.Writer, "event: reload\ndata: %s\n\n", data); err != nil {
+			if _, err := fmt.Fprintf(w, "event: reload\ndata: %s\n\n", data); err != nil {
 				lr.logger.Debug("failed to send live reload event", "error", err)
 			}
 
-			c.Writer.Flush()
+			flusher.Flush()
 		}
 	}
 }
 
-// getTimestamp returns the current Unix timestamp as a string.
 func getTimestamp() string {
 	return strconv.FormatInt(time.Now().Unix(), 10)
 }

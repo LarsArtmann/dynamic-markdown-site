@@ -6,13 +6,16 @@ import (
 
 	templ "github.com/a-h/templ"
 	"github.com/cockroachdb/errors"
-	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/templates"
 )
 
-func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
+func (s *Server) renderDirectory(
+	w http.ResponseWriter,
+	r *http.Request,
+	dir *domain.DirectoryNode,
+) {
 	crumbs := domain.BuildBreadcrumbs(dir.Path())
 
 	hasReadme := false
@@ -42,22 +45,23 @@ func (s *Server) renderDirectory(c *gin.Context, dir *domain.DirectoryNode) {
 	}
 
 	component := templates.DirectoryView(dirProps)
-	s.renderTemplate(c, component, "directory")
+	s.renderTemplate(w, r, component, "directory")
 }
 
-func (s *Server) renderTemplate(c *gin.Context, component templ.Component, context string) {
-	// Must explicitly set 200 OK - Gin may have set 404 for unmatched routes
-	c.Status(http.StatusOK)
-	s.renderComponent(c, component, http.StatusOK, context)
+func (s *Server) renderTemplate(
+	w http.ResponseWriter,
+	r *http.Request,
+	component templ.Component,
+	context string,
+) {
+	s.renderComponent(w, r, component, http.StatusOK, context)
 }
 
-func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
+func (s *Server) renderFile(w http.ResponseWriter, r *http.Request, file *domain.FileNode) {
 	path := file.Path().String()
 
-	// Get or render content
-	renderedContent := s.getOrRenderContent(c.Request.Context(), path, file)
+	renderedContent := s.getOrRenderContent(r.Context(), path, file)
 
-	// Create immutable RenderedFile combining FileNode with rendered content
 	renderedFile := domain.NewRenderedFileWithContent(file, renderedContent)
 
 	crumbs := domain.BuildBreadcrumbs(file.Path())
@@ -88,10 +92,9 @@ func (s *Server) renderFile(c *gin.Context, file *domain.FileNode) {
 	}
 
 	component := templates.FileView(fileProps)
-	s.renderTemplate(c, component, "file")
+	s.renderTemplate(w, r, component, "file")
 }
 
-// getOrRenderContent returns cached content or renders and caches it.
 func (s *Server) getOrRenderContent(
 	ctx context.Context, path string, file *domain.FileNode,
 ) domain.RenderedContent {
@@ -114,7 +117,12 @@ func (s *Server) getOrRenderContent(
 	return *result
 }
 
-func (s *Server) renderSearch(c *gin.Context, query string, results []content.SearchResult) {
+func (s *Server) renderSearch(
+	w http.ResponseWriter,
+	r *http.Request,
+	query string,
+	results []content.SearchResult,
+) {
 	crumbs := domain.BuildBreadcrumbs(domain.MustURLPath("/search"))
 
 	props := templates.LayoutProps{
@@ -133,5 +141,5 @@ func (s *Server) renderSearch(c *gin.Context, query string, results []content.Se
 	}
 
 	component := templates.SearchView(searchProps)
-	s.renderTemplate(c, component, "search")
+	s.renderTemplate(w, r, component, "search")
 }

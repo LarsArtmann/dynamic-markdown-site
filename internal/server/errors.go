@@ -1,25 +1,20 @@
-// Package server provides HTTP server implementation and request handling.
 package server
 
 import (
 	"net/http"
 
 	templ "github.com/a-h/templ"
-	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/templates"
 )
 
-func (s *Server) handle404(c *gin.Context) {
-	c.Status(http.StatusNotFound)
-
-	requestPath := c.Request.URL.Path
+func (s *Server) handle404(w http.ResponseWriter, r *http.Request) {
+	requestPath := r.URL.Path
 	suggestions := s.getPathSuggestions(requestPath)
 
-	s.renderNotFound(c, requestPath, suggestions)
+	s.renderNotFound(w, r, requestPath, suggestions)
 }
 
-// getPathSuggestions returns path suggestions based on similarity to the requested path.
 func (s *Server) getPathSuggestions(requestedPath string) []domain.SuggestedPath {
 	paths := s.repo.AllPaths()
 
@@ -27,7 +22,7 @@ func (s *Server) getPathSuggestions(requestedPath string) []domain.SuggestedPath
 }
 
 func (s *Server) renderNotFound(
-	c *gin.Context, requestPath string, suggestions []domain.SuggestedPath,
+	w http.ResponseWriter, r *http.Request, requestPath string, suggestions []domain.SuggestedPath,
 ) {
 	props := templates.ErrorViewProps{
 		Title:       "Page Not Found",
@@ -39,17 +34,20 @@ func (s *Server) renderNotFound(
 	}
 
 	component := templates.ErrorView(props)
-	s.renderComponent(c, component, http.StatusNotFound, "404 page")
+	s.renderComponent(w, r, component, http.StatusNotFound, "404 page")
 }
 
-func (s *Server) handle500(c *gin.Context) {
-	c.Status(http.StatusInternalServerError)
-
-	s.renderError(c, 500, "Internal Server Error",
+func (s *Server) handle500(w http.ResponseWriter, r *http.Request) {
+	s.renderError(w, r, 500, "Internal Server Error",
 		"Something went wrong in the cyber realm. Please try again later.")
 }
 
-func (s *Server) renderError(c *gin.Context, statusCode int, title, message string) {
+func (s *Server) renderError(
+	w http.ResponseWriter,
+	r *http.Request,
+	statusCode int,
+	title, message string,
+) {
 	props := templates.ErrorViewProps{
 		Title:       title,
 		Message:     message,
@@ -60,23 +58,24 @@ func (s *Server) renderError(c *gin.Context, statusCode int, title, message stri
 	}
 
 	component := templates.ErrorView(props)
-	s.renderComponent(c, component, statusCode, "error page")
+	s.renderComponent(w, r, component, statusCode, "error page")
 }
 
-func (s *Server) renderComponent(c *gin.Context, component templ.Component,
+func (s *Server) renderComponent(w http.ResponseWriter, r *http.Request, component templ.Component,
 	statusCode int, context string,
 ) {
-	err := component.Render(c.Request.Context(), c.Writer)
+	w.WriteHeader(statusCode)
+
+	err := component.Render(r.Context(), w)
 	if err != nil {
 		s.logger.Error("failed to render "+context, "status", statusCode, "error", err)
 
 		switch statusCode {
 		case http.StatusOK:
-			// When rendering normal templates fails, we need to handle 500
-			s.handle500(c)
+			s.handle500(w, r)
 		case http.StatusInternalServerError:
-			// When rendering error page fails, just send string
-			c.String(statusCode, "Internal Server Error")
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			_, _ = w.Write([]byte("Internal Server Error"))
 		}
 	}
 }

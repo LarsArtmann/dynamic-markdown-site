@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/stretchr/testify/assert"
@@ -18,8 +17,6 @@ import (
 
 const testHost = "example.com"
 
-// newTestFileNode creates a new file node without adding it to the repository.
-// It fails the test if node creation fails.
 func newTestFileNode(
 	t *testing.T,
 	filePath, title string,
@@ -40,8 +37,6 @@ func newTestFileNode(
 	return file
 }
 
-// addTestFile creates a file node, adds it to the repository and the repository's root.
-// It fails the test if any operation fails.
 func addTestFile(
 	t *testing.T,
 	repo *content.InMemoryRepository,
@@ -59,8 +54,6 @@ func addTestFile(
 	root.AddChild(file)
 }
 
-// addTestDir creates a directory node and adds it to the repository's root.
-// It fails the test if any operation fails.
 func addTestDir(
 	t *testing.T,
 	repo *content.InMemoryRepository,
@@ -79,11 +72,11 @@ func addTestDir(
 	return dir
 }
 
-func serveSitemap(router *gin.Engine) *httptest.ResponseRecorder {
-	return serveSitemapWithProto(router, "")
+func serveSitemap(handler http.Handler) *httptest.ResponseRecorder {
+	return serveSitemapWithProto(handler, "")
 }
 
-func serveSitemapWithProto(router *gin.Engine, proto string) *httptest.ResponseRecorder {
+func serveSitemapWithProto(handler http.Handler, proto string) *httptest.ResponseRecorder {
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/sitemap.xml", nil)
 
 	req.Host = testHost
@@ -92,7 +85,7 @@ func serveSitemapWithProto(router *gin.Engine, proto string) *httptest.ResponseR
 	}
 
 	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
 	return rec
 }
@@ -101,10 +94,10 @@ func TestSitemapXMLEmptyRepo(t *testing.T) {
 	t.Parallel()
 
 	repo := content.NewInMemoryRepository()
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
-	rec := serveSitemap(router)
+	rec := serveSitemap(handler)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Contains(t, rec.Header().Get("Content-Type"), "application/xml")
@@ -124,10 +117,10 @@ func TestSitemapXMLWithFiles(t *testing.T) {
 		time.Date(2026, 3, 15, 10, 0, 0, 0, time.UTC),
 	)
 
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
-	rec := serveSitemap(router)
+	rec := serveSitemap(handler)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -158,10 +151,10 @@ func TestSitemapXMLWithDirectories(t *testing.T) {
 	repo.Add(file)
 	dir.AddChild(file)
 
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
-	rec := serveSitemap(router)
+	rec := serveSitemap(handler)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -178,10 +171,10 @@ func TestSitemapXMLSkipsRootPath(t *testing.T) {
 	t.Parallel()
 
 	repo := content.NewInMemoryRepository()
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
-	rec := serveSitemap(router)
+	rec := serveSitemap(handler)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
@@ -197,10 +190,10 @@ func TestSitemapXMLHasCleanURLs(t *testing.T) {
 
 	addTestFile(t, repo, "/my-page", "My Page", []byte("# My Page"), time.Now())
 
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
-	rec := serveSitemap(router)
+	rec := serveSitemap(handler)
 
 	body := rec.Body.String()
 	assert.Contains(t, body, "http://example.com/my-page")
@@ -214,10 +207,10 @@ func TestSitemapXMLHTTPSEnvironment(t *testing.T) {
 
 	addTestFile(t, repo, "/secure", "Secure", []byte("# Secure"), time.Now())
 
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
-	rec := serveSitemapWithProto(router, "https")
+	rec := serveSitemapWithProto(handler, "https")
 
 	body := rec.Body.String()
 	assert.Contains(t, body, "https://example.com/secure")
@@ -226,9 +219,9 @@ func TestSitemapXMLHTTPSEnvironment(t *testing.T) {
 func TestSitemapXMLRepositoryError(t *testing.T) {
 	t.Parallel()
 
-	router := newFailingTestServer(t)
+	handler := newFailingTestHandler(t)
 
-	rec := serveSitemap(router)
+	rec := serveSitemap(handler)
 
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 }
@@ -236,7 +229,7 @@ func TestSitemapXMLRepositoryError(t *testing.T) {
 func TestCalculatePriority(t *testing.T) {
 	t.Parallel()
 
-	server := newTestServer(t, content.NewInMemoryRepository())
+	srv := newTestServer(t, content.NewInMemoryRepository())
 
 	tests := []struct {
 		segments int
@@ -263,7 +256,7 @@ func TestCalculatePriority(t *testing.T) {
 				path = domain.MustURLPath(strings.Repeat("/a", tt.segments))
 			}
 
-			result := server.calculatePriority(path)
+			result := srv.calculatePriority(path)
 			assert.InEpsilon(t, tt.expected, result, 0.001)
 		})
 	}
@@ -272,11 +265,11 @@ func TestCalculatePriority(t *testing.T) {
 func TestCalculateChangeFreq(t *testing.T) {
 	t.Parallel()
 
-	server := newTestServer(t, content.NewInMemoryRepository())
+	srv := newTestServer(t, content.NewInMemoryRepository())
 
 	dir, err := domain.NewDirectoryNode(domain.MustURLPath("/docs"), "Docs", time.Now())
 	require.NoError(t, err)
-	assert.Equal(t, "daily", server.calculateChangeFreq(dir))
+	assert.Equal(t, "daily", srv.calculateChangeFreq(dir))
 
 	oldFile, err := domain.NewFileNode(
 		domain.MustURLPath("/old"),
@@ -286,17 +279,17 @@ func TestCalculateChangeFreq(t *testing.T) {
 		10,
 	)
 	require.NoError(t, err)
-	assert.Equal(t, "yearly", server.calculateChangeFreq(oldFile))
+	assert.Equal(t, "yearly", srv.calculateChangeFreq(oldFile))
 }
 
 func TestSitemapXMLCacheHeaders(t *testing.T) {
 	t.Parallel()
 
 	repo := content.NewInMemoryRepository()
-	server := newTestServer(t, repo)
-	router := newTestRouter(server)
+	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
-	rec := serveSitemap(router)
+	rec := serveSitemap(handler)
 
 	assert.Equal(t, "public, max-age=3600", rec.Header().Get("Cache-Control"))
 }

@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -18,26 +17,15 @@ func newTestRequest() (*httptest.ResponseRecorder, *http.Request) {
 	return w, req
 }
 
-// registerTestEndpoint registers a GET /test endpoint that captures the request ID into the provided pointer.
-func registerTestEndpoint(router *gin.Engine, capture *string) {
-	router.GET("/test", func(c *gin.Context) {
-		*capture = getRequestID(c)
-		c.Status(http.StatusOK)
-	})
-}
-
 func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 	t.Parallel()
-	gin.SetMode(gin.TestMode)
 
-	router := gin.New()
-	router.Use(requestIDMiddleware())
-	router.GET("/test", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
+	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
 
 	w, req := newTestRequest()
-	router.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.NotEmpty(t, w.Header().Get(RequestIDHeader))
@@ -45,18 +33,15 @@ func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 
 func TestRequestIDMiddleware_UsesExistingHeader(t *testing.T) {
 	t.Parallel()
-	gin.SetMode(gin.TestMode)
 
-	router := gin.New()
-	router.Use(requestIDMiddleware())
-	router.GET("/test", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
+	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
 
 	w, req := newTestRequest()
 	existingID := "existing-request-id-12345"
 	req.Header.Set(RequestIDHeader, existingID)
-	router.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, existingID, w.Header().Get(RequestIDHeader))
@@ -64,20 +49,16 @@ func TestRequestIDMiddleware_UsesExistingHeader(t *testing.T) {
 
 func TestRequestIDMiddleware_StoresInContext(t *testing.T) {
 	t.Parallel()
-	gin.SetMode(gin.TestMode)
-
-	router := gin.New()
-	router.Use(requestIDMiddleware())
 
 	var contextID string
 
-	router.GET("/test", func(c *gin.Context) {
-		contextID = getRequestID(c)
-		c.Status(http.StatusOK)
-	})
+	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		contextID = requestIDFromContext(r.Context())
+		w.WriteHeader(http.StatusOK)
+	}))
 
 	w, req := newTestRequest()
-	router.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.NotEmpty(t, contextID)
@@ -86,20 +67,16 @@ func TestRequestIDMiddleware_StoresInContext(t *testing.T) {
 
 func TestGetRequestID_NotSet(t *testing.T) {
 	t.Parallel()
-	gin.SetMode(gin.TestMode)
-
-	router := gin.New()
-	// Note: NOT using requestIDMiddleware
 
 	var contextID string
 
-	router.GET("/test", func(c *gin.Context) {
-		contextID = getRequestID(c)
-		c.Status(http.StatusOK)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		contextID = requestIDFromContext(r.Context())
+		w.WriteHeader(http.StatusOK)
 	})
 
 	w, req := newTestRequest()
-	router.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Empty(t, contextID)
@@ -110,10 +87,8 @@ func TestGenerateRequestID_Length(t *testing.T) {
 
 	id := generateRequestID()
 
-	// Should be 32 hex characters (16 bytes * 2)
 	require.Len(t, id, 32)
 
-	// Should be valid hex
 	for _, c := range id {
 		assert.True(t, isHex(c), "character %c is not valid hex", c)
 	}
@@ -138,24 +113,17 @@ func isHex(c rune) bool {
 func TestGetRequestIDFromContext_WithID(t *testing.T) {
 	t.Parallel()
 
-	gin.SetMode(gin.TestMode)
-
-	router := gin.New()
-	router.Use(requestIDMiddleware())
-
 	var extractedID string
 
-	router.GET("/test", func(c *gin.Context) {
-		extractedID = getRequestIDFromContext(c.Request.Context())
-		c.Status(http.StatusOK)
-	})
+	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		extractedID = getRequestIDFromContext(r.Context())
+		w.WriteHeader(http.StatusOK)
+	}))
 
 	w, req := newTestRequest()
-	router.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
-	// Note: Gin context values don't propagate to request.Context() automatically
-	// This tests the fallback behavior
-	assert.Empty(t, extractedID)
+	assert.NotEmpty(t, extractedID)
 }
 
 func TestGetRequestIDFromContext_WithoutID(t *testing.T) {
@@ -168,27 +136,26 @@ func TestGetRequestIDFromContext_WithoutID(t *testing.T) {
 
 func TestRequestIDMiddleware_Chain(t *testing.T) {
 	t.Parallel()
-	gin.SetMode(gin.TestMode)
 
 	executionOrder := []string{}
 
-	router := gin.New()
-	router.Use(func(c *gin.Context) {
-		executionOrder = append(executionOrder, "before-middleware")
-
-		c.Next()
-
-		executionOrder = append(executionOrder, "after-middleware")
-	})
-	router.Use(requestIDMiddleware())
-	router.GET("/test", func(c *gin.Context) {
-		executionOrder = append(executionOrder, "handler")
-
-		c.Status(http.StatusOK)
-	})
+	handler := chain(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			executionOrder = append(executionOrder, "handler")
+			w.WriteHeader(http.StatusOK)
+		}),
+		func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				executionOrder = append(executionOrder, "before-middleware")
+				next.ServeHTTP(w, r)
+				executionOrder = append(executionOrder, "after-middleware")
+			})
+		},
+		requestIDMiddleware(),
+	)
 
 	w, req := newTestRequest()
-	router.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, []string{

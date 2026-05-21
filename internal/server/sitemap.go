@@ -5,11 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
-// SitemapEntry represents a single entry in the sitemap.
 type SitemapEntry struct {
 	Loc        string    `xml:"loc"`
 	LastMod    time.Time `xml:"lastmod"`
@@ -17,22 +15,21 @@ type SitemapEntry struct {
 	Priority   float64   `xml:"priority"`
 }
 
-// URLSet is the root element of a sitemap.xml file.
 type URLSet struct {
 	XMLName xml.Name       `xml:"http://www.sitemaps.org/schemas/sitemap/0.9 urlset"`
 	URLs    []SitemapEntry `xml:"url"`
 }
 
-func (s *Server) handleSitemapXML(c *gin.Context) {
+func (s *Server) handleSitemapXML(w http.ResponseWriter, r *http.Request) {
 	root, err := s.repo.Root()
 	if err != nil {
 		s.logger.Error("failed to get root for sitemap", "error", err)
-		c.String(http.StatusInternalServerError, "Error generating sitemap")
+		http.Error(w, "Error generating sitemap", http.StatusInternalServerError)
 
 		return
 	}
 
-	baseURL := s.baseURL(c)
+	baseURL := s.baseURL(r)
 	entries := s.buildSitemapEntries(root, baseURL)
 
 	urlset := URLSet{
@@ -40,10 +37,18 @@ func (s *Server) handleSitemapXML(c *gin.Context) {
 		URLs:    entries,
 	}
 
-	c.Header("Content-Type", "application/xml; charset=utf-8")
-	c.Header("Cache-Control", "public, max-age=3600")
+	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=3600")
 
-	c.XML(http.StatusOK, urlset)
+	data, err := xml.Marshal(urlset)
+	if err != nil {
+		s.logger.Error("failed to marshal sitemap", "error", err)
+		http.Error(w, "Error generating sitemap", http.StatusInternalServerError)
+
+		return
+	}
+
+	_, _ = w.Write(data)
 }
 
 func (s *Server) buildSitemapEntries(root *domain.DirectoryNode, baseURL string) []SitemapEntry {
@@ -56,7 +61,6 @@ func (s *Server) buildSitemapEntries(root *domain.DirectoryNode, baseURL string)
 func (s *Server) collectEntries(node domain.ContentNode, baseURL string, entries *[]SitemapEntry) {
 	path := node.Path()
 
-	// Skip root path - we want actual content paths
 	if !path.IsRoot() {
 		loc := baseURL + path.String()
 		priority := s.calculatePriority(path)
@@ -70,7 +74,6 @@ func (s *Server) collectEntries(node domain.ContentNode, baseURL string, entries
 		})
 	}
 
-	// Recursively collect from directories
 	if dir, ok := node.(*domain.DirectoryNode); ok {
 		for _, child := range dir.Children() {
 			s.collectEntries(child, baseURL, entries)
@@ -82,25 +85,23 @@ func (s *Server) calculatePriority(path domain.URLPath) float64 {
 	segments := path.Segments()
 	depth := len(segments)
 
-	// Higher priority for shallower paths
 	switch depth {
 	case 0:
-		return 1.0 // Root
+		return 1.0
 	case 1:
-		return 0.8 // Top-level pages
+		return 0.8
 	case 2:
-		return 0.6 // Second-level
+		return 0.6
 	default:
-		return 0.4 // Deeper pages
+		return 0.4
 	}
 }
 
 func (s *Server) calculateChangeFreq(node domain.ContentNode) string {
 	if node.Kind() == domain.NodeKindDirectory {
-		return "daily" // Directories change when children are added/removed
+		return "daily"
 	}
 
-	// Files change based on age
 	age := time.Since(node.Modified())
 	switch {
 	case age < 24*time.Hour:

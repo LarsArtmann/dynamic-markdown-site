@@ -1,28 +1,29 @@
 package server
 
 import (
+	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
-// accessLogMiddleware logs each request with method, path, status, duration, and request ID.
-func (s *Server) accessLogMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		start := time.Now()
+func (s *Server) accessLogMiddleware() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			rec := newResponseRecorder(w)
 
-		c.Next()
+			next.ServeHTTP(rec, r)
 
-		duration := time.Since(start)
-		status := c.Writer.Status()
+			duration := time.Since(start)
 
-		s.logger.Info("request",
-			"method", c.Request.Method,
-			"path", c.Request.URL.Path,
-			"status", status,
-			"duration", duration,
-			"request_id", getRequestID(c),
-			"client_ip", c.ClientIP(),
-		)
+			s.logger.Info(
+				"request",
+				"method", r.Method,
+				"path", r.URL.Path,
+				"status", rec.Status(),
+				"duration", duration,
+				"request_id", requestIDFromContext(r.Context()),
+				"client_ip", clientIP(r),
+			)
+		})
 	}
 }

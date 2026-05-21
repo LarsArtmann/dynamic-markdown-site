@@ -6,8 +6,6 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/gin-gonic/gin"
 )
 
 func TestHandleRobotsTxt(t *testing.T) {
@@ -15,6 +13,7 @@ func TestHandleRobotsTxt(t *testing.T) {
 
 	repo := &FailingRepository{}
 	srv := newTestServer(t, repo)
+	handler := srv.Handler()
 
 	tests := []struct {
 		name            string
@@ -64,9 +63,6 @@ func TestHandleRobotsTxt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			router := gin.New()
-			srv.RegisterRoutes(router)
-
 			req := httptest.NewRequestWithContext(
 				context.Background(),
 				http.MethodGet,
@@ -80,7 +76,7 @@ func TestHandleRobotsTxt(t *testing.T) {
 			}
 
 			rec := httptest.NewRecorder()
-			router.ServeHTTP(rec, req)
+			handler.ServeHTTP(rec, req)
 
 			if rec.Code != tt.wantStatus {
 				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)

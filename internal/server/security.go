@@ -1,41 +1,27 @@
 package server
 
-import (
-	"github.com/gin-gonic/gin"
-)
+import "net/http"
 
-// securityHeadersMiddleware adds security-related HTTP headers to all responses.
-func securityHeadersMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Prevent MIME type sniffing
-		c.Header("X-Content-Type-Options", "nosniff")
+func securityHeadersMiddleware() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("X-Content-Type-Options", "nosniff")
+			w.Header().Set("X-Frame-Options", "DENY")
+			w.Header().Set("X-XSS-Protection", "1; mode=block")
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+			w.Header().Set(
+				"Content-Security-Policy",
+				"default-src 'self'; "+
+					"script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "+
+					"style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "+
+					"img-src 'self' data: https:; "+
+					"font-src 'self' https://cdn.jsdelivr.net; "+
+					"connect-src 'self'",
+			)
+			w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+			w.Header().Set("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
 
-		// Prevent clickjacking attacks
-		c.Header("X-Frame-Options", "DENY")
-
-		// XSS protection (legacy browsers)
-		c.Header("X-XSS-Protection", "1; mode=block")
-
-		// Strict Transport Security (HTTPS only)
-		c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-
-		// Content Security Policy
-		c.Header(
-			"Content-Security-Policy",
-			"default-src 'self'; "+
-				"script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "+
-				"style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "+
-				"img-src 'self' data: https:; "+
-				"font-src 'self' https://cdn.jsdelivr.net; "+
-				"connect-src 'self'",
-		)
-
-		// Referrer Policy
-		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
-
-		// Permissions Policy (disable unnecessary browser features)
-		c.Header("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
-
-		c.Next()
+			next.ServeHTTP(w, r)
+		})
 	}
 }

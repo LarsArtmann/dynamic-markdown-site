@@ -8,24 +8,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 )
 
-func init() {
-	gin.SetMode(gin.TestMode)
-}
-
-// newBenchmarkServer creates a server with in-memory repository for benchmarking.
-func newBenchmarkServer(b *testing.B) *gin.Engine {
+func newBenchmarkHandler(b *testing.B) http.Handler {
 	b.Helper()
 
 	repo := content.NewInMemoryRepository()
 
-	// Add some files for realistic benchmarking
 	const fileCount = 50
 	for i := range fileCount {
 		path := domain.MustURLPath("/file-" + string(rune('0'+i%10)))
@@ -53,10 +46,7 @@ func newBenchmarkServer(b *testing.B) *gin.Engine {
 		renderer.NewGoldmarkRenderer(), false, "Site",
 	)
 
-	router := gin.New()
-	srv.RegisterRoutes(router)
-
-	return router
+	return srv.Handler()
 }
 
 func createBenchmarkFileContent(index int) string {
@@ -95,64 +85,56 @@ End of file.
 `
 }
 
-// BenchmarkServerRootRequest benchmarks requests to the root path.
 func BenchmarkServerRootRequest(b *testing.B) {
-	router := newBenchmarkServer(b)
-	runBenchmarkRequest(b, router, "/")
+	handler := newBenchmarkHandler(b)
+	runBenchmarkRequest(b, handler, "/")
 }
 
-// BenchmarkServerFileRequest benchmarks requests for individual files.
 func BenchmarkServerFileRequest(b *testing.B) {
-	router := newBenchmarkServer(b)
+	handler := newBenchmarkHandler(b)
 
 	paths := []string{"/file-0", "/file-1", "/file-2", "/file-3", "/file-4"}
 
 	for _, path := range paths {
 		b.Run("path_"+path, func(b *testing.B) {
-			runBenchmarkRequest(b, router, path)
+			runBenchmarkRequest(b, handler, path)
 		})
 	}
 }
 
-// BenchmarkServerCachedRequest benchmarks requests that hit the HTML cache.
 func BenchmarkServerCachedRequest(b *testing.B) {
-	router := newBenchmarkServer(b)
+	handler := newBenchmarkHandler(b)
 
-	// Prime the cache with a request
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/file-0", nil)
 	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
-	runBenchmarkRequest(b, router, "/file-0")
+	runBenchmarkRequest(b, handler, "/file-0")
 }
 
-// runBenchmarkRequest executes a benchmark for a single HTTP GET request to the given path.
-func runBenchmarkRequest(b *testing.B, router *gin.Engine, path string) {
+func runBenchmarkRequest(b *testing.B, handler http.Handler, path string) {
 	b.Helper()
 	b.ResetTimer()
 
 	for range b.N {
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		w := httptest.NewRecorder()
-		router.ServeHTTP(w, req)
+		handler.ServeHTTP(w, req)
 	}
 }
 
-// BenchmarkServerNotFound benchmarks 404 responses.
 func BenchmarkServerNotFound(b *testing.B) {
-	router := newBenchmarkServer(b)
-	runBenchmarkRequest(b, router, "/nonexistent-file")
+	handler := newBenchmarkHandler(b)
+	runBenchmarkRequest(b, handler, "/nonexistent-file")
 }
 
-// BenchmarkServerHealthCheck benchmarks the health endpoint.
 func BenchmarkServerHealthCheck(b *testing.B) {
-	router := newBenchmarkServer(b)
-	runBenchmarkRequest(b, router, "/health")
+	handler := newBenchmarkHandler(b)
+	runBenchmarkRequest(b, handler, "/health")
 }
 
-// BenchmarkServerConcurrent benchmarks concurrent requests.
 func BenchmarkServerConcurrent(b *testing.B) {
-	router := newBenchmarkServer(b)
+	handler := newBenchmarkHandler(b)
 
 	paths := []string{"/", "/file-0", "/file-1", "/file-2", "/health"}
 
@@ -167,34 +149,31 @@ func BenchmarkServerConcurrent(b *testing.B) {
 				nil,
 			)
 			w := httptest.NewRecorder()
-			router.ServeHTTP(w, req)
+			handler.ServeHTTP(w, req)
 
 			i++
 		}
 	})
 }
 
-// BenchmarkServerMixedWorkload simulates realistic traffic mix.
 func BenchmarkServerMixedWorkload(b *testing.B) {
-	router := newBenchmarkServer(b)
+	handler := newBenchmarkHandler(b)
 
-	// Mix of different request types with weights
 	requests := []struct {
 		path   string
 		weight int
 	}{
-		{"/", 10},       // Root directory listing - frequent
-		{"/file-0", 30}, // File viewing - most common
+		{"/", 10},
+		{"/file-0", 30},
 		{"/file-1", 25},
 		{"/file-2", 20},
-		{"/health", 10},     // Health checks - periodic
-		{"/nonexistent", 5}, // 404s - occasional
+		{"/health", 10},
+		{"/nonexistent", 5},
 	}
 
 	b.ResetTimer()
 
 	for i := range b.N {
-		// Weighted selection based on realistic traffic distribution
 		var path string
 
 		r := i % 100
@@ -211,6 +190,6 @@ func BenchmarkServerMixedWorkload(b *testing.B) {
 
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		w := httptest.NewRecorder()
-		router.ServeHTTP(w, req)
+		handler.ServeHTTP(w, req)
 	}
 }

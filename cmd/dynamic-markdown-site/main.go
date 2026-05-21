@@ -1,6 +1,3 @@
-// Dynamic Markdown Site - Main entry point
-//
-// A type-safe, high-performance markdown-to-website converter.
 package main
 
 import (
@@ -15,7 +12,6 @@ import (
 	"time"
 
 	cockroachdberrors "github.com/cockroachdb/errors"
-	"github.com/gin-gonic/gin"
 	"github.com/larsartmann/dynamic-markdown-site/internal/config"
 	"github.com/larsartmann/dynamic-markdown-site/internal/container"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
@@ -23,15 +19,11 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 )
 
-// Server timeouts.
 const (
-	// idleTimeout is how long to wait for idle connections before closing.
-	idleTimeout = 120 * time.Second
-	// shutdownTimeout is how long to wait for graceful shutdown.
+	idleTimeout     = 120 * time.Second
 	shutdownTimeout = 30 * time.Second
 )
 
-// services holds all services obtained from the container.
 type services struct {
 	config    *config.Config
 	logger    *slog.Logger
@@ -58,11 +50,12 @@ func run() error {
 		return err
 	}
 
-	router, httpServer := setupServer(svc)
+	httpServer := setupHTTPServer(svc)
+	handler := svc.server.Handler()
 
 	startFileWatcher(svc)
 
-	if err := serveHTTP(svc, httpServer, router); err != nil {
+	if err := serveHTTP(svc, httpServer, handler); err != nil {
 		shutdownServices(svc)
 
 		return err
@@ -71,7 +64,6 @@ func run() error {
 	return gracefulShutdown(svc, httpServer)
 }
 
-// setupServices creates the DI container and extracts all services.
 func setupServices() (*services, error) {
 	c, err := container.New()
 	if err != nil {
@@ -91,9 +83,9 @@ func setupServices() (*services, error) {
 	return svc, nil
 }
 
-// logStartupInfo logs all startup configuration.
 func logStartupInfo(svc *services) {
-	svc.logger.Info("starting site generator",
+	svc.logger.Info(
+		"starting site generator",
 		slog.Uint64("port", uint64(svc.config.Port)),
 		slog.String("root_dir", svc.config.RootDir),
 		slog.String("log_level", svc.config.LogLevel),
@@ -107,49 +99,26 @@ func logStartupInfo(svc *services) {
 
 	svc.logger.Info("configuration", slog.String("config", svc.config.String()))
 
-	svc.logger.Info("content repository initialized",
+	svc.logger.Info(
+		"content repository initialized",
 		slog.Time("last_modified", svc.repo.LastModified()),
 	)
 }
 
-// setupServer creates the router and HTTP server.
-func setupServer(svc *services) (*gin.Engine, *http.Server) {
-	configureGin(svc.config.LogLevel)
+func setupHTTPServer(svc *services) *http.Server {
+	handler := svc.server.Handler()
 
-	router := createRouter(svc)
-
-	//nolint:exhaustruct
-	httpServer := &http.Server{
+	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", svc.config.Port),
-		Handler:      router,
+		Handler:      handler,
 		ReadTimeout:  svc.config.Timeout,
 		WriteTimeout: svc.config.Timeout,
 		IdleTimeout:  idleTimeout,
 		ErrorLog:     slog.NewLogLogger(svc.logger.Handler(), slog.LevelError),
 	}
-
-	return router,
-		httpServer
 }
 
-// configureGin sets the Gin mode based on log level.
-func configureGin(logLevel string) {
-	if logLevel == "info" || logLevel == "warn" || logLevel == "error" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-}
-
-// createRouter creates and configures the Gin router.
-func createRouter(svc *services) *gin.Engine {
-	router := gin.New()
-	router.Use(gin.Recovery())
-	svc.server.RegisterRoutes(router)
-
-	return router
-}
-
-// serveHTTP starts the HTTP server and waits for shutdown.
-func serveHTTP(svc *services, httpServer *http.Server, _ *gin.Engine) error {
+func serveHTTP(svc *services, httpServer *http.Server, _ http.Handler) error {
 	errChan := make(chan error, 1)
 
 	go func() {
@@ -174,7 +143,6 @@ func serveHTTP(svc *services, httpServer *http.Server, _ *gin.Engine) error {
 	}
 }
 
-// gracefulShutdown performs the HTTP server shutdown.
 func gracefulShutdown(svc *services, httpServer *http.Server) error {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
@@ -191,7 +159,6 @@ func gracefulShutdown(svc *services, httpServer *http.Server) error {
 	return nil
 }
 
-// shutdownServices performs graceful shutdown of services.
 func shutdownServices(svc *services) {
 	svc.server.Shutdown()
 
@@ -201,7 +168,6 @@ func shutdownServices(svc *services) {
 	}
 }
 
-// startFileWatcher starts the file watcher in dev mode.
 func startFileWatcher(svc *services) {
 	if svc.config.DevMode {
 		liveReload := svc.server.LiveReload()
@@ -211,5 +177,4 @@ func startFileWatcher(svc *services) {
 	}
 }
 
-// Compile-time check that Server implements the expected interface.
 var _ *server.Server = (*server.Server)(nil)

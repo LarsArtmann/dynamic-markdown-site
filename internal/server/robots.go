@@ -1,22 +1,22 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) handleRobotsTxt(c *gin.Context) {
-	c.Header("Content-Type", "text/plain; charset=utf-8")
-	c.Header("Cache-Control", "public, max-age=86400")
-	c.String(http.StatusOK, "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n", s.baseURL(c))
+func (s *Server) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=86400")
+
+	_, _ = fmt.Fprintf(w, "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n", s.baseURL(r))
 }
 
-func (s *Server) baseURL(c *gin.Context) string {
+func (s *Server) baseURL(r *http.Request) string {
 	scheme := "http"
-	if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
+	if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
 		scheme = "https"
 	}
 
-	return scheme + "://" + c.Request.Host
+	return scheme + "://" + r.Host
 }
