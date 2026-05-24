@@ -1,6 +1,6 @@
 module github.com/larsartmann/dynamic-markdown-site
 
-go 1.26.2
+go 1.26.3
 
 require (
 	charm.land/log/v2 v2.0.0
@@ -8,6 +8,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.23.1
 	github.com/cockroachdb/errors v1.12.0
 	github.com/fsnotify/fsnotify v1.9.0
+	github.com/larsartmann/httputil v0.0.0-20260524205403-4a82791db46e
 	github.com/maypok86/otter/v2 v2.3.0
 	github.com/samber/do/v2 v2.0.0
 	github.com/samber/lo v1.53.0
@@ -96,6 +97,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/larsartmann/go-error-family v0.1.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

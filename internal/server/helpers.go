@@ -3,10 +3,9 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"net"
 	"net/http"
-	"slices"
-	"strings"
+
+	httputil "github.com/larsartmann/httputil"
 )
 
 type contextKey string
@@ -22,50 +21,18 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	}
 }
 
-type responseRecorder struct {
-	http.ResponseWriter
+type responseRecorder = httputil.ResponseRecorder
 
-	statusCode int
-}
-
-func newResponseRecorder(w http.ResponseWriter) *responseRecorder {
-	return &responseRecorder{ResponseWriter: w, statusCode: http.StatusOK}
-}
-
-func (r *responseRecorder) WriteHeader(code int) {
-	r.statusCode = code
-	r.ResponseWriter.WriteHeader(code)
-}
-
-func (r *responseRecorder) Status() int {
-	return r.statusCode
+func newResponseRecorder(w http.ResponseWriter) *httputil.ResponseRecorder {
+	return httputil.NewResponseRecorder(w)
 }
 
 func clientIP(r *http.Request) string {
-	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-		if ips := strings.Split(xff, ","); len(ips) > 0 {
-			return strings.TrimSpace(ips[0])
-		}
-	}
-
-	if xri := r.Header.Get("X-Real-IP"); xri != "" {
-		return strings.TrimSpace(xri)
-	}
-
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-
-	return host
+	return httputil.ClientIP(r)
 }
 
 func chain(handler http.Handler, middlewares ...func(http.Handler) http.Handler) http.Handler {
-	for _, v := range slices.Backward(middlewares) {
-		handler = v(handler)
-	}
-
-	return handler
+	return httputil.Chain(handler, middlewares...)
 }
 
 func requestIDFromContext(ctx context.Context) string {
