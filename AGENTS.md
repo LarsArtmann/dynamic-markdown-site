@@ -24,14 +24,20 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 ### Build & Run
 
 ```bash
-# Build the server
-go build -o site-generator ./cmd/server
+# Build the server (Nix — preferred)
+NIXPKGS_ALLOW_UNFREE=1 nix build --impure
+
+# Build the server (Go directly)
+go build -o dynamic-markdown-site ./cmd/dynamic-markdown-site
+
+# Enter development shell (Go, gopls, golangci-lint, templ)
+NIXPKGS_ALLOW_UNFREE=1 nix develop --impure
 
 # Run in development mode (file watching, no caching)
-go run ./cmd/server -dev -root ./content
+go run ./cmd/dynamic-markdown-site -dev -root ./content
 
 # Run with custom port
-go run ./cmd/server -port 3000 -root ./docs
+go run ./cmd/dynamic-markdown-site -port 3000 -root ./docs
 
 # Production flags
 -port 8080          # HTTP port
@@ -41,6 +47,27 @@ go run ./cmd/server -port 3000 -root ./docs
 -dev                # Development mode (disables caching, enables file watching)
 -timeout 30s        # Request timeout
 ```
+
+### Nix
+
+```bash
+# Build binary
+NIXPKGS_ALLOW_UNFREE=1 nix build --impure
+
+# Enter dev shell
+NIXPKGS_ALLOW_UNFREE=1 nix develop --impure
+
+# Run all checks (format + build)
+NIXPKGS_ALLOW_UNFREE=1 nix flake check --impure
+
+# Format .nix files
+nix fmt
+
+# Update flake inputs
+nix flake update
+```
+
+> **Note:** `--impure` and `NIXPKGS_ALLOW_UNFREE=1` are needed because the project uses a proprietary license.
 
 ### Testing
 
@@ -365,5 +392,7 @@ Before declaring complete:
 - [ ] `go test ./...` passes
 - [ ] `golangci-lint run ./...` passes (or documented exceptions in `.golangci.yml`)
 - [ ] `templ generate` succeeds (if templates changed)
+- [ ] `NIXPKGS_ALLOW_UNFREE=1 nix flake check --impure` passes (if nix files changed)
+- [ ] `nix fmt -- --check` passes (if nix files changed)
 - [ ] New code follows existing patterns
 - [ ] Tests use `t.Parallel()` where applicable
