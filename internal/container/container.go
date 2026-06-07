@@ -3,7 +3,6 @@ package container
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 	"time"
@@ -86,7 +85,7 @@ func (c *Container) Shutdown() *do.ShutdownReport {
 func provideConfig(_ do.Injector) (*config.Config, error) {
 	cfg, err := config.Load()
 	if err != nil {
-		return nil, fmt.Errorf("failed to load config: %w", err)
+		return nil, errors.Wrap(err, "failed to load config")
 	}
 
 	return cfg, nil
@@ -162,7 +161,7 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 		select {
 		case res := <-resultCh:
 			if res.err != nil {
-				return nil, fmt.Errorf("failed to create blob repository: %w", res.err)
+				return nil, errors.Wrap(res.err, "failed to create blob repository")
 			}
 
 			return res.repo, nil
@@ -174,7 +173,7 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 	// Use filesystem repository as default
 	repo, err := content.NewFileSystemRepository(cfg.RootDir)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create filesystem repository: %w", err)
+		return nil, errors.Wrap(err, "failed to create filesystem repository")
 	}
 
 	return repo, nil
