@@ -81,7 +81,7 @@
               homepage = "https://github.com/LarsArtmann/dynamic-markdown-site";
               license = licenses.unfree;
               mainProgram = pname;
-              maintainers = [ ];
+              maintainers = [ maintainers.larsartmann ];;
             };
           };
         in
@@ -112,6 +112,9 @@
               command = pkgs.nixfmt;
               includes = [ "*.nix" ];
             };
+
+          checks.format = config.treefmt.build.check self;
+          checks.build = config.packages.default;
           };
         };
 
