@@ -43,6 +43,11 @@ type Searcher struct {
 	repo Repository
 }
 
+// Searchable is the interface for content search operations.
+type Searchable interface {
+	Search(query string) ([]SearchResult, error)
+}
+
 // NewSearcher creates a new searcher for the given repository.
 func NewSearcher(repo Repository) *Searcher {
 	return &Searcher{repo: repo}

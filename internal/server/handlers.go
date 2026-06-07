@@ -16,7 +16,7 @@ import (
 
 type Server struct {
 	repo        content.Repository
-	searcher    *content.Searcher
+	searcher    content.Searchable
 	renderer    domain.Renderer
 	logger      *slog.Logger
 	rateLimiter *rateLimiter
@@ -28,7 +28,7 @@ type Server struct {
 
 func NewServer(
 	repo content.Repository,
-	searcher *content.Searcher,
+	searcher content.Searchable,
 	log *slog.Logger,
 	htmlCache *cache.HTMLCache,
 	renderer domain.Renderer,
