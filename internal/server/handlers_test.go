@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -18,10 +17,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 )
 
-var (
-	errFailingRoot   = errors.New("root error")
-	errFailingSearch = errors.New("search error")
-)
+var errFailingRoot = errors.New("root error")
 
 func executeRequest(handler http.Handler, path string) *httptest.ResponseRecorder {
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
@@ -75,13 +71,6 @@ type httpTestCase struct {
 	wantBody   string
 }
 
-type statusTestCase struct {
-	name       string
-	method     string
-	path       string
-	wantStatus int
-}
-
 var sharedHTTPTestCases = []httpTestCase{
 	{
 		name:       "status",
@@ -118,24 +107,6 @@ var sharedHTTPTestCases = []httpTestCase{
 		wantStatus: http.StatusOK,
 		wantBody:   `"timestamp"`,
 	},
-}
-
-func runStatusTests(t *testing.T, handler http.Handler, tests []statusTestCase) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			req := httptest.NewRequestWithContext(context.Background(), tt.method, tt.path, nil)
-			rec := httptest.NewRecorder()
-			handler.ServeHTTP(rec, req)
-
-			if rec.Code != tt.wantStatus {
-				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
-			}
-		})
-	}
 }
 
 func runHTTPTests(t *testing.T, handler http.Handler, tests []httpTestCase) {
@@ -630,6 +601,10 @@ func (f *FailingRepository) Get(_ domain.URLPath) (domain.ContentNode, error) {
 	return nil, errFailingRoot
 }
 
+func (f *FailingRepository) GetRaw(_ domain.URLPath) (*content.RawFile, error) {
+	return nil, errFailingRoot
+}
+
 func (f *FailingRepository) Root() (*domain.DirectoryNode, error) {
 	return nil, errFailingRoot
 }
@@ -650,15 +625,7 @@ func (f *FailingRepository) AllPaths() []domain.URLPath {
 	return nil
 }
 
-func (f *FailingRepository) Search(_ string) ([]content.SearchResult, error) {
-	return nil, errFailingSearch
-}
-
-func (f *FailingRepository) GetRaw(_ domain.URLPath) (*content.RawFile, error) {
-	return nil, errFailingRoot
-}
-
 // Ensure test content directory exists for benchmark tests.
 func init() {
-	_ = os.MkdirAll(filepath.Join("test-content"), 0o755)
+	_ = os.MkdirAll("test-content", 0o755)
 }

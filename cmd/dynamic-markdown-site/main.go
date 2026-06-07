@@ -176,5 +176,3 @@ func startFileWatcher(svc *services) {
 		svc.logger.Info("file watcher started in dev mode")
 	}
 }
-
-var _ *server.Server = (*server.Server)(nil)

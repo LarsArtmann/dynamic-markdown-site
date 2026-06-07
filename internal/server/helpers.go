@@ -21,8 +21,6 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	}
 }
 
-type responseRecorder = httputil.ResponseRecorder
-
 func newResponseRecorder(w http.ResponseWriter) *httputil.ResponseRecorder {
 	return httputil.NewResponseRecorder(w)
 }
