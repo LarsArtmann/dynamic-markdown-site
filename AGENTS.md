@@ -1,6 +1,6 @@
 # Dynamic Markdown Site - Agent Guidelines
 
-**Version:** 1.0 | **Updated:** 2026-03-27
+**Version:** 1.1 | **Updated:** 2026-06-07
 
 ---
 
@@ -10,12 +10,16 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 
 **Key Technologies:**
 
-- Go 1.26.1 with modules
-- Gin web framework for HTTP routing
+- Go 1.26.3 with modules
+- Standard `net/http` with Go 1.22+ method routing (no Gin)
 - Goldmark + Chroma for markdown rendering with syntax highlighting
 - Templ for type-safe HTML templates
 - samber/do/v2 for dependency injection
 - charm.land/log for structured logging
+- golang.org/x/time/rate for rate limiting
+- Otter for HTML caching
+- gocloud.dev for blob storage (S3, GCS, filesystem)
+- D2 + Mermaid for diagram rendering
 
 ---
 
@@ -121,23 +125,26 @@ go mod tidy
 
 ```
 dynamic-markdown-site/
-├── cmd/server/           # Application entry point
-│   ├── main.go          # Main function, graceful shutdown
-│   └── watcher.go       # File system watcher (dev mode)
-├── internal/            # Private application code
-│   ├── cache/          # HTML response caching (otter cache)
-│   ├── config/          # Configuration from flags/env vars
-│   ├── container/      # Dependency injection container (samber/do)
-│   ├── content/        # Content repository (filesystem, memory)
-│   ├── domain/         # Core domain types (DirectoryNode, FileNode, URLPath)
-│   ├── renderer/       # Markdown to HTML (Goldmark + Chroma)
-│   ├── server/         # HTTP handlers, routing, rate limiting
-│   └── static/         # Static assets (CSS, favicon)
-├── templates/          # Templ HTML templates
-│   └── layout.templ    # Main layout, directory/file views, search
-├── go.mod              # Go module definition
-├── .golangci.yml       # Linter configuration (75 linters enabled)
-└── .gitignore
+├── cmd/dynamic-markdown-site/  # Application entry point
+│   ├── main.go                # Main function, graceful shutdown
+│   └── watcher.go             # File system watcher (dev mode, 500ms debounce)
+├── internal/                  # Private application code
+│   ├── cache/                 # HTML response caching (otter cache with Close())
+│   ├── config/                # Configuration from flags/env vars
+│   ├── container/             # Dependency injection container (samber/do)
+│   ├── content/               # Content repository (filesystem, blob, memory) + search
+│   ├── domain/                # Core domain types (DirectoryNode, FileNode, URLPath)
+│   ├── renderer/              # Markdown to HTML (Goldmark + Chroma + D2 + Mermaid)
+│   ├── server/                # HTTP handlers, routing, rate limiting (x/time/rate)
+│   ├── test/                  # Shared test utilities
+│   └── version/               # Build-time version info
+├── templates/                 # Templ HTML templates
+│   └── layout.templ           # Main layout, directory/file views, search
+├── docs/                      # Documentation (DOMAIN_LANGUAGE.md, planning, status)
+├── go.mod                     # Go module definition
+├── .golangci.yml              # Linter configuration (~75 linters)
+├── flake.nix                  # Nix build + dev shell (preferred over justfile)
+└── package.nix                # Nix package definition
 ```
 
 ---
@@ -303,7 +310,7 @@ urlPath, err := domain.NewURLPath(filepath)
 
 ### 2. File Watching
 
-File watcher only runs in dev mode (`-dev` flag). It refreshes the content repository when markdown files change.
+File watcher only runs in dev mode (`-dev` flag). It refreshes the content repository when markdown files change with 500ms debounce to coalesce bulk operations.
 
 ### 3. Cache Behavior
 
@@ -311,6 +318,7 @@ File watcher only runs in dev mode (`-dev` flag). It refreshes the content repos
 - Dev mode (`-dev`) disables caching automatically
 - Cache invalidates on `/refresh` endpoint
 - Rate limit: 10 refresh requests per minute per IP
+- **Otter cache has background goroutines** — always call `cache.Close()` on shutdown or via `t.Cleanup()` in tests
 
 ### 4. Frontmatter Support
 
@@ -340,7 +348,19 @@ Files/directories starting with `.` are ignored by the filesystem repository.
 
 ### 7. Graceful Shutdown
 
-The server handles SIGINT/SIGTERM and waits up to 30 seconds for in-flight requests.
+The server handles SIGINT/SIGTERM and waits up to 30 seconds for in-flight requests. `Server.Shutdown()` stops the rate limiter and closes the cache.
+
+### 8. Templ Version Mismatch
+
+The `templ` CLI version must match `go.mod`. If the CLI is newer, it generates code the library version doesn't understand (e.g., `templ.ResolveAttributeValue` undefined). Always run `go get github.com/a-h/templ@latest` after updating the CLI.
+
+### 9. SSE Handler Blocks Without Cancellable Context
+
+`handleSSE` enters an infinite loop blocking on `ctx.Done()`. `httptest.ResponseRecorder` implements `http.Flusher`, so the early-return path is NOT taken. Tests must use a cancellable context.
+
+### 10. Rate Limiting Uses Token Bucket
+
+Rate limiting uses `golang.org/x/time/rate` (token bucket). No background goroutines. `Stop()` is a no-op kept for API compatibility.
 
 ---
 
