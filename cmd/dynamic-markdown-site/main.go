@@ -51,11 +51,10 @@ func run() error {
 	}
 
 	httpServer := setupHTTPServer(svc)
-	handler := svc.server.Handler()
 
 	startFileWatcher(svc)
 
-	if err := serveHTTP(svc, httpServer, handler); err != nil {
+	if err := serveHTTP(svc, httpServer); err != nil {
 		shutdownServices(svc)
 
 		return err
@@ -109,16 +108,17 @@ func setupHTTPServer(svc *services) *http.Server {
 	handler := svc.server.Handler()
 
 	return &http.Server{
-		Addr:         fmt.Sprintf(":%d", svc.config.Port),
-		Handler:      handler,
-		ReadTimeout:  svc.config.Timeout,
-		WriteTimeout: svc.config.Timeout,
-		IdleTimeout:  idleTimeout,
-		ErrorLog:     slog.NewLogLogger(svc.logger.Handler(), slog.LevelError),
+		Addr:              fmt.Sprintf(":%d", svc.config.Port),
+		Handler:           handler,
+		ReadTimeout:       svc.config.Timeout,
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      svc.config.Timeout,
+		IdleTimeout:       idleTimeout,
+		ErrorLog:          slog.NewLogLogger(svc.logger.Handler(), slog.LevelError),
 	}
 }
 
-func serveHTTP(svc *services, httpServer *http.Server, _ http.Handler) error {
+func serveHTTP(svc *services, httpServer *http.Server) error {
 	errChan := make(chan error, 1)
 
 	go func() {
