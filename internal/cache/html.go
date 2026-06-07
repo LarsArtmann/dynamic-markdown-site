@@ -70,6 +70,11 @@ func (c *HTMLCache) InvalidateAll() {
 	c.cache.InvalidateAll()
 }
 
+// Close releases all cache resources including background goroutines.
+func (c *HTMLCache) Close() {
+	c.cache.StopAllGoroutines()
+}
+
 // Stats returns cache statistics.
 func (c *HTMLCache) Stats() Stats {
 	s := c.cache.Stats()

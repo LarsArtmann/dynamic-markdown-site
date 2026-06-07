@@ -36,10 +36,14 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 
 	logger := slog.New(slog.DiscardHandler)
 	htmlCache := cache.NewHTMLCache(100)
+	t.Cleanup(htmlCache.Close)
 	searcher := content.NewSearcher(repo)
 	rndr := renderer.NewGoldmarkRenderer()
 
-	return NewServer(repo, searcher, logger, htmlCache, rndr, false, "Site")
+	srv := NewServer(repo, searcher, logger, htmlCache, rndr, false, "Site")
+	t.Cleanup(srv.Shutdown)
+
+	return srv
 }
 
 func newTestHandler(s *Server) http.Handler {
@@ -52,11 +56,13 @@ func newFailingTestHandler(t *testing.T) http.Handler {
 	repo := &FailingRepository{}
 	logger := slog.New(slog.DiscardHandler)
 	htmlCache := cache.NewHTMLCache(100)
+	t.Cleanup(htmlCache.Close)
 	searcher := content.NewSearcher(repo)
 	srv := NewServer(
 		repo, searcher, logger, htmlCache,
 		renderer.NewGoldmarkRenderer(), false, "Site",
 	)
+	t.Cleanup(srv.Shutdown)
 
 	return newTestHandler(srv)
 }
@@ -588,18 +594,28 @@ func TestLiveReloadEndpoint(t *testing.T) {
 
 	handler := newTestHandlerForEndpointTests(t)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
 	req := httptest.NewRequestWithContext(
-		context.Background(),
+		ctx,
 		http.MethodGet,
 		"/api/live-reload",
 		nil,
 	)
 	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, req)
 
-	// httptest.ResponseRecorder doesn't implement http.Flusher,
-	// so SSE will fail gracefully. Just verify the route is registered
-	// by checking we don't get a 404.
+	done := make(chan struct{})
+	go func() {
+		handler.ServeHTTP(rec, req)
+		close(done)
+	}()
+
+	// Wait briefly for the SSE handler to start, then cancel to unblock it.
+	// The SSE handler blocks on ctx.Done() in an infinite loop.
+	cancel()
+	<-done
+
 	if rec.Code == http.StatusNotFound {
 		t.Error("live-reload endpoint should be registered, got 404")
 	}

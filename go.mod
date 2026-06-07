@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	charm.land/log/v2 v2.0.0
-	github.com/a-h/templ v0.3.1001
+	github.com/a-h/templ v0.3.1020
 	github.com/alecthomas/chroma/v2 v2.23.1
 	github.com/cockroachdb/errors v1.12.0
 	github.com/fsnotify/fsnotify v1.9.0
