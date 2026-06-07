@@ -5,12 +5,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/fsnotify/fsnotify"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
 )
+
+const debounceDelay = 500 * time.Millisecond
 
 // watchForChanges monitors the root directory for filesystem changes in dev mode.
 func watchForChanges(
@@ -41,6 +45,11 @@ func watchForChanges(
 		return
 	}
 
+	var (
+		debounceMu    sync.Mutex
+		debounceTimer *time.Timer
+	)
+
 	for {
 		select {
 		case event, ok := <-watcher.Events:
@@ -48,7 +57,45 @@ func watchForChanges(
 				return
 			}
 
-			handleFileEvent(watcher, event, repo, liveReload, logger)
+			if event.Op&fsnotify.Chmod != 0 {
+				continue
+			}
+
+			logger.Debug(
+				"filesystem event",
+				slog.String("path", event.Name),
+				slog.String("op", event.Op.String()),
+			)
+
+			if shouldTriggerRefresh(event.Name) {
+				debounceMu.Lock()
+				if debounceTimer != nil {
+					debounceTimer.Stop()
+				}
+
+				debounceTimer = time.AfterFunc(debounceDelay, func() {
+					doRefresh(repo, liveReload, logger)
+				})
+				debounceMu.Unlock()
+
+				logger.Debug(
+					"debounced refresh for markdown change",
+					slog.String("path", event.Name),
+				)
+			}
+
+			if event.Op&fsnotify.Create != 0 && isDirectory(event.Name) {
+				logger.Debug("adding new directory to watcher", slog.String("path", event.Name))
+
+				err := addDirectoriesRecursive(watcher, event.Name, logger)
+				if err != nil {
+					logger.Error(
+						"failed to add new directory to watcher",
+						slog.String("path", event.Name),
+						slog.Any("error", err),
+					)
+				}
+			}
 
 		case err, ok := <-watcher.Errors:
 			if !ok {
@@ -60,49 +107,7 @@ func watchForChanges(
 	}
 }
 
-// handleFileEvent processes a single filesystem event.
-func handleFileEvent(
-	watcher *fsnotify.Watcher,
-	event fsnotify.Event,
-	repo content.Repository,
-	liveReload *server.LiveReload,
-	logger *slog.Logger,
-) {
-	if event.Op&fsnotify.Chmod != 0 {
-		return
-	}
-
-	logger.Debug(
-		"filesystem event",
-		slog.String("path", event.Name),
-		slog.String("op", event.Op.String()),
-	)
-
-	if shouldTriggerRefresh(event.Name) {
-		logger.Debug(
-			"scheduling refresh for markdown change",
-			slog.String("path", event.Name),
-		)
-		scheduleRefresh(repo, liveReload, logger)
-	}
-
-	if event.Op&fsnotify.Create != 0 && isDirectory(event.Name) {
-		logger.Debug("adding new directory to watcher", slog.String("path", event.Name))
-
-		err := addDirectoriesRecursive(watcher, event.Name, logger)
-		if err != nil {
-			logger.Error(
-				"failed to add new directory to watcher",
-				slog.String("path", event.Name),
-				slog.Any("error", err),
-			)
-		}
-	}
-}
-
-// scheduleRefresh schedules a content refresh with debouncing.
-func scheduleRefresh(repo content.Repository, liveReload *server.LiveReload, logger *slog.Logger) {
-	// This is a simplified version - the full debouncing logic is in watchForChanges
+func doRefresh(repo content.Repository, liveReload *server.LiveReload, logger *slog.Logger) {
 	logger.Info("refreshing content repository due to filesystem changes")
 
 	result := repo.Refresh()
