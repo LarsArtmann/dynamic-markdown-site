@@ -79,6 +79,7 @@ func (s *Server) Handler() http.Handler {
 
 func (s *Server) Shutdown() {
 	s.rateLimiter.Stop()
+	s.cache.Close()
 }
 
 func (s *Server) LiveReload() *LiveReload {
