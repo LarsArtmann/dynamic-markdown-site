@@ -116,6 +116,11 @@
             GOWORK = "off";
           };
 
+          devShells.ci = pkgs.mkShellNoCC {
+            packages = [ pkgs.go_1_26 pkgs.golangci-lint ];
+            GOWORK = "off";
+          };
+
           treefmt.settings = {
             formatter.nixfmt = {
               command = pkgs.nixfmt;
