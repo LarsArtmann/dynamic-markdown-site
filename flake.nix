@@ -26,9 +26,14 @@
           config,
           pkgs,
           lib,
+          system,
           ...
         }:
         let
+          pkgs = import inputs.nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
           pname = "dynamic-markdown-site";
           version = self.rev or self.dirtyRev or "dev";
           vendorHash = "sha256-/bIf2sea5gjbB8GFtl27yePL/BVP4paPr5eeKA4BLVo=";
@@ -86,9 +91,12 @@
           };
         in
         {
+          _module.args.pkgs = pkgs;
+
           packages.default = pkg;
 
           checks = {
+            format = config.treefmt.build.check self;
             build = config.packages.default;
           };
 
@@ -112,10 +120,8 @@
               command = pkgs.nixfmt;
               includes = [ "*.nix" ];
             };
-
-          checks.format = config.treefmt.build.check self;
-          checks.build = config.packages.default;
           };
+
         };
 
       flake = {
