@@ -37,6 +37,7 @@
           pname = "dynamic-markdown-site";
           version = self.rev or self.dirtyRev or "dev";
           vendorHash = "sha256-/bIf2sea5gjbB8GFtl27yePL/BVP4paPr5eeKA4BLVo=";
+          proxyVendor = true;
 
           sourceFiles = lib.fileset.unions [
             ./cmd
