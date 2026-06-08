@@ -81,7 +81,7 @@
               homepage = "https://github.com/LarsArtmann/dynamic-markdown-site";
               license = licenses.unfree;
               mainProgram = pname;
-              maintainers = [ maintainers.larsartmann ];;
+              maintainers = [ maintainers.larsartmann ];
             };
           };
         in
