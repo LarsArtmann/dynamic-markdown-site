@@ -99,13 +99,15 @@
           checks = {
             format = config.treefmt.build.check self;
             build = config.packages.default;
-            test = config.packages.default.overrideAttrs (_: { doCheck = true; });
+            test = config.packages.default.overrideAttrs (_: {
+              doCheck = true;
+            });
           };
 
           apps = {
             default = {
               type = "app";
-              program = lib.getExe(config.packages.default);
+              program = lib.getExe (config.packages.default);
             };
 
             test = {
@@ -121,7 +123,10 @@
               type = "app";
               program = pkgs.writeShellApplication {
                 name = "run-lint";
-                runtimeInputs = [ pkgs.go_1_26 pkgs.golangci-lint ];
+                runtimeInputs = [
+                  pkgs.go_1_26
+                  pkgs.golangci-lint
+                ];
                 text = "golangci-lint run ./...";
               };
             };
@@ -143,7 +148,10 @@
           };
 
           devShells.ci = pkgs.mkShellNoCC {
-            packages = [ pkgs.go_1_26 pkgs.golangci-lint ];
+            packages = [
+              pkgs.go_1_26
+              pkgs.golangci-lint
+            ];
             GOWORK = "off";
           };
 
