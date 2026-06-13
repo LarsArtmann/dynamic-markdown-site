@@ -135,7 +135,6 @@ linters:
             - $gostd
             - $local
             - github.com/cockroachdb/errors
-            - github.com/gin-gonic/gin
             - github.com/larsartmann/dynamic-markdown-site
             - github.com/samber/do/v2
             - github.com/samber/lo
@@ -149,6 +148,8 @@ linters:
             - gocloud.dev/blob/memblob
             - gocloud.dev/blob/s3blob
             - gopkg.in/yaml.v3
+            - github.com/larsartmann/httputil
+            - golang.org/x/time/rate
             - github.com/yuin/goldmark
             - github.com/yuin/goldmark/ast
             - github.com/yuin/goldmark/extension

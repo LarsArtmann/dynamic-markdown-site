@@ -6,9 +6,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	httputil "github.com/larsartmann/httputil"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
+
+const requestIDHeader = "X-Request-ID"
 
 func newTestRequest() (*httptest.ResponseRecorder, *http.Request) {
 	w := httptest.NewRecorder()
@@ -20,31 +22,35 @@ func newTestRequest() (*httptest.ResponseRecorder, *http.Request) {
 func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 	t.Parallel()
 
-	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
+	handler := httputil.RequestID(httputil.DefaultRequestIDConfig())(
+		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}),
+	)
 
 	w, req := newTestRequest()
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.NotEmpty(t, w.Header().Get(RequestIDHeader))
+	assert.NotEmpty(t, w.Header().Get(requestIDHeader))
 }
 
 func TestRequestIDMiddleware_UsesExistingHeader(t *testing.T) {
 	t.Parallel()
 
-	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
+	handler := httputil.RequestID(httputil.DefaultRequestIDConfig())(
+		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}),
+	)
 
 	w, req := newTestRequest()
 	existingID := "existing-request-id-12345"
-	req.Header.Set(RequestIDHeader, existingID)
+	req.Header.Set(requestIDHeader, existingID)
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, existingID, w.Header().Get(RequestIDHeader))
+	assert.Equal(t, existingID, w.Header().Get(requestIDHeader))
 }
 
 func TestRequestIDMiddleware_StoresInContext(t *testing.T) {
@@ -52,95 +58,33 @@ func TestRequestIDMiddleware_StoresInContext(t *testing.T) {
 
 	var contextID string
 
-	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		contextID = requestIDFromContext(r.Context())
-		w.WriteHeader(http.StatusOK)
-	}))
+	handler := httputil.RequestID(httputil.DefaultRequestIDConfig())(
+		http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+			contextID = httputil.RequestIDFromContext(r.Context())
+		}),
+	)
 
 	w, req := newTestRequest()
 	handler.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusOK, w.Code)
 	assert.NotEmpty(t, contextID)
-	assert.Equal(t, w.Header().Get(RequestIDHeader), contextID)
+	assert.Equal(t, w.Header().Get(requestIDHeader), contextID)
 }
 
-func TestGetRequestID_NotSet(t *testing.T) {
+func TestRequestIDFromContext_NotSet(t *testing.T) {
 	t.Parallel()
 
-	var contextID string
-
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		contextID = requestIDFromContext(r.Context())
-		w.WriteHeader(http.StatusOK)
-	})
-
-	w, req := newTestRequest()
-	handler.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Empty(t, contextID)
-}
-
-func TestGenerateRequestID_Length(t *testing.T) {
-	t.Parallel()
-
-	id := generateRequestID()
-
-	require.Len(t, id, 32)
-
-	for _, c := range id {
-		assert.True(t, isHex(c), "character %c is not valid hex", c)
-	}
-}
-
-func TestGenerateRequestID_Uniqueness(t *testing.T) {
-	t.Parallel()
-
-	ids := make(map[string]bool)
-
-	for range 100 {
-		id := generateRequestID()
-		assert.False(t, ids[id], "duplicate ID generated: %s", id)
-		ids[id] = true
-	}
-}
-
-func isHex(c rune) bool {
-	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')
-}
-
-func TestGetRequestIDFromContext_WithID(t *testing.T) {
-	t.Parallel()
-
-	var extractedID string
-
-	handler := requestIDMiddleware()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		extractedID = getRequestIDFromContext(r.Context())
-		w.WriteHeader(http.StatusOK)
-	}))
-
-	w, req := newTestRequest()
-	handler.ServeHTTP(w, req)
-
-	assert.NotEmpty(t, extractedID)
-}
-
-func TestGetRequestIDFromContext_WithoutID(t *testing.T) {
-	t.Parallel()
-
-	ctx := context.Background()
-	id := getRequestIDFromContext(ctx)
+	id := httputil.RequestIDFromContext(context.Background())
 	assert.Empty(t, id)
 }
 
-func TestRequestIDMiddleware_Chain(t *testing.T) {
+func TestRequestIDMiddleware_ChainOrder(t *testing.T) {
 	t.Parallel()
 
 	executionOrder := []string{}
 
 	handler := chain(
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			executionOrder = append(executionOrder, "handler")
 			w.WriteHeader(http.StatusOK)
 		}),
@@ -151,7 +95,7 @@ func TestRequestIDMiddleware_Chain(t *testing.T) {
 				executionOrder = append(executionOrder, "after-middleware")
 			})
 		},
-		requestIDMiddleware(),
+		httputil.RequestID(httputil.DefaultRequestIDConfig()),
 	)
 
 	w, req := newTestRequest()

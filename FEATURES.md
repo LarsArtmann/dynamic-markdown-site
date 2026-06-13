@@ -1,5 +1,7 @@
 # Features
 
+<!-- Last updated: 2026-06-13 -->
+
 A complete catalog of everything Dynamic Markdown Site does — from the user's browser to the server's internals.
 
 ---

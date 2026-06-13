@@ -1,6 +1,63 @@
 # Library Integration Report — Dynamic Markdown Site
 
-**Generated:** 2026-05-13 | **Codebase:** `github.com/larsartmann/dynamic-markdown-site`
+**Generated:** 2026-05-13 | **Updated:** 2026-06-13 | **Codebase:** `github.com/larsartmann/dynamic-markdown-site`
+
+---
+
+## Current Library Usage Analysis (2026-06-13)
+
+### Version Status: All Direct Dependencies Updated
+
+All 5 outdated direct dependencies have been updated to latest:
+
+| Library              | Was       | Now     | Notes                                         |
+| -------------------- | --------- | ------- | --------------------------------------------- |
+| alecthomas/chroma/v2 | v2.23.1   | v2.26.1 | Syntax highlighting                           |
+| cockroachdb/errors   | v1.12.0   | v1.13.0 | Error wrapping                                |
+| fsnotify/fsnotify    | v1.9.0    | v1.10.1 | File watcher                                  |
+| larsartmann/httputil | v0.0.0-\* | v0.2.0  | HTTP middleware (breaking: `Middleware` type) |
+| gocloud.dev          | v0.40.0   | v0.46.0 | Blob storage                                  |
+
+### Usage Depth Assessment
+
+| Library                   | Usage Level      | What's Used                                                          | Untapped Potential                                                                                            |
+| ------------------------- | ---------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **charm.land/log/v2**     | Adequate         | Level setting, formatter (text/JSON), slog.Handler wrapping          | Child loggers with `With()` for component context (available via slog)                                        |
+| **a-h/templ**             | Well used        | Component rendering, template-to-ResponseWriter, 13 components       | None significant                                                                                              |
+| **chroma/v2**             | Minimal          | Monokai style, line numbers disabled                                 | `WithClasses(true)` (CSS-based, smaller HTML), `TabWidth()`, `HighlightLines()`, line linking, custom lexers  |
+| **cockroachdb/errors**    | Adequate         | `Wrap`, `Wrapf`, `New`, `Is` in 14 files                             | `WithDetail()`, `WithHint()` for actionable user-facing error messages; `Assert()`/`Assertf()` for invariants |
+| **fsnotify**              | Well used        | Watcher lifecycle, events, errors, recursive dirs, debounce          | None significant                                                                                              |
+| **httputil**              | **Now improved** | Recovery, Compression, RequestID, ResponseRecorder, ClientIP, Chain  | `ETag()` (conditional GETs), `CORS()`, `Timeout()`, `Server` (graceful lifecycle), `HealthHandler`            |
+| **otter/v2**              | Well used        | Get, Set, GetWithLoader, InvalidateAll, Stats, EstimatedSize, Close  | None significant                                                                                              |
+| **samber/do/v2**          | Well used        | Provide, Invoke, Shutdown, ShutdownReport                            | `ProvideNamedValue`, `InjectableScope` (not needed at this scale)                                             |
+| **samber/lo**             | Minimal          | `FilterMap`, `ContainsBy` (2 of 200+ functions)                      | `Map`, `Filter`, `Reduce`, `CoalesceOrEmpty`, `Ternary`, `Must` — many manual loops could use lo              |
+| **testify**               | Well used        | `assert` + `require` extensively (~94 calls across 4 test files)     | None significant                                                                                              |
+| **goldmark**              | Well used        | 7 extensions, 2 custom extensions, AST walking, TOC extraction       | `goldmark.WithRendererOptions()` for custom HTML rendering rules                                              |
+| **goldmark-highlighting** | Minimal          | Monokai style, no line numbers                                       | `WithFormatOptions()` — same chroma opportunities as above                                                    |
+| **goldmark-meta**         | Well used        | Frontmatter parsing, metadata extraction                             | None significant                                                                                              |
+| **gocloud.dev**           | Adequate         | Blob: OpenBucket, List, NewReader, Exists, Attributes, Close         | `blob.SignedURL()` for pre-signed download URLs (if serving from S3/GCS)                                      |
+| **x/time/rate**           | Adequate         | Token bucket: `NewLimiter`, `Allow`, per-IP map                      | `SetLimit()`/`SetBurst()` for dynamic rate adjustment                                                         |
+| **yaml.v3**               | Minimal          | `Unmarshal` for draft detection only                                 | Could be replaced by goldmark-meta frontmatter parsing to eliminate the dependency entirely                   |
+| **d2**                    | Well used        | Compile, render to SVG, textmeasure, 11 render options, dagre layout | Custom themes, multi-board diagrams, animations (tooling-level, not library-level)                            |
+
+### Improvements Implemented This Session
+
+1. **httputil.Recovery()** added — critical panic recovery middleware we were missing entirely
+2. **httputil.Compression()** added — gzip response compression for all responses
+3. **httputil.RequestID()** replaced custom `requestIDMiddleware()` — eliminated ~50 lines of duplicate code
+4. **Middleware ordering fixed** — RequestID now runs BEFORE accessLog, so request_id is no longer empty in logs (was a bug)
+5. **Depguard config cleaned** — removed unused `gin-gonic/gin`, added `httputil` and `x/time/rate`
+
+### Remaining Opportunities (Not Implemented)
+
+| Opportunity                     | Impact | Effort | Notes                                                                                          |
+| ------------------------------- | ------ | ------ | ---------------------------------------------------------------------------------------------- |
+| httputil.ETag()                 | Medium | Low    | Conditional GETs — 304 responses for unchanged content, saves bandwidth                        |
+| httputil.Timeout()              | Low    | Low    | Request-level timeout via context (currently using http.Server timeout which kills connection) |
+| chroma WithClasses(true)        | Medium | Medium | Switches from inline styles to CSS classes — smaller HTML, but requires generating monokai CSS |
+| cockroachdb WithHint/WithDetail | Medium | Medium | Actionable error messages for API consumers (/refresh, /search)                                |
+| yaml.v3 removal                 | Low    | Low    | goldmark-meta already parses frontmatter; draft check could use that instead                   |
+| samber/lo expansion             | Low    | Low    | Many manual loops could be simplified, but risk of churn vs readability tradeoff               |
 
 ---
 

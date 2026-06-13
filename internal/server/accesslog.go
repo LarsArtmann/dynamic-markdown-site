@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 	"time"
+
+	httputil "github.com/larsartmann/httputil"
 )
 
 func (s *Server) accessLogMiddleware() func(http.Handler) http.Handler {
@@ -21,7 +23,7 @@ func (s *Server) accessLogMiddleware() func(http.Handler) http.Handler {
 				"path", r.URL.Path,
 				"status", rec.Status(),
 				"duration", duration,
-				"request_id", requestIDFromContext(r.Context()),
+				"request_id", httputil.RequestIDFromContext(r.Context()),
 				"client_ip", clientIP(r),
 			)
 		})

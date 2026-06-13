@@ -12,6 +12,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/internal/version"
+	httputil "github.com/larsartmann/httputil"
 )
 
 type Server struct {
@@ -69,9 +70,11 @@ func (s *Server) Handler() http.Handler {
 	var handler http.Handler = mux
 	handler = chain(
 		handler,
-		s.accessLogMiddleware(),
+		httputil.Recovery(s.logger),
+		httputil.RequestID(httputil.DefaultRequestIDConfig()),
 		securityHeadersMiddleware(),
-		requestIDMiddleware(),
+		s.accessLogMiddleware(),
+		httputil.Compression(httputil.DefaultCompressionConfig()),
 	)
 
 	return handler

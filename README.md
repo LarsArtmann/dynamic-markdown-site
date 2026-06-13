@@ -1,5 +1,7 @@
 # Dynamic Markdown Site
 
+<!-- Last updated: 2026-06-13 -->
+
 A type-safe, high-performance Go web server that converts a directory of markdown files into a beautiful, navigable website — with syntax highlighting, full-text search, diagram rendering, live reload, and caching built in.
 
 Point it at any folder of `.md` files and get a fully functional site in seconds.
