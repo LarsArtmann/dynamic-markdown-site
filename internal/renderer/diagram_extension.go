@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html"
+	"log/slog"
 
 	"github.com/cockroachdb/errors"
 	"github.com/yuin/goldmark"
@@ -203,6 +204,12 @@ func wrapWriteError(err error, msg, content string) error {
 func (r *diagramNodeRenderer) renderD2(w util.BufWriter, content string) (ast.WalkStatus, error) {
 	svg, err := r.diagramRenderer.RenderD2(content)
 	if err != nil {
+		slog.Warn(
+			"d2 render failed; falling back to code block",
+			slog.String("content", truncateForLog(content)),
+			slog.String("error", err.Error()),
+		)
+
 		htmlContent := html.EscapeString(content)
 		writeErr := writeStrings(
 			w,
@@ -222,21 +229,15 @@ func (r *diagramNodeRenderer) renderD2(w util.BufWriter, content string) (ast.Wa
 		return ast.WalkContinue, nil
 	}
 
-	writeErr := writeStrings(
-		w,
-		"write D2 output",
-		`<div class="diagram d2-diagram">`,
-	)
-	if writeErr != nil {
-		return ast.WalkStop, wrapWriteError(writeErr, "write D2 div start", content)
-	}
+	// Build the complete fragment in memory so a partial-write failure cannot
+	// leak an unbalanced `<div>` into the response.
+	var buf bytes.Buffer
+	buf.WriteString(`<div class="diagram d2-diagram">`)
+	buf.Write(svg)
+	buf.WriteString("</div>")
 
-	if _, writeErr := w.Write(svg); writeErr != nil {
-		return ast.WalkStop, wrapWriteError(writeErr, "write D2 SVG", content)
-	}
-
-	if _, writeErr := w.WriteString("</div>"); writeErr != nil {
-		return ast.WalkContinue, wrapWriteError(writeErr, "write D2 div end", content)
+	if _, writeErr := w.Write(buf.Bytes()); writeErr != nil {
+		return ast.WalkStop, wrapWriteError(writeErr, "write D2 diagram", content)
 	}
 
 	return ast.WalkContinue, nil

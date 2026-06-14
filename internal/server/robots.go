@@ -6,7 +6,7 @@ import (
 )
 
 func (s *Server) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set(headerContentType, "text/plain; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=86400")
 
 	// s.baseURL(r) returns scheme://host, where scheme is a hard-coded
@@ -17,7 +17,7 @@ func (s *Server) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) baseURL(r *http.Request) string {
 	scheme := schemeHTTP
-	if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == schemeHTTPS {
+	if r.TLS != nil || r.Header.Get(headerForwardedProto) == schemeHTTPS {
 		scheme = schemeHTTPS
 	}
 

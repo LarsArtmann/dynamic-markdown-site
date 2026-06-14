@@ -72,7 +72,7 @@ func TestHandleRobotsTxt(t *testing.T) {
 
 			req.Host = tt.host
 			if tt.forwardedProto != "" {
-				req.Header.Set("X-Forwarded-Proto", tt.forwardedProto)
+				req.Header.Set(headerForwardedProto, tt.forwardedProto)
 			}
 
 			rec := httptest.NewRecorder()

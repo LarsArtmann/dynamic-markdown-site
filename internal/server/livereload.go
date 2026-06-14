@@ -78,12 +78,18 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set(headerContentType, "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	connectedData, _ := json.Marshal(map[string]string{jsonKeyMessage: "connected to live reload"})
+	connectedData, err := json.Marshal(map[string]string{jsonKeyMessage: "connected to live reload"})
+	if err != nil {
+		lr.logger.Error("failed to marshal connected event", "error", err)
+
+		return
+	}
+
 	_, _ = fmt.Fprintf(w, "event: connected\ndata: %s\n\n", connectedData)
 	flusher.Flush()
 

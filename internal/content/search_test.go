@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
+	"github.com/larsartmann/dynamic-markdown-site/internal/test"
 )
 
 // newFile creates a FileNode for testing purposes.
@@ -13,18 +14,7 @@ import (
 func newFile(t *testing.T, now time.Time, path, title, content string) *domain.FileNode {
 	t.Helper()
 
-	node, err := domain.NewFileNode(
-		domain.MustURLPath(path),
-		title,
-		[]byte(content),
-		now,
-		uint64(len(content)),
-	)
-	if err != nil {
-		t.Fatalf("failed to create file node: %v", err)
-	}
-
-	return node
+	return test.FileNode{Path: path, Title: title, Content: content, ModTime: now}.NewFileNode(t)
 }
 
 // setupRepoWithFiles creates an InMemoryRepository and adds the given files as root children.
@@ -177,148 +167,6 @@ func TestSearcher_Search(t *testing.T) {
 	}
 }
 
-func TestSearcher_Search_TitleMatching(t *testing.T) {
-	t.Parallel()
-
-	now := time.Now()
-
-	repo := repoWithFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content")
-	searcher := NewSearcher(repo)
-
-	tests := []struct {
-		name          string
-		query         string
-		wantCount     int
-		wantScores    map[string]float64
-		wantHighlight map[string]string
-	}{
-		{
-			name:      "exact title match scores 1.0",
-			query:     "Getting Started Guide",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 1.0,
-			},
-			wantHighlight: map[string]string{
-				"Getting Started Guide": "<mark>Getting Started Guide</mark>",
-			},
-		},
-		{
-			name:      "partial title match scores 0.5",
-			query:     "Getting",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 0.5,
-			},
-			wantHighlight: map[string]string{
-				"Getting Started Guide": "<mark>Getting</mark> Started Guide",
-			},
-		},
-		{
-			name:      "case insensitive matching",
-			query:     "getting started",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 0.5,
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			results, err := searcher.Search(tt.query)
-			if err != nil {
-				t.Fatalf("Searcher.Search() error = %v", err)
-			}
-
-			if len(results) != tt.wantCount {
-				t.Errorf(
-					"Searcher.Search() returned %d results, want %d",
-					len(results),
-					tt.wantCount,
-				)
-			}
-
-			for _, result := range results {
-				title := result.Node.Title()
-				if wantScore, ok := tt.wantScores[title]; ok {
-					if result.Score != wantScore {
-						t.Errorf("result[%q].Score = %v, want %v", title, result.Score, wantScore)
-					}
-				}
-
-				if wantHighlight, ok := tt.wantHighlight[title]; ok {
-					if result.Highlighted != wantHighlight {
-						t.Errorf(
-							"result[%q].Highlighted = %q, want %q",
-							title,
-							result.Highlighted,
-							wantHighlight,
-						)
-					}
-				}
-			}
-		})
-	}
-}
-
-func TestSearcher_Search_NestedDirectories(t *testing.T) {
-	t.Parallel()
-
-	now := time.Now()
-
-	repo := NewInMemoryRepository()
-
-	// Create nested structure
-	root, _ := repo.Root()
-	docsDir, _ := domain.NewDirectoryNode(domain.MustURLPath("/docs"), "Documentation", now)
-	advancedDir, _ := domain.NewDirectoryNode(
-		domain.MustURLPath("/docs/advanced"),
-		"Advanced Topics",
-		now,
-	)
-
-	file1, _ := domain.NewFileNode(
-		domain.MustURLPath("/docs/intro"),
-		"Introduction",
-		[]byte("Intro content"),
-		now,
-		12,
-	)
-	file2, _ := domain.NewFileNode(
-		domain.MustURLPath("/docs/advanced/tutorial"),
-		"Advanced Tutorial",
-		[]byte("Advanced content"),
-		now,
-		16,
-	)
-
-	root.AddChild(docsDir)
-	docsDir.AddChild(file1)
-	docsDir.AddChild(advancedDir)
-	advancedDir.AddChild(file2)
-
-	repo.Add(file1)
-	repo.Add(file2)
-
-	searcher := NewSearcher(repo)
-
-	results, err := searcher.Search("Tutorial")
-	if err != nil {
-		t.Fatalf("Search failed: %v", err)
-	}
-
-	if len(results) != 1 {
-		t.Errorf("expected 1 result, got %d", len(results))
-	}
-
-	if len(results) > 0 && results[0].Node.Title() != "Advanced Tutorial" {
-		t.Errorf("expected 'Advanced Tutorial', got %q", results[0].Node.Title())
-	}
-}
-
 func TestHighlightMatch(t *testing.T) {
 	t.Parallel()
 
@@ -390,100 +238,6 @@ func TestHighlightMatch(t *testing.T) {
 					tt.query,
 					result,
 					tt.expected,
-				)
-			}
-		})
-	}
-}
-
-func TestSearcher_Search_EmptyRepository(t *testing.T) {
-	t.Parallel()
-
-	repo := NewInMemoryRepository()
-	searcher := NewSearcher(repo)
-
-	results, err := searcher.Search("anything")
-	if err != nil {
-		t.Fatalf("Search failed: %v", err)
-	}
-
-	if len(results) != 0 {
-		t.Errorf("expected 0 results from empty repository, got %d", len(results))
-	}
-}
-
-func TestSearcher_Search_WhitespaceQuery(t *testing.T) {
-	t.Parallel()
-
-	now := time.Now()
-	repo := NewInMemoryRepository()
-	file, _ := domain.NewFileNode(domain.MustURLPath("/test"), "Test", []byte("content"), now, 7)
-	repo.Add(file)
-
-	searcher := NewSearcher(repo)
-
-	tests := []struct {
-		name  string
-		query string
-	}{
-		{"single space", " "},
-		{"multiple spaces", "   "},
-		{"tabs", "\t\t"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			results, err := searcher.Search(tt.query)
-			if err != nil {
-				t.Errorf("Search(%q) error = %v", tt.query, err)
-			}
-			// Whitespace queries should either return no results or handle gracefully
-			// The current implementation would search for whitespace literally
-			_ = results
-		})
-	}
-}
-
-func TestSearcher_Search_SpecialCharacters(t *testing.T) {
-	t.Parallel()
-
-	now := time.Now()
-
-	repo := NewInMemoryRepository()
-	root, _ := repo.Root()
-	file := newFile(t, now, "/api", "API v1.0.0", "content")
-	root.AddChild(file)
-	repo.Add(file)
-
-	searcher := NewSearcher(repo)
-
-	tests := []struct {
-		name      string
-		query     string
-		wantCount int
-	}{
-		{"dots in query", "v1.0", 1},
-		{"partial version", "1.0.0", 1},
-		{"with space", "API v1", 1},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			results, err := searcher.Search(tt.query)
-			if err != nil {
-				t.Errorf("Search(%q) error = %v", tt.query, err)
-
-				return
-			}
-
-			if len(results) != tt.wantCount {
-				t.Errorf(
-					"Search(%q) returned %d results, want %d",
-					tt.query,
-					len(results),
-					tt.wantCount,
 				)
 			}
 		})

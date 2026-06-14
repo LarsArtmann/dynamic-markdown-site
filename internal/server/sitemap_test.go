@@ -81,7 +81,7 @@ func serveSitemapWithProto(handler http.Handler, proto string) *httptest.Respons
 
 	req.Host = testHost
 	if proto != "" {
-		req.Header.Set("X-Forwarded-Proto", proto)
+		req.Header.Set(headerForwardedProto, proto)
 	}
 
 	rec := httptest.NewRecorder()

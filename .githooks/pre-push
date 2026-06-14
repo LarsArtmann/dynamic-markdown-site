@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Pre-push hook: run tests + linter before pushing to remote.
+# Install with:
+#   ln -sf ../../.githooks/pre-push .git/hooks/pre-push
+set -euo pipefail
+
+echo "==> Running tests..."
+go test ./... -race -cover
+
+echo "==> Running linter..."
+if command -v golangci-lint >/dev/null 2>&1; then
+    golangci-lint run ./...
+else
+    echo "golangci-lint not found; skipping (install from https://golangci-lint.run/)"
+fi
+
+echo "==> All checks passed. Pushing..."

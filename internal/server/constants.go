@@ -32,7 +32,6 @@ const (
 
 // HTTP header values used across handlers.
 const (
-	headerHTTPSProto     = "X-Forwarded-Proto"
 	headerForwardedProto = "X-Forwarded-Proto"
 	headerContentType    = "Content-Type"
 )

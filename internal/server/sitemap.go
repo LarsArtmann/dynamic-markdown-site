@@ -37,7 +37,7 @@ func (s *Server) handleSitemapXML(w http.ResponseWriter, r *http.Request) {
 		URLs:    entries,
 	}
 
-	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	w.Header().Set(headerContentType, "application/xml; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
 	data, err := xml.Marshal(urlset)

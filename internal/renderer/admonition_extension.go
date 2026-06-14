@@ -26,13 +26,27 @@ const (
 	alertCritical  alertKind = "critical"
 )
 
+const (
+	alertTitleNote      = "Note"
+	alertTitleTip       = "Tip"
+	alertTitleImportant = "Important"
+	alertTitleWarning   = "Warning"
+	alertTitleCaution   = "Caution"
+	alertTitleCritical  = "Critical"
+)
+
 var alertTitles = map[alertKind]string{
-	alertNote:      "Note",
-	alertTip:       "Tip",
-	alertImportant: "Important",
-	alertWarning:   "Warning",
-	alertCaution:   "Caution",
-	alertCritical:  "Critical",
+	alertNote:      alertTitleNote,
+	alertTip:       alertTitleTip,
+	alertImportant: alertTitleImportant,
+	alertWarning:   alertTitleWarning,
+	alertCaution:   alertTitleCaution,
+	alertCritical:  alertTitleCritical,
+}
+
+// AlertTitles returns the display title for an alert kind.
+func (k alertKind) Title() string {
+	return alertTitles[k]
 }
 
 func parseAlertKind(raw string) (alertKind, bool) {

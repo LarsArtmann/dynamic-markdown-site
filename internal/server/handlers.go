@@ -25,6 +25,7 @@ type Server struct {
 	liveReload  *LiveReload
 	devMode     bool
 	siteName    string
+	startedAt   time.Time
 }
 
 func NewServer(
@@ -49,6 +50,7 @@ func NewServer(
 		liveReload:  lr,
 		devMode:     devMode,
 		siteName:    siteName,
+		startedAt:   time.Now(),
 	}
 }
 
@@ -62,6 +64,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /refresh", s.handleRefresh)
 	mux.HandleFunc("POST /refresh", s.handleRefresh)
 	mux.HandleFunc("GET /search", s.handleSearch)
+	mux.HandleFunc("GET /cache/stats", s.handleCacheStats)
+	mux.HandleFunc("GET /metrics", s.handleMetrics)
 	mux.HandleFunc("GET /{$}", s.handleRoot)
 	mux.HandleFunc("GET /api/live-reload", s.liveReload.handleSSE)
 	mux.HandleFunc("GET /static/", s.serveStaticFile)
@@ -74,6 +78,7 @@ func (s *Server) Handler() http.Handler {
 		httputil.RequestID(httputil.DefaultRequestIDConfig()),
 		securityHeadersMiddleware(),
 		s.accessLogMiddleware(),
+		s.responseTimeMiddleware(),
 		httputil.Compression(httputil.DefaultCompressionConfig()),
 	)
 
@@ -94,13 +99,51 @@ func (s *Server) handleContentOr404(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, _ *http.Request) {
+	now := time.Now().UTC()
+
+	dependencies := map[string]any{
+		"repository": s.checkRepository(),
+		"cache":      s.checkCache(),
+	}
+
 	writeJSON(w, http.StatusOK, map[string]any{
 		jsonKeyStatus:    jsonStatusHealthy,
 		jsonKeyVersion:   version.Version,
 		jsonKeyCommit:    version.Commit,
 		jsonKeyBuildDate: version.BuildDate,
-		jsonKeyTimestamp: time.Now().UTC(),
+		jsonKeyTimestamp: now,
+		"uptime":         now.Sub(s.startedAt).String(),
+		"dependencies":   dependencies,
 	})
+}
+
+// checkRepository reports whether the content repository is reachable.
+func (s *Server) checkRepository() map[string]any {
+	_, err := s.repo.Root()
+	if err != nil {
+		return map[string]any{
+			jsonKeyStatus: jsonStatusError,
+			"error":       err.Error(),
+		}
+	}
+
+	return map[string]any{
+		jsonKeyStatus: jsonStatusHealthy,
+		"modified":    s.repo.LastModified().UTC(),
+	}
+}
+
+// checkCache reports current cache utilization.
+func (s *Server) checkCache() map[string]any {
+	stats := s.cache.Stats()
+
+	return map[string]any{
+		jsonKeyStatus: jsonStatusHealthy,
+		"size":        s.cache.EstimatedSize(),
+		"hits":        stats.Hits,
+		"misses":      stats.Misses,
+		"hitRate":     stats.HitRatio(),
+	}
 }
 
 func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {
@@ -212,7 +255,7 @@ func (s *Server) handleContentByPath(w http.ResponseWriter, r *http.Request, fil
 	if err != nil {
 		if errors.Is(err, content.ErrContentNotFound) {
 			if rawFile, rawErr := s.repo.GetRaw(urlPath); rawErr == nil {
-				w.Header().Set("Content-Type", rawFile.ContentType)
+				w.Header().Set(headerContentType, rawFile.ContentType)
 				w.Header().Set("Cache-Control", "public, max-age=86400")
 				w.WriteHeader(http.StatusOK)
 				// rawFile.Content is read from server-side storage (filesystem

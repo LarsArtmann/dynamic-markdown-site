@@ -33,6 +33,16 @@ type services struct {
 }
 
 func main() {
+	// Healthcheck subcommand: probe the server's /health endpoint and exit.
+	if len(os.Args) > 1 && os.Args[1] == healthcheckSubcommand {
+		if err := runHealthcheck(); err != nil {
+			slog.Error("healthcheck failed", slog.Any("error", err))
+			os.Exit(1)
+		}
+
+		return
+	}
+
 	if version.Version == "dev" {
 		slog.Info("running in development mode (version not set)")
 	}
@@ -107,7 +117,7 @@ func logStartupInfo(svc *services) {
 func setupHTTPServer(svc *services) *http.Server {
 	handler := svc.server.Handler()
 
-	return &http.Server{
+	return &http.Server{ //nolint:exhaustruct // http.Server has many optional fields; we set only what we need.
 		Addr:              fmt.Sprintf(":%d", svc.config.Port),
 		Handler:           handler,
 		ReadTimeout:       svc.config.Timeout,

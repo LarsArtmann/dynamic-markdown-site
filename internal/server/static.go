@@ -32,7 +32,7 @@ func (s *Server) serveStaticFile(w http.ResponseWriter, r *http.Request) {
 
 	contentType := staticContentType(relativePath)
 	if contentType != "" {
-		w.Header().Set("Content-Type", contentType)
+		w.Header().Set(headerContentType, contentType)
 	}
 
 	w.WriteHeader(http.StatusOK)

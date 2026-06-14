@@ -1,0 +1,107 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**.go"
+      - "**.templ"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/test.yml"
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+env:
+  TEMPL_VERSION: "v0.3.1020"
+  GOLANGCI_LINT_VERSION: "v2.12.2"
+
+jobs:
+  test:
+    name: Unit + integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install templ
+        run: go install github.com/a-h/templ/cmd/templ@${{ env.TEMPL_VERSION }}
+
+      - name: Generate templ templates
+        run: templ generate
+
+      - name: Verify templ is in sync
+        run: |
+          if [[ -n "$(git status --porcelain templates/*_templ.go)" ]]; then
+            echo "::error::Generated templ files are out of date. Run 'templ generate' and commit."
+            git status --porcelain templates/*_templ.go
+            exit 1
+          fi
+
+      - name: Run tests with race + coverage
+        run: go test ./... -cover -race -coverprofile=coverage.out -covermode=atomic
+
+      - name: Enforce coverage threshold on Go packages (≥75%)
+        run: |
+          # Compute total statement coverage over all Go packages EXCLUDING
+          # the auto-generated templ files and the test helper package.
+          FAILED=0
+          while IFS= read -r line; do
+            # line is "ok  <pkg>  <time>  coverage:  NN.N% of statements"
+            pkg=$(echo "$line" | awk '{print $2}')
+            cov=$(echo "$line" | grep -oE 'coverage: [0-9.]+%' | awk '{print $2}' | tr -d '%')
+            if [[ -z "$cov" ]]; then
+              continue
+            fi
+            case "$pkg" in
+              *templates|*internal/test|*internal/version|*cmd/dynamic-markdown-site)
+                echo "  skip $pkg ($cov%)"
+                continue
+                ;;
+            esac
+            awk -v c="$cov" -v p="$pkg" 'BEGIN { exit !(c+0 >= 75) }' && \
+              echo "  OK   $pkg $cov%" || \
+              { echo "  FAIL $pkg $cov% (below 75% threshold)"; FAILED=1; }
+          done < <(go test ./... -cover 2>&1 | grep -E '^ok\s')
+          exit "$FAILED"
+
+      - name: Upload coverage artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: coverage
+          path: coverage.out
+          retention-days: 14
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install templ
+        run: go install github.com/a-h/templ/cmd/templ@${{ env.TEMPL_VERSION }}
+
+      - name: Generate templ templates
+        run: templ generate
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@9fae48acfc02a90574d7c304a1758ef9895495fa
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}

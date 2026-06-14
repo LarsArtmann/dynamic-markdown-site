@@ -14,5 +14,10 @@ ENV PORT=8080 \
 
 VOLUME ["/content"]
 
+# Distroless images have no shell, curl, or wget. The binary implements the
+# healthcheck subcommand which probes /health and exits 0 on a 200 response.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["/app/dynamic-markdown-site", "healthcheck", "--addr", "localhost:8080"]
+
 ENTRYPOINT ["/app/dynamic-markdown-site"]
 CMD ["-root", "/content", "-port", "8080", "-cache"]

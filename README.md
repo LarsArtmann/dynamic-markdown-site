@@ -165,6 +165,24 @@ The image uses a multi-stage build:
 - **Builder:** `golang:1.26-alpine` with static binary compilation
 - **Runtime:** `distroless/static-debian13` running as `nonroot` (UID 65532)
 
+A `HEALTHCHECK` is built into the image: the binary exposes a `healthcheck`
+subcommand that probes `/health` and exits 0 on a 200 response. Distroless
+has no shell or `curl`/`wget`, so the binary performs the probe itself.
+
+## Continuous Integration
+
+GitHub Actions runs two workflows on every push and pull request:
+
+| Workflow | Purpose | Triggers |
+| --- | --- | --- |
+| `test.yml` | `go test -race -cover`, coverage threshold, `golangci-lint`, `templ` drift check | Go/Templ/go.mod changes |
+| `docker.yml` | Multi-arch (amd64, arm64) Docker build & push, Trivy scan, artifact attestation | Go/Templ/Dockerfile changes, `v*.*.*` tags |
+
+The `test` workflow enforces a 75% coverage floor and runs the pinned
+`golangci-lint v2.12.2` for reproducible lint results. It also runs
+`templ generate` and fails the build if the generated files are not
+checked in — a useful safety net for the templ compile step.
+
 ## Development
 
 ### Prerequisites

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Pre-commit hook: regenerate templ files and stage them if changed.
+# Install with:
+#   ln -sf ../../.githooks/pre-commit .git/hooks/pre-commit
+set -euo pipefail
+
+if ! command -v templ >/dev/null 2>&1; then
+    echo "templ not found; skipping (install with 'go install github.com/a-h/templ/cmd/templ@latest')"
+    exit 0
+fi
+
+echo "==> Regenerating templ templates..."
+templ generate
+
+# Stage any regenerated files so they're part of the commit.
+git add -A templates/
+
+echo "==> Done."

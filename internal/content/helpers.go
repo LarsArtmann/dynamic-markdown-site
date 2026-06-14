@@ -11,10 +11,18 @@ import (
 	"github.com/samber/lo"
 )
 
+const (
+	skipDirNodeModules = "node_modules"
+	skipDirGit         = ".git"
+	skipDirVendor      = "vendor"
+	skipDirDist        = "dist"
+	skipDirBuild       = "build"
+	skipDirTmp         = "tmp"
+	skipDirTemp        = "temp"
+)
+
 // SkipDirs contains directory names to skip during content discovery.
-//
-//nolint:gochecknoglobals
-var SkipDirs = []string{"node_modules", ".git", "vendor", "dist", "build", "tmp", "temp"}
+var SkipDirs = []string{skipDirNodeModules, skipDirGit, skipDirVendor, skipDirDist, skipDirBuild, skipDirTmp, skipDirTemp} //nolint:gochecknoglobals,golines
 
 // ShouldSkipDir returns true if the directory should be skipped during traversal.
 func ShouldSkipDir(name string) bool {

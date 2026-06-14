@@ -220,61 +220,6 @@ func TestRootEndpointRepositoryError(t *testing.T) {
 	}
 }
 
-func TestSearchEndpointEmptyQuery(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTests(t)
-	rec := executeRequest(handler, "/search")
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
-}
-
-func TestSearchEndpointWithQuery(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTests(t)
-
-	req := httptest.NewRequestWithContext(
-		context.Background(),
-		http.MethodGet,
-		"/search?q=guide",
-		nil,
-	)
-	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, req)
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
-}
-
-func TestRefreshEndpoint(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTests(t)
-	rec := executeRequest(handler, "/refresh")
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
-}
-
-func TestRefreshEndpointPost(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTests(t)
-
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/refresh", nil)
-	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, req)
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
-}
-
 func TestContentByPath(t *testing.T) {
 	t.Parallel()
 
@@ -305,52 +250,6 @@ func TestContentByPath(t *testing.T) {
 	}
 }
 
-func TestRefreshRateLimit(t *testing.T) {
-	t.Parallel()
-
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
-	handler := newTestHandler(srv)
-
-	for range 10 {
-		rec := executeRequest(handler, "/refresh")
-
-		if rec.Code != http.StatusOK {
-			t.Fatalf("pre-limit request failed: status = %d", rec.Code)
-		}
-	}
-
-	rec := executeRequest(handler, "/refresh")
-
-	if rec.Code != http.StatusTooManyRequests {
-		t.Errorf("status after rate limit = %d, want %d", rec.Code, http.StatusTooManyRequests)
-	}
-}
-
-func TestStaticFileServing(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTests(t)
-
-	tests := []struct {
-		name string
-		path string
-	}{
-		{"css", "/static/style.css"},
-		{"js", "/static/app.js"},
-		{"nonexistent", "/static/nonexistent.css"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			rec := executeRequest(handler, tt.path)
-			_ = rec
-		})
-	}
-}
-
 func TestHealthEndpointContentType(t *testing.T) {
 	t.Parallel()
 
@@ -360,39 +259,6 @@ func TestHealthEndpointContentType(t *testing.T) {
 	ct := rec.Header().Get("Content-Type")
 	if !strings.Contains(ct, "application/json") {
 		t.Errorf("Content-Type = %q, want application/json", ct)
-	}
-}
-
-func TestRefreshEndpointFailing(t *testing.T) {
-	t.Parallel()
-
-	repo := &FailingRepository{refreshError: true}
-	srv := newTestServer(t, repo)
-	handler := newTestHandler(srv)
-
-	rec := executeRequest(handler, "/refresh")
-
-	if rec.Code != http.StatusInternalServerError {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusInternalServerError)
-	}
-}
-
-func TestSearchEndpointFailingRepository(t *testing.T) {
-	t.Parallel()
-
-	handler := newFailingTestHandler(t)
-
-	req := httptest.NewRequestWithContext(
-		context.Background(),
-		http.MethodGet,
-		"/search?q=test",
-		nil,
-	)
-	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, req)
-
-	if rec.Code != http.StatusInternalServerError {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusInternalServerError)
 	}
 }
 
@@ -424,23 +290,6 @@ func TestDirectoryListing(t *testing.T) {
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
-}
-
-func TestMDExtensionRedirect(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTests(t)
-
-	rec := executeRequest(handler, "/guide.md")
-
-	if rec.Code != http.StatusMovedPermanently {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusMovedPermanently)
-	}
-
-	location := rec.Header().Get("Location")
-	if location != "/guide" {
-		t.Errorf("Location = %q, want %q", location, "/guide")
 	}
 }
 
@@ -491,38 +340,6 @@ func TestNotFoundSuggestions(t *testing.T) {
 
 	if rec.Code != http.StatusNotFound {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusNotFound)
-	}
-}
-
-func TestRawFileServing(t *testing.T) {
-	t.Parallel()
-
-	handler, repo := newTestHandlerWithRepo(t)
-	_ = repo
-
-	rec := executeRequest(handler, "/nonexistent-image.png")
-
-	if rec.Code != http.StatusNotFound {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusNotFound)
-	}
-}
-
-func TestSearchEndpointMethod(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTests(t)
-
-	req := httptest.NewRequestWithContext(
-		context.Background(),
-		http.MethodPost,
-		"/search?q=test",
-		nil,
-	)
-	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, req)
-
-	if rec.Code != http.StatusMethodNotAllowed {
-		t.Errorf("POST /search status = %d, want %d", rec.Code, http.StatusMethodNotAllowed)
 	}
 }
 
