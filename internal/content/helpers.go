@@ -22,7 +22,15 @@ const (
 )
 
 // SkipDirs contains directory names to skip during content discovery.
-var SkipDirs = []string{skipDirNodeModules, skipDirGit, skipDirVendor, skipDirDist, skipDirBuild, skipDirTmp, skipDirTemp} //nolint:gochecknoglobals,golines
+var SkipDirs = []string{
+	skipDirNodeModules,
+	skipDirGit,
+	skipDirVendor,
+	skipDirDist,
+	skipDirBuild,
+	skipDirTmp,
+	skipDirTemp,
+} //nolint:gochecknoglobals,golines
 
 // ShouldSkipDir returns true if the directory should be skipped during traversal.
 func ShouldSkipDir(name string) bool {

@@ -49,4 +49,4 @@ Negative:
 - **Comments in code** — discoverability is poor and they bloat the
   source.
 - **Commit messages** — they are append-only, hard to find, and often
-  describe the *change* not the *decision*.
+  describe the _change_ not the _decision_.
