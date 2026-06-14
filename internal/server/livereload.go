@@ -83,7 +83,7 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	connectedData, _ := json.Marshal(map[string]string{"message": "connected to live reload"})
+	connectedData, _ := json.Marshal(map[string]string{jsonKeyMessage: "connected to live reload"})
 	_, _ = fmt.Fprintf(w, "event: connected\ndata: %s\n\n", connectedData)
 	flusher.Flush()
 

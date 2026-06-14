@@ -95,11 +95,11 @@ func (s *Server) handleContentOr404(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleHealth(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
-		"status":     "healthy",
-		"version":    version.Version,
-		"commit":     version.Commit,
-		"build_date": version.BuildDate,
-		"timestamp":  time.Now().UTC(),
+		jsonKeyStatus:    jsonStatusHealthy,
+		jsonKeyVersion:   version.Version,
+		jsonKeyCommit:    version.Commit,
+		jsonKeyBuildDate: version.BuildDate,
+		jsonKeyTimestamp: time.Now().UTC(),
 	})
 }
 
@@ -108,10 +108,10 @@ func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {
 	if !s.rateLimiter.checkRateLimit(ip) {
 		s.logger.Warn("rate limit exceeded for refresh endpoint", "client_ip", ip)
 		writeJSON(w, http.StatusTooManyRequests, map[string]any{
-			"status":    "error",
-			"message":   "rate limit exceeded: too many refresh requests",
-			"limit":     "10 requests per minute per IP",
-			"timestamp": time.Now().UTC(),
+			jsonKeyStatus:    jsonStatusError,
+			jsonKeyMessage:   "rate limit exceeded: too many refresh requests",
+			jsonKeyLimit:     "10 requests per minute per IP",
+			jsonKeyTimestamp: time.Now().UTC(),
 		})
 
 		return
@@ -123,10 +123,10 @@ func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {
 	if !result.Success {
 		s.logger.Error("failed to refresh repository", "error", result.Error)
 		writeJSON(w, http.StatusInternalServerError, map[string]any{
-			"status":    "error",
-			"message":   "failed to refresh content repository",
-			"error":     result.Error,
-			"timestamp": time.Now().UTC(),
+			jsonKeyStatus:    jsonStatusError,
+			jsonKeyMessage:   "failed to refresh content repository",
+			jsonKeyError:     result.Error,
+			jsonKeyTimestamp: time.Now().UTC(),
 		})
 
 		return
@@ -143,13 +143,13 @@ func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {
 	)
 
 	writeJSON(w, http.StatusOK, map[string]any{
-		"status":        "success",
-		"message":       "content repository refreshed",
-		"last_modified": result.LastModified.UTC(),
-		"total_files":   result.TotalFiles,
-		"total_dirs":    result.TotalDirs,
-		"duration":      result.Duration,
-		"timestamp":     time.Now().UTC(),
+		jsonKeyStatus:     jsonStatusSuccess,
+		jsonKeyMessage:    "content repository refreshed",
+		jsonKeyLastMod:    result.LastModified.UTC(),
+		jsonKeyTotalFiles: result.TotalFiles,
+		jsonKeyTotalDirs:  result.TotalDirs,
+		jsonKeyDuration:   result.Duration,
+		jsonKeyTimestamp:  time.Now().UTC(),
 	})
 }
 
@@ -191,6 +191,10 @@ func (s *Server) handleContentByPath(w http.ResponseWriter, r *http.Request, fil
 			before,
 			"/",
 		)
+		// cleanPath is constructed from the request path with a forced leading
+		// "/" and stripped of any leading slashes, guaranteeing a same-host
+		// relative path. Safe to redirect.
+		//nolint:gosec // G110: redirect target is a same-host path, not user-controlled URL
 		http.Redirect(w, r, cleanPath, http.StatusMovedPermanently)
 
 		return
@@ -211,6 +215,10 @@ func (s *Server) handleContentByPath(w http.ResponseWriter, r *http.Request, fil
 				w.Header().Set("Content-Type", rawFile.ContentType)
 				w.Header().Set("Cache-Control", "public, max-age=86400")
 				w.WriteHeader(http.StatusOK)
+				// rawFile.Content is read from server-side storage (filesystem
+				// or blob) and the Content-Type header is set from the file's
+				// actual MIME type. Not a user-controlled response body.
+				//nolint:gosec // G107: raw file content from repository, MIME type set explicitly
 				_, _ = w.Write(rawFile.Content)
 
 				return

@@ -21,6 +21,23 @@ var (
 	errInvalidLogLevel = errors.New("invalid log level (must be debug, info, warn, or error)")
 )
 
+// Log level names used for validation, parsing, and slog conversion.
+const (
+	logLevelDebug = "debug"
+	logLevelInfo  = "info"
+	logLevelWarn  = "warn"
+	logLevelError = "error"
+)
+
+// Boolean truthy strings accepted by parseBool.
+const (
+	boolTrueString  = "true"
+	boolOneString   = "1"
+	boolYesString   = "yes"
+	boolOnString    = "on"
+	boolFalseString = "false"
+)
+
 // Config holds all application configuration.
 type Config struct {
 	Port         uint16
@@ -39,7 +56,7 @@ func DefaultConfig() *Config {
 		Port:         8080,
 		RootDir:      ".",
 		StorageURL:   "",
-		LogLevel:     "info",
+		LogLevel:     logLevelInfo,
 		CacheEnabled: true,
 		DevMode:      false,
 		Timeout:      30 * time.Second,
@@ -170,10 +187,10 @@ func (c *Config) validate() error {
 
 	// Validate log level
 	validLevels := map[string]bool{
-		"debug": true,
-		"info":  true,
-		"warn":  true,
-		"error": true,
+		logLevelDebug: true,
+		logLevelInfo:  true,
+		logLevelWarn:  true,
+		logLevelError: true,
 	}
 	if !validLevels[strings.ToLower(c.LogLevel)] {
 		return errors.Wrap(errInvalidLogLevel, "level="+c.LogLevel)
@@ -199,13 +216,13 @@ func (c *Config) LogValue() slog.Value {
 // SlogLevel returns the slog.Level corresponding to LogLevel.
 func (c *Config) SlogLevel() slog.Level {
 	switch strings.ToLower(c.LogLevel) {
-	case "debug":
+	case logLevelDebug:
 		return slog.LevelDebug
-	case "info":
+	case logLevelInfo:
 		return slog.LevelInfo
-	case "warn":
+	case logLevelWarn:
 		return slog.LevelWarn
-	case "error":
+	case logLevelError:
 		return slog.LevelError
 	default:
 		return slog.LevelInfo
@@ -237,7 +254,7 @@ func (c *Config) String() string {
 func parseBool(s string) bool {
 	s = strings.ToLower(strings.TrimSpace(s))
 	switch s {
-	case "true", "1", "yes", "on":
+	case boolTrueString, boolOneString, boolYesString, boolOnString:
 		return true
 	default:
 		return false
