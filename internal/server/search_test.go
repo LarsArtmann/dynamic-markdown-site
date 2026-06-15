@@ -10,12 +10,7 @@ import (
 func TestSearchEndpointEmptyQuery(t *testing.T) {
 	t.Parallel()
 
-	handler := newTestHandlerForEndpointTests(t)
-	rec := executeRequest(handler, "/search")
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
+	assertEndpointOK(t, "/search")
 }
 
 func TestSearchEndpointWithQuery(t *testing.T) {

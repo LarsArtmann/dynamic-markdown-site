@@ -26,21 +26,13 @@ func TestFindSuggestions_EmptyPathsReturnsNil(t *testing.T) {
 func TestFindSuggestions_ExactMatchIsExcluded(t *testing.T) {
 	t.Parallel()
 
-	paths := []domain.URLPath{pathMust(t, "/guide")}
-	got := findSuggestions("/guide", paths, 5)
-	if len(got) != 0 {
-		t.Errorf("expected exact match to be excluded, got %v", got)
-	}
+	assertNoSuggestions(t, "/guide", "/guide")
 }
 
 func TestFindSuggestions_CaseInsensitiveExactMatchExcluded(t *testing.T) {
 	t.Parallel()
 
-	paths := []domain.URLPath{pathMust(t, "/guide")}
-	got := findSuggestions("/Guide", paths, 5)
-	if len(got) != 0 {
-		t.Errorf("expected case-insensitive exact match to be excluded, got %v", got)
-	}
+	assertNoSuggestions(t, "/Guide", "/guide")
 }
 
 func TestFindSuggestions_TypoYieldsSuggestion(t *testing.T) {
@@ -97,11 +89,7 @@ func TestFindSuggestions_RespectsLimit(t *testing.T) {
 func TestFindSuggestions_ThresholdDropsPoorMatches(t *testing.T) {
 	t.Parallel()
 
-	paths := []domain.URLPath{pathMust(t, "/zzzzzzzzzzzz")}
-	got := findSuggestions("/a", paths, 5)
-	if len(got) != 0 {
-		t.Errorf("expected poor match to be dropped, got %v", got)
-	}
+	assertNoSuggestions(t, "/a", "/zzzzzzzzzzzz")
 }
 
 // pathMust is a tiny helper to construct a URLPath or fail the test.
@@ -113,4 +101,16 @@ func pathMust(t *testing.T, s string) domain.URLPath {
 	}
 
 	return p
+}
+
+// assertNoSuggestions fails the test if findSuggestions returns any results
+// for the given requested/available path pair. It exists to make "exact match
+// excluded" and "threshold drops poor match" tests read in one line.
+func assertNoSuggestions(t *testing.T, requested, available string) {
+	t.Helper()
+
+	paths := []domain.URLPath{pathMust(t, available)}
+	if got := findSuggestions(requested, paths, 5); len(got) != 0 {
+		t.Errorf("expected no suggestions for %q with paths %v, got %v", requested, paths, got)
+	}
 }

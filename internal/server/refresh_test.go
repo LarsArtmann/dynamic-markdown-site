@@ -12,12 +12,7 @@ import (
 func TestRefreshEndpointGet(t *testing.T) {
 	t.Parallel()
 
-	handler := newTestHandlerForEndpointTests(t)
-	rec := executeRequest(handler, "/refresh")
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
+	assertEndpointOK(t, "/refresh")
 }
 
 func TestRefreshEndpointPost(t *testing.T) {

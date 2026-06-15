@@ -7,6 +7,17 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
+// titleScoringCase is a single-query, single-expected-result description used
+// by TestSearcher_Search_TitleMatching. Flattening the wantScores /
+// wantHighlight maps into a single result keeps table entries small and
+// avoids the symmetric-clone pattern that table-driven maps produce.
+type titleScoringCase struct {
+	name          string
+	query         string
+	wantScore     float64
+	wantHighlight string
+}
+
 func TestSearcher_Search_TitleMatching(t *testing.T) {
 	t.Parallel()
 
@@ -15,46 +26,27 @@ func TestSearcher_Search_TitleMatching(t *testing.T) {
 	repo := repoWithFile(t, now, "/docs/guide", "Getting Started Guide", "# Guide content")
 	searcher := NewSearcher(repo)
 
-	tests := []struct {
-		name          string
-		query         string
-		wantCount     int
-		wantScores    map[string]float64
-		wantHighlight map[string]string
-	}{
+	cases := []titleScoringCase{
 		{
-			name:      "exact title match scores 1.0",
-			query:     "Getting Started Guide",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 1.0,
-			},
-			wantHighlight: map[string]string{
-				"Getting Started Guide": "<mark>Getting Started Guide</mark>",
-			},
+			name:          "exact title match scores 1.0",
+			query:         "Getting Started Guide",
+			wantScore:     1.0,
+			wantHighlight: "<mark>Getting Started Guide</mark>",
 		},
 		{
-			name:      "partial title match scores 0.5",
-			query:     "Getting",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 0.5,
-			},
-			wantHighlight: map[string]string{
-				"Getting Started Guide": "<mark>Getting</mark> Started Guide",
-			},
+			name:          "partial title match scores 0.5",
+			query:         "Getting",
+			wantScore:     0.5,
+			wantHighlight: "<mark>Getting</mark> Started Guide",
 		},
 		{
 			name:      "case insensitive matching",
 			query:     "getting started",
-			wantCount: 1,
-			wantScores: map[string]float64{
-				"Getting Started Guide": 0.5,
-			},
+			wantScore: 0.5,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -63,33 +55,16 @@ func TestSearcher_Search_TitleMatching(t *testing.T) {
 				t.Fatalf("Searcher.Search() error = %v", err)
 			}
 
-			if len(results) != tt.wantCount {
-				t.Errorf(
-					"Searcher.Search() returned %d results, want %d",
-					len(results),
-					tt.wantCount,
-				)
+			wantScores := map[string]float64{"Getting Started Guide": tt.wantScore}
+			wantHighlights := map[string]string{}
+			if tt.wantHighlight != "" {
+				wantHighlights["Getting Started Guide"] = tt.wantHighlight
 			}
 
-			for _, result := range results {
-				title := result.Node.Title()
-				if wantScore, ok := tt.wantScores[title]; ok {
-					if result.Score != wantScore {
-						t.Errorf("result[%q].Score = %v, want %v", title, result.Score, wantScore)
-					}
-				}
-
-				if wantHighlight, ok := tt.wantHighlight[title]; ok {
-					if result.Highlighted != wantHighlight {
-						t.Errorf(
-							"result[%q].Highlighted = %q, want %q",
-							title,
-							result.Highlighted,
-							wantHighlight,
-						)
-					}
-				}
-			}
+			assertSearchResults(t, results, 1, searchExpectations{
+				scores:    wantScores,
+				highlight: wantHighlights,
+			})
 		})
 	}
 }

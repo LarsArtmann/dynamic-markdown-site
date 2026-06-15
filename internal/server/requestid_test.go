@@ -19,14 +19,20 @@ func newTestRequest() (*httptest.ResponseRecorder, *http.Request) {
 	return w, req
 }
 
+// newRequestIDHandler wraps inner in the project's RequestID middleware so
+// each test only states what its inner handler does with the request/response.
+// The chain-order test still calls httputil.RequestID directly because it
+// composes the middleware with another wrapper.
+func newRequestIDHandler(inner http.HandlerFunc) http.Handler {
+	return httputil.RequestID(httputil.DefaultRequestIDConfig())(inner)
+}
+
 func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 	t.Parallel()
 
-	handler := httputil.RequestID(httputil.DefaultRequestIDConfig())(
-		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusOK)
-		}),
-	)
+	handler := newRequestIDHandler(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
 	w, req := newTestRequest()
 	handler.ServeHTTP(w, req)
@@ -38,11 +44,9 @@ func TestRequestIDMiddleware_GeneratesID(t *testing.T) {
 func TestRequestIDMiddleware_UsesExistingHeader(t *testing.T) {
 	t.Parallel()
 
-	handler := httputil.RequestID(httputil.DefaultRequestIDConfig())(
-		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusOK)
-		}),
-	)
+	handler := newRequestIDHandler(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
 	w, req := newTestRequest()
 	existingID := "existing-request-id-12345"
@@ -58,11 +62,9 @@ func TestRequestIDMiddleware_StoresInContext(t *testing.T) {
 
 	var contextID string
 
-	handler := httputil.RequestID(httputil.DefaultRequestIDConfig())(
-		http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
-			contextID = httputil.RequestIDFromContext(r.Context())
-		}),
-	)
+	handler := newRequestIDHandler(func(_ http.ResponseWriter, r *http.Request) {
+		contextID = httputil.RequestIDFromContext(r.Context())
+	})
 
 	w, req := newTestRequest()
 	handler.ServeHTTP(w, req)

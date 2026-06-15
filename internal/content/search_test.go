@@ -131,30 +131,10 @@ func TestSearcher_Search(t *testing.T) {
 				return
 			}
 
-			// Verify scores
-			for _, result := range results {
-				title := result.Node.Title()
-				if wantScore, ok := tt.wantScores[title]; ok {
-					if result.Score != wantScore {
-						t.Errorf("result[%q].Score = %v, want %v", title, result.Score, wantScore)
-					}
-				}
-			}
-
-			// Verify highlights
-			for _, result := range results {
-				title := result.Node.Title()
-				if wantHighlight, ok := tt.wantHighlight[title]; ok {
-					if result.Highlighted != wantHighlight {
-						t.Errorf(
-							"result[%q].Highlighted = %q, want %q",
-							title,
-							result.Highlighted,
-							wantHighlight,
-						)
-					}
-				}
-			}
+			assertSearchResults(t, results, tt.wantCount, searchExpectations{
+				scores:    tt.wantScores,
+				highlight: tt.wantHighlight,
+			})
 
 			// Verify results are sorted by score descending
 			for i := 1; i < len(results); i++ {
@@ -359,27 +339,10 @@ func TestSearcher_Search_ContentBody(t *testing.T) {
 				return
 			}
 
-			for _, result := range results {
-				title := result.Node.Title()
-				if wantScore, ok := tt.wantScores[title]; ok {
-					if result.Score != wantScore {
-						t.Errorf("result[%q].Score = %v, want %v", title, result.Score, wantScore)
-					}
-				}
-
-				if wantSnippet, ok := tt.wantSnippets[title]; ok {
-					hasSnippet := result.Snippet != ""
-					if hasSnippet != wantSnippet {
-						t.Errorf(
-							"result[%q].Snippet empty=%v, want empty=%v (snippet=%q)",
-							title,
-							!hasSnippet,
-							!wantSnippet,
-							result.Snippet,
-						)
-					}
-				}
-			}
+			assertSearchResults(t, results, tt.wantCount, searchExpectations{
+				scores:   tt.wantScores,
+				snippets: tt.wantSnippets,
+			})
 		})
 	}
 }

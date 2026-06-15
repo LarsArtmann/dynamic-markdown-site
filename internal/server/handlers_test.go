@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -25,6 +26,32 @@ func executeRequest(handler http.Handler, path string) *httptest.ResponseRecorde
 	handler.ServeHTTP(rec, req)
 
 	return rec
+}
+
+// decodeJSON unmarshals rec.Body into target or fails the test with the
+// response body for context. Use it instead of inlining json.Unmarshal +
+// t.Fatalf at every endpoint test that decodes a JSON payload.
+func decodeJSON[T any](t *testing.T, rec *httptest.ResponseRecorder, target T) {
+	t.Helper()
+
+	if err := json.Unmarshal(rec.Body.Bytes(), target); err != nil {
+		t.Fatalf("decode payload: %v (body=%s)", err, rec.Body.String())
+	}
+}
+
+// assertEndpointOK runs a GET against the shared endpoint-test handler and
+// fails the test if the response is not 200. Use for the trivially happy-path
+// endpoint tests; anything with body assertions should use executeRequest
+// directly.
+func assertEndpointOK(t *testing.T, path string) {
+	t.Helper()
+
+	handler := newTestHandlerForEndpointTests(t)
+	rec := executeRequest(handler, path)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
 }
 
 func newTestServer(t *testing.T, repo content.Repository) *Server {
@@ -346,12 +373,7 @@ func TestNotFoundSuggestions(t *testing.T) {
 func TestHandleContentByPathRootNode(t *testing.T) {
 	t.Parallel()
 
-	handler := newTestHandlerForEndpointTests(t)
-	rec := executeRequest(handler, "/")
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
+	assertEndpointOK(t, "/")
 }
 
 func TestHandleContentByPathInvalidPath(t *testing.T) {

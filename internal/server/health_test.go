@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -42,9 +41,7 @@ func TestHealthEndpointReportsUptime(t *testing.T) {
 	}
 
 	var payload healthPayload
-	if err := json.Unmarshal(rec.Body.Bytes(), &payload); err != nil {
-		t.Fatalf("decode payload: %v (body=%s)", err, rec.Body.String())
-	}
+	decodeJSON(t, rec, &payload)
 
 	if payload.Uptime == "" {
 		t.Errorf("expected uptime in response, got empty")
@@ -76,9 +73,7 @@ func TestHealthEndpointReportsDependencies(t *testing.T) {
 	}
 
 	var payload healthPayload
-	if err := json.Unmarshal(rec.Body.Bytes(), &payload); err != nil {
-		t.Fatalf("decode payload: %v", err)
-	}
+	decodeJSON(t, rec, &payload)
 
 	repoHealth, ok := payload.Dependencies["repository"].(map[string]any)
 	if !ok {
@@ -127,9 +122,7 @@ func TestHealthEndpointReportsUnhealthyRepository(t *testing.T) {
 	}
 
 	var payload healthPayload
-	if err := json.Unmarshal(rec.Body.Bytes(), &payload); err != nil {
-		t.Fatalf("decode payload: %v", err)
-	}
+	decodeJSON(t, rec, &payload)
 
 	repoHealth, ok := payload.Dependencies["repository"].(map[string]any)
 	if !ok {

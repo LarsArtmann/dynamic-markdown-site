@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -40,9 +39,7 @@ func TestCacheStatsEndpointReturnsJSON(t *testing.T) {
 	}
 
 	var payload cacheStatsPayload
-	if err := json.Unmarshal(rec.Body.Bytes(), &payload); err != nil {
-		t.Fatalf("decode payload: %v (body=%s)", err, rec.Body.String())
-	}
+	decodeJSON(t, rec, &payload)
 
 	if payload.Status != "success" {
 		t.Errorf("status = %q, want success", payload.Status)
