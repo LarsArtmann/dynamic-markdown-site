@@ -5,7 +5,7 @@ go 1.26.3
 require (
 	charm.land/log/v2 v2.0.0
 	github.com/a-h/templ v0.3.1020
-	github.com/alecthomas/chroma/v2 v2.26.1
+	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/cockroachdb/errors v1.13.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/larsartmann/httputil v0.2.0
@@ -95,7 +95,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.22.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/larsartmann/go-error-family v0.3.0 // indirect
+	github.com/larsartmann/go-error-family v0.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
