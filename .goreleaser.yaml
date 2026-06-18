@@ -48,7 +48,7 @@ archives:
         {{- else }}{{ .Arch }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats: ["zip"]
     files:
       - LICENSE*
       - README*
@@ -87,7 +87,7 @@ signs:
 sboms:
   - artifacts: archive
 
-brews:
+homebrew_casks:
   - name: dynamic-markdown-site
     skip_upload: true
     homepage: https://github.com/LarsArtmann/dynamic-markdown-site
@@ -96,14 +96,15 @@ brews:
     repository:
       owner: LarsArtmann
       name: homebrew-tap
-    directory: Formula
+    directory: Casks
     commit_author:
       name: goreleaserbot
       email: goreleaser@larsartmann.com
-    install: |
-      bin.install "dynamic-markdown-site"
-    test: |
-      system "#{bin}/dynamic-markdown-site --version"
+    binaries:
+      - dynamic-markdown-site
+    caveats: |
+      Verify the installation by running:
+        dynamic-markdown-site --version
 
 nfpms:
   - id: default
@@ -164,10 +165,10 @@ release:
   footer: |
     ## Installation
 
-    **Homebrew:**
+    **Homebrew (cask):**
     ```bash
     brew tap LarsArtmann/tap
-    brew install dynamic-markdown-site
+    brew install --cask dynamic-markdown-site
     ```
 
     **Nix:**
