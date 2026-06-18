@@ -27,17 +27,13 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 
 ### Build & Run
 
-
 ### Nix
-
 
 > **Note:** `--impure` and `NIXPKGS_ALLOW_UNFREE=1` are needed because the project uses a proprietary license.
 
 ### Testing
 
-
 ### Linting
-
 
 ### Code Generation
 
@@ -52,7 +48,6 @@ go mod tidy
 ---
 
 ## Project Structure
-
 
 ---
 
@@ -269,6 +264,17 @@ The `templ` CLI version must match `go.mod`. If the CLI is newer, it generates c
 
 Rate limiting uses `golang.org/x/time/rate` (token bucket). No background goroutines. `Stop()` is a no-op kept for API compatibility.
 
+### 11. GoReleaser Config Deprecations
+
+`goreleaser check` fails on deprecated keys. Two known ones in this project:
+
+- `archives.format_overrides[].format` → renamed to `formats` (accepts a list, e.g. `formats: ["zip"]`)
+- `brews` → fully deprecated since v2.16. Use `homebrew_casks` instead. Key differences:
+  - Directory must be `Casks/` (not `Formula/`)
+  - `install:` block is replaced by `binaries:` (auto-installed from archive)
+  - `test:` block has no cask equivalent — use `caveats:` for user-facing notes
+  - First release may need a `tap_migrations.json` entry in the tap repo to redirect users from the old formula
+
 ---
 
 ## Configuration
@@ -311,4 +317,3 @@ Prefix: `DYNAMIC_MARKDOWN_`
 | `/static/*path` | GET      | Static assets                   |
 
 ---
-
