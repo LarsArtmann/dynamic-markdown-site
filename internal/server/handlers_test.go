@@ -16,6 +16,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
+	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 )
 
 var errFailingRoot = errors.New("root error")
@@ -111,14 +112,14 @@ var sharedHTTPTestCases = []httpTestCase{
 		method:     http.MethodGet,
 		path:       "/health",
 		wantStatus: http.StatusOK,
-		wantBody:   `"version":"dev"`,
+		wantBody:   `"version":"` + version.Version + `"`,
 	},
 	{
 		name:       "commit",
 		method:     http.MethodGet,
 		path:       "/health",
 		wantStatus: http.StatusOK,
-		wantBody:   `"commit":"unknown"`,
+		wantBody:   `"commit":"` + version.Commit + `"`,
 	},
 	{
 		name:       "build_date",
