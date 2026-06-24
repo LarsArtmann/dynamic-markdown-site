@@ -55,23 +55,7 @@ func NewBlobRepository(ctx context.Context, bucketURL string) (*BlobRepository, 
 
 // Get retrieves a content node by URL path.
 func (r *BlobRepository) Get(p domain.URLPath) (domain.ContentNode, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if r.tree == nil {
-		return nil, errors.Wrapf(ErrContentNotFound, "path: %s", p)
-	}
-
-	if p.IsRoot() {
-		return r.tree.Root(), nil
-	}
-
-	node, found := r.tree.Find(p)
-	if !found {
-		return nil, errors.Wrapf(ErrContentNotFound, "path: %s", p)
-	}
-
-	return node, nil
+	return getFromTree(r.tree, &r.mu, p)
 }
 
 // Root returns the root directory.

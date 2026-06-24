@@ -76,10 +76,12 @@ func TestSearcher_Search_NestedDirectories(t *testing.T) {
 
 	repo := NewInMemoryRepository()
 
-	// Create nested structure
 	root, _ := repo.Root()
 	docsDir, _ := domain.NewDirectoryNode(domain.MustURLPath("/docs"), "Documentation", now)
 	apiDir, _ := domain.NewDirectoryNode(domain.MustURLPath("/docs/api"), "API", now)
+
+	repo.Add(docsDir)
+	repo.Add(apiDir)
 
 	file1 := newFile(t, now, "/docs/intro", "Introduction", "Welcome")
 	file2 := newFile(t, now, "/docs/api/v1", "API v1", "REST API v1")

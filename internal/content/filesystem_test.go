@@ -389,14 +389,10 @@ func TestFileSystemRepository_Refresh(t *testing.T) {
 }
 
 func TestFileSystemRepository_SkipsHiddenFiles(t *testing.T) {
-	tmpDir := t.TempDir()
-	writeTestFile(t, tmpDir, "visible.md", "# Visible")
-	writeTestFile(t, tmpDir, ".hidden.md", "# Hidden")
-
-	repo, err := NewFileSystemRepository(tmpDir)
-	if err != nil {
-		t.Fatalf("NewFileSystemRepository() error = %v", err)
-	}
+	repo := newFileSystemRepoWithFiles(t, map[string]string{
+		"visible.md": "# Visible",
+		".hidden.md": "# Hidden",
+	})
 
 	result := repo.Refresh()
 	if !result.Success {
@@ -410,7 +406,7 @@ func TestFileSystemRepository_SkipsHiddenFiles(t *testing.T) {
 		)
 	}
 
-	_, err = repo.Get(domain.MustURLPath("/.hidden.md"))
+	_, err := repo.Get(domain.MustURLPath("/.hidden.md"))
 	if err == nil {
 		t.Error("expected error for hidden file")
 	}
@@ -491,16 +487,12 @@ func TestFileSystemRepository_SkipsBlacklistedDirectories(t *testing.T) {
 }
 
 func TestFileSystemRepository_OnlyProcessesMarkdown(t *testing.T) {
-	tmpDir := t.TempDir()
-	writeTestFile(t, tmpDir, "doc.md", "# Doc")
-	writeTestFile(t, tmpDir, "readme.markdown", "# Readme")
-	writeTestFile(t, tmpDir, "script.js", "console.log('test')")
-	writeTestFile(t, tmpDir, "style.css", "body {}")
-
-	repo, err := NewFileSystemRepository(tmpDir)
-	if err != nil {
-		t.Fatalf("NewFileSystemRepository() error = %v", err)
-	}
+	repo := newFileSystemRepoWithFiles(t, map[string]string{
+		"doc.md":          "# Doc",
+		"readme.markdown": "# Readme",
+		"script.js":       "console.log('test')",
+		"style.css":       "body {}",
+	})
 
 	result := repo.Refresh()
 	if !result.Success {

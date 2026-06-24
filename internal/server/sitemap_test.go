@@ -54,6 +54,21 @@ func addTestFile(
 	root.AddChild(file)
 }
 
+func addTestFileToDir(
+	t *testing.T,
+	repo *content.InMemoryRepository,
+	dir *domain.DirectoryNode,
+	filePath, title string,
+	contentBytes []byte,
+	modTime time.Time,
+) {
+	t.Helper()
+
+	file := newTestFileNode(t, filePath, title, contentBytes, modTime)
+	repo.Add(file)
+	dir.AddChild(file)
+}
+
 func addTestDir(
 	t *testing.T,
 	repo *content.InMemoryRepository,
@@ -64,6 +79,8 @@ func addTestDir(
 
 	dir, err := domain.NewDirectoryNode(domain.MustURLPath(dirPath), title, modTime)
 	require.NoError(t, err)
+
+	repo.Add(dir)
 
 	root, err := repo.Root()
 	require.NoError(t, err)
@@ -93,11 +110,7 @@ func serveSitemapWithProto(handler http.Handler, proto string) *httptest.Respons
 func TestSitemapXMLEmptyRepo(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
-	handler := srv.Handler()
-
-	rec := serveSitemap(handler)
+	rec := serveSitemap(newTestHandlerFor(t))
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Contains(t, rec.Header().Get("Content-Type"), "application/xml")
@@ -170,11 +183,7 @@ func TestSitemapXMLWithDirectories(t *testing.T) {
 func TestSitemapXMLSkipsRootPath(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
-	handler := srv.Handler()
-
-	rec := serveSitemap(handler)
+	rec := serveSitemap(newTestHandlerFor(t))
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 

@@ -52,23 +52,7 @@ func NewFileSystemRepository(rootDir string) (*FileSystemRepository, error) {
 
 // Get retrieves a content node by URL path.
 func (r *FileSystemRepository) Get(path domain.URLPath) (domain.ContentNode, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if r.tree == nil {
-		return nil, errors.Wrapf(ErrContentNotFound, "path: %s", path)
-	}
-
-	if path.IsRoot() {
-		return r.tree.Root(), nil
-	}
-
-	node, found := r.tree.Find(path)
-	if !found {
-		return nil, errors.Wrapf(ErrContentNotFound, "path: %s", path)
-	}
-
-	return node, nil
+	return getFromTree(r.tree, &r.mu, path)
 }
 
 // Root returns the root directory.

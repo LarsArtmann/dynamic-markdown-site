@@ -1,26 +1,17 @@
 package server
 
 import (
-	"context"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 )
 
 func TestMetricsEndpointReturnsPrometheusFormat(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
+	handler := newTestHandlerFor(t)
 
-	rec := httptest.NewRecorder()
-	newTestHandler(srv).ServeHTTP(
-		rec,
-		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/metrics", nil),
-	)
+	rec := executeRequest(handler, "/metrics")
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", rec.Code)

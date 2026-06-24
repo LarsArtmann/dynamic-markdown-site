@@ -118,18 +118,30 @@ func padNum(n int) string {
 	return fmt.Sprintf("%03d", n)
 }
 
+// newBenchmarkRepository creates a refreshed filesystem repository backed by
+// a freshly-generated benchmark content directory of the requested size.
+func newBenchmarkRepository(b *testing.B, fileCount int) *FileSystemRepository {
+	b.Helper()
+
+	dir := createBenchmarkTestContent(b, fileCount)
+
+	repo, err := NewFileSystemRepository(dir)
+	if err != nil {
+		b.Fatalf("failed to create repository: %v", err)
+	}
+
+	repo.Refresh()
+
+	return repo
+}
+
 // BenchmarkRepositoryRefresh benchmarks the content tree refresh operation.
 func BenchmarkRepositoryRefresh(b *testing.B) {
 	sizes := []int{10, 50, 100, 500}
 
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("files_%d", size), func(b *testing.B) {
-			dir := createBenchmarkTestContent(b, size)
-
-			repo, err := NewFileSystemRepository(dir)
-			if err != nil {
-				b.Fatalf("failed to create repository: %v", err)
-			}
+			repo := newBenchmarkRepository(b, size)
 
 			b.ResetTimer()
 
@@ -142,14 +154,7 @@ func BenchmarkRepositoryRefresh(b *testing.B) {
 
 // BenchmarkRepositoryGet benchmarks content retrieval by path.
 func BenchmarkRepositoryGet(b *testing.B) {
-	dir := createBenchmarkTestContent(b, 100)
-
-	repo, err := NewFileSystemRepository(dir)
-	if err != nil {
-		b.Fatalf("failed to create repository: %v", err)
-	}
-
-	repo.Refresh()
+	repo := newBenchmarkRepository(b, 100)
 
 	paths := []domain.URLPath{
 		"/",
@@ -173,14 +178,7 @@ func BenchmarkRepositoryGet(b *testing.B) {
 
 // BenchmarkRepositoryRoot benchmarks getting the root directory.
 func BenchmarkRepositoryRoot(b *testing.B) {
-	dir := createBenchmarkTestContent(b, 100)
-
-	repo, err := NewFileSystemRepository(dir)
-	if err != nil {
-		b.Fatalf("failed to create repository: %v", err)
-	}
-
-	repo.Refresh()
+	repo := newBenchmarkRepository(b, 100)
 
 	for b.Loop() {
 		_, _ = repo.Root()
@@ -189,12 +187,7 @@ func BenchmarkRepositoryRoot(b *testing.B) {
 
 // BenchmarkRepositoryRefreshConcurrent benchmarks concurrent refresh operations.
 func BenchmarkRepositoryRefreshConcurrent(b *testing.B) {
-	dir := createBenchmarkTestContent(b, 100)
-
-	repo, err := NewFileSystemRepository(dir)
-	if err != nil {
-		b.Fatalf("failed to create repository: %v", err)
-	}
+	repo := newBenchmarkRepository(b, 100)
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
@@ -206,14 +199,7 @@ func BenchmarkRepositoryRefreshConcurrent(b *testing.B) {
 
 // BenchmarkRepositoryGetConcurrent benchmarks concurrent content retrieval.
 func BenchmarkRepositoryGetConcurrent(b *testing.B) {
-	dir := createBenchmarkTestContent(b, 100)
-
-	repo, err := NewFileSystemRepository(dir)
-	if err != nil {
-		b.Fatalf("failed to create repository: %v", err)
-	}
-
-	repo.Refresh()
+	repo := newBenchmarkRepository(b, 100)
 
 	paths := []domain.URLPath{
 		"/",

@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 )
 
 func TestRefreshEndpointGet(t *testing.T) {
@@ -32,9 +30,7 @@ func TestRefreshEndpointPost(t *testing.T) {
 func TestRefreshRateLimit(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
-	handler := newTestHandler(srv)
+	handler := newTestHandlerFor(t)
 
 	// Fire 15 sequential requests; limit is 10/minute.
 	var lastCode int

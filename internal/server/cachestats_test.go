@@ -1,12 +1,8 @@
 package server
 
 import (
-	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
-
-	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 )
 
 type cacheStatsPayload struct {
@@ -25,14 +21,9 @@ type cacheStatsPayload struct {
 func TestCacheStatsEndpointReturnsJSON(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
+	handler := newTestHandlerFor(t)
 
-	rec := httptest.NewRecorder()
-	newTestHandler(srv).ServeHTTP(
-		rec,
-		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/cache/stats", nil),
-	)
+	rec := executeRequest(handler, "/cache/stats")
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", rec.Code)
@@ -49,14 +40,9 @@ func TestCacheStatsEndpointReturnsJSON(t *testing.T) {
 func TestResponseTimeHeaderIsSet(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
+	handler := newTestHandlerFor(t)
 
-	rec := httptest.NewRecorder()
-	newTestHandler(srv).ServeHTTP(
-		rec,
-		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil),
-	)
+	rec := executeRequest(handler, "/health")
 
 	header := rec.Header().Get("X-Response-Time")
 	if header == "" {

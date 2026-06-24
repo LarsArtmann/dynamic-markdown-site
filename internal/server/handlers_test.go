@@ -55,12 +55,30 @@ func assertEndpointOK(t *testing.T, path string) {
 	}
 }
 
+// assertRequestOK runs a GET against the given handler and fails the test if
+// the response status is not 200.
+func assertRequestOK(t *testing.T, handler http.Handler, path string) {
+	t.Helper()
+
+	rec := executeRequest(handler, path)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+}
+
 func newTestServer(t *testing.T, repo content.Repository) *Server {
 	t.Helper()
 
-	logger := slog.New(slog.DiscardHandler)
-	htmlCache := cache.NewHTMLCache(100)
+	return newTestServerWithCache(t, repo, cache.NewHTMLCache(100))
+}
+
+func newTestServerWithCache(t *testing.T, repo content.Repository, htmlCache *cache.HTMLCache) *Server {
+	t.Helper()
+
 	t.Cleanup(htmlCache.Close)
+
+	logger := slog.New(slog.DiscardHandler)
 	searcher := content.NewSearcher(repo)
 	rndr := renderer.NewGoldmarkRenderer()
 
@@ -74,19 +92,19 @@ func newTestHandler(s *Server) http.Handler {
 	return s.Handler()
 }
 
+// newTestHandlerFor builds a handler backed by an empty InMemoryRepository.
+// Use when the test body only needs a working handler and does not require
+// access to the repo.
+func newTestHandlerFor(t *testing.T) http.Handler {
+	t.Helper()
+
+	return newTestHandler(newTestServer(t, content.NewInMemoryRepository()))
+}
+
 func newFailingTestHandler(t *testing.T) http.Handler {
 	t.Helper()
 
-	repo := &FailingRepository{}
-	logger := slog.New(slog.DiscardHandler)
-	htmlCache := cache.NewHTMLCache(100)
-	t.Cleanup(htmlCache.Close)
-	searcher := content.NewSearcher(repo)
-	srv := NewServer(
-		repo, searcher, logger, htmlCache,
-		renderer.NewGoldmarkRenderer(), false, "Site",
-	)
-	t.Cleanup(srv.Shutdown)
+	srv := newTestServerWithCache(t, &FailingRepository{}, cache.NewHTMLCache(100))
 
 	return newTestHandler(srv)
 }
@@ -176,18 +194,7 @@ func newTestHandlerForEndpointTests(t *testing.T) http.Handler {
 	addTestFile(t, repo, "/about", "About", []byte("# About\n\npage"), time.Now())
 	addTestFile(t, repo, "/docs/intro", "Intro", []byte("# Introduction\n\nWelcome"), time.Now())
 
-	dir, err := domain.NewDirectoryNode(domain.MustURLPath("/docs"), "Docs", time.Now())
-	if err != nil {
-		t.Fatalf("failed to create directory: %v", err)
-	}
-
-	root, err := repo.Root()
-	if err != nil {
-		t.Fatalf("failed to get root: %v", err)
-	}
-
-	root.AddChild(dir)
-	repo.Add(dir)
+	addTestDir(t, repo, "/docs", "Docs", time.Now())
 
 	srv := newTestServer(t, repo)
 
@@ -294,64 +301,25 @@ func TestDirectoryListing(t *testing.T) {
 	t.Parallel()
 
 	repo := content.NewInMemoryRepository()
-	dir, err := domain.NewDirectoryNode(domain.MustURLPath("/docs"), "Docs", time.Now())
-	if err != nil {
-		t.Fatalf("failed to create directory: %v", err)
-	}
+	dir := addTestDir(t, repo, "/docs", "Docs", time.Now())
 
-	root, err := repo.Root()
-	if err != nil {
-		t.Fatalf("failed to get root: %v", err)
-	}
+	addTestFileToDir(t, repo, dir, "/docs/guide", "Guide", []byte("# Guide"), time.Now())
 
-	root.AddChild(dir)
-	repo.Add(dir)
-
-	file := newTestFileNode(t, "/docs/guide", "Guide", []byte("# Guide"), time.Now())
-	repo.Add(file)
-	dir.AddChild(file)
-
-	srv := newTestServer(t, repo)
-	handler := newTestHandler(srv)
-
-	rec := executeRequest(handler, "/docs")
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
+	handler := newTestHandler(newTestServer(t, repo))
+	assertRequestOK(t, handler, "/docs")
 }
 
 func TestContentDirServingWithReadme(t *testing.T) {
 	t.Parallel()
 
 	repo := content.NewInMemoryRepository()
-	addTestFile(t, repo, "/docs/README", "README", []byte("# Docs README"), time.Now())
 
-	root, err := repo.Root()
-	if err != nil {
-		t.Fatalf("failed to get root: %v", err)
-	}
+	dir := addTestDir(t, repo, "/docs", "Docs", time.Now())
 
-	dir, err := domain.NewDirectoryNode(domain.MustURLPath("/docs"), "Docs", time.Now())
-	if err != nil {
-		t.Fatalf("failed to create directory: %v", err)
-	}
+	addTestFileToDir(t, repo, dir, "/docs/README", "README", []byte("# Docs README"), time.Now())
 
-	root.AddChild(dir)
-	repo.Add(dir)
-
-	file := newTestFileNode(t, "/docs/README", "README", []byte("# Docs README"), time.Now())
-	repo.Add(file)
-	dir.AddChild(file)
-
-	srv := newTestServer(t, repo)
-	handler := newTestHandler(srv)
-
-	rec := executeRequest(handler, "/docs")
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
-	}
+	handler := newTestHandler(newTestServer(t, repo))
+	assertRequestOK(t, handler, "/docs")
 }
 
 func TestNotFoundSuggestions(t *testing.T) {
@@ -389,9 +357,7 @@ func TestHandleContentByPathInvalidPath(t *testing.T) {
 func TestHandleContentByPathRawFile(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
-	handler := newTestHandler(srv)
+	handler := newTestHandlerFor(t)
 
 	rec := executeRequest(handler, "/some-image.png")
 

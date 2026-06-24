@@ -123,6 +123,32 @@ func rootFromTree(tree *domain.ContentTree, mu *sync.RWMutex) (*domain.Directory
 	return tree.Root(), nil
 }
 
+// getFromTree looks up a path in a content tree under a read lock and returns
+// ErrContentNotFound for missing or uninitialized trees.
+func getFromTree(
+	tree *domain.ContentTree,
+	mu *sync.RWMutex,
+	path domain.URLPath,
+) (domain.ContentNode, error) {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	if tree == nil {
+		return nil, errors.Wrapf(ErrContentNotFound, "path: %s", path)
+	}
+
+	if path.IsRoot() {
+		return tree.Root(), nil
+	}
+
+	node, found := tree.Find(path)
+	if !found {
+		return nil, errors.Wrapf(ErrContentNotFound, "path: %s", path)
+	}
+
+	return node, nil
+}
+
 // lastModifiedFromRepo returns the last modified time from a repository with proper locking.
 func lastModifiedFromRepo(lastModified *time.Time, mu *sync.RWMutex) time.Time {
 	mu.RLock()

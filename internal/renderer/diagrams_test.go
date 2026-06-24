@@ -98,12 +98,7 @@ func TestRenderMermaidToHTML(t *testing.T) {
 func TestRenderMermaidDiagramThroughGoldmark(t *testing.T) {
 	t.Parallel()
 
-	diagramRenderer, err := NewDiagramRenderer()
-	if err != nil {
-		t.Fatalf("failed to create diagram renderer: %v", err)
-	}
-
-	renderer := NewGoldmarkRendererWithDiagrams(diagramRenderer)
+	renderer := newDiagramGoldmarkRenderer(t)
 
 	tests := []struct {
 		name             string
@@ -168,12 +163,7 @@ func TestRenderMermaidDiagramThroughGoldmark(t *testing.T) {
 func TestRenderD2DiagramThroughGoldmark(t *testing.T) {
 	t.Parallel()
 
-	diagramRenderer, err := NewDiagramRenderer()
-	if err != nil {
-		t.Fatalf("failed to create diagram renderer: %v", err)
-	}
-
-	renderer := NewGoldmarkRendererWithDiagrams(diagramRenderer)
+	renderer := newDiagramGoldmarkRenderer(t)
 
 	input := "```d2\nx -> y\n```"
 
@@ -200,12 +190,7 @@ func TestRenderD2DiagramThroughGoldmark(t *testing.T) {
 func TestMixedCodeBlocksAndDiagrams(t *testing.T) {
 	t.Parallel()
 
-	diagramRenderer, err := NewDiagramRenderer()
-	if err != nil {
-		t.Fatalf("failed to create diagram renderer: %v", err)
-	}
-
-	renderer := NewGoldmarkRendererWithDiagrams(diagramRenderer)
+	renderer := newDiagramGoldmarkRenderer(t)
 
 	input := "# Document\n\n```go\nfmt.Println(\"hello\")\n```\n\n```mermaid\ngraph TD;\n    A-->B;\n```\n\n```d2\nx -> y\n```"
 
@@ -231,4 +216,17 @@ func TestMixedCodeBlocksAndDiagrams(t *testing.T) {
 	if !result.HasMermaid {
 		t.Error("expected HasMermaid to be true")
 	}
+}
+
+// newDiagramGoldmarkRenderer builds a Goldmark renderer wired to a fresh
+// diagram renderer. Fails the test if the diagram renderer cannot be created.
+func newDiagramGoldmarkRenderer(t *testing.T) *GoldmarkRenderer {
+	t.Helper()
+
+	diagramRenderer, err := NewDiagramRenderer()
+	if err != nil {
+		t.Fatalf("failed to create diagram renderer: %v", err)
+	}
+
+	return NewGoldmarkRendererWithDiagrams(diagramRenderer)
 }

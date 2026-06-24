@@ -58,13 +58,7 @@ func TestSearcher_Search_WhitespaceQuery(t *testing.T) {
 func TestSearcher_Search_SpecialCharacters(t *testing.T) {
 	t.Parallel()
 
-	now := time.Now()
-
-	repo := NewInMemoryRepository()
-	root, _ := repo.Root()
-	file := newFile(t, now, "/api", "API v1.0.0", "content")
-	root.AddChild(file)
-	repo.Add(file)
+	repo := setupRepoWithFiles(newFile(t, time.Now(), "/api", "API v1.0.0", "content"))
 
 	searcher := NewSearcher(repo)
 

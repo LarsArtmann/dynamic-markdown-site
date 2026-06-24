@@ -179,6 +179,9 @@ linters:
     funlen:
       lines: 150
       statements: 80
+    ginkgolinter:
+      forbid-focus-container: true
+      forbid-spec-pollution: true
     gocritic:
       disabled-checks:
         - ifElseChain
@@ -201,6 +204,8 @@ linters:
         - anon
         - stdlib
         - generic
+    makezero:
+      always: true
     revive:
       rules:
         - disabled: true
@@ -211,6 +216,10 @@ linters:
       checks:
         - all
         - -SA1019
+    testifylint:
+      disable:
+        - go-require
+      enable-all: true
     varnamelen:
       ignore-map-index-ok: true
       ignore-names:

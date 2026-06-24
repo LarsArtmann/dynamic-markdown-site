@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
-	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 )
 
 type healthPayload struct {
@@ -23,12 +21,8 @@ type healthPayload struct {
 	Dependencies map[string]any `json:"dependencies"`
 }
 
-func TestHealthEndpointReportsUptime(t *testing.T) {
-	t.Parallel()
-
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
-	srv.startedAt = time.Now().Add(-2 * time.Second)
+func fetchHealth(t *testing.T, srv *Server) healthPayload {
+	t.Helper()
 
 	rec := httptest.NewRecorder()
 	newTestHandler(srv).ServeHTTP(
@@ -42,6 +36,18 @@ func TestHealthEndpointReportsUptime(t *testing.T) {
 
 	var payload healthPayload
 	decodeJSON(t, rec, &payload)
+
+	return payload
+}
+
+func TestHealthEndpointReportsUptime(t *testing.T) {
+	t.Parallel()
+
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+	srv.startedAt = time.Now().Add(-2 * time.Second)
+
+	payload := fetchHealth(t, srv)
 
 	if payload.Uptime == "" {
 		t.Errorf("expected uptime in response, got empty")
@@ -62,18 +68,7 @@ func TestHealthEndpointReportsDependencies(t *testing.T) {
 	repo := content.NewInMemoryRepository()
 	srv := newTestServer(t, repo)
 
-	rec := httptest.NewRecorder()
-	newTestHandler(srv).ServeHTTP(
-		rec,
-		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil),
-	)
-
-	if rec.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", rec.Code)
-	}
-
-	var payload healthPayload
-	decodeJSON(t, rec, &payload)
+	payload := fetchHealth(t, srv)
 
 	repoHealth, ok := payload.Dependencies["repository"].(map[string]any)
 	if !ok {
@@ -95,34 +90,9 @@ func TestHealthEndpointReportsDependencies(t *testing.T) {
 func TestHealthEndpointReportsUnhealthyRepository(t *testing.T) {
 	t.Parallel()
 
-	repo := &FailingRepository{}
-	logger := slog.New(slog.DiscardHandler)
-	htmlCache := cache.NewHTMLCache(10)
-	t.Cleanup(htmlCache.Close)
+	srv := newUnhealthyRepositoryServer(t)
 
-	srv := NewServer(
-		repo,
-		content.NewSearcher(repo),
-		logger,
-		htmlCache,
-		renderer.NewGoldmarkRenderer(),
-		false,
-		"Site",
-	)
-	t.Cleanup(srv.Shutdown)
-
-	rec := httptest.NewRecorder()
-	newTestHandler(srv).ServeHTTP(
-		rec,
-		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil),
-	)
-
-	if rec.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", rec.Code)
-	}
-
-	var payload healthPayload
-	decodeJSON(t, rec, &payload)
+	payload := fetchHealth(t, srv)
 
 	repoHealth, ok := payload.Dependencies["repository"].(map[string]any)
 	if !ok {
@@ -131,4 +101,13 @@ func TestHealthEndpointReportsUnhealthyRepository(t *testing.T) {
 	if repoHealth["status"] != "error" {
 		t.Errorf("expected repository error, got %v", repoHealth["status"])
 	}
+}
+
+func newUnhealthyRepositoryServer(t *testing.T) *Server {
+	t.Helper()
+
+	htmlCache := cache.NewHTMLCache(10)
+	t.Cleanup(htmlCache.Close)
+
+	return newTestServerWithCache(t, &FailingRepository{}, htmlCache)
 }
