@@ -64,6 +64,7 @@ func (s *Server) renderError(
 func (s *Server) renderComponent(w http.ResponseWriter, r *http.Request, component templ.Component,
 	statusCode int, context string,
 ) {
+	w.Header().Set(headerContentType, "text/html; charset=utf-8")
 	w.WriteHeader(statusCode)
 
 	err := component.Render(r.Context(), w)

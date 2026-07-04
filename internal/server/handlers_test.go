@@ -309,6 +309,23 @@ func TestDirectoryListing(t *testing.T) {
 	assertRequestOK(t, handler, "/docs")
 }
 
+func TestHTMLPagesSetContentType(t *testing.T) {
+	t.Parallel()
+
+	repo := content.NewInMemoryRepository()
+	addTestFile(t, repo, "/guide", "Guide", []byte("# Guide"), time.Now())
+	addTestDir(t, repo, "/docs", "Docs", time.Now())
+
+	handler := newTestHandler(newTestServer(t, repo))
+
+	for _, path := range []string{"/", "/docs", "/guide"} {
+		rec := executeRequest(handler, path)
+		if got := rec.Header().Get("Content-Type"); !strings.Contains(got, "text/html") {
+			t.Errorf("Content-Type for %s = %q, want text/html", path, got)
+		}
+	}
+}
+
 func TestContentDirServingWithReadme(t *testing.T) {
 	t.Parallel()
 
