@@ -23,6 +23,7 @@ var errFailingRoot = errors.New("root error")
 
 func executeRequest(handler http.Handler, path string) *httptest.ResponseRecorder {
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
+	req.Header.Set("Accept-Encoding", "identity")
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
