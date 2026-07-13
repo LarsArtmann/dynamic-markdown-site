@@ -1,0 +1,50 @@
+---
+title: Changelog
+description: All notable changes to Dynamic Markdown Site.
+---
+
+## [Unreleased]
+
+### Added
+
+- Admonition/Alert blocks — GitHub-style `> [!TYPE]` blockquote syntax with 6 types (NOTE, TIP, IMPORTANT, WARNING, CAUTION, CRITICAL)
+- Custom Goldmark AST transformer for parsing alert markers
+- `/sitemap.xml` endpoint for search engine crawlers
+- Raw asset serving for non-markdown files alongside markdown content
+- URL fallback handling: `.md` extension redirects, case-insensitive path matching, trailing slash normalization
+- AST-based Mermaid detection via Goldmark parser context
+- Blob storage support via gocloud.dev (S3, GCS, Azure Blob, filesystem, memory)
+- Prometheus-format `/metrics` endpoint
+- Reading time estimates in article headers
+- Smart 404 pages with Levenshtein-distance "Did you mean?" suggestions
+
+### Changed
+
+- Refactored frontmatter draft parsing to use `yaml.v3`
+- Simplified static file embedding pattern using `//go:embed`
+
+### Fixed
+
+- Fixed panic on double `Stop()` call in rate limiter
+- Fixed `hasMermaid` not propagating through `NewRenderedFile` constructor
+- Removed dead regex-based diagram detection code
+- Stripped `.md` extension from URL paths for clean URLs
+
+## [0.1.0] — 2026-04-01
+
+### Added
+
+- Go web server that converts markdown files into a navigable website
+- Goldmark + Chroma markdown rendering with syntax highlighting
+- Full-text search with relevance scoring
+- D2 server-side and Mermaid client-side diagram rendering
+- Live reload via SSE in dev mode
+- Otter HTML response caching
+- Templ type-safe templates
+- samber/do/v2 dependency injection
+- Rate-limited `/refresh` endpoint
+- Graceful shutdown with SIGINT/SIGTERM
+- Path traversal prevention at the type level
+- Distroless Docker image with built-in healthcheck
+- Nix flake for reproducible builds
+- GitHub Actions CI: test, Docker, release workflows

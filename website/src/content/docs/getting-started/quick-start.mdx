@@ -1,0 +1,79 @@
+---
+title: Quick Start
+description: Get a markdown website running in under a minute.
+---
+
+## Serve a Directory
+
+```bash
+# Development mode: live reload, no caching, file watching
+dynamic-markdown-site -dev -root ./docs
+```
+
+Any `.md` file in `./docs` is now a page on your site. Edit a file, save, and the browser auto-reloads.
+
+## Serve from S3
+
+```bash
+dynamic-markdown-site -storage-url s3://my-bucket/docs
+```
+
+The server reads directly from S3. No sync step, no local files.
+
+## Serve from Google Cloud Storage
+
+```bash
+dynamic-markdown-site -storage-url gs://my-bucket/docs
+```
+
+## Directory Structure
+
+```
+docs/
+├── index.md          # -> /
+├── getting-started/
+│   ├── index.md      # -> /getting-started/
+│   └── install.md    # -> /getting-started/install
+├── api/
+│   ├── auth.md       # -> /api/auth
+│   └── users.md      # -> /api/users
+└── about.md          # -> /about
+```
+
+Directories without an `index.md` show a navigable card grid of their contents.
+
+## Frontmatter
+
+Each markdown file can include YAML frontmatter:
+
+```yaml
+---
+title: "Getting Started"
+description: "How to get up and running in 60 seconds"
+author: "Team"
+tags: ["guide", "setup"]
+draft: false
+---
+```
+
+Files with `draft: true` are excluded from the site.
+
+## Search
+
+Full-text search is built in at `/search?q=your-query`. Results are ranked by:
+
+1. Exact title match (100%)
+2. Partial title match (50%)
+3. Content body match (30%)
+
+Matches are highlighted with `<mark>` tags and shown with surrounding context.
+
+## Refresh Content
+
+If you're not using dev mode (no file watcher), trigger a manual refresh:
+
+```bash
+curl -X POST http://localhost:8080/refresh
+```
+
+Rate limited to 10 requests per minute per IP.

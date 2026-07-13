@@ -1,0 +1,131 @@
+---
+title: API Endpoints
+description: HTTP API reference for all endpoints.
+---
+
+## Content Routes
+
+| Endpoint | Method | Description                        |
+| -------- | ------ | ---------------------------------- |
+| `/`      | GET    | Root directory listing             |
+| `/*path` | GET    | Markdown file or directory listing |
+
+Directory pages show a card grid with file/folder icons, titles, and last modified dates. Directories are sorted first, then files, alphabetically.
+
+### Path Resolution
+
+- `.md` extension is optional: `/about` and `/about.md` both work
+- Trailing slashes are normalized
+- Case-insensitive matching as a fallback
+- Non-markdown files (images, PDFs, JSON) are served as raw assets
+
+## Health Check
+
+```http
+GET /health
+```
+
+Returns JSON with server status, version, uptime, and dependency health:
+
+```json
+{
+	"status": "healthy",
+	"version": "1.0.0",
+	"commit": "abc123",
+	"uptime": "2h30m",
+	"dependencies": {
+		"repository": { "status": "healthy", "modified": "2026-07-13T..." },
+		"cache": { "status": "healthy", "size": 42, "hits": 100, "misses": 5, "hitRate": 0.95 }
+	}
+}
+```
+
+## Refresh
+
+```http
+GET /refresh
+POST /refresh
+```
+
+Reloads all content from the storage backend and invalidates the cache. Rate limited to 10 requests per minute per IP.
+
+```json
+{
+	"status": "success",
+	"message": "content repository refreshed",
+	"lastModified": "2026-07-13T...",
+	"totalFiles": 42,
+	"totalDirs": 8,
+	"duration": "15ms"
+}
+```
+
+## Search
+
+```http
+GET /search?q=your+query
+```
+
+Full-text search with relevance scoring:
+
+- **Exact title match:** 100%
+- **Partial title match:** 50%
+- **Content body match:** 30%
+
+Results include highlighted snippets with `<mark>` tags.
+
+## Sitemap
+
+```http
+GET /sitemap.xml
+```
+
+XML sitemap for search engines. Includes all non-draft pages with priority and changefreq metadata.
+
+## Robots
+
+```http
+GET /robots.txt
+```
+
+Robots file for crawlers. Allows all user agents and points to the sitemap.
+
+## Metrics
+
+```http
+GET /metrics
+```
+
+Prometheus-format metrics for monitoring.
+
+## Cache Stats
+
+```http
+GET /cache/stats
+```
+
+Returns cache hit/miss statistics:
+
+```json
+{
+	"hits": 100,
+	"misses": 5,
+	"hitRate": 0.95
+}
+```
+
+## Static Assets
+
+```http
+GET /static/*path
+```
+
+CSS, favicon, and other embedded assets. Served with immutable cache headers.
+
+## Live Reload (Dev Mode Only)
+
+```http
+GET /api/live-reload
+```
+
+Server-Sent Events endpoint for live reload. The browser connects and receives reload events when files change. Only available in dev mode (`-dev` flag).

@@ -1,0 +1,69 @@
+---
+title: Docker
+description: Run Dynamic Markdown Site in Docker for production.
+---
+
+## Quick Start
+
+```bash
+docker run -p 8080:8080 -v ./content:/content ghcr.io/larsartmann/dynamic-markdown-site:latest
+```
+
+## Image Details
+
+The image uses Google's [distroless](https://github.com/GoogleContainerTools/distroless) runtime:
+
+- **Base:** `gcr.io/distroless/static-debian13:nonroot`
+- **User:** UID 65532 (`nonroot`)
+- **Arch:** amd64 and arm64
+- **Shell:** None (distroless has no shell, `curl`, or `wget`)
+
+### Healthcheck
+
+Since distroless has no shell, the binary implements its own healthcheck subcommand:
+
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["/app/dynamic-markdown-site", "healthcheck", "--addr", "localhost:8080"]
+```
+
+The `healthcheck` subcommand probes `/health` and exits 0 on a 200 response.
+
+## Docker Compose
+
+```yaml
+services:
+  markdown-site:
+    image: ghcr.io/larsartmann/dynamic-markdown-site:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./content:/content
+    restart: unless-stopped
+```
+
+## Run with S3 Backend
+
+```bash
+docker run -p 8080:8080 \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  ghcr.io/larsartmann/dynamic-markdown-site:latest \
+  -storage-url s3://my-bucket/docs
+```
+
+## CI/CD
+
+The Docker image is built and published by GitHub Actions on every push to `master` and on version tags (`v*.*.*`):
+
+- Multi-arch builds (amd64 + arm64)
+- Pushed to GitHub Container Registry (`ghcr.io`)
+- Trivy vulnerability scan
+- Artifact attestation
+
+### Pull a Specific Version
+
+```bash
+docker pull ghcr.io/larsartmann/dynamic-markdown-site:v1.0.0
+docker pull ghcr.io/larsartmann/dynamic-markdown-site:latest
+```

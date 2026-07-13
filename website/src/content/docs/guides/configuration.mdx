@@ -1,0 +1,67 @@
+---
+title: Configuration
+description: CLI flags, environment variables, and runtime options.
+---
+
+## CLI Flags
+
+```bash
+dynamic-markdown-site [flags]
+```
+
+| Flag           | Default | Description                                                             |
+| -------------- | ------- | ----------------------------------------------------------------------- |
+| `-port`        | `8080`  | HTTP server port                                                        |
+| `-root`        | `.`     | Root directory containing markdown files (filesystem mode)              |
+| `-storage-url` |         | Blob storage URL: `file://`, `s3://`, `gs://`, `azblob://`              |
+| `-log-level`   | `info`  | Log level: `debug`, `info`, `warn`, `error`                             |
+| `-cache`       | `true`  | Enable HTML response caching                                            |
+| `-dev`         | `false` | Development mode: disables cache, enables file watching and live reload |
+| `-timeout`     | `30s`   | HTTP request timeout                                                    |
+
+### Shorthand Flags
+
+| Flag | Equivalent |
+| ---- | ---------- |
+| `-r` | `-root`    |
+
+## Environment Variables
+
+All flags can be set via environment variables with the `DYNAMIC_MARKDOWN_` prefix:
+
+| Variable                       | Maps to flag                  |
+| ------------------------------ | ----------------------------- |
+| `DYNAMIC_MARKDOWN_PORT`        | `-port`                       |
+| `DYNAMIC_MARKDOWN_ROOT`        | `-root`                       |
+| `DYNAMIC_MARKDOWN_STORAGE_URL` | `-storage-url`                |
+| `DYNAMIC_MARKDOWN_LOG_LEVEL`   | `-log-level`                  |
+| `DYNAMIC_MARKDOWN_CACHE`       | `-cache`                      |
+| `DYNAMIC_MARKDOWN_DEV`         | `-dev`                        |
+| `DYNAMIC_MARKDOWN_TIMEOUT`     | `-timeout`                    |
+| `DYNAMIC_MARKDOWN_SITE_NAME`   | Site name shown in the header |
+
+Environment variables override CLI flags. CLI flags override defaults.
+
+### Boolean Parsing
+
+The following values are accepted as `true`: `true`, `1`, `yes`, `on`. Everything else is `false`.
+
+## Dev Mode
+
+Dev mode (`-dev` flag or `DYNAMIC_MARKDOWN_DEV=true`) is a convenience shortcut that:
+
+- Disables caching (every request renders fresh)
+- Enables file watching (fsnotify monitors all `.md` files recursively)
+- Enables live reload via SSE (`/api/live-reload`)
+- Debounces file changes at 500ms to coalesce bulk operations
+
+## Logging
+
+Uses [charm.land/log](https://github.com/charmbracelet/log) via `*slog.Logger`. Log levels:
+
+| Level   | When to use                                |
+| ------- | ------------------------------------------ |
+| `debug` | Development: every request, cache hit/miss |
+| `info`  | Default: startup, refresh, shutdown        |
+| `warn`  | Rate limiting, recoverable errors          |
+| `error` | Failed operations, panics                  |

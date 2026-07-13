@@ -1,0 +1,32 @@
+---
+title: Related Tools
+description: Tools that complement Dynamic Markdown Site.
+---
+
+## Goldmark
+
+[Goldmark](https://github.com/yuin/goldmark) is the markdown parser that powers Dynamic Markdown Site. It is CommonMark compliant, extensible, and has first-class support for all GFM features.
+
+## Chroma
+
+[Chroma](https://github.com/alecthomas/chroma) provides syntax highlighting for 200+ languages. It is the same library used by Hugo and Gitea. Dynamic Markdown Site uses it with the Monokai theme for server-side rendering — no client-side JavaScript needed.
+
+## D2
+
+[D2](https://d2lang.com/) is a modern diagram scripting language. Dynamic Markdown Site compiles D2 source to SVG at render time, so diagrams are always crisp and require no client-side rendering.
+
+## Mermaid
+
+[Mermaid](https://mermaid.js.org/) is the most popular client-side diagram library. Dynamic Markdown Site loads it on-demand — only on pages that contain ` ```mermaid ` blocks.
+
+## Templ
+
+[Templ](https://templ.guide/) compiles HTML templates to Go code at build time. This catches template errors at compile time rather than runtime, and eliminates XSS risks by construction.
+
+## go-atomic-write
+
+[go-atomic-write](https://github.com/LarsArtmann/go-atomic-write) provides crash-safe, race-free file writes for Go. Useful for any tooling that writes configuration or content files alongside a Dynamic Markdown Site deployment.
+
+## gogenfilter
+
+[gogenfilter](https://github.com/LarsArtmann/gogenfilter) detects and filters auto-generated Go code files. Useful if your markdown documentation includes or references generated Go code.

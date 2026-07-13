@@ -1,0 +1,85 @@
+---
+title: Cloud Storage
+description: Serve markdown from S3, GCS, Azure Blob, or the filesystem.
+---
+
+## Overview
+
+Dynamic Markdown Site uses [gocloud.dev](https://gocloud.dev) for portable blob storage. The same binary works with any supported backend — just change the URL.
+
+## Filesystem (Default)
+
+```bash
+dynamic-markdown-site -root ./docs
+# Or explicitly:
+dynamic-markdown-site -storage-url file:///absolute/path/to/docs
+```
+
+## Amazon S3
+
+```bash
+dynamic-markdown-site -storage-url s3://my-bucket/docs
+```
+
+### Authentication
+
+Uses the standard AWS SDK credential chain:
+
+1. `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` environment variables
+2. `~/.aws/credentials` profile
+3. IAM role (on EC2/ECS/EKS)
+
+```bash
+export AWS_ACCESS_KEY_ID=AKIA...
+export AWS_SECRET_ACCESS_KEY=...
+dynamic-markdown-site -storage-url s3://my-bucket/docs
+```
+
+### Region
+
+Set `AWS_REGION` or `AWS_DEFAULT_REGION`:
+
+```bash
+AWS_REGION=eu-west-1 dynamic-markdown-site -storage-url s3://my-bucket/docs
+```
+
+## Google Cloud Storage
+
+```bash
+dynamic-markdown-site -storage-url gs://my-bucket/docs
+```
+
+### Authentication
+
+Uses `GOOGLE_APPLICATION_CREDENTIALS` for a service account key, or the metadata server on GCE/GKE.
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
+dynamic-markdown-site -storage-url gs://my-bucket/docs
+```
+
+## Azure Blob Storage
+
+```bash
+dynamic-markdown-site -storage-url azblob://my-container/docs
+```
+
+Set `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_KEY` (or a SAS token).
+
+## In-Memory (Testing)
+
+```bash
+dynamic-markdown-site -storage-url mem://
+```
+
+Useful for smoke testing the binary without any files.
+
+## Refreshing Content
+
+In production (non-dev mode), content is loaded at startup. To reload from the storage backend without restarting:
+
+```bash
+curl -X POST http://localhost:8080/refresh
+```
+
+This re-reads all content and invalidates the cache. Rate limited to 10 requests per minute per IP.

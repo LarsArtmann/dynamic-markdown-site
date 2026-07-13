@@ -1,0 +1,16 @@
+{
+  "name": "Dynamic Markdown Site",
+  "short_name": "DMS",
+  "description": "A Go server that turns markdown files into a navigable website",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0a09",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

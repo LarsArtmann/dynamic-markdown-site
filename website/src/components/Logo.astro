@@ -1,0 +1,15 @@
+---
+export interface Props {
+  width?: number;
+  height?: number;
+  class?: string;
+}
+
+const { width = 28, height = 28, class: className } = Astro.props;
+---
+
+<svg class={className} width={width} height={height} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dynamic Markdown Site logo">
+  <rect width="28" height="28" rx="6" class="fill-[var(--color-accent)]" />
+  <path d="M7 19V9h2.5l2.5 4 2.5-4H17v10h-2.5v-5.5L12 17.5 9.5 13.5V19H7z" class="fill-[var(--color-bg-primary)]" />
+  <path d="M19 9h2v8h2v2h-4V9z" class="fill-[var(--color-bg-primary)]" />
+</svg>

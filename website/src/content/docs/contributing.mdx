@@ -1,0 +1,84 @@
+---
+title: Contributing
+description: How to contribute to Dynamic Markdown Site.
+---
+
+## Development Setup
+
+**Requirements:** Go 1.26+, [Templ CLI](https://templ.guide/), [golangci-lint](https://golangci-lint.run/)
+
+The project uses [Nix flakes](https://nixos.wiki/wiki/Flakes) for reproducible development environments:
+
+```bash
+NIXPKGS_ALLOW_UNFREE=1 nix develop --impure
+```
+
+Or without Nix:
+
+```bash
+git clone https://github.com/LarsArtmann/dynamic-markdown-site.git
+cd dynamic-markdown-site
+go mod download
+go install github.com/a-h/templ/cmd/templ@latest
+```
+
+## Building
+
+```bash
+# Generate Templ templates (required after editing .templ files)
+templ generate
+
+# Build
+go build ./cmd/dynamic-markdown-site
+```
+
+## Testing
+
+```bash
+# Run all tests with race detection and coverage
+go test ./... -race -cover -coverprofile=coverage.out
+
+# Verbose
+go test ./... -race -v
+
+# Benchmarks
+go test ./... -bench=. -benchmem
+```
+
+## Linting
+
+Uses golangci-lint with ~75 linters configured in `.golangci.yml`. Must produce zero issues:
+
+```bash
+golangci-lint run ./...
+```
+
+## CI Pipeline
+
+All pull requests must pass:
+
+- `go test -race -cover` — tests pass with 75% coverage floor
+- `golangci-lint run ./...` — no lint issues
+- `templ generate` — generated files must be checked in
+
+## Code Style
+
+- Standard `testing` package — testify only used in some tests
+- `t.Parallel()` where possible
+- `t.TempDir()` for filesystem isolation
+- Early returns over nested conditionals
+- Strong types over runtime checks
+- Full word variable names (no single letters)
+- Wrap errors with `cockroachdb/errors` and add context
+- `*slog.Logger` via `charm.land/log` — never log secrets
+
+## Adding Dependencies
+
+New third-party imports require updating the `depguard.rules.main.allow` list in `.golangci.yml`.
+
+## Pull Requests
+
+- Keep changes focused and atomic
+- Add tests for new functionality
+- Ensure all CI checks pass
+- Run `templ generate` and commit the result if you changed `.templ` files

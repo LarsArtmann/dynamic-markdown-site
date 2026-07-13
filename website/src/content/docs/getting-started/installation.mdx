@@ -1,0 +1,62 @@
+---
+title: Installation
+description: Install and run Dynamic Markdown Site.
+---
+
+## Requirements
+
+- Go 1.26+ (for building from source)
+- Or Docker, or Nix
+
+## Docker (Fastest)
+
+```bash
+docker run -p 8080:8080 -v ./content:/content ghcr.io/larsartmann/dynamic-markdown-site:latest
+```
+
+Open [http://localhost:8080](http://localhost:8080).
+
+## Build from Source
+
+```bash
+git clone https://github.com/LarsArtmann/dynamic-markdown-site.git
+cd dynamic-markdown-site
+
+# Install Templ CLI
+go install github.com/a-h/templ/cmd/templ@latest
+
+# Generate templates
+templ generate
+
+# Build the binary
+go build -o dynamic-markdown-site ./cmd/dynamic-markdown-site
+
+# Run against a directory of markdown
+./dynamic-markdown-site -root ./content
+```
+
+## Nix
+
+```bash
+NIXPKGS_ALLOW_UNFREE=1 nix run github:LarsArtmann/dynamic-markdown-site --impure
+```
+
+## Pre-built Binary
+
+Download the latest release from [GitHub Releases](https://github.com/LarsArtmann/dynamic-markdown-site/releases).
+
+## Verify
+
+```bash
+dynamic-markdown-site -root ./content
+# Server starting on :8080
+```
+
+Open [http://localhost:8080](http://localhost:8080) to see your markdown files rendered as a website.
+
+## Next Steps
+
+- Follow the [Quick Start](/getting-started/quick-start/) for common usage patterns
+- Learn about [Configuration](/guides/configuration/) for all CLI flags and env vars
+- Set up [Docker](/guides/docker/) for production deployment
+- Connect [Cloud Storage](/guides/cloud-storage/) (S3, GCS, Azure Blob)
