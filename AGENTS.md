@@ -1,7 +1,5 @@
 # Dynamic Markdown Site - Agent Guidelines
 
-**Version:** 1.1 | **Updated:** 2026-06-07
-
 ---
 
 ## Project Overview
@@ -27,13 +25,43 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 
 ### Build & Run
 
+```bash
+# Build the binary
+go build -o dynamic-markdown-site ./cmd/dynamic-markdown-site
+
+# Run in dev mode (live reload, no cache)
+go run ./cmd/dynamic-markdown-site -dev -root ./content
+
+# Run from S3/GCS
+go run ./cmd/dynamic-markdown-site -storage-url s3://my-bucket/docs
+```
+
 ### Nix
 
 > **Note:** `--impure` and `NIXPKGS_ALLOW_UNFREE=1` are needed because the project uses a proprietary license.
 
+```bash
+# Build
+NIXPKGS_ALLOW_UNFREE=1 nix build . --impure
+
+# Run
+NIXPKGS_ALLOW_UNFREE=1 nix run . --impure
+
+# Dev shell (Go, golangci-lint, gopls, templ)
+NIXPKGS_ALLOW_UNFREE=1 nix develop --impure
+```
+
 ### Testing
 
+```bash
+go test ./... -race -cover
+```
+
 ### Linting
+
+```bash
+golangci-lint run ./...
+```
 
 ### Code Generation
 
@@ -75,15 +103,18 @@ Content stored in `internal/content/` with interface:
 ```go
 type Repository interface {
     Get(path domain.URLPath) (domain.ContentNode, error)
+    GetRaw(path domain.URLPath) (*RawFile, error)
     Root() (*domain.DirectoryNode, error)
     Refresh() domain.RefreshResult
     LastModified() time.Time
+    AllPaths() []domain.URLPath
 }
 ```
 
 Implementations:
 
 - `FileSystemRepository` - reads from disk
+- `BlobRepository` - reads from S3/GCS/Azure via gocloud.dev
 - `InMemoryRepository` - for testing
 
 ### Domain Types
@@ -264,16 +295,17 @@ The `templ` CLI version must match `go.mod`. If the CLI is newer, it generates c
 
 Rate limiting uses `golang.org/x/time/rate` (token bucket). No background goroutines. `Stop()` is a no-op kept for API compatibility.
 
-### 11. GoReleaser Config Deprecations
+### 11. GoReleaser License Mismatch
 
-`goreleaser check` fails on deprecated keys. Two known ones in this project:
+The `.goreleaser.yaml` declares `license: MIT` in 4 places (homebrew_casks, nfpms, nix, scoops sections), but the `LICENSE` file is proprietary and `flake.nix` correctly uses `licenses.unfree`. This is a **pre-existing inconsistency** that causes Homebrew/Scoop/Nix to publish wrong license metadata. (The previous `archives.format_overrides` and `brews` deprecations mentioned here have already been fixed — `formats: ["zip"]` and `homebrew_casks` are now used.)
 
-- `archives.format_overrides[].format` → renamed to `formats` (accepts a list, e.g. `formats: ["zip"]`)
-- `brews` → fully deprecated since v2.16. Use `homebrew_casks` instead. Key differences:
-  - Directory must be `Casks/` (not `Formula/`)
-  - `install:` block is replaced by `binaries:` (auto-installed from archive)
-  - `test:` block has no cask equivalent — use `caveats:` for user-facing notes
-  - First release may need a `tap_migrations.json` entry in the tap repo to redirect users from the old formula
+### 12. encoding/json/v2 Must Not Be Used
+
+The project intentionally uses stable `encoding/json`. The `go-error-family` dependency must stay pinned at `v0.6.1` (v0.7.0+ adopts `encoding/json/v2`). Automated upgrade tools (go-auto-upgrade) will re-break the build by migrating imports — the migration must be excluded. `GOEXPERIMENT=jsonv2` is NOT enabled.
+
+### 13. Compression Middleware Affects Tests
+
+`httputil.Compression` gzips responses >512 bytes when no `Accept-Encoding` header is set. The shared test helper `executeRequest` in `handlers_test.go` sets `Accept-Encoding: identity` to disable compression so tests can assert on plaintext response bodies.
 
 ---
 
@@ -281,39 +313,47 @@ Rate limiting uses `golang.org/x/time/rate` (token bucket). No background gorout
 
 ### Flags
 
-| Flag         | Default | Description                        |
-| ------------ | ------- | ---------------------------------- |
-| `-port`      | 8080    | HTTP server port                   |
-| `-root`      | `.`     | Root directory with markdown files |
-| `-log-level` | info    | debug, info, warn, error           |
-| `-cache`     | true    | Enable HTML caching                |
-| `-dev`       | false   | Dev mode (no cache, file watching) |
-| `-timeout`   | 30s     | Request timeout                    |
+| Flag           | Default | Description                                                |
+| -------------- | ------- | ---------------------------------------------------------- |
+| `-port`        | 8080    | HTTP server port                                           |
+| `-root`        | `.`     | Root directory with markdown files                         |
+| `-storage-url` |         | Blob storage URL: `file://`, `s3://`, `gs://`, `azblob://` |
+| `-log-level`   | info    | debug, info, warn, error                                   |
+| `-cache`       | true    | Enable HTML caching                                        |
+| `-dev`         | false   | Dev mode (no cache, file watching)                         |
+| `-timeout`     | 30s     | Request timeout                                            |
 
 ### Environment Variables
 
 Prefix: `DYNAMIC_MARKDOWN_`
 
-| Variable                     | Description     |
-| ---------------------------- | --------------- |
-| `DYNAMIC_MARKDOWN_PORT`      | Server port     |
-| `DYNAMIC_MARKDOWN_ROOT`      | Root directory  |
-| `DYNAMIC_MARKDOWN_LOG_LEVEL` | Log level       |
-| `DYNAMIC_MARKDOWN_CACHE`     | Enable caching  |
-| `DYNAMIC_MARKDOWN_DEV`       | Dev mode        |
-| `DYNAMIC_MARKDOWN_TIMEOUT`   | Request timeout |
+| Variable                       | Description      |
+| ------------------------------ | ---------------- |
+| `DYNAMIC_MARKDOWN_PORT`        | Server port      |
+| `DYNAMIC_MARKDOWN_ROOT`        | Root directory   |
+| `DYNAMIC_MARKDOWN_STORAGE_URL` | Blob storage URL |
+| `DYNAMIC_MARKDOWN_LOG_LEVEL`   | Log level        |
+| `DYNAMIC_MARKDOWN_CACHE`       | Enable caching   |
+| `DYNAMIC_MARKDOWN_DEV`         | Dev mode         |
+| `DYNAMIC_MARKDOWN_TIMEOUT`     | Request timeout  |
+| `DYNAMIC_MARKDOWN_SITE_NAME`   | Site name        |
 
 ---
 
 ## HTTP API
 
-| Endpoint        | Method   | Description                     |
-| --------------- | -------- | ------------------------------- |
-| `/`             | GET      | Root directory view             |
-| `/*path`        | GET      | Content (markdown or directory) |
-| `/health`       | GET      | Health check                    |
-| `/refresh`      | GET/POST | Refresh content (rate limited)  |
-| `/search`       | GET      | Search content (`?q=query`)     |
-| `/static/*path` | GET      | Static assets                   |
+| Endpoint           | Method   | Description                     |
+| ------------------ | -------- | ------------------------------- |
+| `/`                | GET      | Root directory view             |
+| `/*path`           | GET      | Content (markdown or directory) |
+| `/health`          | GET      | Health check                    |
+| `/refresh`         | GET/POST | Refresh content (rate limited)  |
+| `/search`          | GET      | Search content (`?q=query`)     |
+| `/sitemap.xml`     | GET      | XML sitemap                     |
+| `/robots.txt`      | GET      | Robots file                     |
+| `/metrics`         | GET      | Prometheus-format metrics       |
+| `/cache/stats`     | GET      | Cache statistics (JSON)         |
+| `/static/*path`    | GET      | Static assets                   |
+| `/api/live-reload` | GET      | SSE live reload (dev mode)      |
 
 ---

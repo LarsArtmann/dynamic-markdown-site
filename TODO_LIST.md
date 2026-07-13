@@ -1,14 +1,14 @@
 # TODO List
 
-**Generated:** 2026-04-05 | **Last Updated:** 2026-06-14
+**Generated:** 2026-04-05 | **Last Updated:** 2026-07-13
 **Purpose:** Actionable items for the next 2-4 weeks
 **Status:** Active development items only
 
 ## 🔴 Critical (Fix Now)
 
-- [ ] Address GitHub security vulnerabilities in dependencies
+- [x] Address GitHub security vulnerabilities in dependencies
   - govulncheck identified 2 stdlib CVEs (GO-2026-5039, GO-2026-5037) fixed in
-    Go 1.26.4. Requires bumping the Go toolchain; no project code is at fault.
+    Go 1.26.4. Toolchain bumped to `go 1.26.4` in `go.mod`.
 - [ ] Fix Go 1.26.1 environment mismatch for BuildFlow
   - BuildFlow is not part of this repo. Re-evaluate if reintroduced.
 - [x] Fix unused parameter warnings in `container.go`
@@ -96,8 +96,9 @@
 
 ## 🟢 Process Improvements
 
-- [x] Add git pre-push hook calling `just pre-push`
-  - `.githooks/pre-push` runs `go test -race -cover` + `golangci-lint`.
+- [x] Add git pre-push hook
+  - `.githooks/pre-push` runs `go test -race -cover` + `golangci-lint` (plain bash,
+    no `just` — the project uses Nix, not justfile).
 - [x] Add pre-commit hook for golines
   - `.githooks/pre-commit` runs `templ generate` and stages any
     regenerated files.

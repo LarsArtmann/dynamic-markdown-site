@@ -1,6 +1,6 @@
 # Roadmap
 
-**Generated:** 2026-04-05
+**Generated:** 2026-04-05 | **Last Updated:** 2026-07-13
 **Purpose:** Aspirational items without timeline
 
 > Items here are goals and ideas. No commitment on delivery dates.
@@ -27,9 +27,8 @@
 ### Rendering & Content
 
 - [ ] Implement content draft preview
-- [ ] Add reading time estimates to UI
 - [ ] Add image optimization
-- [ ] Implement graceful degradation for D2 rendering failures
+- [ ] Implement graceful degradation for D2 rendering failures — _partially done; full fallback chain could be deeper_
 - [ ] Add diagram export (PNG/SVG download buttons)
 - [ ] Add diagram zoom for large diagrams
 - [ ] Implement content versioning (git-based history)
@@ -40,16 +39,14 @@
 - [ ] Dark mode CSS and theme toggle
 - [ ] Implement syntax highlighting themes
 - [ ] Add keyboard navigation and shortcuts
-- [ ] Implement table of contents with sticky positioning
+- [ ] Implement table of contents with sticky positioning — _base TOC shipped; sticky UX not done_
 - [ ] Add print stylesheet
 - [ ] Add code copy button (one-click code copying)
 - [ ] Add pagination for directories
-- [ ] Implement breadcrumbs for deep directory navigation
 
 ### Content Delivery
 
 - [ ] Add RSS/Atom feed generation
-- [ ] Add sitemap.xml generation and endpoint
 - [ ] Implement WebSocket live reload
 - [ ] Add gzip/brotli compression
 - [ ] Add ETag/If-None-Match support
@@ -57,7 +54,6 @@
 ### Observability
 
 - [ ] Add structured logging to renderer package
-- [ ] Add metrics collection
 - [ ] Add response time histograms
 - [ ] Implement distributed tracing with OpenTelemetry
 - [ ] Add pprof profiling endpoint
@@ -66,8 +62,7 @@
 
 ### Admin & API
 
-- [ ] Add admin endpoints (cache stats, content stats)
-- [ ] Add admin/debug endpoints
+- [ ] Add admin/debug endpoints (content stats dashboard)
 - [ ] Create admin dashboard
 - [ ] Add API endpoint for programmatic content access
 - [ ] Add analytics integration

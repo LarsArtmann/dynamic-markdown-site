@@ -11,10 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Admonition/Alert blocks — GitHub-style `> [!TYPE]` blockquote syntax with 6 types (NOTE, TIP, IMPORTANT, WARNING, CAUTION, CRITICAL) and themed CSS styling
 - Custom Goldmark AST transformer for parsing alert markers across split text nodes
 - `/sitemap.xml` endpoint for search engine crawlers with priority and changefreq metadata
+- `/metrics` endpoint exposing Prometheus-format metrics (dependency-free)
+- `/cache/stats` endpoint returning cache hit/miss/eviction statistics (JSON)
 - Raw asset serving for non-markdown files (images, PDFs, JSON, etc.) alongside markdown content
 - URL fallback handling: `.md` extension redirects, case-insensitive path matching, trailing slash normalization
 - AST-based Mermaid detection via Goldmark parser context (replaces regex-based approach)
 - Comprehensive sitemap tests covering directories, files, HTTPS detection, and priority calculation
+- HEALTHCHECK directive re-added to Dockerfile (uses binary's `healthcheck` subcommand)
+- Compression middleware via `httputil.Compression` for gzip-encoded responses
+- Astro + Starlight documentation website in `website/` (hosted at dynamicmarkdown.lars.software)
 
 ### Changed
 
@@ -25,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added godoc comments on exported admonition extension types
 - Silence `fmt.Fprintf` return value warnings in admonition renderer
 - Add linter exclusions for exhaustruct and gochecknoglobals in Goldmark extensions
+- Pinned `go-error-family` to `v0.6.1` (v0.7.0+ adopts `encoding/json/v2` which is not enabled)
 
 ### Fixed
 
@@ -32,6 +38,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed `hasMermaid` not propagating through `NewRenderedFile` constructor
 - Removed dead regex-based diagram detection code
 - Stripped `.md` extension from URL paths for clean URLs
+- Reverted accidental `encoding/json/v2` migration that broke compilation (`GOEXPERIMENT=jsonv2` not enabled)
+- Fixed metrics endpoint test by setting `Accept-Encoding: identity` to bypass compression middleware
+
+### Removed
+
+- Removed Gin web framework — migrated to standard `net/http` with Go 1.22+ method-based routing
+- Removed `justfile` — build/task automation now handled by `flake.nix`
 
 ## [0.1.0] - 2026-04-01
 

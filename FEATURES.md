@@ -1,6 +1,6 @@
 # Features
 
-<!-- Last updated: 2026-06-13 -->
+<!-- Last updated: 2026-07-13 -->
 
 A complete catalog of everything Dynamic Markdown Site does — from the user's browser to the server's internals.
 
@@ -181,14 +181,16 @@ Compiled with `CGO_ENABLED=0`, `-tags netgo`, and static linking — zero runtim
 
 ## Configuration
 
-| Option          | Flag         | Env Var                      | Default |
-| --------------- | ------------ | ---------------------------- | ------- |
-| Port            | `-port`      | `DYNAMIC_MARKDOWN_PORT`      | `8080`  |
-| Content root    | `-root`      | `DYNAMIC_MARKDOWN_ROOT`      | `.`     |
-| Log level       | `-log-level` | `DYNAMIC_MARKDOWN_LOG_LEVEL` | `info`  |
-| Caching         | `-cache`     | `DYNAMIC_MARKDOWN_CACHE`     | `true`  |
-| Dev mode        | `-dev`       | `DYNAMIC_MARKDOWN_DEV`       | `false` |
-| Request timeout | `-timeout`   | `DYNAMIC_MARKDOWN_TIMEOUT`   | `30s`   |
+| Option          | Flag           | Env Var                        | Default |
+| --------------- | -------------- | ------------------------------ | ------- |
+| Port            | `-port`        | `DYNAMIC_MARKDOWN_PORT`        | `8080`  |
+| Content root    | `-root`        | `DYNAMIC_MARKDOWN_ROOT`        | `.`     |
+| Storage URL     | `-storage-url` | `DYNAMIC_MARKDOWN_STORAGE_URL` |         |
+| Log level       | `-log-level`   | `DYNAMIC_MARKDOWN_LOG_LEVEL`   | `info`  |
+| Caching         | `-cache`       | `DYNAMIC_MARKDOWN_CACHE`       | `true`  |
+| Dev mode        | `-dev`         | `DYNAMIC_MARKDOWN_DEV`         | `false` |
+| Request timeout | `-timeout`     | `DYNAMIC_MARKDOWN_TIMEOUT`     | `30s`   |
+| Site name       |                | `DYNAMIC_MARKDOWN_SITE_NAME`   | `Site`  |
 
 Dev mode (`-dev`) automatically disables caching and enables file watching + live reload.
 
@@ -201,11 +203,13 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/`                | GET      | Root directory listing                        |
 | `/*path`           | GET      | Markdown file or subdirectory listing         |
 | `/health`          | GET      | Health check — returns `{"status":"healthy"}` |
-| `/refresh`         | GET/POST | Reload content from disk (rate limited)       |
+| `/refresh`         | GET/POST | Reload content from source (rate limited)     |
 | `/search`          | GET      | Full-text search — `?q=query`                 |
 | `/static/*`        | GET      | Embedded static assets (CSS, favicon)         |
 | `/sitemap.xml`     | GET      | XML sitemap for search engine crawlers        |
 | `/robots.txt`      | GET      | robots.txt with sitemap reference             |
+| `/metrics`         | GET      | Prometheus-format metrics                     |
+| `/cache/stats`     | GET      | Cache hit/miss/eviction statistics (JSON)     |
 | `/api/live-reload` | GET      | SSE stream for live reload (dev mode)         |
 
 ---
@@ -251,10 +255,11 @@ draft: false
 
 ### Docker
 
-Multi-stage build:
+Single-stage distroless build:
 
-- **Builder**: `golang:1.26-alpine` — compiles static binary
-- **Runtime**: `gcr.io/distroless/static-debian13:nonroot` — minimal attack surface
+- **Runtime**: `gcr.io/distroless/static-debian13:nonroot` — no shell, no package manager, minimal attack surface
+- **Built-in healthcheck**: binary probes `/health` via a `healthcheck` subcommand (distroless has no shell/curl)
+- **Non-root**: runs as UID 65532 (`nonroot` user)
 
 ```bash
 docker build -t dynamic-markdown-site .
@@ -263,15 +268,13 @@ docker run -p 8080:8080 -v ./content:/content:ro dynamic-markdown-site
 
 ### CI Pipeline
 
-GitHub Actions workflow on every push to `master`:
+Three GitHub Actions workflows:
 
-1. Go setup from `go.mod` version
-2. Templ template generation
-3. Test suite with race detector (`-race`)
-4. golangci-lint (~75 linters)
-5. Docker image build with BuildKit caching
-6. Smoke test — starts container, hits `/health`
-7. Image artifact upload (14-day retention)
+| Workflow      | Purpose                                                                  | Triggers                                   |
+| ------------- | ------------------------------------------------------------------------ | ------------------------------------------ |
+| `test.yml`    | `go test -race -cover`, 75% coverage floor, `golangci-lint`, templ check | Go/Templ/go.mod changes                    |
+| `docker.yml`  | Multi-arch Docker build & push to GHCR, Trivy scan, artifact attest      | Go/Templ/Dockerfile changes, `v*.*.*` tags |
+| `release.yml` | GoReleaser: cross-compile, cosign signing, SBOM, Homebrew, Nix, Scoop    | `v*.*.*` tags                              |
 
 ### Graceful Shutdown
 
@@ -296,6 +299,7 @@ GitHub Actions workflow on every push to `master`:
 `content.Repository` interface abstracts content storage:
 
 - `FileSystemRepository` — production, reads from disk
+- `BlobRepository` — production, reads from S3/GCS/Azure via gocloud.dev
 - `InMemoryRepository` — testing, backed by a map
 
 ### Domain Types
@@ -320,7 +324,7 @@ GitHub Actions workflow on every push to `master`:
 - **Unit tests** across all packages (`domain`, `config`, `content`, `renderer`, `server`, `cache`, `container`)
 - **Parallel tests** where applicable (`t.Parallel()` enforced by linter)
 - **Benchmarks** for content loading, rendering, search, and HTTP handlers
-- **Test utilities** package (`internal/testutil`) with shared fixtures
+- **Test utilities** package (`internal/test`) with shared fixtures
 - **Mock repositories** for isolated handler testing
 - **~75 linters** configured in `.golangci.yml`
 - CI runs with `-race` detector
