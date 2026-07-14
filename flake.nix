@@ -36,7 +36,7 @@
           };
           pname = "dynamic-markdown-site";
           version = self.rev or self.dirtyRev or "dev";
-          vendorHash = "sha256-BNMiWs+Tk28qMoOS0tii5iLOMVvcyh3IIshqc2V0ovU=";
+          vendorHash = "sha256-ldBfi70Kkt7zqJlwXFs04FPA3DiHaarwySdcaNoPZIE=";
           proxyVendor = true;
 
           sourceFiles = lib.fileset.unions [
