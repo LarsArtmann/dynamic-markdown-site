@@ -5,9 +5,7 @@ import "testing"
 func TestRenderWithFrontmatter(t *testing.T) {
 	t.Parallel()
 
-	renderer := NewGoldmarkRenderer()
-
-	input := `---
+	result := renderMust(t, NewGoldmarkRenderer(), `---
 title: Test Document
 description: A test document
 author: Test Author
@@ -19,12 +17,7 @@ draft: false
 
 # Hello
 
-Content.`
-
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("Render() error: %v", err)
-	}
+Content.`)
 
 	if result.Metadata.Title != "Test Document" {
 		t.Errorf("Metadata.Title = %q, want %q", result.Metadata.Title, "Test Document")
@@ -43,16 +36,9 @@ Content.`
 func TestRenderFrontmatterMissing(t *testing.T) {
 	t.Parallel()
 
-	renderer := NewGoldmarkRenderer()
+	result := renderMust(t, NewGoldmarkRenderer(), `# No Frontmatter
 
-	input := `# No Frontmatter
-
-Just content.`
-
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("Render() error: %v", err)
-	}
+Just content.`)
 
 	if result.Metadata.Title != "" {
 		t.Errorf("Metadata.Title should be empty, got %q", result.Metadata.Title)

@@ -134,20 +134,13 @@ func TestRenderBasicMarkdown(t *testing.T) {
 func TestRenderResultStructure(t *testing.T) {
 	t.Parallel()
 
-	renderer := NewGoldmarkRenderer()
-
-	input := `---
+	result := renderMust(t, NewGoldmarkRenderer(), `---
 title: Test
 ---
 
 ## Section
 
-Content.`
-
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("Render() error: %v", err)
-	}
+Content.`)
 
 	// Verify all fields are populated
 	if result.HTML == "" {
@@ -300,9 +293,7 @@ The end.
 func TestRenderResultImplementsDomainTypes(t *testing.T) {
 	t.Parallel()
 
-	renderer := NewGoldmarkRenderer()
-
-	input := `---
+	result := renderMust(t, NewGoldmarkRenderer(), `---
 title: Test
 tags:
   - one
@@ -310,12 +301,7 @@ tags:
 ---
 
 ## Section
-`
-
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("Render() error: %v", err)
-	}
+`)
 
 	// Verify domain.Frontmatter fields
 	_ = result.Metadata

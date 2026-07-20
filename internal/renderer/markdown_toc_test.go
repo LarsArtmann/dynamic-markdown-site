@@ -1,15 +1,11 @@
 package renderer
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestRenderTOC(t *testing.T) {
 	t.Parallel()
 
-	renderer := NewGoldmarkRenderer()
-
-	input := `# Top Level
+	result := renderMust(t, NewGoldmarkRenderer(), `# Top Level
 
 ## Section One
 
@@ -22,12 +18,7 @@ More content.
 ### Subsection
 
 Detailed content.
-`
-
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("Render() error: %v", err)
-	}
+`)
 
 	if len(result.TOC) == 0 {
 		t.Error("expected TOC to be generated")
@@ -44,13 +35,7 @@ Detailed content.
 func TestRenderTOCEmpty(t *testing.T) {
 	t.Parallel()
 
-	renderer := NewGoldmarkRenderer()
-
-	input := "Plain text with no headings.\n"
-	result, err := renderer.Render([]byte(input))
-	if err != nil {
-		t.Fatalf("Render() error: %v", err)
-	}
+	result := renderMust(t, NewGoldmarkRenderer(), "Plain text with no headings.\n")
 
 	if len(result.TOC) != 0 {
 		t.Errorf("expected empty TOC, got %d items", len(result.TOC))

@@ -3,7 +3,23 @@ package renderer
 import (
 	"strings"
 	"testing"
+
+	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
+
+// renderMust is a render-and-return helper: it runs r.Render on input, fails
+// the test on any error, and returns the resulting RenderedContent so callers
+// can inspect HTML, TOC, metadata, etc. without re-running the renderer.
+func renderMust(t *testing.T, r *GoldmarkRenderer, input string) domain.RenderedContent {
+	t.Helper()
+
+	result, err := r.Render([]byte(input))
+	if err != nil {
+		t.Fatalf("Render() error: %v", err)
+	}
+
+	return result
+}
 
 // renderContains is a render-and-assert helper: it runs r.Render on input,
 // fails the test on any error, and asserts that want is a substring of the
