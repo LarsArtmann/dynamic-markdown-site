@@ -214,8 +214,6 @@ github.com/larsartmann/go-filewatcher/v2 v2.2.1 h1:pBtMrRq5oKaUV7NjBaaHFnY8P4RMd
 github.com/larsartmann/go-filewatcher/v2 v2.2.1/go.mod h1:VmtZ/YAXv1N6D++rNdScnKA9gB2Vn5tPbc1dUOGxubk=
 github.com/larsartmann/httputil v0.5.0 h1:ARo/PLrZSqQH7CDyMQmWRNZq6h18uRjG9YnFy928T0c=
 github.com/larsartmann/httputil v0.5.0/go.mod h1:do35f2Dt4vcF6MmTibmw+/XgI0eL2qjXl7+r8LKgBmo=
-github.com/larsartmann/httputil v0.6.0 h1:FRcn1jTV//sVX3YhhMjKIODxBCe/XeHXzsPPUF3sWVc=
-github.com/larsartmann/httputil v0.6.0/go.mod h1:WZOXUsHhqvzmNe+wogKEyIp8RlCXwnLhEyjqXomiiRA=
 github.com/lucasb-eyer/go-colorful v1.4.0 h1:UtrWVfLdarDgc44HcS7pYloGHJUjHV/4FwW4TvVgFr4=
 github.com/lucasb-eyer/go-colorful v1.4.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/mattn/go-colorable v0.1.15 h1:+u9SLTRGnXv73cEsnsmoZBom+dMU88B2M0aDcWy0/jY=

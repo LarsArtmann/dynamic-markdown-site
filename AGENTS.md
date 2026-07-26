@@ -18,6 +18,7 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 - Otter for HTML caching
 - gocloud.dev for blob storage (S3, GCS, filesystem)
 - D2 + Mermaid for diagram rendering
+- go-filewatcher/v2 for dev-mode file watching (replaces raw fsnotify)
 
 ---
 
@@ -243,7 +244,7 @@ urlPath, err := domain.NewURLPath(filepath)
 
 ### 2. File Watching
 
-File watcher only runs in dev mode (`-dev` flag). It refreshes the content repository when markdown files change with 500ms debounce to coalesce bulk operations.
+File watcher only runs in dev mode (`-dev` flag). It uses `github.com/larsartmann/go-filewatcher/v2` for recursive watching with extension filtering (`.md`, `.markdown`), directory ignoring (`content.SkipDirs`), and 500ms global debounce. The watcher receives the SIGINT/SIGTERM context and exits cleanly on shutdown.
 
 ### 3. Cache Behavior
 
@@ -301,7 +302,7 @@ The `.goreleaser.yaml` declares `license: MIT` in 4 places (homebrew_casks, nfpm
 
 ### 12. encoding/json/v2 Must Not Be Used
 
-The project intentionally uses stable `encoding/json`. The `go-error-family` dependency must stay pinned at `v0.6.1` (v0.7.0+ adopts `encoding/json/v2`). Automated upgrade tools (go-auto-upgrade) will re-break the build by migrating imports — the migration must be excluded. `GOEXPERIMENT=jsonv2` is NOT enabled.
+The project intentionally uses stable `encoding/json`. `httputil` must stay pinned at `v0.5.0` (v0.6.0+ imports `encoding/json/v2` in `health.go`, breaking the build without `GOEXPERIMENT=jsonv2`). `go-error-family` is at `v0.9.0` as a transitive dependency of `go-filewatcher` — if it causes build issues, pin it. Automated upgrade tools (go-auto-upgrade) will re-break the build by upgrading `httputil` — the upgrade must be excluded. `GOEXPERIMENT=jsonv2` is NOT enabled.
 
 ### 13. Compression Middleware Affects Tests
 
