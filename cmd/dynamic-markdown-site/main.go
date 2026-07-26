@@ -62,9 +62,12 @@ func run() error {
 
 	httpServer := setupHTTPServer(svc)
 
-	startFileWatcher(svc)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	if err := serveHTTP(svc, httpServer); err != nil {
+	startFileWatcher(ctx, svc)
+
+	if err := serveHTTP(ctx, svc, httpServer); err != nil {
 		shutdownServices(svc)
 
 		return err
@@ -128,7 +131,7 @@ func setupHTTPServer(svc *services) *http.Server {
 	}
 }
 
-func serveHTTP(svc *services, httpServer *http.Server) error {
+func serveHTTP(ctx context.Context, svc *services, httpServer *http.Server) error {
 	errChan := make(chan error, 1)
 
 	go func() {
@@ -139,9 +142,6 @@ func serveHTTP(svc *services, httpServer *http.Server) error {
 			errChan <- err
 		}
 	}()
-
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
 
 	select {
 	case err := <-errChan:
@@ -178,10 +178,10 @@ func shutdownServices(svc *services) {
 	}
 }
 
-func startFileWatcher(svc *services) {
+func startFileWatcher(ctx context.Context, svc *services) {
 	if svc.config.DevMode {
 		liveReload := svc.server.LiveReload()
-		go watchForChanges(svc.config.RootDir, svc.repo, liveReload, svc.logger)
+		go watchForChanges(ctx, svc.config.RootDir, svc.repo, liveReload, svc.logger)
 
 		svc.logger.Info("file watcher started in dev mode")
 	}

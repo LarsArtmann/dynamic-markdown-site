@@ -1,29 +1,36 @@
 package main
 
 import (
+	"context"
 	"log/slog"
-	"os"
-	"path/filepath"
-	"strings"
-	"sync"
 	"time"
 
-	"github.com/cockroachdb/errors"
-	"github.com/fsnotify/fsnotify"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
+	filewatcher "github.com/larsartmann/go-filewatcher/v2"
 )
 
 const debounceDelay = 500 * time.Millisecond
 
-// watchForChanges monitors the root directory for filesystem changes in dev mode.
+// watchForChanges monitors the root directory for markdown file changes in dev
+// mode using go-filewatcher for recursive watching, extension filtering, and
+// debouncing. The watcher exits cleanly when ctx is cancelled.
 func watchForChanges(
+	ctx context.Context,
 	rootDir string,
 	repo content.Repository,
 	liveReload *server.LiveReload,
 	logger *slog.Logger,
 ) {
-	watcher, err := fsnotify.NewWatcher()
+	watcher, err := filewatcher.New(
+		[]string{rootDir},
+		filewatcher.WithExtensions(".md", ".markdown"),
+		filewatcher.WithDebounce(debounceDelay),
+		filewatcher.WithIgnoreDirs(content.SkipDirs...),
+		filewatcher.WithOnError(func(err error) {
+			logger.Error("file watcher error", slog.Any("error", err))
+		}),
+	)
 	if err != nil {
 		logger.Error("failed to create file watcher", slog.Any("error", err))
 
@@ -31,79 +38,28 @@ func watchForChanges(
 	}
 
 	defer func() {
-		err := watcher.Close()
-		if err != nil {
-			logger.Error("failed to close file watcher", slog.Any("error", err))
+		if closeErr := watcher.Close(); closeErr != nil {
+			logger.Error("failed to close file watcher", slog.Any("error", closeErr))
 		}
 	}()
 
 	logger.Info("file watcher initialized in dev mode", slog.String("root_dir", rootDir))
 
-	if err := addDirectoriesRecursive(watcher, rootDir, logger); err != nil {
-		logger.Error("failed to add directories to watcher", slog.Any("error", err))
+	events, err := watcher.Watch(ctx)
+	if err != nil {
+		logger.Error("failed to start watching", slog.Any("error", err))
 
 		return
 	}
 
-	var (
-		debounceMu    sync.Mutex
-		debounceTimer *time.Timer
-	)
+	for event := range events {
+		logger.Debug(
+			"filesystem event",
+			slog.String("path", event.Path),
+			slog.String("op", event.Op.String()),
+		)
 
-	for {
-		select {
-		case event, ok := <-watcher.Events:
-			if !ok {
-				return
-			}
-
-			if event.Op&fsnotify.Chmod != 0 {
-				continue
-			}
-
-			logger.Debug(
-				"filesystem event",
-				slog.String("path", event.Name),
-				slog.String("op", event.Op.String()),
-			)
-
-			if shouldTriggerRefresh(event.Name) {
-				debounceMu.Lock()
-				if debounceTimer != nil {
-					debounceTimer.Stop()
-				}
-
-				debounceTimer = time.AfterFunc(debounceDelay, func() {
-					doRefresh(repo, liveReload, logger)
-				})
-				debounceMu.Unlock()
-
-				logger.Debug(
-					"debounced refresh for markdown change",
-					slog.String("path", event.Name),
-				)
-			}
-
-			if event.Op&fsnotify.Create != 0 && isDirectory(event.Name) {
-				logger.Debug("adding new directory to watcher", slog.String("path", event.Name))
-
-				err := addDirectoriesRecursive(watcher, event.Name, logger)
-				if err != nil {
-					logger.Error(
-						"failed to add new directory to watcher",
-						slog.String("path", event.Name),
-						slog.Any("error", err),
-					)
-				}
-			}
-
-		case err, ok := <-watcher.Errors:
-			if !ok {
-				return
-			}
-
-			logger.Error("file watcher error", slog.Any("error", err))
-		}
+		doRefresh(repo, liveReload, logger)
 	}
 }
 
@@ -125,56 +81,4 @@ func doRefresh(repo content.Repository, liveReload *server.LiveReload, logger *s
 			liveReload.Notify("")
 		}
 	}
-}
-
-// addDirectoriesRecursive recursively adds all directories to the watcher.
-func addDirectoriesRecursive(watcher *fsnotify.Watcher, root string, logger *slog.Logger) error {
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return errors.Wrapf(err, "walking directory tree at %s (root: %s)", path, root)
-		}
-
-		if info.IsDir() {
-			if strings.HasPrefix(filepath.Base(path), ".") {
-				return filepath.SkipDir
-			}
-
-			if content.ShouldSkipDir(filepath.Base(path)) {
-				return filepath.SkipDir
-			}
-
-			err := watcher.Add(path)
-			if err != nil {
-				logger.Warn(
-					"failed to add directory to watcher",
-					slog.String("path", path),
-					slog.Any("error", err),
-				)
-			} else {
-				logger.Debug("added directory to watcher", slog.String("path", path))
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return errors.Wrapf(err, "walk directories in root: %s", root)
-	}
-
-	return nil
-}
-
-// shouldTriggerRefresh returns true if the file change should trigger a repository refresh.
-func shouldTriggerRefresh(path string) bool {
-	return content.IsMarkdownFile(path)
-}
-
-// isDirectory returns true if the path exists and is a directory.
-func isDirectory(path string) bool {
-	info, err := os.Stat(path)
-	if err != nil {
-		return false
-	}
-
-	return info.IsDir()
 }
