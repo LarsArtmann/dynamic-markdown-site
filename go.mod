@@ -8,7 +8,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/cockroachdb/errors v1.14.0
 	github.com/larsartmann/go-filewatcher/v2 v2.2.1
-	github.com/larsartmann/httputil v0.6.0
+	github.com/larsartmann/httputil v0.5.0
 	github.com/maypok86/otter/v2 v2.3.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/samber/lo v1.53.0

@@ -212,6 +212,8 @@ github.com/larsartmann/go-error-family v0.9.0 h1:DpIAvgi5q6+HrGbMNc979yO/0rq/uFa
 github.com/larsartmann/go-error-family v0.9.0/go.mod h1:JEvLiYWT8p9WrNXrD1Ow97DphYsB9Bksr2lNmwG3Vm4=
 github.com/larsartmann/go-filewatcher/v2 v2.2.1 h1:pBtMrRq5oKaUV7NjBaaHFnY8P4RMdVT/X98fxoUw9LM=
 github.com/larsartmann/go-filewatcher/v2 v2.2.1/go.mod h1:VmtZ/YAXv1N6D++rNdScnKA9gB2Vn5tPbc1dUOGxubk=
+github.com/larsartmann/httputil v0.5.0 h1:ARo/PLrZSqQH7CDyMQmWRNZq6h18uRjG9YnFy928T0c=
+github.com/larsartmann/httputil v0.5.0/go.mod h1:do35f2Dt4vcF6MmTibmw+/XgI0eL2qjXl7+r8LKgBmo=
 github.com/larsartmann/httputil v0.6.0 h1:FRcn1jTV//sVX3YhhMjKIODxBCe/XeHXzsPPUF3sWVc=
 github.com/larsartmann/httputil v0.6.0/go.mod h1:WZOXUsHhqvzmNe+wogKEyIp8RlCXwnLhEyjqXomiiRA=
 github.com/lucasb-eyer/go-colorful v1.4.0 h1:UtrWVfLdarDgc44HcS7pYloGHJUjHV/4FwW4TvVgFr4=
