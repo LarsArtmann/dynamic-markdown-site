@@ -76,12 +76,14 @@ Nothing. The migration is clean and working. The one thing worth calling out: I 
 ## f) Up to 50 Things to Get Done Next
 
 ### High priority
+
 1. Add integration test for `watchForChanges` (temp dir + markdown write + assert refresh)
 2. Fix pre-existing flaky `TestRateLimiter_Concurrent` test (race condition in token bucket assertion)
 3. Remove `goexperiment.jsonv2` from `.golangci.yml` build-tags (project doesn't use json/v2)
 4. Commit the uncommitted `flake.nix` vendorHash change (or let daemon pick it up)
 
 ### Medium priority
+
 5. Fix pre-existing `gochecknoglobals` / `nolintlint` warnings in `internal/content/helpers.go`
 6. Consider upgrading `go-error-family` to latest explicitly (v0.9.0 is currently indirect via go-filewatcher — make it a documented direct dep or pin it)
 7. Add `go-filewatcher` middleware for structured logging of watch events (the library supports `WithMiddleware`)
@@ -94,6 +96,7 @@ Nothing. The migration is clean and working. The one thing worth calling out: I 
 14. Add `nix flake check` to CI
 
 ### Low priority / future
+
 15. Migrate `httputil` to a version that doesn't require json/v2 (or contribute a fix upstream to remove the json/v2 dependency from `health.go`)
 16. Consider replacing `httputil` entirely with a small internal middleware package (the project only uses Recovery, RequestID, Compression, Chain, ClientIP, ResponseRecorder)
 17. Document the dev-mode architecture in a README section or architecture diagram
