@@ -70,7 +70,14 @@ func TestRateLimiter_DifferentIPs(t *testing.T) {
 func TestRateLimiter_Concurrent(t *testing.T) {
 	t.Parallel()
 
-	rl := newRateLimiter(100, time.Second)
+	// Use a long window so the token bucket does not measurably refill during
+	// the concurrent burst. With time.Second (100 tokens/sec), ~1 token refills
+	// every 10ms of test runtime, producing flaky off-by-one counts (e.g. 101
+	// instead of 100). At one token per 36s, refill here is effectively zero,
+	// so the exact-count assertion is deterministic regardless of scheduler
+	// latency. This test verifies burst capacity and goroutine safety, not
+	// time-based refill (covered by the sequential Allow tests).
+	rl := newRateLimiter(100, time.Hour)
 	defer rl.Stop()
 
 	var wg sync.WaitGroup
