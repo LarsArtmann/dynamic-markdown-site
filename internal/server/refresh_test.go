@@ -32,20 +32,30 @@ func TestRefreshRateLimit(t *testing.T) {
 
 	handler := newTestHandlerFor(t)
 
-	// Fire 15 sequential requests; limit is 10/minute.
-	var lastCode int
+	var ok, limited int
 	for range 15 {
 		rec := httptest.NewRecorder()
 		handler.ServeHTTP(
 			rec,
 			httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/refresh", nil),
 		)
-		lastCode = rec.Code
+
+		switch rec.Code {
+		case http.StatusOK:
+			ok++
+		case http.StatusTooManyRequests:
+			limited++
+		default:
+			t.Fatalf("unexpected status %d from /refresh", rec.Code)
+		}
 	}
 
-	// At least one request after the limit should be rate limited.
-	if lastCode != http.StatusTooManyRequests && lastCode != http.StatusOK {
-		t.Errorf("final status = %d, want 429 or 200", lastCode)
+	if ok != 10 {
+		t.Errorf("allowed refresh requests = %d, want 10", ok)
+	}
+
+	if limited != 5 {
+		t.Errorf("rate-limited refresh requests = %d, want 5", limited)
 	}
 }
 
