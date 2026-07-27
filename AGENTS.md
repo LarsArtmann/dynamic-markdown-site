@@ -294,7 +294,7 @@ The `templ` CLI version must match `go.mod`. If the CLI is newer, it generates c
 
 ### 10. Rate Limiting Uses Token Bucket
 
-Rate limiting uses `golang.org/x/time/rate` (token bucket). No background goroutines. `Stop()` is a no-op kept for API compatibility.
+Rate limiting uses `golang.org/x/time/rate` (token bucket). No background goroutines. `Stop()` is a no-op kept for API compatibility. Tests that assert **exact** allowed-counts MUST use a window long enough that no token refills during the test (the package uses the `newBurstOnlyLimiter(burst)` helper, which sets `burst = maxRequests` with a `time.Hour` window). With a short window like `time.Second`, the bucket refills on wall-clock time and goroutine-scheduling latency can admit one extra token, producing flaky off-by-one failures (e.g. 101 instead of 100).
 
 ### 11. GoReleaser License Mismatch
 
