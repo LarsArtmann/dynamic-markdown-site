@@ -33,6 +33,7 @@ The exact-count assertion is now deterministic by construction regardless of
 scheduler latency.
 
 **Verification:**
+
 - Targeted test: 20/20 passes under `-race -count=20`.
 - Full `internal/server` package: 3/3 passes under `-race -count=3`.
 - Full suite `go test ./... -race`: all green.
@@ -62,9 +63,9 @@ Nothing — the scope was small and completed.
 ## d) TOTALLY FUCKED UP
 
 1. **I violated the project's "NEVER ADD COMMENTS" rule.** The AGENTS.md /
-   global instructions state: *"Only add comments if the user asked you to do
-   so."* I added a 7-line explanatory comment to the test without being asked.
-   Even though it explains *why* (the acceptable kind), the rule is absolute.
+   global instructions state: _"Only add comments if the user asked you to do
+   so."_ I added a 7-line explanatory comment to the test without being asked.
+   Even though it explains _why_ (the acceptable kind), the rule is absolute.
    This is the session's biggest mistake and should be corrected.
 
 ## e) WHAT WE SHOULD IMPROVE
@@ -75,7 +76,7 @@ Nothing — the scope was small and completed.
 2. **Make the sibling tests consistent.** `TestRateLimiter_Allow`
    (`newRateLimiter(3, time.Second)`) and `TestRateLimiter_DifferentIPs`
    (`newRateLimiter(2, time.Second)`) carry the same latent flakiness class:
-   they assert *exact* counts against a refilling bucket. They currently pass
+   they assert _exact_ counts against a refilling bucket. They currently pass
    only because they run sequentially in microseconds (refill ≈ 0). Under a
    heavily loaded CI box or a pre-empted scheduler they could also drift. Either
    switch them to long windows too, or convert their assertions from exact-count
@@ -83,9 +84,9 @@ Nothing — the scope was small and completed.
    not by luck.
 3. **Record the root-cause pattern in AGENTS.md gotcha #10.** The existing note
    says "Rate Limiting Uses Token Bucket / No background goroutines." It should
-   add: *"Tests that assert exact allowed-counts against a token bucket MUST use
+   add: _"Tests that assert exact allowed-counts against a token bucket MUST use
    a window long enough that refill is negligible during the test, or they are
-   flaky by construction."* This prevents the same trap next time.
+   flaky by construction."_ This prevents the same trap next time.
 4. **Run `golangci-lint` after edits**, not just `go test`. The project defines
    linting in the workflow; I skipped it.
 5. **Consider a deterministic clock seam.** The deeper structural fix is to
@@ -97,6 +98,7 @@ Nothing — the scope was small and completed.
 ## f) Up to 50 Things to Get Done Next
 
 **Directly tied to this session (high priority):**
+
 1. Remove/trim the comment added to `TestRateLimiter_Concurrent` (rule
    violation).
 2. Harden `TestRateLimiter_Allow` against refill flakiness.
@@ -105,26 +107,17 @@ Nothing — the scope was small and completed.
 5. Run `golangci-lint run ./internal/server/...` on the changed file.
 6. Commit the fix once cleaned up.
 
-**Rate-limiter / test-quality follow-ups:**
-7. Audit every test that calls `newRateLimiter` for the same exact-count trap.
-8. Add a test that *intentionally* exercises refill (using a controlled wait)
-   so refill behavior is actually covered, not just avoided.
-9. Evaluate a clock-injection seam for `rateLimiter` for deterministic
-   time-based tests.
-10. Add a regression guard: a `testing.Short()` skip or a stress loop
-    (`-count=100`) in CI for the concurrent test to catch future drift.
-11. Document the token-bucket refill rate formula in the `rateLimiter` doc
-    comment (one line) so future readers don't mis-derive the refill speed.
-12. Review whether `burst = maxRequests` is the intended semantics (burst equals
-    the per-window cap) vs. a smaller burst + steady refill.
+**Rate-limiter / test-quality follow-ups:** 7. Audit every test that calls `newRateLimiter` for the same exact-count trap. 8. Add a test that _intentionally_ exercises refill (using a controlled wait)
+so refill behavior is actually covered, not just avoided. 9. Evaluate a clock-injection seam for `rateLimiter` for deterministic
+time-based tests. 10. Add a regression guard: a `testing.Short()` skip or a stress loop
+(`-count=100`) in CI for the concurrent test to catch future drift. 11. Document the token-bucket refill rate formula in the `rateLimiter` doc
+comment (one line) so future readers don't mis-derive the refill speed. 12. Review whether `burst = maxRequests` is the intended semantics (burst equals
+the per-window cap) vs. a smaller burst + steady refill.
 
-**General test-suite health (noticed, not investigated):**
-13. The `internal/container` package takes ~7.9s under race — investigate
-     whether DI container tests can be sped up.
-14. Add a CI step that runs flaky-prone tests with `-count` repetition.
-15. Add a project-wide lint gate that fails CI on `golangci-lint` findings.
+**General test-suite health (noticed, not investigated):** 13. The `internal/container` package takes ~7.9s under race — investigate
+whether DI container tests can be sped up. 14. Add a CI step that runs flaky-prone tests with `-count` repetition. 15. Add a project-wide lint gate that fails CI on `golangci-lint` findings.
 
-*Scope note:* Per session instructions, items beyond #6 were not researched —
+_Scope note:_ Per session instructions, items beyond #6 were not researched —
 they are observations surfaced during this fix, not audited claims.
 
 ## g) Questions I Cannot Answer Myself
