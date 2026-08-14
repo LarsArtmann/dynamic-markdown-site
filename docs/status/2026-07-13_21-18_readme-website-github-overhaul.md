@@ -82,7 +82,7 @@ The project has a **proprietary** LICENSE file (`PROPRIETARY LICENSE ... Unautho
 
 ### bun.lock committed to git history risk
 
-The `.gitignore` ignores `bun.lock`, but I used `bun install` which created `bun.lock`. If someone runs `git add website/` carelessly, it won't be added (gitignored). But the reference sites note "CI uses npm" — there's no npm-lock.json. The lockfile situation is unclear.
+The `.gitignore` ignores `bun.lock`, but I used `bun install` which created `bun.lock`. If someone runs `git add website/` carelessly, it won't be added (gitignored). But the reference sites note "CI uses pnpm" — there's no pnpm-lock.json. The lockfile situation is unclear.
 
 ---
 
@@ -93,7 +93,7 @@ The `.gitignore` ignores `bun.lock`, but I used `bun install` which created `bun
 3. **Dogfood D2 diagrams** — The project supports D2 diagram rendering. The website should include architecture diagrams rendered as D2 on the docs pages. This proves the product works.
 4. **Add a "Live Demo" link** — The GitHub repo has no way to see the server running. Consider linking to a live instance or adding screenshots/GIFs to the README.
 5. **Website CI workflow** — Add a GitHub Action that runs `astro check` and `astro build` on the website directory to catch breakage before merge.
-6. **npm lockfile** — Decide on npm vs bun and commit a lockfile for reproducible CI builds.
+6. **pnpm lockfile** — Decide on pnpm vs bun and commit a lockfile for reproducible CI builds.
 7. **Landing page screenshot in README** — The reference repos don't do this, but for a "website generator" project, showing what the output looks like is critical.
 8. **Test all internal links** — The website build succeeded, but there could be broken relative links in the docs content.
 9. **Add a "Comparison" section to README** — The website has a great comparison matrix vs SSGs and wiki engines. This could be a strong selling point in the README too.

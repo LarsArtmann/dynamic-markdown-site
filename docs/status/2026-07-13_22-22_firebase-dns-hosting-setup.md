@@ -78,7 +78,7 @@ The domains repo had **14 pre-existing uncommitted files**. I added my changes o
 2. **Apply the Terraform DNS change** — the site is live at `.web.app` but `dynamicmarkdown.lars.software` won't work until DNS propagates. Must be done from a whitelisted IP.
 3. **Set up CI/CD for the website** — add a GitHub Action that runs `astro check` + `astro build` + `firebase deploy` on push to `master` for the `website/` directory.
 4. **Clean the domains repo working tree** — 14 files have pre-existing uncommitted changes. These should be reviewed, committed, or reverted before my DNS change is applied.
-5. **Add a deploy script** — the website `flake.nix` already has a `deploy` app (`npm run build && firebase deploy --only hosting`). Document this in the README or CONTRIBUTING.
+5. **Add a deploy script** — the website `flake.nix` already has a `deploy` app (`pnpm run build && firebase deploy --only hosting`). Document this in the README or CONTRIBUTING.
 
 ---
 
