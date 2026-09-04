@@ -36,12 +36,12 @@ func main() {
 
 ### Diagrams
 
-| Engine                             | Rendering                          | Syntax                           |
-| ---------------------------------- | ---------------------------------- | -------------------------------- |
-| [D2](https://d2lang.com/)          | Server-side SVG                    | ` ```d2 ` fenced code block      |
-| [Mermaid](https://mermaid.js.org/) | Client-side via Mermaid.js v11 CDN | ` ```mermaid ` fenced code block |
+| Engine                             | Rendering                          | Syntax                             |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| [D2](https://d2lang.com/)          | Server-side SVG                    | `` ```d2 `` fenced code block      |
+| [Mermaid](https://mermaid.js.org/) | Client-side via Mermaid.js v11 CDN | `` ```mermaid `` fenced code block |
 
-D2 diagrams are compiled to SVG at render time. Mermaid diagrams load the library on-demand — only when the page contains ` ```mermaid ` blocks.
+D2 diagrams are compiled to SVG at render time. Mermaid diagrams load the library on-demand — only when the page contains `` ```mermaid `` blocks.
 
 ### Admonition / Alert Blocks
 

@@ -1,8 +1,8 @@
 # Comprehensive Status Report
 
-**Date:** 2026-04-01 15:45  
-**Branch:** master  
-**Commit:** Working tree clean (no uncommitted changes)  
+**Date:** 2026-04-01 15:45\
+**Branch:** master\
+**Commit:** Working tree clean (no uncommitted changes)\
 **Last Commit:** `88e3367` - feat(renderer): add Goldmark admonition extension for alert blocks
 
 ---
@@ -198,43 +198,43 @@ The codebase is in excellent shape. No critical issues identified.
 
 ### 🔴 High Priority (Do First)
 
-| #   | Task                                    | Impact   | Effort | Package              |
-| --- | --------------------------------------- | -------- | ------ | -------------------- |
-| 1   | Add container package tests             | Critical | Medium | `internal/container` |
-| 2   | Address GitHub security vulnerabilities | High     | Low    | Dependencies         |
-| 3   | Split `handlers_test.go` (914 lines)    | High     | Medium | `internal/server`    |
-| 4   | Split `search_test.go` (685 lines)      | High     | Medium | `internal/content`   |
-| 5   | Split `markdown_test.go` (611 lines)    | Medium   | Medium | `internal/renderer`  |
-| 6   | Fix Go 1.26.1 environment mismatch      | Medium   | Low    | CI/CD                |
-| 7   | Add integration test suite              | High     | High   | `internal/test`      |
-| 8   | Implement request timing middleware     | Medium   | Low    | `internal/server`    |
-| 9   | Add Prometheus metrics endpoint         | Medium   | Medium | `internal/server`    |
-| 10  | Clean up remaining 9 linter warnings    | Low      | Low    | Various              |
+| #  | Task                                    | Impact   | Effort | Package              |
+| -- | --------------------------------------- | -------- | ------ | -------------------- |
+| 1  | Add container package tests             | Critical | Medium | `internal/container` |
+| 2  | Address GitHub security vulnerabilities | High     | Low    | Dependencies         |
+| 3  | Split `handlers_test.go` (914 lines)    | High     | Medium | `internal/server`    |
+| 4  | Split `search_test.go` (685 lines)      | High     | Medium | `internal/content`   |
+| 5  | Split `markdown_test.go` (611 lines)    | Medium   | Medium | `internal/renderer`  |
+| 6  | Fix Go 1.26.1 environment mismatch      | Medium   | Low    | CI/CD                |
+| 7  | Add integration test suite              | High     | High   | `internal/test`      |
+| 8  | Implement request timing middleware     | Medium   | Low    | `internal/server`    |
+| 9  | Add Prometheus metrics endpoint         | Medium   | Medium | `internal/server`    |
+| 10 | Clean up remaining 9 linter warnings    | Low      | Low    | Various              |
 
 ### 🟡 Medium Priority (Do Soon)
 
-| #   | Task                        | Impact | Effort | Package                       |
-| --- | --------------------------- | ------ | ------ | ----------------------------- |
-| 11  | Dark mode / theme toggle    | High   | Medium | `templates/` + CSS            |
-| 12  | Add code copy button        | Medium | Low    | `templates/` + JS             |
-| 13  | Diagram zoom functionality  | Medium | Low    | `templates/` + JS             |
-| 14  | Search autocomplete         | Medium | Medium | `internal/server` + JS        |
-| 15  | Directory pagination        | Medium | Medium | `internal/server` + templates |
-| 16  | Cache stats dashboard       | Low    | Medium | `internal/server` + templates |
-| 17  | RSS/Atom feed generation    | Medium | Medium | `internal/server`             |
-| 18  | Keyboard navigation         | High   | Low    | `templates/` + JS             |
-| 19  | Print stylesheet            | Low    | Low    | `templates/` + CSS            |
-| 20  | Related content suggestions | Medium | High   | `internal/content`            |
+| #  | Task                        | Impact | Effort | Package                       |
+| -- | --------------------------- | ------ | ------ | ----------------------------- |
+| 11 | Dark mode / theme toggle    | High   | Medium | `templates/` + CSS            |
+| 12 | Add code copy button        | Medium | Low    | `templates/` + JS             |
+| 13 | Diagram zoom functionality  | Medium | Low    | `templates/` + JS             |
+| 14 | Search autocomplete         | Medium | Medium | `internal/server` + JS        |
+| 15 | Directory pagination        | Medium | Medium | `internal/server` + templates |
+| 16 | Cache stats dashboard       | Low    | Medium | `internal/server` + templates |
+| 17 | RSS/Atom feed generation    | Medium | Medium | `internal/server`             |
+| 18 | Keyboard navigation         | High   | Low    | `templates/` + JS             |
+| 19 | Print stylesheet            | Low    | Low    | `templates/` + CSS            |
+| 20 | Related content suggestions | Medium | High   | `internal/content`            |
 
 ### 🟢 Low Priority (Do Later)
 
-| #   | Task                        | Impact | Effort | Package               |
-| --- | --------------------------- | ------ | ------ | --------------------- |
-| 21  | Content analytics           | Low    | High   | New package           |
-| 22  | Plugin system architecture  | High   | High   | Design + impl         |
-| 23  | Internationalization (i18n) | Medium | High   | `templates/` + domain |
-| 24  | WebSocket live reload       | Low    | Medium | `internal/server`     |
-| 25  | Kubernetes manifests        | Low    | Medium | `k8s/` directory      |
+| #  | Task                        | Impact | Effort | Package               |
+| -- | --------------------------- | ------ | ------ | --------------------- |
+| 21 | Content analytics           | Low    | High   | New package           |
+| 22 | Plugin system architecture  | High   | High   | Design + impl         |
+| 23 | Internationalization (i18n) | Medium | High   | `templates/` + domain |
+| 24 | WebSocket live reload       | Low    | Medium | `internal/server`     |
+| 25 | Kubernetes manifests        | Low    | Medium | `k8s/` directory      |
 
 ---
 
@@ -262,9 +262,9 @@ The codebase is in excellent shape. No critical issues identified.
 
 ## Metrics Snapshot
 
-| Metric              | Value                            | Trend         |
-| ------------------- | -------------------------------- | ------------- |
-| Total Lines of Code | ~8,500                           | Stable        |
+| Metric              | Value                            | Trend        |
+| ------------------- | -------------------------------- | ------------ |
+| Total Lines of Code | ~8,500                           | Stable       |
 | Test Functions      | 100+                             | ⬆️ Growing    |
 | Test Coverage       | 80.3% (server), 84.3% (renderer) | ⬆️ Improving  |
 | Linter Issues       | 9 non-critical                   | ⬇️ Decreasing |
@@ -300,6 +300,6 @@ The codebase is in excellent shape. No critical issues identified.
 
 ---
 
-_Report generated: 2026-04-01 15:45_  
-_Status reports in docs/status/: 3 files_  
+_Report generated: 2026-04-01 15:45_\
+_Status reports in docs/status/: 3 files_\
 _Latest: This report_

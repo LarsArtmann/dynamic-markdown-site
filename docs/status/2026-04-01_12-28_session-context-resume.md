@@ -188,74 +188,74 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 ### Critical (Do First)
 
-| #   | Improvement                                                        | Impact                | Effort |
-| --- | ------------------------------------------------------------------ | --------------------- | ------ |
-| 1   | **Agent coordination protocol** — branch-per-agent or file locking | Prevents build breaks | Policy |
-| 2   | Always verify with `go test -count=1 ./...` not just `go build`    | Catches real errors   | Habit  |
-| 3   | AST-based `HasMermaid` — eliminate redundant regex scan            | Correctness + perf    | 30min  |
-| 4   | Remove dead diagram code (`diagrams.go` regex pipeline)            | Code clarity          | 30min  |
-| 5   | Proper YAML parsing for `isDraft`                                  | Correctness           | 30min  |
+| # | Improvement                                                        | Impact                | Effort |
+| - | ------------------------------------------------------------------ | --------------------- | ------ |
+| 1 | **Agent coordination protocol** — branch-per-agent or file locking | Prevents build breaks | Policy |
+| 2 | Always verify with `go test -count=1 ./...` not just `go build`    | Catches real errors   | Habit  |
+| 3 | AST-based `HasMermaid` — eliminate redundant regex scan            | Correctness + perf    | 30min  |
+| 4 | Remove dead diagram code (`diagrams.go` regex pipeline)            | Code clarity          | 30min  |
+| 5 | Proper YAML parsing for `isDraft`                                  | Correctness           | 30min  |
 
 ### Architecture
 
-| #   | Improvement                                            | Impact                      | Effort |
-| --- | ------------------------------------------------------ | --------------------------- | ------ |
-| 6   | Rename `version` → `buildinfo`                         | Eliminates revive exclusion | 30min  |
-| 7   | Immutable FileNode (remove setters)                    | Thread safety               | 2hr    |
-| 8   | Split Repository into Reader + Refresher               | Cleaner concerns            | 1hr    |
-| 9   | Structured errors with Is/As/Unwrap                    | Better error matching       | 2hr    |
-| 10  | Frontmatter typed struct (not `map[string]any`)        | Type safety                 | 1hr    |
-| 11  | `RenderResult` → use `domain.RenderedContent` directly | Eliminate duplication       | 1hr    |
+| #  | Improvement                                            | Impact                      | Effort |
+| -- | ------------------------------------------------------ | --------------------------- | ------ |
+| 6  | Rename `version` → `buildinfo`                         | Eliminates revive exclusion | 30min  |
+| 7  | Immutable FileNode (remove setters)                    | Thread safety               | 2hr    |
+| 8  | Split Repository into Reader + Refresher               | Cleaner concerns            | 1hr    |
+| 9  | Structured errors with Is/As/Unwrap                    | Better error matching       | 2hr    |
+| 10 | Frontmatter typed struct (not `map[string]any`)        | Type safety                 | 1hr    |
+| 11 | `RenderResult` → use `domain.RenderedContent` directly | Eliminate duplication       | 1hr    |
 
 ### Process
 
-| #   | Improvement                                   | Impact                  | Effort |
-| --- | --------------------------------------------- | ----------------------- | ------ |
-| 12  | Pre-push hook (lint + test + build)           | Prevents broken CI      | 30min  |
-| 13  | Coverage threshold ≥75% in CI                 | Prevents regression     | 15min  |
-| 14  | Separate fast test workflow from Docker build | Faster PR feedback      | Medium |
-| 15  | Disk space monitoring cron                    | Prevents build failures | 30min  |
+| #  | Improvement                                   | Impact                  | Effort |
+| -- | --------------------------------------------- | ----------------------- | ------ |
+| 12 | Pre-push hook (lint + test + build)           | Prevents broken CI      | 30min  |
+| 13 | Coverage threshold ≥75% in CI                 | Prevents regression     | 15min  |
+| 14 | Separate fast test workflow from Docker build | Faster PR feedback      | Medium |
+| 15 | Disk space monitoring cron                    | Prevents build failures | 30min  |
 
 ### Library Considerations
 
-| #   | Current              | Alternative               | Why                                 |
-| --- | -------------------- | ------------------------- | ----------------------------------- |
-| 16  | `samber/do/v2`       | `wire` (compile-time)     | Catch DI errors at build time       |
-| 17  | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` | One less dependency                 |
-| 18  | `charm.land/log`     | `slog` directly           | stdlib                              |
-| 19  | Custom search        | `bleve`                   | Fuzzy matching, ranking, pagination |
+| #  | Current              | Alternative               | Why                                 |
+| -- | -------------------- | ------------------------- | ----------------------------------- |
+| 16 | `samber/do/v2`       | `wire` (compile-time)     | Catch DI errors at build time       |
+| 17 | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` | One less dependency                 |
+| 18 | `charm.land/log`     | `slog` directly           | stdlib                              |
+| 19 | Custom search        | `bleve`                   | Fuzzy matching, ranking, pagination |
 
 ---
 
 ## F. TOP 25 NEXT ITEMS (Impact/Effort Sort)
 
-| #   | Item                                               | Impact      | Effort | Cat           | Blocking?       |
-| --- | -------------------------------------------------- | ----------- | ------ | ------------- | --------------- |
-| 1   | Fix broken build (GetRaw implementation)           | 🔴 Critical | Varies | Fix           | Another agent   |
-| 2   | AST-based HasMermaid detection                     | 🔴 High     | 30min  | Code          | No              |
-| 3   | Remove dead diagram code from `diagrams.go`        | 🟡 Medium   | 30min  | Code          | No              |
-| 4   | Proper YAML parsing for `isDraft`                  | 🟡 Medium   | 30min  | Code          | No              |
-| 5   | Write sitemap.go tests                             | 🔴 High     | 1hr    | Testing       | No              |
-| 6   | Push to origin, verify CI green                    | 🔴 Critical | 10min  | CI            | Build must pass |
-| 7   | Pre-push hook (lint + test + build)                | 🔴 High     | 30min  | Process       | No              |
-| 8   | Split `handlers_test.go` (667+ lines)              | 🟡 Medium   | 1hr    | Quality       | No              |
-| 9   | Split `search_test.go` (685 lines)                 | 🟡 Medium   | 1hr    | Quality       | No              |
-| 10  | Coverage threshold ≥75% in CI                      | 🟡 Medium   | 15min  | CI            | No              |
-| 11  | Verify CI green on GitHub Actions                  | 🔴 Critical | 10min  | CI            | Push first      |
-| 12  | Rename `version` → `buildinfo`                     | 🟡 Medium   | 30min  | Arch          | No              |
-| 13  | Unify `RenderResult` with `domain.RenderedContent` | 🟡 Medium   | 1hr    | Arch          | No              |
-| 14  | Immutable FileNode (remove setters)                | 🟡 Medium   | 2hr    | Arch          | No              |
-| 15  | Frontmatter typed struct                           | 🟡 Medium   | 1hr    | Types         | No              |
-| 16  | Split Repository: Reader + Refresher               | 🟡 Medium   | 1hr    | Arch          | No              |
-| 17  | HTTP integration tests                             | 🟢 High     | 3hr    | Testing       | No              |
-| 18  | Disk space monitoring                              | 🟢 Low      | 30min  | Tooling       | No              |
-| 19  | RSS/Atom feed generation                           | 🟢 Low      | 2hr    | Feature       | No              |
-| 20  | Dark mode CSS toggle                               | 🟢 Low      | 2hr    | UX            | No              |
-| 21  | Prometheus metrics endpoint                        | 🟢 Low      | 2hr    | Observability | No              |
-| 22  | Rate limit search endpoint                         | 🟢 Low      | 30min  | Security      | No              |
-| 23  | gzip/brotli compression                            | 🟢 Low      | 30min  | Perf          | No              |
-| 24  | Graceful shutdown tests                            | 🟢 Low      | 1hr    | Testing       | No              |
-| 25  | ADR for DI choice (do vs wire)                     | 🟢 Low      | 30min  | Docs          | No              |
+| #  | Item                                               | Impact      | Effort | Cat           | Blocking?       |
+| -- | -------------------------------------------------- | ----------- | ------ | ------------- | --------------- |
+| 1  | Fix broken build (GetRaw implementation)           | 🔴 Critical | Varies | Fix           | Another agent   |
+| 2  | AST-based HasMermaid detection                     | 🔴 High     | 30min  | Code          | No              |
+| 3  | Remove dead diagram code from `diagrams.go`        | 🟡 Medium   | 30min  | Code          | No              |
+| 4  | Proper YAML parsing for `isDraft`                  | 🟡 Medium   | 30min  | Code          | No              |
+| 5  | Write sitemap.go tests                             | 🔴 High     | 1hr    | Testing       | No              |
+| 6  | Push to origin, verify CI green                    | 🔴 Critical | 10min  | CI            | Build must pass |
+| 7  | Pre-push hook (lint + test + build)                | 🔴 High     | 30min  | Process       | No              |
+| 8  | Split `handlers_test.go` (667+ lines)              | 🟡 Medium   | 1hr    | Quality       | No              |
+| 9  | Split `search_test.go` (685 lines)                 | 🟡 Medium   | 1hr    | Quality       | No              |
+| 10 | Coverage threshold ≥75% in CI                      | 🟡 Medium   | 15min  | CI            | No              |
+| 11 | Verify CI green on GitHub Actions                  | 🔴 Critical | 10min  | CI            | Push first      |
+| 12 | Rename `version` → `buildinfo`                     | 🟡 Medium   | 30min  | Arch          | No              |
+| 13 | Unify `RenderResult` with `domain.RenderedContent` | 🟡 Medium   | 1hr    | Arch          | No              |
+| 14 | Immutable FileNode (remove setters)                | 🟡 Medium   | 2hr    | Arch          | No              |
+| 15 | Frontmatter typed struct                           | 🟡 Medium   | 1hr    | Types         | No              |
+| 16 | Split Repository: Reader + Refresher               | 🟡 Medium   | 1hr    | Arch          | No              |
+| 17 | HTTP integration tests                             | 🟢 High     | 3hr    | Testing       | No              |
+| 18 | Disk space monitoring                              | 🟢 Low      | 30min  | Tooling       | No              |
+| 19 | RSS/Atom feed generation                           | 🟢 Low      | 2hr    | Feature       | No              |
+| 20 | Dark mode CSS toggle                               | 🟢 Low      | 2hr    | UX            | No              |
+| 21 | Prometheus metrics endpoint                        | 🟢 Low      | 2hr    | Observability | No              |
+| 22 | Rate limit search endpoint                         | 🟢 Low      | 30min  | Security      | No              |
+| 23 | gzip/brotli compression                            | 🟢 Low      | 30min  | Perf          | No              |
+| 24 | Graceful shutdown tests                            | 🟢 Low      | 1hr    | Testing       | No              |
+| 25 | ADR for DI choice (do vs wire)                     | 🟢 Low      | 30min  | Docs          | No              |
 
 ---
 

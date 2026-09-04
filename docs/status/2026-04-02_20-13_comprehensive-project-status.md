@@ -1,9 +1,9 @@
 # Comprehensive Project Status Report
 
-**Generated:** 2026-04-02 20:13 CEST  
-**Author:** Crush (GLM-5.1)  
-**Branch:** master  
-**Unpushed commits:** 4  
+**Generated:** 2026-04-02 20:13 CEST\
+**Author:** Crush (GLM-5.1)\
+**Branch:** master\
+**Unpushed commits:** 4\
 **Local Go version:** 1.26.0 (go.mod requires 1.26.1 — mismatch causes warnings but tests pass)
 
 ---
@@ -88,16 +88,16 @@ The project is **functionally complete and production-capable**. All core featur
 
 The following were planned but only the CI fix was completed:
 
-| #   | Task                                                   | Status         |
-| --- | ------------------------------------------------------ | -------------- |
-| 1   | Fix CI: lowercase IMAGE_NAME + digest scan             | ✅ Done        |
-| 2   | Export content helpers (ShouldSkipDir, IsMarkdownFile) | ❌ Not started |
-| 3   | Deduplicate `getContentType` (server vs content pkg)   | ❌ Not started |
-| 4   | Deduplicate `skipDirs` (watcher vs content pkg)        | ❌ Not started |
-| 5   | Optimize ContentTree with path map for O(1) lookups    | ❌ Not started |
-| 6   | Add compile-time interface checks where missing        | ❌ Not started |
-| 7   | Run full test suite + lint verification                | ❌ Not started |
-| 8   | Push all changes                                       | ❌ Not started |
+| # | Task                                                   | Status         |
+| - | ------------------------------------------------------ | -------------- |
+| 1 | Fix CI: lowercase IMAGE_NAME + digest scan             | ✅ Done        |
+| 2 | Export content helpers (ShouldSkipDir, IsMarkdownFile) | ❌ Not started |
+| 3 | Deduplicate `getContentType` (server vs content pkg)   | ❌ Not started |
+| 4 | Deduplicate `skipDirs` (watcher vs content pkg)        | ❌ Not started |
+| 5 | Optimize ContentTree with path map for O(1) lookups    | ❌ Not started |
+| 6 | Add compile-time interface checks where missing        | ❌ Not started |
+| 7 | Run full test suite + lint verification                | ❌ Not started |
+| 8 | Push all changes                                       | ❌ Not started |
 
 ---
 
@@ -207,33 +207,33 @@ Causes ~50 "compile: version does not match" warnings on every `go test` run. Te
 
 ## F) TOP 25 THINGS TO DO NEXT (Sorted by Impact × Ease)
 
-| #   | Task                                                                             | Impact      | Effort | Type          |
-| --- | -------------------------------------------------------------------------------- | ----------- | ------ | ------------- |
-| 1   | **Push the 4 unpushed commits** (CI fix is among them)                           | 🔴 Critical | 1 min  | Ops           |
-| 2   | **Upgrade local Go to 1.26.1** (fixes noise, speeds builds)                      | 🔴 High     | 5 min  | Env           |
-| 3   | **Export content helpers** (`ShouldSkipDir`, `IsMarkdownFile`, `GetContentType`) | 🟡 Medium   | 15 min | Refactor      |
-| 4   | **Deduplicate `getContentType`** in `server/static.go`                           | 🟡 Medium   | 10 min | Refactor      |
-| 5   | **Deduplicate `skipDirs`** in `cmd/watcher.go`                                   | 🟡 Medium   | 10 min | Refactor      |
-| 6   | **Optimize ContentTree** with `map[URLPath]ContentNode` for O(1) `Find()`        | 🟡 Medium   | 30 min | Perf          |
-| 7   | **Add compile-time interface checks** for BlobRepository, InMemoryRepository     | 🟢 Low      | 5 min  | Safety        |
-| 8   | **Remove dead `treeStats.addError`** method                                      | 🟢 Low      | 2 min  | Cleanup       |
-| 9   | **Apply staticcheck tagged switch** suggestion in `errors.go`                    | 🟢 Low      | 5 min  | Cleanup       |
-| 10  | **Wire git pre-push hook** to `just pre-push`                                    | 🟡 Medium   | 5 min  | DevEx         |
-| 11  | **Add sample markdown content** to `content/` for demo                           | 🟡 Medium   | 15 min | Content       |
-| 12  | **Add integration tests** for full HTTP pipeline                                 | 🔴 High     | 2 hrs  | Testing       |
-| 13  | **Increase container test coverage** from 0%                                     | 🟡 Medium   | 30 min | Testing       |
-| 14  | **Split large test files** (search, handlers, markdown)                          | 🟢 Low      | 30 min | Hygiene       |
-| 15  | **CI: pin golangci-lint version**                                                | 🟢 Low      | 5 min  | CI            |
-| 16  | **CI: add Go module caching**                                                    | 🟡 Medium   | 15 min | CI            |
-| 17  | **CI: add `templ generate` diff check**                                          | 🟡 Medium   | 10 min | CI            |
-| 18  | **Add gzip/brotli compression** middleware                                       | 🟡 Medium   | 30 min | Perf          |
-| 19  | **Add ETag/If-None-Match** support                                               | 🟡 Medium   | 30 min | Perf          |
-| 20  | **Document architecture decisions** (ADR)                                        | 🟡 Medium   | 1 hr   | Docs          |
-| 21  | **Add Prometheus metrics endpoint**                                              | 🟡 Medium   | 1 hr   | Observability |
-| 22  | **RSS/Atom feed generation**                                                     | 🟡 Medium   | 1 hr   | Feature       |
-| 23  | **Dark mode CSS + theme toggle**                                                 | 🟡 Medium   | 1 hr   | UX            |
-| 24  | **Code copy button** on code blocks                                              | 🟢 Low      | 30 min | UX            |
-| 25  | **Separate CI workflows** (`test.yml` fast + `docker.yml` build)                 | 🟡 Medium   | 30 min | CI            |
+| #  | Task                                                                             | Impact      | Effort | Type          |
+| -- | -------------------------------------------------------------------------------- | ----------- | ------ | ------------- |
+| 1  | **Push the 4 unpushed commits** (CI fix is among them)                           | 🔴 Critical | 1 min  | Ops           |
+| 2  | **Upgrade local Go to 1.26.1** (fixes noise, speeds builds)                      | 🔴 High     | 5 min  | Env           |
+| 3  | **Export content helpers** (`ShouldSkipDir`, `IsMarkdownFile`, `GetContentType`) | 🟡 Medium   | 15 min | Refactor      |
+| 4  | **Deduplicate `getContentType`** in `server/static.go`                           | 🟡 Medium   | 10 min | Refactor      |
+| 5  | **Deduplicate `skipDirs`** in `cmd/watcher.go`                                   | 🟡 Medium   | 10 min | Refactor      |
+| 6  | **Optimize ContentTree** with `map[URLPath]ContentNode` for O(1) `Find()`        | 🟡 Medium   | 30 min | Perf          |
+| 7  | **Add compile-time interface checks** for BlobRepository, InMemoryRepository     | 🟢 Low      | 5 min  | Safety        |
+| 8  | **Remove dead `treeStats.addError`** method                                      | 🟢 Low      | 2 min  | Cleanup       |
+| 9  | **Apply staticcheck tagged switch** suggestion in `errors.go`                    | 🟢 Low      | 5 min  | Cleanup       |
+| 10 | **Wire git pre-push hook** to `just pre-push`                                    | 🟡 Medium   | 5 min  | DevEx         |
+| 11 | **Add sample markdown content** to `content/` for demo                           | 🟡 Medium   | 15 min | Content       |
+| 12 | **Add integration tests** for full HTTP pipeline                                 | 🔴 High     | 2 hrs  | Testing       |
+| 13 | **Increase container test coverage** from 0%                                     | 🟡 Medium   | 30 min | Testing       |
+| 14 | **Split large test files** (search, handlers, markdown)                          | 🟢 Low      | 30 min | Hygiene       |
+| 15 | **CI: pin golangci-lint version**                                                | 🟢 Low      | 5 min  | CI            |
+| 16 | **CI: add Go module caching**                                                    | 🟡 Medium   | 15 min | CI            |
+| 17 | **CI: add `templ generate` diff check**                                          | 🟡 Medium   | 10 min | CI            |
+| 18 | **Add gzip/brotli compression** middleware                                       | 🟡 Medium   | 30 min | Perf          |
+| 19 | **Add ETag/If-None-Match** support                                               | 🟡 Medium   | 30 min | Perf          |
+| 20 | **Document architecture decisions** (ADR)                                        | 🟡 Medium   | 1 hr   | Docs          |
+| 21 | **Add Prometheus metrics endpoint**                                              | 🟡 Medium   | 1 hr   | Observability |
+| 22 | **RSS/Atom feed generation**                                                     | 🟡 Medium   | 1 hr   | Feature       |
+| 23 | **Dark mode CSS + theme toggle**                                                 | 🟡 Medium   | 1 hr   | UX            |
+| 24 | **Code copy button** on code blocks                                              | 🟢 Low      | 30 min | UX            |
+| 25 | **Separate CI workflows** (`test.yml` fast + `docker.yml` build)                 | 🟡 Medium   | 30 min | CI            |
 
 ---
 

@@ -29,7 +29,7 @@ The Dockerfile's `HEALTHCHECK` uses it directly:
 
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD ["/app/dynamic-markdown-site", "healthcheck", "--addr", "localhost:8080"]
+  CMD ["/app/dynamic-markdown-site", "healthcheck", "--addr", "localhost:8080"]
 ```
 
 This keeps the runtime image distroless (no shell, no extra binaries)

@@ -1,14 +1,14 @@
 # Comprehensive Status Report — 2026-04-01 15:47
 
-**Generated:** 2026-04-01T15:47:45+02:00  
-**Branch:** master  
-**Commit:** 88e3367  
-**Go Version:** 1.26.1 (tool 1.26.0 mismatch)  
-**Test Results:** ALL 7 packages PASS  
-**Linter:** 0 issues (`go vet` clean)  
-**Production Lines:** 4,564  
-**Test Lines:** 7,344  
-**Test-to-Code Ratio:** 1.61:1  
+**Generated:** 2026-04-01T15:47:45+02:00\
+**Branch:** master\
+**Commit:** 88e3367\
+**Go Version:** 1.26.1 (tool 1.26.0 mismatch)\
+**Test Results:** ALL 7 packages PASS\
+**Linter:** 0 issues (`go vet` clean)\
+**Production Lines:** 4,564\
+**Test Lines:** 7,344\
+**Test-to-Code Ratio:** 1.61:1\
 **Coverage:** cache 100% | config 90.5% | content 72.6% | domain 75.8% | renderer 84.3% | server 80.3% | container 0%
 
 ---
@@ -125,33 +125,33 @@
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #   | Priority    | Item                                                           | Effort |
-| --- | ----------- | -------------------------------------------------------------- | ------ |
-| 1   | 🔴 Critical | Fix Go 1.26.1/1.26.0 tool version mismatch                     | S      |
-| 2   | 🔴 Critical | Tag v0.1.0 release                                             | S      |
-| 3   | 🔴 Critical | Validate CI pipeline end-to-end with a real PR                 | M      |
-| 4   | 🔴 Critical | Address GitHub security vulnerabilities in dependencies        | M      |
-| 5   | 🟡 High     | Add integration test suite (filesystem repo → HTTP → HTML)     | L      |
-| 6   | 🟡 High     | Add container package tests (0% → 80%+)                        | M      |
-| 7   | 🟡 High     | Fix `stringscutsuffix` hint in `handlers.go:203`               | S      |
-| 8   | 🟡 High     | Consolidate `getContentType` (exists in 2 packages)            | S      |
-| 9   | 🟡 High     | Add `templ generate` check to CI                               | S      |
-| 10  | 🟡 High     | Add coverage threshold enforcement to CI (≥75%)                | S      |
-| 11  | 🟡 High     | Split `search_test.go`, `handlers_test.go`, `markdown_test.go` | M      |
-| 12  | 🟡 High     | Add Docker HEALTHCHECK to Dockerfile                           | S      |
-| 13  | 🟡 High     | Add gzip/brotli compression middleware                         | M      |
-| 14  | 🟡 High     | Add ETag/If-None-Match support                                 | M      |
-| 15  | 🟡 High     | Add git pre-push hook calling `just pre-push`                  | S      |
-| 16  | 🟢 Medium   | Add request timing middleware                                  | S      |
-| 17  | 🟢 Medium   | Add structured health check (version, uptime, deps)            | M      |
-| 18  | 🟢 Medium   | Add Prometheus metrics endpoint                                | M      |
-| 19  | 🟢 Medium   | Implement search result highlighting                           | M      |
-| 20  | 🟢 Medium   | Add breadcrumbs for deep navigation                            | M      |
-| 21  | 🟢 Medium   | Create architecture decision records (ADRs)                    | M      |
-| 22  | 🟢 Medium   | Dark mode CSS + theme toggle                                   | M      |
-| 23  | 🟢 Medium   | Add RSS/Atom feed generation                                   | M      |
-| 24  | 🟢 Medium   | Add CONTRIBUTING.md                                            | S      |
-| 25  | 🟢 Medium   | Kubernetes / Cloud Run deployment manifests                    | L      |
+| #  | Priority    | Item                                                           | Effort |
+| -- | ----------- | -------------------------------------------------------------- | ------ |
+| 1  | 🔴 Critical | Fix Go 1.26.1/1.26.0 tool version mismatch                     | S      |
+| 2  | 🔴 Critical | Tag v0.1.0 release                                             | S      |
+| 3  | 🔴 Critical | Validate CI pipeline end-to-end with a real PR                 | M      |
+| 4  | 🔴 Critical | Address GitHub security vulnerabilities in dependencies        | M      |
+| 5  | 🟡 High     | Add integration test suite (filesystem repo → HTTP → HTML)     | L      |
+| 6  | 🟡 High     | Add container package tests (0% → 80%+)                        | M      |
+| 7  | 🟡 High     | Fix `stringscutsuffix` hint in `handlers.go:203`               | S      |
+| 8  | 🟡 High     | Consolidate `getContentType` (exists in 2 packages)            | S      |
+| 9  | 🟡 High     | Add `templ generate` check to CI                               | S      |
+| 10 | 🟡 High     | Add coverage threshold enforcement to CI (≥75%)                | S      |
+| 11 | 🟡 High     | Split `search_test.go`, `handlers_test.go`, `markdown_test.go` | M      |
+| 12 | 🟡 High     | Add Docker HEALTHCHECK to Dockerfile                           | S      |
+| 13 | 🟡 High     | Add gzip/brotli compression middleware                         | M      |
+| 14 | 🟡 High     | Add ETag/If-None-Match support                                 | M      |
+| 15 | 🟡 High     | Add git pre-push hook calling `just pre-push`                  | S      |
+| 16 | 🟢 Medium   | Add request timing middleware                                  | S      |
+| 17 | 🟢 Medium   | Add structured health check (version, uptime, deps)            | M      |
+| 18 | 🟢 Medium   | Add Prometheus metrics endpoint                                | M      |
+| 19 | 🟢 Medium   | Implement search result highlighting                           | M      |
+| 20 | 🟢 Medium   | Add breadcrumbs for deep navigation                            | M      |
+| 21 | 🟢 Medium   | Create architecture decision records (ADRs)                    | M      |
+| 22 | 🟢 Medium   | Dark mode CSS + theme toggle                                   | M      |
+| 23 | 🟢 Medium   | Add RSS/Atom feed generation                                   | M      |
+| 24 | 🟢 Medium   | Add CONTRIBUTING.md                                            | S      |
+| 25 | 🟢 Medium   | Kubernetes / Cloud Run deployment manifests                    | L      |
 
 ---
 

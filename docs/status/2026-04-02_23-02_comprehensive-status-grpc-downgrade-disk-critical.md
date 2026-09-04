@@ -16,16 +16,16 @@
 
 ### Committed & Pushed to origin/master
 
-| #   | Commit        | Task                                               | Status   |
-| --- | ------------- | -------------------------------------------------- | -------- |
-| 1   | `8906c10`     | Delete testutil package (ghost, 0 imports)         | **DONE** |
-| 2   | Prior session | Unify skipDirs list (content vs watcher)           | **DONE** |
-| 3   | Prior session | Unify isMarkdownFile (content vs watcher)          | **DONE** |
-| 4   | Prior session | Unify getContentType (content vs server)           | **DONE** |
-| 5   | `983431f`     | Use cache.GetOrCompute in render.go                | **DONE** |
-| 6   | `983431f`     | Implement HasReadme properly (was hardcoded false) | **DONE** |
-| 7   | `983431f`     | Render SearchResult.Snippet in template            | **DONE** |
-| 8   | `983431f`     | Unify SuggestedPath type into domain package       | **DONE** |
+| # | Commit        | Task                                               | Status   |
+| - | ------------- | -------------------------------------------------- | -------- |
+| 1 | `8906c10`     | Delete testutil package (ghost, 0 imports)         | **DONE** |
+| 2 | Prior session | Unify skipDirs list (content vs watcher)           | **DONE** |
+| 3 | Prior session | Unify isMarkdownFile (content vs watcher)          | **DONE** |
+| 4 | Prior session | Unify getContentType (content vs server)           | **DONE** |
+| 5 | `983431f`     | Use cache.GetOrCompute in render.go                | **DONE** |
+| 6 | `983431f`     | Implement HasReadme properly (was hardcoded false) | **DONE** |
+| 7 | `983431f`     | Render SearchResult.Snippet in template            | **DONE** |
+| 8 | `983431f`     | Unify SuggestedPath type into domain package       | **DONE** |
 
 ### Earlier Completed (from TODO_LIST.md)
 
@@ -192,33 +192,33 @@ The previous session's comprehensive context document is accurate but highlights
 
 Sorted by **impact × urgency / effort**:
 
-| #   | Task                                                                   | Impact   | Effort | Why                                            |
-| --- | ---------------------------------------------------------------------- | -------- | ------ | ---------------------------------------------- |
-| 1   | **Free disk space** (`go clean -modcache`)                             | CRITICAL | 1 min  | Unblocks everything                            |
-| 2   | **Fix grpc dependency** — upgrade to latest, not downgrade             | HIGH     | 5 min  | Security vulnerability is LIVE on master       |
-| 3   | **Verify build passes** (`GOWORK=off go build ./...`)                  | HIGH     | 5 min  | Confirm code health                            |
-| 4   | **Verify tests pass** (`GOWORK=off go test ./... -count=1`)            | HIGH     | 2 min  | Confirm correctness                            |
-| 5   | **Run linter** (`GOWORK=off golangci-lint run ./...`)                  | HIGH     | 2 min  | Confirm quality                                |
-| 6   | **Delete stale status docs** (15 of 17 files in `docs/status/`)        | MEDIUM   | 2 min  | Reduce noise, save space                       |
-| 7   | **Install golines** (`go install github.com/segmentio/golines@latest`) | MEDIUM   | 1 min  | Fix formatting issues permanently              |
-| 8   | **Remove unused `coverage.out`** (56KB)                                | LOW      | 1 min  | Stale artifact                                 |
-| 9   | **Add git pre-push hook** (`just pre-push`)                            | MEDIUM   | 5 min  | Prevent future bad pushes                      |
-| 10  | **Split large test files** (3 files >600 lines each)                   | MEDIUM   | 30 min | Maintainability                                |
-| 11  | **Separate CI workflows** (test.yml + docker.yml)                      | MEDIUM   | 20 min | Faster feedback on PRs                         |
-| 12  | **Pin golangci-lint version in CI**                                    | MEDIUM   | 5 min  | Reproducible linting                           |
-| 13  | **Add `templ generate` check to CI**                                   | MEDIUM   | 10 min | Catch template regression                      |
-| 14  | **Audit go.mod for unused deps** (gocloud.dev?)                        | HIGH     | 15 min | 6.3GB module cache is 90% from transitive deps |
-| 15  | **Add gzip/brotli compression**                                        | HIGH     | 15 min | Major performance win for text-heavy site      |
-| 16  | **Add ETag/If-None-Match**                                             | MEDIUM   | 15 min | Bandwidth savings                              |
-| 17  | **Dark mode CSS + theme toggle**                                       | HIGH     | 30 min | User-facing impact, high visibility            |
-| 18  | **Add code copy button** to code blocks                                | HIGH     | 15 min | UX staple for documentation sites              |
-| 19  | **Split Repository interface** (Reader/Refresher)                      | MEDIUM   | 20 min | Better abstraction                             |
-| 20  | **Add Docker HEALTHCHECK**                                             | MEDIUM   | 5 min  | Production readiness                           |
-| 21  | **Add Prometheus/pprof endpoints**                                     | MEDIUM   | 20 min | Observability                                  |
-| 22  | **RSS/Atom feed generation**                                           | MEDIUM   | 20 min | Content discoverability                        |
-| 23  | **Breadcrumbs for deep directory navigation**                          | MEDIUM   | 15 min | Navigation UX                                  |
-| 24  | **Rate limit search endpoint**                                         | MEDIUM   | 5 min  | Security (refresh is limited, search isn't)    |
-| 25  | **Content search autocomplete**                                        | MEDIUM   | 30 min | UX improvement                                 |
+| #  | Task                                                                   | Impact   | Effort | Why                                            |
+| -- | ---------------------------------------------------------------------- | -------- | ------ | ---------------------------------------------- |
+| 1  | **Free disk space** (`go clean -modcache`)                             | CRITICAL | 1 min  | Unblocks everything                            |
+| 2  | **Fix grpc dependency** — upgrade to latest, not downgrade             | HIGH     | 5 min  | Security vulnerability is LIVE on master       |
+| 3  | **Verify build passes** (`GOWORK=off go build ./...`)                  | HIGH     | 5 min  | Confirm code health                            |
+| 4  | **Verify tests pass** (`GOWORK=off go test ./... -count=1`)            | HIGH     | 2 min  | Confirm correctness                            |
+| 5  | **Run linter** (`GOWORK=off golangci-lint run ./...`)                  | HIGH     | 2 min  | Confirm quality                                |
+| 6  | **Delete stale status docs** (15 of 17 files in `docs/status/`)        | MEDIUM   | 2 min  | Reduce noise, save space                       |
+| 7  | **Install golines** (`go install github.com/segmentio/golines@latest`) | MEDIUM   | 1 min  | Fix formatting issues permanently              |
+| 8  | **Remove unused `coverage.out`** (56KB)                                | LOW      | 1 min  | Stale artifact                                 |
+| 9  | **Add git pre-push hook** (`just pre-push`)                            | MEDIUM   | 5 min  | Prevent future bad pushes                      |
+| 10 | **Split large test files** (3 files >600 lines each)                   | MEDIUM   | 30 min | Maintainability                                |
+| 11 | **Separate CI workflows** (test.yml + docker.yml)                      | MEDIUM   | 20 min | Faster feedback on PRs                         |
+| 12 | **Pin golangci-lint version in CI**                                    | MEDIUM   | 5 min  | Reproducible linting                           |
+| 13 | **Add `templ generate` check to CI**                                   | MEDIUM   | 10 min | Catch template regression                      |
+| 14 | **Audit go.mod for unused deps** (gocloud.dev?)                        | HIGH     | 15 min | 6.3GB module cache is 90% from transitive deps |
+| 15 | **Add gzip/brotli compression**                                        | HIGH     | 15 min | Major performance win for text-heavy site      |
+| 16 | **Add ETag/If-None-Match**                                             | MEDIUM   | 15 min | Bandwidth savings                              |
+| 17 | **Dark mode CSS + theme toggle**                                       | HIGH     | 30 min | User-facing impact, high visibility            |
+| 18 | **Add code copy button** to code blocks                                | HIGH     | 15 min | UX staple for documentation sites              |
+| 19 | **Split Repository interface** (Reader/Refresher)                      | MEDIUM   | 20 min | Better abstraction                             |
+| 20 | **Add Docker HEALTHCHECK**                                             | MEDIUM   | 5 min  | Production readiness                           |
+| 21 | **Add Prometheus/pprof endpoints**                                     | MEDIUM   | 20 min | Observability                                  |
+| 22 | **RSS/Atom feed generation**                                           | MEDIUM   | 20 min | Content discoverability                        |
+| 23 | **Breadcrumbs for deep directory navigation**                          | MEDIUM   | 15 min | Navigation UX                                  |
+| 24 | **Rate limit search endpoint**                                         | MEDIUM   | 5 min  | Security (refresh is limited, search isn't)    |
+| 25 | **Content search autocomplete**                                        | MEDIUM   | 30 min | UX improvement                                 |
 
 ---
 

@@ -187,7 +187,8 @@ The image uses Google's distroless runtime — no shell, no package manager, min
 FROM gcr.io/distroless/static-debian13:nonroot
 COPY dynamic-markdown-site /app/dynamic-markdown-site
 USER 65532:65532
-HEALTHCHECK CMD ["/app/dynamic-markdown-site", "healthcheck", "--addr", "localhost:8080"]
+HEALTHCHECK \
+  CMD ["/app/dynamic-markdown-site", "healthcheck", "--addr", "localhost:8080"]
 ENTRYPOINT ["/app/dynamic-markdown-site"]
 CMD ["-root", "/content", "-port", "8080", "-cache"]
 ```

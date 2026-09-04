@@ -1,7 +1,7 @@
 # Dynamic Markdown Site — Full Status Report
 
-**Date:** 2026-04-02 21:16  
-**Author:** Crush (GLM-5.1)  
+**Date:** 2026-04-02 21:16\
+**Author:** Crush (GLM-5.1)\
 **Session:** Third continuation. Previous sessions: CI fix + status reports, then refactoring session, then environment-blocked session.
 
 ---
@@ -195,48 +195,48 @@
 
 ### Critical (Fix Now)
 
-| #   | Area   | Issue                                                          | Impact             | Effort |
-| --- | ------ | -------------------------------------------------------------- | ------------------ | ------ |
-| 1   | System | Reboot to fix cache corruption and reduce load                 | Everything blocked | 2 min  |
-| 2   | Disk   | Free up 50GB+ — clean Go cache, Docker images, build artifacts | System stability   | 10 min |
-| 3   | Push   | 3 unpushed commits risk data loss                              | Data safety        | 1 min  |
+| # | Area   | Issue                                                          | Impact             | Effort |
+| - | ------ | -------------------------------------------------------------- | ------------------ | ------ |
+| 1 | System | Reboot to fix cache corruption and reduce load                 | Everything blocked | 2 min  |
+| 2 | Disk   | Free up 50GB+ — clean Go cache, Docker images, build artifacts | System stability   | 10 min |
+| 3 | Push   | 3 unpushed commits risk data loss                              | Data safety        | 1 min  |
 
 ### High Priority (Fix This Week)
 
-| #   | Area       | Issue                                   | Impact                           | Effort |
-| --- | ---------- | --------------------------------------- | -------------------------------- | ------ |
-| 4   | Go version | Upgrade local to 1.26.1                 | Eliminates ~50 warnings          | 5 min  |
-| 5   | go.work    | Add project to `~/projects/go.work`     | Removes `GOWORK=off` requirement | 2 min  |
-| 6   | Deps       | Evaluate removing `gocloud.dev`         | 200MB+ build time reduction      | Medium |
-| 7   | Tests      | Add container package tests (0% → 80%+) | Test coverage                    | Low    |
-| 8   | Watcher    | Implement actual debouncing             | Prevents refresh storms          | Low    |
+| # | Area       | Issue                                   | Impact                           | Effort |
+| - | ---------- | --------------------------------------- | -------------------------------- | ------ |
+| 4 | Go version | Upgrade local to 1.26.1                 | Eliminates ~50 warnings          | 5 min  |
+| 5 | go.work    | Add project to `~/projects/go.work`     | Removes `GOWORK=off` requirement | 2 min  |
+| 6 | Deps       | Evaluate removing `gocloud.dev`         | 200MB+ build time reduction      | Medium |
+| 7 | Tests      | Add container package tests (0% → 80%+) | Test coverage                    | Low    |
+| 8 | Watcher    | Implement actual debouncing             | Prevents refresh storms          | Low    |
 
 ### Medium Priority (Fix This Month)
 
-| #   | Area    | Issue                                                  | Impact                         | Effort  |
-| --- | ------- | ------------------------------------------------------ | ------------------------------ | ------- |
-| 9   | Domain  | Remove `SetChildren()` or make private                 | Immutability contract          | Trivial |
-| 10  | Domain  | Export and test `shouldComeAfter`                      | Sort correctness               | Low     |
-| 11  | Content | Split `filterEmptyDirectories` into query+command      | Clarity                        | Low     |
-| 12  | Server  | Apply staticcheck tagged switch in errors.go           | Lint compliance                | Trivial |
-| 13  | CI      | Add test step to GitHub Actions                        | Catch regressions before merge | Low     |
-| 14  | DevEx   | Add `air` or similar for hot-reload during development | Dev velocity                   | Low     |
-| 15  | Perf    | Add benchmarks for ContentTree.Find                    | Verify O(1) claim              | Low     |
+| #  | Area    | Issue                                                  | Impact                         | Effort  |
+| -- | ------- | ------------------------------------------------------ | ------------------------------ | ------- |
+| 9  | Domain  | Remove `SetChildren()` or make private                 | Immutability contract          | Trivial |
+| 10 | Domain  | Export and test `shouldComeAfter`                      | Sort correctness               | Low     |
+| 11 | Content | Split `filterEmptyDirectories` into query+command      | Clarity                        | Low     |
+| 12 | Server  | Apply staticcheck tagged switch in errors.go           | Lint compliance                | Trivial |
+| 13 | CI      | Add test step to GitHub Actions                        | Catch regressions before merge | Low     |
+| 14 | DevEx   | Add `air` or similar for hot-reload during development | Dev velocity                   | Low     |
+| 15 | Perf    | Add benchmarks for ContentTree.Find                    | Verify O(1) claim              | Low     |
 
 ### Low Priority (Nice to Have)
 
-| #   | Area     | Issue                                      |
-| --- | -------- | ------------------------------------------ |
-| 16  | Features | ETag/If-None-Match HTTP caching            |
-| 17  | Features | RSS/Atom feed generation                   |
-| 18  | Features | sitemap.xml for SEO                        |
-| 19  | Features | OpenGraph meta tags                        |
-| 20  | Features | TOC sidebar (data exists, template needed) |
-| 21  | Features | Dark mode toggle                           |
-| 22  | Features | Pagination for large directories           |
-| 23  | Infra    | TLS/HTTPS support                          |
-| 24  | Infra    | Prometheus metrics                         |
-| 25  | Quality  | Pre-commit hooks for test+lint             |
+| #  | Area     | Issue                                      |
+| -- | -------- | ------------------------------------------ |
+| 16 | Features | ETag/If-None-Match HTTP caching            |
+| 17 | Features | RSS/Atom feed generation                   |
+| 18 | Features | sitemap.xml for SEO                        |
+| 19 | Features | OpenGraph meta tags                        |
+| 20 | Features | TOC sidebar (data exists, template needed) |
+| 21 | Features | Dark mode toggle                           |
+| 22 | Features | Pagination for large directories           |
+| 23 | Infra    | TLS/HTTPS support                          |
+| 24 | Infra    | Prometheus metrics                         |
+| 25 | Quality  | Pre-commit hooks for test+lint             |
 
 ---
 

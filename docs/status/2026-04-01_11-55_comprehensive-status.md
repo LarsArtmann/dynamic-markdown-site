@@ -136,75 +136,75 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 ### Process
 
-| #   | Improvement                                   | Impact                    | Effort |
-| --- | --------------------------------------------- | ------------------------- | ------ |
-| 1   | Pre-push hook (lint + test)                   | Prevents broken CI        | 30min  |
-| 2   | `just pre-push` and `just fix` commands       | Standardized verification | 15min  |
-| 3   | Separate fast test workflow from Docker build | Faster PR feedback        | Medium |
-| 4   | Coverage threshold ≥75% in CI                 | Prevents regression       | 15min  |
-| 5   | Disk space monitoring                         | Prevents build failures   | 30min  |
+| # | Improvement                                   | Impact                    | Effort |
+| - | --------------------------------------------- | ------------------------- | ------ |
+| 1 | Pre-push hook (lint + test)                   | Prevents broken CI        | 30min  |
+| 2 | `just pre-push` and `just fix` commands       | Standardized verification | 15min  |
+| 3 | Separate fast test workflow from Docker build | Faster PR feedback        | Medium |
+| 4 | Coverage threshold ≥75% in CI                 | Prevents regression       | 15min  |
+| 5 | Disk space monitoring                         | Prevents build failures   | 30min  |
 
 ### Architecture
 
-| #   | Improvement                                     | Impact                      | Effort |
-| --- | ----------------------------------------------- | --------------------------- | ------ |
-| 6   | Rename `version` → `buildinfo`                  | Eliminates revive exclusion | 30min  |
-| 7   | Immutable FileNode (remove setters)             | Thread safety               | 2hr    |
-| 8   | Split Repository into Reader + Refresher        | Cleaner concerns            | 1hr    |
-| 9   | Structured errors with Is/As/Unwrap             | Better error matching       | 2hr    |
-| 10  | Frontmatter typed struct (not `map[string]any`) | Type safety                 | 1hr    |
+| #  | Improvement                                     | Impact                      | Effort |
+| -- | ----------------------------------------------- | --------------------------- | ------ |
+| 6  | Rename `version` → `buildinfo`                  | Eliminates revive exclusion | 30min  |
+| 7  | Immutable FileNode (remove setters)             | Thread safety               | 2hr    |
+| 8  | Split Repository into Reader + Refresher        | Cleaner concerns            | 1hr    |
+| 9  | Structured errors with Is/As/Unwrap             | Better error matching       | 2hr    |
+| 10 | Frontmatter typed struct (not `map[string]any`) | Type safety                 | 1hr    |
 
 ### Library Considerations
 
-| #   | Current              | Alternative                              | Why                                    |
-| --- | -------------------- | ---------------------------------------- | -------------------------------------- |
-| 11  | `samber/do/v2`       | `wire` (compile-time)                    | Catch DI errors at build time          |
-| 12  | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` + custom types | One less dependency; stdlib sufficient |
-| 13  | `charm.land/log`     | `slog` directly                          | stdlib; one less dependency            |
-| 14  | Custom search        | `bleve`                                  | Fuzzy matching, ranking, pagination    |
-| 15  | Manual middleware    | `gin-contrib` packages                   | Rate limit, CORS already exist         |
+| #  | Current              | Alternative                              | Why                                    |
+| -- | -------------------- | ---------------------------------------- | -------------------------------------- |
+| 11 | `samber/do/v2`       | `wire` (compile-time)                    | Catch DI errors at build time          |
+| 12 | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` + custom types | One less dependency; stdlib sufficient |
+| 13 | `charm.land/log`     | `slog` directly                          | stdlib; one less dependency            |
+| 14 | Custom search        | `bleve`                                  | Fuzzy matching, ranking, pagination    |
+| 15 | Manual middleware    | `gin-contrib` packages                   | Rate limit, CORS already exist         |
 
 ### Type Model Improvements
 
-| #   | Improvement                                            | Detail                             |
-| --- | ------------------------------------------------------ | ---------------------------------- |
-| 16  | `domain.HTML` with methods                             | `String()`, `Len()`, `IsZero()`    |
-| 17  | `RenderedContent` as immutable                         | Return interface, prevent mutation |
-| 18  | `ContentNode` with `Children()` on both dirs and files | Eliminate type switches            |
-| 19  | `Frontmatter` as typed struct                          | Replace `map[string]any`           |
-| 20  | Sealed interface for node kinds                        | Prevent invalid implementations    |
+| #  | Improvement                                            | Detail                             |
+| -- | ------------------------------------------------------ | ---------------------------------- |
+| 16 | `domain.HTML` with methods                             | `String()`, `Len()`, `IsZero()`    |
+| 17 | `RenderedContent` as immutable                         | Return interface, prevent mutation |
+| 18 | `ContentNode` with `Children()` on both dirs and files | Eliminate type switches            |
+| 19 | `Frontmatter` as typed struct                          | Replace `map[string]any`           |
+| 20 | Sealed interface for node kinds                        | Prevent invalid implementations    |
 
 ---
 
 ## F. TOP 25 NEXT ITEMS (Impact/Effort Sort)
 
-| #   | Item                                     | Impact      | Effort | Cat           |
-| --- | ---------------------------------------- | ----------- | ------ | ------------- |
-| 1   | Pre-push hook (lint + test)              | 🔴 Critical | 30min  | Process       |
-| 2   | `just pre-push` + `just fix` commands    | 🔴 High     | 15min  | Process       |
-| 3   | Verify CI green on GitHub (3 jobs)       | 🔴 Critical | 10min  | CI            |
-| 4   | Write sitemap.go tests                   | 🔴 High     | 1hr    | Testing       |
-| 5   | Rename `version` → `buildinfo`           | 🟡 Medium   | 30min  | Arch          |
-| 6   | Split `handlers_test.go` (667 lines)     | 🟡 Medium   | 1hr    | Quality       |
-| 7   | Split `search_test.go` (685 lines)       | 🟡 Medium   | 1hr    | Quality       |
-| 8   | Coverage threshold ≥75% in CI            | 🟡 Medium   | 15min  | CI            |
-| 9   | ADR for DI choice (do vs wire)           | 🟡 Medium   | 30min  | Docs          |
-| 10  | Immutable FileNode (remove setters)      | 🟡 Medium   | 2hr    | Arch          |
-| 11  | Replace `cockroachdb/errors` with stdlib | 🟡 Medium   | 2hr    | Deps          |
-| 12  | Frontmatter typed struct                 | 🟡 Medium   | 1hr    | Types         |
-| 13  | Split Repository: Reader + Refresher     | 🟡 Medium   | 1hr    | Arch          |
-| 14  | HTTP integration tests                   | 🟢 High     | 3hr    | Testing       |
-| 15  | Disk space monitoring                    | 🟢 Low      | 30min  | Tooling       |
-| 16  | Middleware chain as slice                | 🟢 Low      | 30min  | Arch          |
-| 17  | `errgroup` for concurrent ops            | 🟢 Low      | 1hr    | Perf          |
-| 18  | RSS/Atom feed generation                 | 🟢 Low      | 2hr    | Feature       |
-| 19  | Dark mode CSS toggle                     | 🟢 Low      | 2hr    | UX            |
-| 20  | Prometheus metrics endpoint              | 🟢 Low      | 2hr    | Observability |
-| 21  | Rate limit search endpoint               | 🟢 Low      | 30min  | Security      |
-| 22  | gzip/brotli compression                  | 🟢 Low      | 30min  | Perf          |
-| 23  | Graceful shutdown tests                  | 🟢 Low      | 1hr    | Testing       |
-| 24  | ETag/If-None-Match                       | 🟢 Low      | 1hr    | Perf          |
-| 25  | Evaluate `wire` as DI replacement        | 🟢 Low      | 2hr    | Arch          |
+| #  | Item                                     | Impact      | Effort | Cat           |
+| -- | ---------------------------------------- | ----------- | ------ | ------------- |
+| 1  | Pre-push hook (lint + test)              | 🔴 Critical | 30min  | Process       |
+| 2  | `just pre-push` + `just fix` commands    | 🔴 High     | 15min  | Process       |
+| 3  | Verify CI green on GitHub (3 jobs)       | 🔴 Critical | 10min  | CI            |
+| 4  | Write sitemap.go tests                   | 🔴 High     | 1hr    | Testing       |
+| 5  | Rename `version` → `buildinfo`           | 🟡 Medium   | 30min  | Arch          |
+| 6  | Split `handlers_test.go` (667 lines)     | 🟡 Medium   | 1hr    | Quality       |
+| 7  | Split `search_test.go` (685 lines)       | 🟡 Medium   | 1hr    | Quality       |
+| 8  | Coverage threshold ≥75% in CI            | 🟡 Medium   | 15min  | CI            |
+| 9  | ADR for DI choice (do vs wire)           | 🟡 Medium   | 30min  | Docs          |
+| 10 | Immutable FileNode (remove setters)      | 🟡 Medium   | 2hr    | Arch          |
+| 11 | Replace `cockroachdb/errors` with stdlib | 🟡 Medium   | 2hr    | Deps          |
+| 12 | Frontmatter typed struct                 | 🟡 Medium   | 1hr    | Types         |
+| 13 | Split Repository: Reader + Refresher     | 🟡 Medium   | 1hr    | Arch          |
+| 14 | HTTP integration tests                   | 🟢 High     | 3hr    | Testing       |
+| 15 | Disk space monitoring                    | 🟢 Low      | 30min  | Tooling       |
+| 16 | Middleware chain as slice                | 🟢 Low      | 30min  | Arch          |
+| 17 | `errgroup` for concurrent ops            | 🟢 Low      | 1hr    | Perf          |
+| 18 | RSS/Atom feed generation                 | 🟢 Low      | 2hr    | Feature       |
+| 19 | Dark mode CSS toggle                     | 🟢 Low      | 2hr    | UX            |
+| 20 | Prometheus metrics endpoint              | 🟢 Low      | 2hr    | Observability |
+| 21 | Rate limit search endpoint               | 🟢 Low      | 30min  | Security      |
+| 22 | gzip/brotli compression                  | 🟢 Low      | 30min  | Perf          |
+| 23 | Graceful shutdown tests                  | 🟢 Low      | 1hr    | Testing       |
+| 24 | ETag/If-None-Match                       | 🟢 Low      | 1hr    | Perf          |
+| 25 | Evaluate `wire` as DI replacement        | 🟢 Low      | 2hr    | Arch          |
 
 ---
 

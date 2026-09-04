@@ -133,8 +133,8 @@ The project is in a **functionally complete but environment-blocked state**. The
 | ------------ | ------------------------------ | ----------------------- |
 | Disk         | 215G/229G used (14G free, 94%) | 🔴 Critical             |
 | Load Average | 397 / 342 / 249                | 🔴 Extremely overloaded |
-| RAM          | 24 GB (unknown usage)          | ⚠️ Unknown              |
-| Uptime       | 7 days                         | ⚠️ Reboot needed        |
+| RAM          | 24 GB (unknown usage)          | ⚠️ Unknown               |
+| Uptime       | 7 days                         | ⚠️ Reboot needed         |
 
 Load average of 397 on a machine with ~12 cores is ~33x overloaded. This explains why builds timeout and OOM kills happen.
 
@@ -177,33 +177,33 @@ A `go.work` file in a parent directory adds sibling modules causing Go version c
 
 ## F) TOP #25 THINGS TO DO NEXT
 
-| #   | Priority | Task                                                                                 | Effort | Impact                  |
-| --- | -------- | ------------------------------------------------------------------------------------ | ------ | ----------------------- |
-| 1   | 🔴 P0    | **Reboot machine** — fix Go cache corruption & load average                          | 5 min  | Unblocks everything     |
-| 2   | 🔴 P0    | **Verify build + tests pass** after reboot                                           | 5 min  | Confidence              |
-| 3   | 🔴 P0    | **Run golangci-lint** — fix any issues                                               | 10 min | Zero lint errors        |
-| 4   | 🔴 P0    | **Push to origin/master** — 2 unpushed commits                                       | 1 min  | CI verification         |
-| 5   | 🟡 P1    | **Free disk space** — 14G is critically low                                          | 30 min | System stability        |
-| 6   | 🟡 P1    | **Add CI test workflow** — run tests in GitHub Actions                               | 30 min | Quality gate            |
-| 7   | 🟡 P1    | **Review blob storage deps** — evaluate if gocloud/AWS/GCP SDKs are worth the weight | 1 hr   | Build time, binary size |
-| 8   | 🟡 P1    | **Add integration tests** — full HTTP stack with real filesystem                     | 2 hr   | Reliability             |
-| 9   | 🟡 P1    | **Test coverage report** — establish baseline and set threshold                      | 1 hr   | Quality metric          |
-| 10  | 🟡 P1    | **Content security hardening** — path traversal, XSS, content-type headers           | 2 hr   | Security                |
-| 11  | 🟢 P2    | **Add benchmark suite** — rendering pipeline, cache, filesystem                      | 2 hr   | Performance             |
-| 12  | 🟢 P2    | **Error type system** — structured errors with codes                                 | 1 hr   | Debugging               |
-| 13  | 🟢 P2    | **Context propagation** — all I/O operations accept context                          | 2 hr   | Cancellation            |
-| 14  | 🟢 P2    | **TLS/HTTPS support** — auto TLS via Let's Encrypt or manual certs                   | 3 hr   | Production ready        |
-| 15  | 🟢 P2    | **Config file support** — YAML/TOML config alongside flags                           | 2 hr   | Usability               |
-| 16  | 🟢 P2    | **Health check depth** — check cache, filesystem, renderer status                    | 1 hr   | Observability           |
-| 17  | 🟢 P2    | **Middleware refactoring** — extract logging, metrics, recovery                      | 2 hr   | Clean architecture      |
-| 18  | 🟢 P2    | **Static asset pipeline** — hash-based cache busting, embedding                      | 2 hr   | Performance             |
-| 19  | 🟢 P2    | **RSS/Atom feed generation** — auto-generate from content tree                       | 3 hr   | Content discovery       |
-| 20  | 🟢 P2    | **Pagination** — for large directories                                               | 2 hr   | Usability               |
-| 21  | 🔵 P3    | **Dark mode** — theme switching via CSS custom properties                            | 3 hr   | UX                      |
-| 22  | 🔵 P3    | **WebSocket livereload** — push changes to browser in dev mode                       | 4 hr   | Developer experience    |
-| 23  | 🔵 P3    | **Plugin renderer system** — markdown, asciidoc, rst support                         | 1 day  | Extensibility           |
-| 24  | 🔵 P3    | **Docker Compose** — multi-service setup (app + CDN + cache)                         | 4 hr   | Deployment              |
-| 25  | 🔵 P3    | **API documentation** — OpenAPI spec for HTTP endpoints                              | 3 hr   | Integration             |
+| #  | Priority | Task                                                                                 | Effort | Impact                  |
+| -- | -------- | ------------------------------------------------------------------------------------ | ------ | ----------------------- |
+| 1  | 🔴 P0    | **Reboot machine** — fix Go cache corruption & load average                          | 5 min  | Unblocks everything     |
+| 2  | 🔴 P0    | **Verify build + tests pass** after reboot                                           | 5 min  | Confidence              |
+| 3  | 🔴 P0    | **Run golangci-lint** — fix any issues                                               | 10 min | Zero lint errors        |
+| 4  | 🔴 P0    | **Push to origin/master** — 2 unpushed commits                                       | 1 min  | CI verification         |
+| 5  | 🟡 P1    | **Free disk space** — 14G is critically low                                          | 30 min | System stability        |
+| 6  | 🟡 P1    | **Add CI test workflow** — run tests in GitHub Actions                               | 30 min | Quality gate            |
+| 7  | 🟡 P1    | **Review blob storage deps** — evaluate if gocloud/AWS/GCP SDKs are worth the weight | 1 hr   | Build time, binary size |
+| 8  | 🟡 P1    | **Add integration tests** — full HTTP stack with real filesystem                     | 2 hr   | Reliability             |
+| 9  | 🟡 P1    | **Test coverage report** — establish baseline and set threshold                      | 1 hr   | Quality metric          |
+| 10 | 🟡 P1    | **Content security hardening** — path traversal, XSS, content-type headers           | 2 hr   | Security                |
+| 11 | 🟢 P2    | **Add benchmark suite** — rendering pipeline, cache, filesystem                      | 2 hr   | Performance             |
+| 12 | 🟢 P2    | **Error type system** — structured errors with codes                                 | 1 hr   | Debugging               |
+| 13 | 🟢 P2    | **Context propagation** — all I/O operations accept context                          | 2 hr   | Cancellation            |
+| 14 | 🟢 P2    | **TLS/HTTPS support** — auto TLS via Let's Encrypt or manual certs                   | 3 hr   | Production ready        |
+| 15 | 🟢 P2    | **Config file support** — YAML/TOML config alongside flags                           | 2 hr   | Usability               |
+| 16 | 🟢 P2    | **Health check depth** — check cache, filesystem, renderer status                    | 1 hr   | Observability           |
+| 17 | 🟢 P2    | **Middleware refactoring** — extract logging, metrics, recovery                      | 2 hr   | Clean architecture      |
+| 18 | 🟢 P2    | **Static asset pipeline** — hash-based cache busting, embedding                      | 2 hr   | Performance             |
+| 19 | 🟢 P2    | **RSS/Atom feed generation** — auto-generate from content tree                       | 3 hr   | Content discovery       |
+| 20 | 🟢 P2    | **Pagination** — for large directories                                               | 2 hr   | Usability               |
+| 21 | 🔵 P3    | **Dark mode** — theme switching via CSS custom properties                            | 3 hr   | UX                      |
+| 22 | 🔵 P3    | **WebSocket livereload** — push changes to browser in dev mode                       | 4 hr   | Developer experience    |
+| 23 | 🔵 P3    | **Plugin renderer system** — markdown, asciidoc, rst support                         | 1 day  | Extensibility           |
+| 24 | 🔵 P3    | **Docker Compose** — multi-service setup (app + CDN + cache)                         | 4 hr   | Deployment              |
+| 25 | 🔵 P3    | **API documentation** — OpenAPI spec for HTTP endpoints                              | 3 hr   | Integration             |
 
 ---
 

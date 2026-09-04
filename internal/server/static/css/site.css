@@ -48,7 +48,8 @@
 
 	/* Typography */
 	--font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
-	--font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--font-sans:
+		system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
 	/* Spacing */
 	--space-xs: 0.25rem;
@@ -262,7 +263,11 @@ body {
 	font-size: 2rem;
 	font-weight: 700;
 	margin-bottom: var(--space-sm);
-	background: linear-gradient(135deg, var(--color-text-primary), var(--color-text-accent));
+	background: linear-gradient(
+		135deg,
+		var(--color-text-primary),
+		var(--color-text-accent)
+	);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
@@ -302,7 +307,11 @@ body {
 	font-weight: 800;
 	line-height: 1.2;
 	margin-bottom: var(--space-md);
-	background: linear-gradient(135deg, var(--color-text-primary), var(--color-accent-primary));
+	background: linear-gradient(
+		135deg,
+		var(--color-text-primary),
+		var(--color-accent-primary)
+	);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
@@ -427,41 +436,74 @@ body {
 /* Important — purple */
 .markdown-content .admonition-important {
 	border-color: var(--admonition-important);
-	background-color: color-mix(in srgb, var(--admonition-important) 8%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-important) 8%,
+		transparent
+	);
 }
 .markdown-content .admonition-important .admonition-title {
-	background-color: color-mix(in srgb, var(--admonition-important) 20%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-important) 20%,
+		transparent
+	);
 	color: var(--admonition-important-light);
 }
 
 /* Warning — amber/yellow */
 .markdown-content .admonition-warning {
 	border-color: var(--admonition-warning-color);
-	background-color: color-mix(in srgb, var(--admonition-warning-color) 8%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-warning-color) 8%,
+		transparent
+	);
 }
 .markdown-content .admonition-warning .admonition-title {
-	background-color: color-mix(in srgb, var(--admonition-warning-color) 20%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-warning-color) 20%,
+		transparent
+	);
 	color: var(--admonition-warning-light);
 }
 
 /* Caution — red */
 .markdown-content .admonition-caution {
 	border-color: var(--admonition-caution);
-	background-color: color-mix(in srgb, var(--admonition-caution) 8%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-caution) 8%,
+		transparent
+	);
 }
 .markdown-content .admonition-caution .admonition-title {
-	background-color: color-mix(in srgb, var(--admonition-caution) 20%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-caution) 20%,
+		transparent
+	);
 	color: var(--admonition-caution-light);
 }
 
 /* Critical — intense red with glow */
 .markdown-content .admonition-critical {
 	border-color: var(--admonition-critical);
-	background-color: color-mix(in srgb, var(--admonition-critical) 6%, transparent);
-	box-shadow: 0 0 15px color-mix(in srgb, var(--admonition-critical) 10%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-critical) 6%,
+		transparent
+	);
+	box-shadow: 0 0 15px
+		color-mix(in srgb, var(--admonition-critical) 10%, transparent);
 }
 .markdown-content .admonition-critical .admonition-title {
-	background-color: color-mix(in srgb, var(--admonition-critical) 18%, transparent);
+	background-color: color-mix(
+		in srgb,
+		var(--admonition-critical) 18%,
+		transparent
+	);
 	color: var(--admonition-critical-light);
 	font-size: 0.95rem;
 }
@@ -577,7 +619,12 @@ body {
 .markdown-content hr {
 	border: none;
 	height: 1px;
-	background: linear-gradient(to right, transparent, var(--color-border), transparent);
+	background: linear-gradient(
+		to right,
+		transparent,
+		var(--color-border),
+		transparent
+	);
 	margin: var(--space-2xl) 0;
 }
 
@@ -607,7 +654,11 @@ body {
 	font-size: 8rem;
 	font-weight: 900;
 	line-height: 1;
-	background: linear-gradient(135deg, var(--color-accent-secondary), var(--color-accent-primary));
+	background: linear-gradient(
+		135deg,
+		var(--color-accent-secondary),
+		var(--color-accent-primary)
+	);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;

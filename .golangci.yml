@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.26.4
+  go: 1.26.7
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -28,7 +28,6 @@ linters:
     - copyloopvar
     - cyclop
     - decorder
-    - depguard
     - dogsled
     - dupl
     - dupword
@@ -126,55 +125,29 @@ linters:
     - wsl_v5
     - zerologlint
   disable:
+    - depguard
     - noinlineerr
   settings:
     cyclop:
       max-complexity: 12
-    depguard:
-      rules:
-        main:
-          allow:
-            - $gostd
-            - $local
-            - github.com/cockroachdb/errors
-            - github.com/larsartmann/dynamic-markdown-site
-            - github.com/samber/do/v2
-            - github.com/samber/lo
-            - github.com/larsartmann/go-filewatcher/v2
-            - github.com/maypok86/otter/v2
-            - github.com/maypok86/otter/v2/stats
-            - charm.land/log/v2
-            - gocloud.dev/blob
-            - gocloud.dev/blob/fileblob
-            - gocloud.dev/blob/gcsblob
-            - gocloud.dev/blob/memblob
-            - gocloud.dev/blob/s3blob
-            - gopkg.in/yaml.v3
-            - github.com/larsartmann/httputil
-            - golang.org/x/time/rate
-            - github.com/yuin/goldmark
-            - github.com/yuin/goldmark/ast
-            - github.com/yuin/goldmark/extension
-            - github.com/yuin/goldmark/parser
-            - github.com/yuin/goldmark/renderer
-            - github.com/yuin/goldmark/text
-            - github.com/yuin/goldmark/util
-            - github.com/yuin/goldmark-highlighting/v2
-            - github.com/yuin/goldmark-meta
-            - github.com/alecthomas/chroma/v2
-            - github.com/alecthomas/chroma/v2/formatters/html
-            - github.com/a-h/templ
-            - github.com/a-h/templ/*
-            - oss.terrastruct.com/d2
-            - oss.terrastruct.com/d2/d2graph
-            - oss.terrastruct.com/d2/d2layouts/d2dagrelayout
-            - oss.terrastruct.com/d2/d2lib
-            - oss.terrastruct.com/d2/d2renderers/d2svg
-            - oss.terrastruct.com/d2/lib/log
-            - oss.terrastruct.com/d2/lib/textmeasure
-            - github.com/stretchr/testify
-            - github.com/stretchr/testify/assert
-            - github.com/stretchr/testify/require
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - (io.Closer).Close
+        - (*sql.DB).Close
+        - (*sql.Rows).Close
+        - (*sql.Stmt).Close
+        - (net.Conn).Close
+        - (*net.TCPConn).Close
+        - (*net.UDPConn).Close
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Print
+        - fmt.Printf
+        - fmt.Println
+        - (*strings.Builder).WriteString
+        - (*bytes.Buffer).WriteString
     exhaustruct:
       exclude:
         - os/exec.Cmd
@@ -208,6 +181,12 @@ linters:
         - generic
     makezero:
       always: true
+    mnd:
+      ignored-numbers:
+        - "0"
+        - "1"
+        - "2"
+        - "100"
     revive:
       rules:
         - disabled: true
@@ -237,6 +216,17 @@ linters:
         - b
         - v
       ignore-type-assert-ok: true
+    wrapcheck:
+      ignore-sigs:
+        - .Errorf(
+        - errors.New(
+        - errors.Unwrap(
+        - errors.Join(
+        - .Wrap(
+        - .Wrapf(
+        - .WithMessage(
+        - .WithMessagef(
+        - .WithStack(
   exclusions:
     generated: lax
     warn-unused: true

@@ -33,7 +33,7 @@ Replaced 181 lines of hand-rolled fsnotify boilerplate (recursive directory walk
 
 ## b) PARTIALLY DONE
 
-1. **Uncommitted `flake.nix`** — The vendorHash update in `flake.nix` is still uncommitted in the working tree (`git status` shows ` M flake.nix`). The auto-git daemon committed most other changes but this one remains. It will be picked up by the next daemon cycle.
+1. **Uncommitted `flake.nix`** — The vendorHash update in `flake.nix` is still uncommitted in the working tree (`git status` shows `M flake.nix`). The auto-git daemon committed most other changes but this one remains. It will be picked up by the next daemon cycle.
 
 ---
 

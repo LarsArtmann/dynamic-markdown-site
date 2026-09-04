@@ -61,7 +61,7 @@ func runHealthcheck() error {
 	if err != nil {
 		return cockroachdberrors.Wrapf(errHealthcheckFailed, "GET %s", url)
 	}
-	defer resp.Body.Close() //nolint:errcheck // best-effort close
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("%w: %s returned status %d", errHealthcheckFailed, url, resp.StatusCode)

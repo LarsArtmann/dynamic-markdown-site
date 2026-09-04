@@ -167,33 +167,33 @@ The buildflow run modified `go.sum` (removing unused transitives) but the change
 
 Ranked by impact / effort ratio. **Bold** = addresses a finding from this status report.
 
-| #   | Task                                                                                            | Impact  | Effort | Notes                                                          |
-| --- | ----------------------------------------------------------------------------------------------- | ------- | ------ | -------------------------------------------------------------- |
-| 1   | **Drop `proxyVendor = true` in `flake.nix`** to eliminate `vendorHash` ↔ `go.sum` drift         | 🔴 High | S      | Stops a recurring CI failure mode. See e.1.                    |
-| 2   | **Add `nix flake check` to `.github/workflows/test.yml`** to catch flake regressions at PR time | 🔴 High | XS     | Would have caught both fixes in this session. See e.2.         |
-| 3   | **Add `result` (and other Nix build outputs) to `.gitignore`**                                  | 🟢 Low  | XS     | Pure noise reduction. See e.7.                                 |
-| 4   | **Remove 6 "Stale:" items from `TODO_LIST.md`**                                                 | 🟢 Low  | XS     | Cleanup. See e.5.                                              |
-| 5   | **Commit the working-tree `go.sum` cleanup alongside the `vendorHash` fix**                     | 🔴 High | XS     | Currently these are two separate uncommitted changes. See e.6. |
-| 6   | Implement rate limiting on `/search` (TODO_LIST)                                                | 🟡 Med  | S      | One IP can hammer the in-memory search index.                  |
-| 7   | Decide on `CODE_OF_CONDUCT.md` — keep, delete, or commit (see b.2)                              | 🟡 Med  | XS     | Tracked; awaiting user decision.                               |
-| 8   | Verify Docker artifact appears in GitHub Actions (TODO_LIST)                                    | 🟡 Med  | XS     | One-line confirmation on the next release.                     |
-| 9   | Add `--cask` to `release:` footer in `.goreleaser.yaml` and `README.md` install instructions    | 🟡 Med  | XS     | From the previous status report.                               |
-| 10  | Audit other tests for ldflags-injection brittleness (apply a.2's pattern)                       | 🟡 Med  | M      | Search for hardcoded strings that should read package vars.    |
-| 11  | Add `goreleaser check` to `.github/workflows/release.yml`                                       | 🟡 Med  | XS     | Prevents deprecation drift.                                    |
-| 12  | Implement search result pagination (TODO_LIST)                                                  | 🟢 Low  | S      | Only needed at high cardinality.                               |
-| 13  | Dark mode CSS and theme toggle (ROADMAP)                                                        | 🟢 Low  | M      | Popular ask; templ + CSS variables.                            |
-| 14  | Code copy button on code blocks (ROADMAP)                                                       | 🟢 Low  | XS     | A few lines of JS in `layout.templ`.                           |
-| 15  | ETag / `If-None-Match` support (ROADMAP)                                                        | 🟢 Low  | S      | Drop-in for `static/*` responses.                              |
-| 16  | gzip/brotli compression middleware (ROADMAP)                                                    | 🟢 Low  | S      | `compress` middleware; ~10 lines.                              |
-| 17  | Wire `cache.Warm()` for the most-recent N pages on startup (ROADMAP)                            | 🟢 Low  | M      | Use `AllPaths()` from content tree.                            |
-| 18  | pprof endpoint behind a flag (ROADMAP)                                                          | 🟢 Low  | XS     | `net/http/pprof` + flag gate.                                  |
-| 19  | OpenTelemetry tracing (ROADMAP)                                                                 | 🟢 Low  | L      | Big surface; defer.                                            |
-| 20  | Kubernetes manifests (ROADMAP)                                                                  | 🟢 Low  | S      | Single Deployment + Service + Ingress.                         |
-| 21  | RSS/Atom feed (ROADMAP)                                                                         | 🟢 Low  | S      | Walk `AllPaths()`; filter drafts.                              |
-| 22  | Verify `sitemap.xml` is wired end-to-end with a smoke test                                      | 🟢 Low  | XS     | FEATURES.md claims it; never exercised.                        |
-| 23  | Sample markdown content in `content/` (ROADMAP)                                                 | 🟢 Low  | S      | One demo page per feature.                                     |
-| 24  | Mutation testing (ROADMAP)                                                                      | 🟢 Low  | M      | `go-mutesting` integration.                                    |
-| 25  | Plugin system design doc (ROADMAP)                                                              | 🟢 Low  | L      | ADR-grade write-up before any code.                            |
+| #  | Task                                                                                            | Impact  | Effort | Notes                                                          |
+| -- | ----------------------------------------------------------------------------------------------- | ------- | ------ | -------------------------------------------------------------- |
+| 1  | **Drop `proxyVendor = true` in `flake.nix`** to eliminate `vendorHash` ↔ `go.sum` drift         | 🔴 High | S      | Stops a recurring CI failure mode. See e.1.                    |
+| 2  | **Add `nix flake check` to `.github/workflows/test.yml`** to catch flake regressions at PR time | 🔴 High | XS     | Would have caught both fixes in this session. See e.2.         |
+| 3  | **Add `result` (and other Nix build outputs) to `.gitignore`**                                  | 🟢 Low  | XS     | Pure noise reduction. See e.7.                                 |
+| 4  | **Remove 6 "Stale:" items from `TODO_LIST.md`**                                                 | 🟢 Low  | XS     | Cleanup. See e.5.                                              |
+| 5  | **Commit the working-tree `go.sum` cleanup alongside the `vendorHash` fix**                     | 🔴 High | XS     | Currently these are two separate uncommitted changes. See e.6. |
+| 6  | Implement rate limiting on `/search` (TODO_LIST)                                                | 🟡 Med  | S      | One IP can hammer the in-memory search index.                  |
+| 7  | Decide on `CODE_OF_CONDUCT.md` — keep, delete, or commit (see b.2)                              | 🟡 Med  | XS     | Tracked; awaiting user decision.                               |
+| 8  | Verify Docker artifact appears in GitHub Actions (TODO_LIST)                                    | 🟡 Med  | XS     | One-line confirmation on the next release.                     |
+| 9  | Add `--cask` to `release:` footer in `.goreleaser.yaml` and `README.md` install instructions    | 🟡 Med  | XS     | From the previous status report.                               |
+| 10 | Audit other tests for ldflags-injection brittleness (apply a.2's pattern)                       | 🟡 Med  | M      | Search for hardcoded strings that should read package vars.    |
+| 11 | Add `goreleaser check` to `.github/workflows/release.yml`                                       | 🟡 Med  | XS     | Prevents deprecation drift.                                    |
+| 12 | Implement search result pagination (TODO_LIST)                                                  | 🟢 Low  | S      | Only needed at high cardinality.                               |
+| 13 | Dark mode CSS and theme toggle (ROADMAP)                                                        | 🟢 Low  | M      | Popular ask; templ + CSS variables.                            |
+| 14 | Code copy button on code blocks (ROADMAP)                                                       | 🟢 Low  | XS     | A few lines of JS in `layout.templ`.                           |
+| 15 | ETag / `If-None-Match` support (ROADMAP)                                                        | 🟢 Low  | S      | Drop-in for `static/*` responses.                              |
+| 16 | gzip/brotli compression middleware (ROADMAP)                                                    | 🟢 Low  | S      | `compress` middleware; ~10 lines.                              |
+| 17 | Wire `cache.Warm()` for the most-recent N pages on startup (ROADMAP)                            | 🟢 Low  | M      | Use `AllPaths()` from content tree.                            |
+| 18 | pprof endpoint behind a flag (ROADMAP)                                                          | 🟢 Low  | XS     | `net/http/pprof` + flag gate.                                  |
+| 19 | OpenTelemetry tracing (ROADMAP)                                                                 | 🟢 Low  | L      | Big surface; defer.                                            |
+| 20 | Kubernetes manifests (ROADMAP)                                                                  | 🟢 Low  | S      | Single Deployment + Service + Ingress.                         |
+| 21 | RSS/Atom feed (ROADMAP)                                                                         | 🟢 Low  | S      | Walk `AllPaths()`; filter drafts.                              |
+| 22 | Verify `sitemap.xml` is wired end-to-end with a smoke test                                      | 🟢 Low  | XS     | FEATURES.md claims it; never exercised.                        |
+| 23 | Sample markdown content in `content/` (ROADMAP)                                                 | 🟢 Low  | S      | One demo page per feature.                                     |
+| 24 | Mutation testing (ROADMAP)                                                                      | 🟢 Low  | M      | `go-mutesting` integration.                                    |
+| 25 | Plugin system design doc (ROADMAP)                                                              | 🟢 Low  | L      | ADR-grade write-up before any code.                            |
 
 **Pareto (top 5 = 80% of value):** items 1–5, all of which are direct consequences of this session's findings.
 

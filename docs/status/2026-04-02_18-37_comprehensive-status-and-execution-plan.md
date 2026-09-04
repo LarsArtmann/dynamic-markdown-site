@@ -14,62 +14,62 @@
 
 ## a) FULLY DONE
 
-| #   | What                                                                | Commit               | Impact                              |
-| --- | ------------------------------------------------------------------- | -------------------- | ----------------------------------- |
-| 1   | Lint fixes across renderer, content, sitemap, config                | `b4e23b6`, `24b0195` | Zero lint issues achieved           |
-| 2   | `domain.Renderer` interface introduced                              | `4233fdc`            | Dependency inversion for rendering  |
-| 3   | `RenderedContent` struct + `NewRenderedFileWithContent` constructor | `4233fdc`            | Type-safe rendered output           |
-| 4   | DI wiring: renderer through container                               | `4233fdc`, `6372ec6` | Full DI pipeline works              |
-| 5   | `NewServer` 7-arg signature with `domain.Renderer` + `siteName`     | `4233fdc`            | Proper dependency injection         |
-| 6   | `SiteName` in `ErrorViewProps` and `LayoutProps` templates          | `4233fdc`            | Site name renders everywhere        |
-| 7   | `SimpleRenderer` + tests deleted (dead code)                        | `6372ec6`            | 58 lines of dead code removed       |
-| 8   | Docker workflow: explicit image name                                | `227f551`            | CI no longer breaks on template var |
-| 9   | Admonition extension (goldmark alert blocks)                        | `88e3367`            | Feature complete with tests         |
-| 10  | Sitemap + robots.txt                                                | `9439b33`            | Feature complete with tests         |
-| 11  | Frontmatter draft parsing (yaml.v3)                                 | `c489007`            | Proper draft detection              |
-| 12  | CSS admonition refactored to custom properties                      | `05f48e9`            | Maintainable theming                |
-| 13  | `config.Timeout` wired to HTTP server                               | `4233fdc` (earlier)  | ReadTimeout/WriteTimeout set        |
+| #  | What                                                                | Commit               | Impact                              |
+| -- | ------------------------------------------------------------------- | -------------------- | ----------------------------------- |
+| 1  | Lint fixes across renderer, content, sitemap, config                | `b4e23b6`, `24b0195` | Zero lint issues achieved           |
+| 2  | `domain.Renderer` interface introduced                              | `4233fdc`            | Dependency inversion for rendering  |
+| 3  | `RenderedContent` struct + `NewRenderedFileWithContent` constructor | `4233fdc`            | Type-safe rendered output           |
+| 4  | DI wiring: renderer through container                               | `4233fdc`, `6372ec6` | Full DI pipeline works              |
+| 5  | `NewServer` 7-arg signature with `domain.Renderer` + `siteName`     | `4233fdc`            | Proper dependency injection         |
+| 6  | `SiteName` in `ErrorViewProps` and `LayoutProps` templates          | `4233fdc`            | Site name renders everywhere        |
+| 7  | `SimpleRenderer` + tests deleted (dead code)                        | `6372ec6`            | 58 lines of dead code removed       |
+| 8  | Docker workflow: explicit image name                                | `227f551`            | CI no longer breaks on template var |
+| 9  | Admonition extension (goldmark alert blocks)                        | `88e3367`            | Feature complete with tests         |
+| 10 | Sitemap + robots.txt                                                | `9439b33`            | Feature complete with tests         |
+| 11 | Frontmatter draft parsing (yaml.v3)                                 | `c489007`            | Proper draft detection              |
+| 12 | CSS admonition refactored to custom properties                      | `05f48e9`            | Maintainable theming                |
+| 13 | `config.Timeout` wired to HTTP server                               | `4233fdc` (earlier)  | ReadTimeout/WriteTimeout set        |
 
 ---
 
 ## b) PARTIALLY DONE
 
-| #   | What                             | Status                               | Remaining                                                                            |
-| --- | -------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
-| 1   | Split brain elimination          | **0 of 4 fixed**                     | `skipDirs`, `isMarkdownFile`, `getContentType`, `SuggestedPath` all still duplicated |
-| 2   | Ghost code cleanup               | **1 of 2 fixed**                     | `SimpleRenderer` deleted; `testutil/` still exists (0 imports)                       |
-| 3   | `cache.GetOrCompute` integration | **Method exists but unused**         | `render.go` still does manual Get/Set pattern                                        |
-| 4   | `HasReadme` implementation       | **Field exists, hardcoded `false`**  | Needs actual directory child check                                                   |
-| 5   | `SearchResult.Snippet` rendering | **Field extracted, never displayed** | Template missing snippet display                                                     |
+| # | What                             | Status                               | Remaining                                                                            |
+| - | -------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
+| 1 | Split brain elimination          | **0 of 4 fixed**                     | `skipDirs`, `isMarkdownFile`, `getContentType`, `SuggestedPath` all still duplicated |
+| 2 | Ghost code cleanup               | **1 of 2 fixed**                     | `SimpleRenderer` deleted; `testutil/` still exists (0 imports)                       |
+| 3 | `cache.GetOrCompute` integration | **Method exists but unused**         | `render.go` still does manual Get/Set pattern                                        |
+| 4 | `HasReadme` implementation       | **Field exists, hardcoded `false`**  | Needs actual directory child check                                                   |
+| 5 | `SearchResult.Snippet` rendering | **Field extracted, never displayed** | Template missing snippet display                                                     |
 
 ---
 
 ## c) NOT STARTED
 
-| #   | What                                                                 | Priority        |
-| --- | -------------------------------------------------------------------- | --------------- |
-| 1   | Container DI tests                                                   | Medium          |
-| 2   | E2E diagram rendering tests                                          | Medium          |
-| 3   | Dependabot fix (grpc auth bypass CVE)                                | HIGH — security |
-| 4   | `go mod tidy`                                                        | Medium          |
-| 5   | `git push` (1 commit ahead)                                          | Immediate       |
-| 6   | Unify `treeStats` / `blobTreeStats` duplicate structs                | Low             |
-| 7   | Fix double error wrapping in `search.go:63`                          | Low             |
-| 8   | Populate `Frontmatter.Date` from metadata                            | Low             |
-| 9   | Remove useless type assertion in `main.go:209`                       | Low             |
-| 10  | Move hardcoded values to config (cache size, rate limits, CSP, etc.) | Low             |
+| #  | What                                                                 | Priority        |
+| -- | -------------------------------------------------------------------- | --------------- |
+| 1  | Container DI tests                                                   | Medium          |
+| 2  | E2E diagram rendering tests                                          | Medium          |
+| 3  | Dependabot fix (grpc auth bypass CVE)                                | HIGH — security |
+| 4  | `go mod tidy`                                                        | Medium          |
+| 5  | `git push` (1 commit ahead)                                          | Immediate       |
+| 6  | Unify `treeStats` / `blobTreeStats` duplicate structs                | Low             |
+| 7  | Fix double error wrapping in `search.go:63`                          | Low             |
+| 8  | Populate `Frontmatter.Date` from metadata                            | Low             |
+| 9  | Remove useless type assertion in `main.go:209`                       | Low             |
+| 10 | Move hardcoded values to config (cache size, rate limits, CSP, etc.) | Low             |
 
 ---
 
 ## d) TOTALLY FUCKED UP
 
-| #   | What                          | Severity  | Details                                                                                                                                                                 |
-| --- | ----------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Disk space**                | CRITICAL  | 229GB disk at 98%. Go build cache cleared 3x today. Tests can't run when disk < 2GB. This is the #1 blocker for ALL development.                                        |
-| 2   | **Stale LSP diagnostics**     | ANNOYING  | gopls shows phantom errors in `container.go:192` and `errors.go:35,71` — code is correct, but LSP cache is corrupted. Requires `templ generate` + LSP restart to clear. |
-| 3   | **Go build cache corruption** | RECURRING | Cache gets corrupted when disk hits 100%. Had to `go clean -cache` three times today. Each rebuild takes 3-5 minutes.                                                   |
-| 4   | **Test suite not verifiable** | HIGH      | Cannot confirm tests pass because build cache keeps getting wiped by disk pressure. Last known-good test run was before today's session.                                |
-| 5   | **`go.work` interference**    | ANNOYING  | Parent directory has `go.work` that breaks all Go commands unless `GOWORK=off` is prefixed. Not a bug per se, but a DX papercut.                                        |
+| # | What                          | Severity  | Details                                                                                                                                                                 |
+| - | ----------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **Disk space**                | CRITICAL  | 229GB disk at 98%. Go build cache cleared 3x today. Tests can't run when disk < 2GB. This is the #1 blocker for ALL development.                                        |
+| 2 | **Stale LSP diagnostics**     | ANNOYING  | gopls shows phantom errors in `container.go:192` and `errors.go:35,71` — code is correct, but LSP cache is corrupted. Requires `templ generate` + LSP restart to clear. |
+| 3 | **Go build cache corruption** | RECURRING | Cache gets corrupted when disk hits 100%. Had to `go clean -cache` three times today. Each rebuild takes 3-5 minutes.                                                   |
+| 4 | **Test suite not verifiable** | HIGH      | Cannot confirm tests pass because build cache keeps getting wiped by disk pressure. Last known-good test run was before today's session.                                |
+| 5 | **`go.work` interference**    | ANNOYING  | Parent directory has `go.work` that breaks all Go commands unless `GOWORK=off` is prefixed. Not a bug per se, but a DX papercut.                                        |
 
 ---
 

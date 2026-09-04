@@ -226,33 +226,33 @@ Key unstarted items: dark mode, autocomplete search, RSS/Atom feed, Redis cache,
 
 ## f) Top 25 Things to Get Done Next
 
-| #   | Task                                                                       | Impact   | Effort | Category             |
-| --- | -------------------------------------------------------------------------- | -------- | ------ | -------------------- |
-| 1   | **Fix silent error swallowing in `filesystem.go:254-300`** — add logging   | Critical | 1h     | Code Quality         |
-| 2   | **`go mod tidy`** — remove 6 unused indirect deps                          | High     | 5min   | Dependency Hygiene   |
-| 3   | **Fix container_test.go** — 0% coverage despite having tests               | High     | 2h     | Testing              |
-| 4   | **Fix flaky `TestRateLimiter_Concurrent`** — tolerance assertion           | High     | 15min  | Testing              |
-| 5   | **Adopt httputil.ETag()** — conditional GETs / 304 responses               | High     | 2h     | Performance          |
-| 6   | **Adopt go-error-family** — error classification at HTTP boundary          | High     | 4h     | Architecture         |
-| 7   | **Add tests for `cmd/dynamic-markdown-site`** — watcher, shutdown          | High     | 3h     | Testing              |
-| 8   | **Add integration tests** — HTTP→handler→repo→renderer pipeline            | High     | 4h     | Testing              |
-| 9   | **Reconcile TODO_LIST.md** — mark done items, remove stale                 | Medium   | 1h     | Documentation        |
-| 10  | **Remove yaml.v3** — use goldmark-meta frontmatter for draft detection     | Medium   | 1h     | Dependency Reduction |
-| 10  | **Add chroma WithClasses(true)** — CSS-based highlighting, smaller HTML    | Medium   | 2h     | Performance          |
-| 12  | **Complete Nix Phase 3-5** — OCI image, direnv, CI workflow                | Medium   | 4h     | DevOps               |
-| 13  | **Split oversized test files** — search_test, handlers_test, markdown_test | Medium   | 2h     | Code Quality         |
-| 14  | **Pin golangci-lint version** in CI or flake                               | Medium   | 30min  | DevOps               |
-| 15  | **Add `templ generate` CI check**                                          | Medium   | 30min  | DevOps               |
-| 16  | **Adopt go-filewatcher** — replace raw fsnotify, add debouncing            | Medium   | 2h     | Architecture         |
-| 17  | **Add Prometheus/OpenTelemetry metrics** — cache stats, request timing     | Medium   | 4h     | Observability        |
-| 18  | **Split health check** — /health/live vs /health/ready                     | Medium   | 1h     | Observability        |
-| 19  | **Expand samber/lo** — simplify manual loops                               | Low      | 1h     | Code Quality         |
-| 20  | **Write ADRs** — document key architectural decisions                      | Low      | 2h     | Documentation        |
-| 21  | **Add dark mode** — most-requested roadmap item                            | Low      | 4h     | UI/UX                |
-| 22  | **Add RSS/Atom feed** — content delivery                                   | Low      | 2h     | Features             |
-| 23  | **Add search autocomplete** — typeahead search                             | Low      | 3h     | Features             |
-| 24  | **Add code copy button** — on code blocks                                  | Low      | 1h     | UI/UX                |
-| 25  | **Clean up ROADMAP.md** — remove done items (sitemap.xml)                  | Low      | 15min  | Documentation        |
+| #  | Task                                                                       | Impact   | Effort | Category             |
+| -- | -------------------------------------------------------------------------- | -------- | ------ | -------------------- |
+| 1  | **Fix silent error swallowing in `filesystem.go:254-300`** — add logging   | Critical | 1h     | Code Quality         |
+| 2  | **`go mod tidy`** — remove 6 unused indirect deps                          | High     | 5min   | Dependency Hygiene   |
+| 3  | **Fix container_test.go** — 0% coverage despite having tests               | High     | 2h     | Testing              |
+| 4  | **Fix flaky `TestRateLimiter_Concurrent`** — tolerance assertion           | High     | 15min  | Testing              |
+| 5  | **Adopt httputil.ETag()** — conditional GETs / 304 responses               | High     | 2h     | Performance          |
+| 6  | **Adopt go-error-family** — error classification at HTTP boundary          | High     | 4h     | Architecture         |
+| 7  | **Add tests for `cmd/dynamic-markdown-site`** — watcher, shutdown          | High     | 3h     | Testing              |
+| 8  | **Add integration tests** — HTTP→handler→repo→renderer pipeline            | High     | 4h     | Testing              |
+| 9  | **Reconcile TODO_LIST.md** — mark done items, remove stale                 | Medium   | 1h     | Documentation        |
+| 10 | **Remove yaml.v3** — use goldmark-meta frontmatter for draft detection     | Medium   | 1h     | Dependency Reduction |
+| 10 | **Add chroma WithClasses(true)** — CSS-based highlighting, smaller HTML    | Medium   | 2h     | Performance          |
+| 12 | **Complete Nix Phase 3-5** — OCI image, direnv, CI workflow                | Medium   | 4h     | DevOps               |
+| 13 | **Split oversized test files** — search_test, handlers_test, markdown_test | Medium   | 2h     | Code Quality         |
+| 14 | **Pin golangci-lint version** in CI or flake                               | Medium   | 30min  | DevOps               |
+| 15 | **Add `templ generate` CI check**                                          | Medium   | 30min  | DevOps               |
+| 16 | **Adopt go-filewatcher** — replace raw fsnotify, add debouncing            | Medium   | 2h     | Architecture         |
+| 17 | **Add Prometheus/OpenTelemetry metrics** — cache stats, request timing     | Medium   | 4h     | Observability        |
+| 18 | **Split health check** — /health/live vs /health/ready                     | Medium   | 1h     | Observability        |
+| 19 | **Expand samber/lo** — simplify manual loops                               | Low      | 1h     | Code Quality         |
+| 20 | **Write ADRs** — document key architectural decisions                      | Low      | 2h     | Documentation        |
+| 21 | **Add dark mode** — most-requested roadmap item                            | Low      | 4h     | UI/UX                |
+| 22 | **Add RSS/Atom feed** — content delivery                                   | Low      | 2h     | Features             |
+| 23 | **Add search autocomplete** — typeahead search                             | Low      | 3h     | Features             |
+| 24 | **Add code copy button** — on code blocks                                  | Low      | 1h     | UI/UX                |
+| 25 | **Clean up ROADMAP.md** — remove done items (sitemap.xml)                  | Low      | 15min  | Documentation        |
 
 ---
 
@@ -275,16 +275,16 @@ I cannot determine whether the simplification is worth the loss of explicit shut
 ## Session Changes (Uncommitted)
 
 ```
- .golangci.yml                     |   3 +-
- LIBRARY_INTEGRATIONS.md           |  59 ++++++-
- go.mod                            | 117 +++++++------
- go.sum                            | 335 +++++++++++++++-----------------------
- internal/server/accesslog.go      |   4 +-
- internal/server/handlers.go       |   7 +-
- internal/server/helpers.go        |  18 +-
- internal/server/requestid.go      |  53 ------
- internal/server/requestid_test.go | 110 +++----------
- 9 files changed, 281 insertions(+), 425 deletions(-)
+.golangci.yml                     |   3 +-
+LIBRARY_INTEGRATIONS.md           |  59 ++++++-
+go.mod                            | 117 +++++++------
+go.sum                            | 335 +++++++++++++++-----------------------
+internal/server/accesslog.go      |   4 +-
+internal/server/handlers.go       |   7 +-
+internal/server/helpers.go        |  18 +-
+internal/server/requestid.go      |  53 ------
+internal/server/requestid_test.go | 110 +++----------
+9 files changed, 281 insertions(+), 425 deletions(-)
 ```
 
 ### Dependency Changes Summary
