@@ -290,9 +290,9 @@ func (r *admonitionNodeRenderer) renderAdmonition(
 	kind := string(admonition.kind)
 	title := alertTitles[admonition.kind]
 
-	_, _ = fmt.Fprintf(w, "<div class=\"admonition admonition-%s\">\n", kind)      //nolint:erraudit // BufWriter is memory-backed
-	_, _ = fmt.Fprintf(w, "<div class=\"admonition-title\">%s</div>\n", title)      //nolint:erraudit // BufWriter is memory-backed
-	_, _ = w.WriteString("<div class=\"admonition-content\">\n") //nolint:erraudit // BufWriter is memory-backed
+	_, _ = fmt.Fprintf(w, "<div class=\"admonition admonition-%s\">\n", kind)  //nolint:erraudit // BufWriter is memory-backed
+	_, _ = fmt.Fprintf(w, "<div class=\"admonition-title\">%s</div>\n", title) //nolint:erraudit // BufWriter is memory-backed
+	_, _ = w.WriteString("<div class=\"admonition-content\">\n")               //nolint:erraudit // BufWriter is memory-backed
 
 	return ast.WalkContinue, nil
 }
