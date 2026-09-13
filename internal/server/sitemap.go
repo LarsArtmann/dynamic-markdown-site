@@ -48,7 +48,7 @@ func (s *Server) handleSitemapXML(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = w.Write(data)
+	_, _ = w.Write(data) //nolint:erraudit // client disconnect mid-write is unrecoverable
 }
 
 func (s *Server) buildSitemapEntries(root *domain.DirectoryNode, baseURL string) []SitemapEntry {

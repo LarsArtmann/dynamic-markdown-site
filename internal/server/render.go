@@ -114,7 +114,7 @@ func (s *Server) getOrRenderContent(
 		return domain.RenderedContent{}
 	}
 
-	return *result
+	return *result //nolint:branching-flow:panic // GetOrCompute returns non-nil when err is nil
 }
 
 func (s *Server) renderSearch(

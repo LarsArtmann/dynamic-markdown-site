@@ -76,7 +76,8 @@ func (s *Server) renderComponent(w http.ResponseWriter, r *http.Request, compone
 			s.handle500(w, r)
 		case http.StatusInternalServerError:
 			w.Header().Set(headerContentType, "text/plain; charset=utf-8")
-			_, _ = w.Write([]byte("Internal Server Error"))
+			// Nothing left to recover if even the fallback write fails.
+			_, _ = w.Write([]byte("Internal Server Error")) //nolint:erraudit
 		}
 	}
 }

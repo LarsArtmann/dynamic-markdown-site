@@ -39,7 +39,7 @@ func (s *Server) serveStaticFile(w http.ResponseWriter, r *http.Request) {
 	// data is read from the embedded static filesystem (compile-time asset
 	// bundle), not from user input. Safe to write directly.
 	//nolint:gosec // G107: embedded static asset, path validated against traversal
-	_, _ = w.Write(data)
+	_, _ = w.Write(data) //nolint:erraudit // client disconnect mid-write is unrecoverable
 }
 
 func staticContentType(path string) string {

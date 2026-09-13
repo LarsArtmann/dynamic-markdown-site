@@ -277,7 +277,7 @@ func (r *admonitionNodeRenderer) renderAdmonition(
 	entering bool,
 ) (ast.WalkStatus, error) {
 	if !entering {
-		_, _ = w.WriteString("</div>\n</div>\n")
+		_, _ = w.WriteString("</div>\n</div>\n") //nolint:erraudit // BufWriter is memory-backed
 
 		return ast.WalkContinue, nil
 	}
@@ -290,9 +290,9 @@ func (r *admonitionNodeRenderer) renderAdmonition(
 	kind := string(admonition.kind)
 	title := alertTitles[admonition.kind]
 
-	_, _ = fmt.Fprintf(w, "<div class=\"admonition admonition-%s\">\n", kind)
-	_, _ = fmt.Fprintf(w, "<div class=\"admonition-title\">%s</div>\n", title)
-	_, _ = w.WriteString("<div class=\"admonition-content\">\n")
+	_, _ = fmt.Fprintf(w, "<div class=\"admonition admonition-%s\">\n", kind)      //nolint:erraudit // BufWriter is memory-backed
+	_, _ = fmt.Fprintf(w, "<div class=\"admonition-title\">%s</div>\n", title)      //nolint:erraudit // BufWriter is memory-backed
+	_, _ = w.WriteString("<div class=\"admonition-content\">\n") //nolint:erraudit // BufWriter is memory-backed
 
 	return ast.WalkContinue, nil
 }

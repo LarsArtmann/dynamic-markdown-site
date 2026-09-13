@@ -12,7 +12,7 @@ func (s *Server) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 	// s.baseURL(r) returns scheme://host, where scheme is a hard-coded
 	// constant and host comes from the trusted request. Not user-controlled.
 	//nolint:gosec // G107: baseURL is constructed from validated scheme + host
-	_, _ = fmt.Fprintf(w, "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n", s.baseURL(r))
+	_, _ = fmt.Fprintf(w, "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n", s.baseURL(r)) //nolint:erraudit
 }
 
 func (s *Server) baseURL(r *http.Request) string {

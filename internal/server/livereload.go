@@ -90,7 +90,7 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = fmt.Fprintf(w, "event: connected\ndata: %s\n\n", connectedData)
+	_, _ = fmt.Fprintf(w, "event: connected\ndata: %s\n\n", connectedData) //nolint:erraudit // SSE write; client disconnect unrecoverable
 	flusher.Flush()
 
 	ctx := r.Context()

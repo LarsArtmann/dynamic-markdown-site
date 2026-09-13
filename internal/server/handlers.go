@@ -262,7 +262,7 @@ func (s *Server) handleContentByPath(w http.ResponseWriter, r *http.Request, fil
 				// or blob) and the Content-Type header is set from the file's
 				// actual MIME type. Not a user-controlled response body.
 				//nolint:gosec // G107: raw file content from repository, MIME type set explicitly
-				_, _ = w.Write(rawFile.Content)
+				_, _ = w.Write(rawFile.Content) //nolint:erraudit // client disconnect mid-write is unrecoverable
 
 				return
 			}

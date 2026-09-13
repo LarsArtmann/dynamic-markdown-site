@@ -50,5 +50,5 @@ func (s *Server) handleMetrics(w http.ResponseWriter, _ *http.Request) {
 	fmt.Fprintf(&b, "dynamic_markdown_site_uptime_seconds %s\n",
 		strconv.FormatFloat(time.Since(s.startedAt).Seconds(), 'f', 3, 64))
 
-	_, _ = w.Write([]byte(b.String()))
+	_, _ = w.Write([]byte(b.String())) //nolint:erraudit // client disconnect mid-write is unrecoverable
 }

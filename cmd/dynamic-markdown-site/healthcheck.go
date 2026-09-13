@@ -46,10 +46,10 @@ func runHealthcheck() error {
 		return cockroachdberrors.Wrap(err, "parse flags")
 	}
 
-	url := "http://" + *addr + "/health"
+	url := "http://" + *addr + "/health" //nolint:branching-flow:panic // flag.String always returns non-nil
 
 	client := &http.Client{ //nolint:exhaustruct // use defaults
-		Timeout: time.Duration(*timeoutSec) * time.Second,
+		Timeout: time.Duration(*timeoutSec) * time.Second, //nolint:branching-flow:panic // flag.Int always returns non-nil
 	}
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
