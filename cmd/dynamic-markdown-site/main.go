@@ -82,11 +82,31 @@ func setupServices() (*services, error) {
 		return nil, cockroachdberrors.Wrap(err, "failed to create DI container")
 	}
 
+	cfg, err := c.Config()
+	if err != nil {
+		return nil, cockroachdberrors.Wrap(err, "failed to resolve config")
+	}
+
+	logger, err := c.Logger()
+	if err != nil {
+		return nil, cockroachdberrors.Wrap(err, "failed to resolve logger")
+	}
+
+	httpSrv, err := c.Server()
+	if err != nil {
+		return nil, cockroachdberrors.Wrap(err, "failed to resolve server")
+	}
+
+	repo, err := c.Repository()
+	if err != nil {
+		return nil, cockroachdberrors.Wrap(err, "failed to resolve repository")
+	}
+
 	svc := &services{
-		config:    c.Config(),
-		logger:    c.Logger(),
-		server:    c.Server(),
-		repo:      c.Repository(),
+		config:    cfg,
+		logger:    logger,
+		server:    httpSrv,
+		repo:      repo,
 		container: c,
 	}
 

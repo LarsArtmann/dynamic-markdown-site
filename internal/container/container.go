@@ -41,38 +41,23 @@ func New() (*Container, error) {
 }
 
 // Config returns the application configuration.
-func (c *Container) Config() *config.Config {
-	return do.MustInvoke[*config.Config](c.injector)
+func (c *Container) Config() (*config.Config, error) {
+	return do.Invoke[*config.Config](c.injector)
 }
 
 // Logger returns the application logger.
-func (c *Container) Logger() *slog.Logger {
-	return do.MustInvoke[*slog.Logger](c.injector)
-}
-
-// Cache returns the HTML cache.
-func (c *Container) Cache() *cache.HTMLCache {
-	return do.MustInvoke[*cache.HTMLCache](c.injector)
+func (c *Container) Logger() (*slog.Logger, error) {
+	return do.Invoke[*slog.Logger](c.injector)
 }
 
 // Repository returns the content repository.
-func (c *Container) Repository() content.Repository {
-	return do.MustInvoke[content.Repository](c.injector)
-}
-
-// Renderer returns the markdown renderer.
-func (c *Container) Renderer() *renderer.GoldmarkRenderer {
-	return do.MustInvoke[*renderer.GoldmarkRenderer](c.injector)
-}
-
-// Searcher returns the content searcher.
-func (c *Container) Searcher() *content.Searcher {
-	return do.MustInvoke[*content.Searcher](c.injector)
+func (c *Container) Repository() (content.Repository, error) {
+	return do.Invoke[content.Repository](c.injector)
 }
 
 // Server returns the HTTP server.
-func (c *Container) Server() *server.Server {
-	return do.MustInvoke[*server.Server](c.injector)
+func (c *Container) Server() (*server.Server, error) {
+	return do.Invoke[*server.Server](c.injector)
 }
 
 // Shutdown gracefully shuts down all services.
@@ -92,7 +77,10 @@ func provideConfig(_ do.Injector) (*config.Config, error) {
 }
 
 func provideLogger(i do.Injector) (*slog.Logger, error) {
-	cfg := do.MustInvoke[*config.Config](i)
+	cfg, err := do.Invoke[*config.Config](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve config")
+	}
 
 	// Create charmbracelet logger
 	logger := log.New(os.Stdout)
@@ -140,7 +128,10 @@ func provideRenderer(_ do.Injector) (*renderer.GoldmarkRenderer, error) {
 }
 
 func provideRepository(i do.Injector) (content.Repository, error) {
-	cfg := do.MustInvoke[*config.Config](i)
+	cfg, err := do.Invoke[*config.Config](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve config")
+	}
 
 	// Use blob storage if StorageURL is configured
 	if cfg.StorageURL != "" {
@@ -180,18 +171,44 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 }
 
 func provideSearcher(i do.Injector) (*content.Searcher, error) {
-	repo := do.MustInvoke[content.Repository](i)
+	repo, err := do.Invoke[content.Repository](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve repository")
+	}
 
 	return content.NewSearcher(repo), nil
 }
 
 func provideServer(i do.Injector) (*server.Server, error) {
-	repo := do.MustInvoke[content.Repository](i)
-	searcher := do.MustInvoke[*content.Searcher](i)
-	logger := do.MustInvoke[*slog.Logger](i)
-	htmlCache := do.MustInvoke[*cache.HTMLCache](i)
-	rndr := do.MustInvoke[*renderer.GoldmarkRenderer](i)
-	cfg := do.MustInvoke[*config.Config](i)
+	repo, err := do.Invoke[content.Repository](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve repository")
+	}
+
+	searcher, err := do.Invoke[*content.Searcher](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve searcher")
+	}
+
+	logger, err := do.Invoke[*slog.Logger](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve logger")
+	}
+
+	htmlCache, err := do.Invoke[*cache.HTMLCache](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve cache")
+	}
+
+	rndr, err := do.Invoke[*renderer.GoldmarkRenderer](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve renderer")
+	}
+
+	cfg, err := do.Invoke[*config.Config](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve config")
+	}
 
 	return server.NewServer(repo, searcher, logger, htmlCache, rndr, cfg.DevMode, cfg.SiteName), nil
 }
