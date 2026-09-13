@@ -219,33 +219,33 @@ func TestContainerServiceOrder(t *testing.T) {
 
 		// Access services in different order than registration
 		// This verifies that dependency resolution works correctly
-		server := container.Server()     // Depends on repo, searcher, logger, cache
-		searcher := container.Searcher() // Depends on repo
-		renderer := container.Renderer() // No dependencies
-		repo := container.Repository()   // Depends on config
-		cache := container.Cache()       // No dependencies
-		logger := container.Logger()     // Depends on config
-		cfg := container.Config()        // No dependencies (loaded from flags/env)
+		server, err := container.Server() // Depends on repo, searcher, logger, cache
+		if err != nil {
+			t.Errorf("Server() error: %v", err)
+		}
+
+		repo, err := container.Repository() // Depends on config
+		if err != nil {
+			t.Errorf("Repository() error: %v", err)
+		}
+
+		logger, err := container.Logger() // Depends on config
+		if err != nil {
+			t.Errorf("Logger() error: %v", err)
+		}
+
+		cfg, err := container.Config() // No dependencies (loaded from flags/env)
+		if err != nil {
+			t.Errorf("Config() error: %v", err)
+		}
 
 		// All should be non-nil
 		if server == nil {
 			t.Error("Server() returned nil")
 		}
 
-		if searcher == nil {
-			t.Error("Searcher() returned nil")
-		}
-
-		if renderer == nil {
-			t.Error("Renderer() returned nil")
-		}
-
 		if repo == nil {
 			t.Error("Repository() returned nil")
-		}
-
-		if cache == nil {
-			t.Error("Cache() returned nil")
 		}
 
 		if logger == nil {
