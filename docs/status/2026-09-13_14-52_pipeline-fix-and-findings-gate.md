@@ -10,16 +10,16 @@
 
 All three original blockers were fixed and pushed. The BuildFlow findings gate then surfaced a second layer of failures (77 findings at severity error+), of which 33 were fixed properly, 12+3 were suppressed with justified, verified reasons, and **44 remain as an open policy decision** (PHANTOM_TYPE). The final full BuildFlow run **revealed a new, undiagnosed failure (`test-coverage` step, exit status 1)** — the pipeline is still red and this is the top open item.
 
-| Metric | Start | Now |
-| --- | --- | --- |
-| golangci-lint issues | 8 | **0** |
-| BuildFlow step failures | pnpm-audit (hard fail) | test-coverage (undiagnosed) |
-| Findings gate (error+) | 77 (branching-flow 63, erraudit 12, go-structure-linter 2) | **45** (branching-flow 44 = PHANTOM_TYPE only, go-structure-linter 1*) |
-| erraudit findings | 12 | **0** |
-| do.MustInvoke runtime risks | 16 | **0** |
-| Unpinned GitHub actions | 1 | **0** |
-| `go test ./... -race` | pass | **pass (8/8 packages)** |
-| git/origin | 3 ahead, sync interrupted | synced & pushed through `11470e9`; 7 newer local commits pending |
+| Metric                      | Start                                                      | Now                                                                    |
+| --------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------- |
+| golangci-lint issues        | 8                                                          | **0**                                                                  |
+| BuildFlow step failures     | pnpm-audit (hard fail)                                     | test-coverage (undiagnosed)                                            |
+| Findings gate (error+)      | 77 (branching-flow 63, erraudit 12, go-structure-linter 2) | **45** (branching-flow 44 = PHANTOM_TYPE only, go-structure-linter 1*) |
+| erraudit findings           | 12                                                         | **0**                                                                  |
+| do.MustInvoke runtime risks | 16                                                         | **0**                                                                  |
+| Unpinned GitHub actions     | 1                                                          | **0**                                                                  |
+| `go test ./... -race`       | pass                                                       | **pass (8/8 packages)**                                                |
+| git/origin                  | 3 ahead, sync interrupted                                  | synced & pushed through `11470e9`; 7 newer local commits pending       |
 
 \* The go-structure-linter AGENTS.md line-count finding was re-verified fixed at 14:45 (exactly 377/377 lines) via a passing single-step run; the "1 remaining" in the gate reflects the stale aggregate of the last full run. A fresh full run will confirm.
 
@@ -28,6 +28,7 @@ All three original blockers were fixed and pushed. The BuildFlow findings gate t
 ## a) FULLY DONE
 
 ### 1. golangci-lint: 8 issues → 0 (pre-push hook unblocked)
+
 - `internal/content/helpers.go:24-26` — `SkipDirs` nolint directive was placed after the closing brace (line 33) where it suppressed nothing; moved above the declaration and dropped the stale `,golines` qualifier (nolintlint confirmed it unused).
 - `internal/server/suggestions.go:96-125` — `levenshteinDistance` violated `makezero` (`always: true` forbids `make([]T, n>0)`). Restructured DP rows: `make([]int, 0, len(a)+1)`, `curr = curr[:0]` + `append` per row, `prev = curr` swap. Same O(min(n,m)) space, no allocation per row.
 - `internal/server/suggestions_test.go:11` — `paths()` helper: `make(0, len)` + append.
@@ -36,36 +37,45 @@ All three original blockers were fixed and pushed. The BuildFlow findings gate t
 - `internal/server/sitemap_test.go:72` + 4 call sites in `handlers_test.go` — `unparam`: `addTestDir` always received `"/docs", "Docs"`; dropped both parameters, hardcoded in the helper, updated all 5 call sites.
 
 ### 2. BuildFlow `pnpm-audit` hard failure resolved
+
 - Root cause: BuildFlow runs `pnpm audit` at the repo root; the only JS project lives in `website/` with its own lockfile. `tool_paths` (tried both `pnpm-audit:` and `pnpm:` keys) is silently ignored by this provider.
 - Fix: `skip_steps: [pnpm-audit]` in `.buildflow.yml` with a comment documenting why and the manual replacement (`cd website && pnpm audit`). Verified: dry-run shows "skipped via skip_steps config".
 
 ### 3. Interrupted `git town sync` completed
+
 - Committed the two un-daemonized files (`11470e9`), ran `git town continue`: all checks passed, pushed, `origin/master == 11470e9`, git town reports sync finished successfully.
 - One pre-push test flake (`TestGracefulShutdownStopsInFlightRequests`, EOF under hook load) was re-verified 3/3 passing in isolation with `-race` before retrying — transient, not a regression.
 
 ### 4. erraudit findings 12 → 0
+
 Every flagged site was individually inspected before suppressing. All are provably-infallible writes:
+
 - `internal/renderer/admonition_extension.go` ×4 — goldmark `util.BufWriter` is memory-backed.
 - `internal/server/{handlers,livereload,metrics,robots,sitemap,static}.go` ×7 — `http.ResponseWriter` writes where a client disconnect mid-write is unrecoverable and nothing can be done.
 - `internal/content/memory.go:23` — root node built from compile-time-constant path + title.
-Each carries `//nolint:erraudit` with a short honest reason, within golines' 120-char limit, gofmt comment-aligned.
+  Each carries `//nolint:erraudit` with a short honest reason, within golines' 120-char limit, gofmt comment-aligned.
 
 ### 5. branching-flow NIL_POINTER_DEREF 3 → 0
+
 - `cmd/dynamic-markdown-site/healthcheck.go:49,52` — `flag.String`/`flag.Int` return non-nil pointers by contract.
 - `internal/server/render.go:117` — verified `HTMLCache.GetOrCompute` returns `&val, nil` (never nil on nil error) before suppressing.
 - Suppressed with `//nolint:branching-flow` (the typed `:panic` form is rejected by golangci's nolintlint — tool interop conflict, documented in AGENTS.md).
 
 ### 6. samber/do DO-1 refactor: 16 `do.MustInvoke` runtime risks → 0
+
 Followed the samber-do-best-practices skill:
+
 - `internal/container/container.go` — all provider closures (`provideLogger`, `provideRepository`, `provideSearcher`, `provideServer`) now resolve via `do.Invoke[T]` with wrapped errors; the seven `MustInvoke` accessor methods became: four accessors returning `(T, error)` via `do.Invoke` (Config, Logger, Repository, Server) and three deleted as dead code (Cache, Renderer, Searcher — zero callers).
 - `cmd/dynamic-markdown-site/main.go` — `setupServices` now handles resolution errors explicitly.
 - `internal/container/container_test.go` — rewritten for the new API across 4 test functions.
 
 ### 7. go-structure-linter findings
+
 - `.github/workflows/release.yml:33` — `anchore/sbom-action/download-syft@v0` pinned to full SHA `e22c3899…` (resolved via `git ls-remote`; v0 is a lightweight tag = that commit), matching the file's existing `SHA # version` pattern.
 - AGENTS.md staleness fixed by a real content update (DI section corrected to the new `do.Invoke` pattern + three new gotchas: makezero always mode, findings gate + suppression conventions, pnpm-audit skip). Line overflow (380 > 377 max) condensed to exactly 377.
 
 ### 8. Verification state
+
 - `go build ./...` clean; `go test ./... -race` 8/8 packages pass; `golangci-lint run ./...` **0 issues**.
 - erraudit re-run on `internal/content`: memory.go finding gone.
 - BuildFlow single-step runs: `go-structure-linter` passes (14:45), dry-run confirms skip config.
@@ -116,6 +126,7 @@ Followed the samber-do-best-practices skill:
 ## f) 50 THINGS WE SHOULD GET DONE NEXT
 
 **Immediate (pipeline red → green):**
+
 1. Diagnose & fix the `test-coverage` BuildFlow step failure (exit status 1; suspect container coverage shift from the DO-1 refactor).
 2. Decide & execute the PHANTOM_TYPE policy (44 findings) — see question 1.
 3. Confirm go-structure-linter AGENTS.md finding is green in a fresh full run (line count now exactly 377).
@@ -189,4 +200,4 @@ Followed the samber-do-best-practices skill:
 
 ---
 
-*Report generated 2026-09-13 14:52 CEST. Snapshot only — findings counts and gate state are point-in-time. Format note: written as Markdown per explicit user instruction (skill default is a styled HTML dashboard).*
+_Report generated 2026-09-13 14:52 CEST. Snapshot only — findings counts and gate state are point-in-time. Format note: written as Markdown per explicit user instruction (skill default is a styled HTML dashboard)._
