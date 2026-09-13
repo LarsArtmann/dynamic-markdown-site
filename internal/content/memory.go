@@ -19,7 +19,8 @@ var _ Repository = (*InMemoryRepository)(nil)
 
 // NewInMemoryRepository creates a new in-memory repository.
 func NewInMemoryRepository() *InMemoryRepository {
-	root, _ := domain.NewDirectoryNode(domain.MustURLPath("/"), "Home", time.Now())
+	// Path and title are compile-time constants; NewDirectoryNode cannot fail here.
+	root, _ := domain.NewDirectoryNode(domain.MustURLPath("/"), "Home", time.Now()) //nolint:erraudit // provably infallible
 
 	return &InMemoryRepository{
 		nodes:    make(map[domain.URLPath]domain.ContentNode),
