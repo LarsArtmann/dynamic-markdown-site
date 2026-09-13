@@ -8,9 +8,9 @@ import (
 
 // paths creates a slice of URLPath from string paths.
 func paths(paths ...string) []domain.URLPath {
-	result := make([]domain.URLPath, len(paths))
-	for i, p := range paths {
-		result[i] = domain.MustURLPath(p)
+	result := make([]domain.URLPath, 0, len(paths))
+	for _, p := range paths {
+		result = append(result, domain.MustURLPath(p))
 	}
 
 	return result

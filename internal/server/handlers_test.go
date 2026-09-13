@@ -195,7 +195,7 @@ func newTestHandlerForEndpointTests(t *testing.T) http.Handler {
 	addTestFile(t, repo, "/about", "About", []byte("# About\n\npage"), time.Now())
 	addTestFile(t, repo, "/docs/intro", "Intro", []byte("# Introduction\n\nWelcome"), time.Now())
 
-	addTestDir(t, repo, "/docs", "Docs", time.Now())
+	addTestDir(t, repo, time.Now())
 
 	srv := newTestServer(t, repo)
 
@@ -302,7 +302,7 @@ func TestDirectoryListing(t *testing.T) {
 	t.Parallel()
 
 	repo := content.NewInMemoryRepository()
-	dir := addTestDir(t, repo, "/docs", "Docs", time.Now())
+	dir := addTestDir(t, repo, time.Now())
 
 	addTestFileToDir(t, repo, dir, "/docs/guide", "Guide", []byte("# Guide"), time.Now())
 
@@ -315,7 +315,7 @@ func TestHTMLPagesSetContentType(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 	addTestFile(t, repo, "/guide", "Guide", []byte("# Guide"), time.Now())
-	addTestDir(t, repo, "/docs", "Docs", time.Now())
+	addTestDir(t, repo, time.Now())
 
 	handler := newTestHandler(newTestServer(t, repo))
 
@@ -332,7 +332,7 @@ func TestContentDirServingWithReadme(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 
-	dir := addTestDir(t, repo, "/docs", "Docs", time.Now())
+	dir := addTestDir(t, repo, time.Now())
 
 	addTestFileToDir(t, repo, dir, "/docs/README", "README", []byte("# Docs README"), time.Now())
 

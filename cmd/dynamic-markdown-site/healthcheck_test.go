@@ -4,6 +4,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -40,8 +41,7 @@ func TestRunHealthcheckReturnsNilForHealthyServer(t *testing.T) {
 	addr := listener.Addr().String()
 
 	// Save and restore os.Args.
-	origArgs := make([]string, len(os.Args))
-	copy(origArgs, os.Args)
+	origArgs := slices.Clone(os.Args)
 	t.Cleanup(func() {
 		os.Args = origArgs
 	})

@@ -72,12 +72,11 @@ func addTestFileToDir(
 func addTestDir(
 	t *testing.T,
 	repo *content.InMemoryRepository,
-	dirPath, title string,
 	modTime time.Time,
 ) *domain.DirectoryNode {
 	t.Helper()
 
-	dir, err := domain.NewDirectoryNode(domain.MustURLPath(dirPath), title, modTime)
+	dir, err := domain.NewDirectoryNode(domain.MustURLPath("/docs"), "Docs", modTime)
 	require.NoError(t, err)
 
 	repo.Add(dir)
@@ -152,7 +151,7 @@ func TestSitemapXMLWithDirectories(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 
-	dir := addTestDir(t, repo, "/docs", "Docs", time.Date(2026, 3, 10, 0, 0, 0, 0, time.UTC))
+	dir := addTestDir(t, repo, time.Date(2026, 3, 10, 0, 0, 0, 0, time.UTC))
 
 	file := newTestFileNode(
 		t,

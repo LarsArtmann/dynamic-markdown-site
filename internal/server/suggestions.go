@@ -94,18 +94,18 @@ func levenshteinDistance(a, b string) int {
 	}
 
 	// Previous row of the matrix
-	prev := make([]int, len(a)+1)
-	// Current row of the matrix
-	curr := make([]int, len(a)+1)
-
-	// Initialize first row
-	for i := range prev {
-		prev[i] = i
+	prev := make([]int, 0, len(a)+1)
+	for i := range len(a) + 1 {
+		prev = append(prev, i)
 	}
+
+	// Current row of the matrix
+	curr := make([]int, 0, len(a)+1)
 
 	// Compute each row
 	for j := 1; j <= len(b); j++ {
-		curr[0] = j
+		curr = curr[:0]
+		curr = append(curr, j)
 
 		for i := 1; i <= len(a); i++ {
 			cost := 0
@@ -113,11 +113,11 @@ func levenshteinDistance(a, b string) int {
 				cost = 1
 			}
 
-			curr[i] = min(
+			curr = append(curr, min(
 				curr[i-1]+1,    // deletion
 				prev[i]+1,      // insertion
 				prev[i-1]+cost, // substitution
-			)
+			))
 		}
 
 		// Swap rows

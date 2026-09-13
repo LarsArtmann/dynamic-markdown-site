@@ -622,9 +622,9 @@ func TestNodeKind_String(t *testing.T) {
 
 // Helper function to generate test words.
 func generateWords(n int) string {
-	words := make([]string, n)
-	for i := range words {
-		words[i] = "word"
+	words := make([]string, 0, n)
+	for range n {
+		words = append(words, "word")
 	}
 
 	return joinWords(words)
