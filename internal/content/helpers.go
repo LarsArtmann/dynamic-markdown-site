@@ -23,7 +23,7 @@ const (
 
 // SkipDirs contains directory names to skip during content discovery.
 //
-//nolint:gochecknoglobals,golines
+//nolint:gochecknoglobals
 var SkipDirs = []string{
 	skipDirNodeModules,
 	skipDirGit,

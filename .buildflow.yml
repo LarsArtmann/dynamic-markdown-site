@@ -8,3 +8,11 @@ exclude:
   - "*_test.go"
 
 auto_fix: true
+
+# pnpm-audit always fails here: buildflow runs `pnpm audit` at the repo root,
+# but the only JS/TS project lives in website/ (Astro + Starlight) with its own
+# pnpm-lock.yaml, and the provider ignores per-directory config (tool_paths).
+# Excluded per buildflow's own recommendation; audit website deps directly via
+# `cd website && pnpm audit` until buildflow supports subdirectory projects.
+skip_steps:
+  - pnpm-audit
