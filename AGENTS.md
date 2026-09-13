@@ -95,7 +95,14 @@ func New() (*Container, error) {
 }
 ```
 
-Access via typed accessors: `do.MustInvoke[*config.Config](c.injector)`
+Resolve dependencies with `do.Invoke` (returns error) — never `do.MustInvoke`, which panics at runtime. Provider closures resolve dependencies the same way, and `main.go` handles the errors from the container's typed accessors:
+
+```go
+cfg, err := do.Invoke[*config.Config](i)
+if err != nil {
+    return nil, errors.Wrap(err, "failed to resolve config")
+}
+```
 
 ### Repository Pattern
 
@@ -307,6 +314,18 @@ The project intentionally uses stable `encoding/json`. `httputil` must stay pinn
 ### 13. Compression Middleware Affects Tests
 
 `httputil.Compression` gzips responses >512 bytes when no `Accept-Encoding` header is set. The shared test helper `executeRequest` in `handlers_test.go` sets `Accept-Encoding: identity` to disable compression so tests can assert on plaintext response bodies.
+
+### 14. golangci-lint Runs makezero in always Mode
+
+`.golangci.yml` sets `makezero.always: true`: `make([]T, n)` with n > 0 is forbidden anywhere. Build slices with `make([]T, 0, cap)` + `append`, or use `slices.Clone` for copies. Fixed-length DP buffers that must be indexed use the `curr = curr[:0]` + append pattern.
+
+### 15. BuildFlow Findings Gate and Suppression Conventions
+
+`buildflow` (full mode) fails on any remaining finding at severity error+: `branching-flow`, `erraudit`, and `go-structure-linter`. Suppression conventions when a finding is provably safe: `erraudit` honors `//nolint:erraudit` (keep lines under golines' 120-char limit); `branching-flow` honors typed `//nolint:branching-flow:panic` (directives must sit on the FIRST line of a multi-line call). Real fixes beat suppressions: convert `_, _ =` only when the write target is memory-backed or the failure is genuinely unrecoverable.
+
+### 16. pnpm-audit Is Excluded via skip_steps
+
+BuildFlow runs `pnpm audit` at the repo root, but the only JS project lives in `website/` with its own `pnpm-lock.yaml`, and the step ignores per-directory config (`tool_paths` has no effect). It is excluded via `skip_steps` in `.buildflow.yml`; audit website dependencies manually with `cd website && pnpm audit`.
 
 ---
 

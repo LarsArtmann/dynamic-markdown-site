@@ -68,44 +68,34 @@ func TestContainerServices(t *testing.T) {
 		defer func() { _ = container.Shutdown() }()
 
 		// Test Config accessor
-		cfg := container.Config()
-		if cfg == nil {
+		cfg, err := container.Config()
+		if err != nil {
+			t.Errorf("Config() error: %v", err)
+		} else if cfg == nil {
 			t.Error("Config() returned nil")
 		}
 
 		// Test Logger accessor
-		logger := container.Logger()
-		if logger == nil {
+		logger, err := container.Logger()
+		if err != nil {
+			t.Errorf("Logger() error: %v", err)
+		} else if logger == nil {
 			t.Error("Logger() returned nil")
 		}
 
-		// Test Cache accessor
-		cache := container.Cache()
-		if cache == nil {
-			t.Error("Cache() returned nil")
-		}
-
 		// Test Repository accessor
-		repo := container.Repository()
-		if repo == nil {
+		repo, err := container.Repository()
+		if err != nil {
+			t.Errorf("Repository() error: %v", err)
+		} else if repo == nil {
 			t.Error("Repository() returned nil")
 		}
 
-		// Test Renderer accessor
-		renderer := container.Renderer()
-		if renderer == nil {
-			t.Error("Renderer() returned nil")
-		}
-
-		// Test Searcher accessor
-		searcher := container.Searcher()
-		if searcher == nil {
-			t.Error("Searcher() returned nil")
-		}
-
 		// Test Server accessor
-		server := container.Server()
-		if server == nil {
+		server, err := container.Server()
+		if err != nil {
+			t.Errorf("Server() error: %v", err)
+		} else if server == nil {
 			t.Error("Server() returned nil")
 		}
 
@@ -124,9 +114,13 @@ func TestContainerShutdown(t *testing.T) {
 		}
 
 		// Access some services to ensure they're initialized
-		_ = container.Config()
-		_ = container.Logger()
-		_ = container.Cache()
+		if _, err := container.Config(); err != nil {
+			t.Errorf("Config() error: %v", err)
+		}
+
+		if _, err := container.Logger(); err != nil {
+			t.Errorf("Logger() error: %v", err)
+		}
 
 		// Shutdown should succeed (do.ShutdownReport returns non-nil but empty Error() on success)
 		assertNoShutdownError(t, container)
@@ -151,51 +145,58 @@ func TestContainerMultipleAccess(t *testing.T) {
 		defer func() { _ = container.Shutdown() }()
 
 		// Access services multiple times - should return same instances (singleton)
-		cfg1 := container.Config()
+		cfg1, err := container.Config()
+		if err != nil {
+			t.Fatalf("Config() error: %v", err)
+		}
 
-		cfg2 := container.Config()
+		cfg2, err := container.Config()
+		if err != nil {
+			t.Fatalf("Config() error: %v", err)
+		}
+
 		if cfg1 != cfg2 {
 			t.Error("Config() should return same instance (singleton)")
 		}
 
-		logger1 := container.Logger()
+		logger1, err := container.Logger()
+		if err != nil {
+			t.Fatalf("Logger() error: %v", err)
+		}
 
-		logger2 := container.Logger()
+		logger2, err := container.Logger()
+		if err != nil {
+			t.Fatalf("Logger() error: %v", err)
+		}
+
 		if logger1 != logger2 {
 			t.Error("Logger() should return same instance (singleton)")
 		}
 
-		cache1 := container.Cache()
-
-		cache2 := container.Cache()
-		if cache1 != cache2 {
-			t.Error("Cache() should return same instance (singleton)")
+		repo1, err := container.Repository()
+		if err != nil {
+			t.Fatalf("Repository() error: %v", err)
 		}
 
-		renderer1 := container.Renderer()
-
-		renderer2 := container.Renderer()
-		if renderer1 != renderer2 {
-			t.Error("Renderer() should return same instance (singleton)")
+		repo2, err := container.Repository()
+		if err != nil {
+			t.Fatalf("Repository() error: %v", err)
 		}
 
-		repo1 := container.Repository()
-
-		repo2 := container.Repository()
 		if repo1 != repo2 {
 			t.Error("Repository() should return same instance (singleton)")
 		}
 
-		searcher1 := container.Searcher()
-
-		searcher2 := container.Searcher()
-		if searcher1 != searcher2 {
-			t.Error("Searcher() should return same instance (singleton)")
+		server1, err := container.Server()
+		if err != nil {
+			t.Fatalf("Server() error: %v", err)
 		}
 
-		server1 := container.Server()
+		server2, err := container.Server()
+		if err != nil {
+			t.Fatalf("Server() error: %v", err)
+		}
 
-		server2 := container.Server()
 		if server1 != server2 {
 			t.Error("Server() should return same instance (singleton)")
 		}
