@@ -375,3 +375,9 @@ Prefix: `DYNAMIC_MARKDOWN_`
 | `/api/live-reload` | GET      | SSE live reload (dev mode)      |
 
 ---
+
+## Website build gotcha (pnpm 11)
+
+Build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:` (`esbuild: true`) — pnpm v11 ignores `pnpm.*` in `package.json` and silently skips unapproved postinstall scripts, so `astro build` then fails on a missing esbuild binary. A placeholder value (e.g. `esbuild: set this to true or false`) silently disables the whole key (cmdguard incident, fixed 2026-09-19).
+
+---
