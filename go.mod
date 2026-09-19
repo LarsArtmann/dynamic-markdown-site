@@ -35,7 +35,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.38.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.62.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.62.0 // indirect
-	github.com/LarsArtmann/gogenfilter/v3 v3.6.0 // indirect
+	github.com/LarsArtmann/gogenfilter/v3 v3.6.1 // indirect
 	github.com/PuerkitoBio/goquery v1.13.0 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/andybalholm/brotli v1.2.4 // indirect

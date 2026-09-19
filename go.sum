@@ -32,8 +32,8 @@ github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/cloudmock v0
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/cloudmock v0.62.0/go.mod h1:ifhe5teRNcbxg9p353DhOkOgczzL/IBLYFqT1cm1zpM=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.62.0 h1:aPMa5qZU9dp4fU34o+jQgVIPFIOi20oxYg8TLigmZLg=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.62.0/go.mod h1:sg6Wqbl0BKKZ5zKnQj2q0qic/3ziF894SCx1LpbX37Y=
-github.com/LarsArtmann/gogenfilter/v3 v3.6.0 h1:BKLYuxE71ZoV6h4TWGPHoEX6ai0PtgrwkSDp5vgQMgA=
-github.com/LarsArtmann/gogenfilter/v3 v3.6.0/go.mod h1:jiJIptVE+7HYYkCPJ03buhyT2jd44jPlNr5xsRZe56Y=
+github.com/LarsArtmann/gogenfilter/v3 v3.6.1 h1:0I3czhazOGPifqV0EpO+drXwsNNO+ZLgefOlPXpiQFQ=
+github.com/LarsArtmann/gogenfilter/v3 v3.6.1/go.mod h1:jiJIptVE+7HYYkCPJ03buhyT2jd44jPlNr5xsRZe56Y=
 github.com/Masterminds/semver/v3 v3.5.0 h1:kQceYJfbupGfZOKZQg0kou0DgAKhzDg2NZPAwZ/2OOE=
 github.com/Masterminds/semver/v3 v3.5.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/PuerkitoBio/goquery v1.13.0 h1:mqHbjD7Jmnul4DTR24LKTjo1uUmHUh072kteGV+xpFM=
