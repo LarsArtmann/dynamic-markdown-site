@@ -20,6 +20,7 @@
 	--color-accent-hover: #818cf8;
 	--color-accent-dim: rgba(99, 102, 241, 0.08);
 	--color-accent-light: #a5b4fc;
+	--color-on-accent: #000000;
 
 	--color-amber: #fbbf24;
 	--color-danger: #f87171;
@@ -65,6 +66,7 @@
 	--color-accent-hover: #6366f1;
 	--color-accent-dim: rgba(79, 70, 229, 0.06);
 	--color-accent-light: #818cf8;
+	--color-on-accent: #ffffff;
 
 	--color-danger: #dc2626;
 	--color-danger-dim: rgba(220, 38, 38, 0.05);
