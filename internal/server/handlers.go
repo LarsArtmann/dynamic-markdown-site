@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -88,6 +89,21 @@ func (s *Server) Handler() http.Handler {
 func (s *Server) Shutdown() {
 	s.rateLimiter.Stop()
 	s.cache.Close()
+}
+
+// HealthCheck verifies the content repository is reachable, the server's only
+// dependency that can fail. The same probe is served at runtime via the
+// /health endpoint; no in-process sweep invokes this method today.
+func (s *Server) HealthCheck(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("health check cancelled: %w", err)
+	}
+
+	if _, err := s.repo.Root(); err != nil {
+		return fmt.Errorf("content repository unreachable: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Server) LiveReload() *LiveReload {

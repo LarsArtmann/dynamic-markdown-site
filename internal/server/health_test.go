@@ -111,3 +111,38 @@ func newUnhealthyRepositoryServer(t *testing.T) *Server {
 
 	return newTestServerWithCache(t, &FailingRepository{}, htmlCache)
 }
+
+func TestHealthCheckReturnsNilForHealthyServer(t *testing.T) {
+	t.Parallel()
+
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+
+	if err := srv.HealthCheck(context.Background()); err != nil {
+		t.Errorf("HealthCheck() = %v, want nil", err)
+	}
+}
+
+func TestHealthCheckReportsUnhealthyRepository(t *testing.T) {
+	t.Parallel()
+
+	srv := newUnhealthyRepositoryServer(t)
+
+	if err := srv.HealthCheck(context.Background()); err == nil {
+		t.Error("HealthCheck() = nil, want error for unreachable repository")
+	}
+}
+
+func TestHealthCheckRespectsCancelledContext(t *testing.T) {
+	t.Parallel()
+
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	if err := srv.HealthCheck(ctx); err == nil {
+		t.Error("HealthCheck() = nil, want error for cancelled context")
+	}
+}
