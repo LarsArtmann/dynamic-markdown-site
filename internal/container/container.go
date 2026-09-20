@@ -35,7 +35,15 @@ func New() (*Container, error) {
 	do.Provide(injector, provideRenderer)
 	do.Provide(injector, provideRepository)
 	do.Provide(injector, provideSearcher)
-	do.Provide(injector, provideServer)
+
+	// The server is boot-critical: main starts it immediately after wiring.
+	// Construct it here so health sweeps see a constructed service from boot
+	// instead of reporting green for one that was never resolved.
+	srv, err := provideServer(injector)
+	if err != nil {
+		return nil, err
+	}
+	do.ProvideValue(injector, srv)
 
 	return &Container{injector: injector}, nil
 }

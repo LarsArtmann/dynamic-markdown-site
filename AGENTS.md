@@ -307,9 +307,9 @@ Rate limiting uses `golang.org/x/time/rate` (token bucket). No background gorout
 
 The `.goreleaser.yaml` declares `license: MIT` in 4 places (homebrew_casks, nfpms, nix, scoops sections), but the `LICENSE` file is proprietary and `flake.nix` correctly uses `licenses.unfree`. This is a **pre-existing inconsistency** that causes Homebrew/Scoop/Nix to publish wrong license metadata. (The previous `archives.format_overrides` and `brews` deprecations mentioned here have already been fixed — `formats: ["zip"]` and `homebrew_casks` are now used.)
 
-### 12. encoding/json/v2 Must Not Be Used
+### 12. encoding/json/v2 Is the Server Standard
 
-The project intentionally uses stable `encoding/json`. `httputil` must stay pinned at `v0.5.0` (v0.6.0+ imports `encoding/json/v2` in `health.go`, breaking the build without `GOEXPERIMENT=jsonv2`). `go-error-family` is at `v0.9.0` as a transitive dependency of `go-filewatcher` — if it causes build issues, pin it. Automated upgrade tools (go-auto-upgrade) will re-break the build by upgrading `httputil` — the upgrade must be excluded. `GOEXPERIMENT=jsonv2` is NOT enabled.
+Since commit `1fc8408` (2026-09-04) `internal/server` deliberately uses `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2` and a `go 1.27+` directive (kept in sync between `go.mod` and `.golangci.yml run.go`). All `go` commands that compile this repo must set `GOEXPERIMENT=jsonv2`. This supersedes the older guidance (httputil pinned at `v0.5.0`, stable `encoding/json` only); `httputil` is at `v1.2.0`.
 
 ### 13. Compression Middleware Affects Tests
 
