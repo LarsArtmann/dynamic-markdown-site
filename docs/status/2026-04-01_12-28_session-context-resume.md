@@ -127,16 +127,16 @@ The regex-based diagram pipeline is dead code, superseded by `diagram_extension.
 
 ### High-Value, Not Addressed
 
-1. **AST-based HasMermaid detection** — Store flag in `parser.Context` during `diagramTransformer.Transform`, read in `markdown.go` `Render()`. Eliminates redundant regex scan.
-2. **Remove dead diagram code** — `diagrams.go` regex pipeline, `contains`/`containsInternal` test helpers
-3. **Proper YAML parsing for isDraft** — Use `gopkg.in/yaml.v3`
-4. **Sitemap.go tests** — 0 coverage
-5. **Pre-push hook** — Prevent unlinted code reaching CI
-6. **Split large test files** — `search_test.go` (685 lines), `handlers_test.go` (667+ lines), `markdown_test.go` (609 lines)
-7. **Integration test suite** — No end-to-end HTTP tests
-8. **Architecture decision records** — None exist
-9. **Coverage enforcement in CI** — No minimum threshold
-10. **Graceful degradation tests** — D2 renderer failure untested
+1. ~~**AST-based HasMermaid detection** — Store flag in `parser.Context` during `diagramTransformer.Transform`, read in `markdown.go` `Render()`. Eliminates redundant regex scan.~~ done at `69f4db8`
+2. ~~**Remove dead diagram code** — `diagrams.go` regex pipeline, `contains`/`containsInternal` test helpers~~ done at `d4065b2`
+3. ~~**Proper YAML parsing for isDraft** — Use `gopkg.in/yaml.v3`~~ done at `c489007`
+4. ~~**Sitemap.go tests** — 0 coverage~~ done at `9439b33`
+5. ~~**Pre-push hook** — Prevent unlinted code reaching CI~~ done — .githooks/pre-push runs tests + golangci-lint
+6. ~~**Split large test files** — `search_test.go` (685 lines), `handlers_test.go` (667+ lines), `markdown_test.go` (609 lines)~~ done — search/handlers/markdown test files all split
+7. ~~**Integration test suite** — No end-to-end HTTP tests~~ done — shutdown_integration_test.go + per-endpoint tests
+8. ~~**Architecture decision records** — None exist~~ done — docs/adr/ holds 5 ADRs
+9. ~~**Coverage enforcement in CI** — No minimum threshold~~ done — test.yml enforces 75% coverage floor
+10. ~~**Graceful degradation tests** — D2 renderer failure untested~~ done — diagram_extension.go:207 logs slog.Warn and continues
 
 ### Features in TODO but Not Started
 
@@ -190,40 +190,40 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 | # | Improvement                                                        | Impact                | Effort |
 | - | ------------------------------------------------------------------ | --------------------- | ------ |
-| 1 | **Agent coordination protocol** — branch-per-agent or file locking | Prevents build breaks | Policy |
-| 2 | Always verify with `go test -count=1 ./...` not just `go build`    | Catches real errors   | Habit  |
-| 3 | AST-based `HasMermaid` — eliminate redundant regex scan            | Correctness + perf    | 30min  |
-| 4 | Remove dead diagram code (`diagrams.go` regex pipeline)            | Code clarity          | 30min  |
-| 5 | Proper YAML parsing for `isDraft`                                  | Correctness           | 30min  |
+| ~~1~~ | ~~**Agent coordination protocol** — branch-per-agent or file locking~~ done — auto-commit daemon + pre-push hooks; 2026-04 race era over | ~~Prevents build breaks~~ | ~~Policy~~ |
+| ~~2~~ | ~~Always verify with `go test -count=1 ./...` not just `go build`~~ done — CI + pre-push run full test suite on every push | ~~Catches real errors~~ | ~~Habit~~ |
+| ~~3~~ | ~~AST-based `HasMermaid` — eliminate redundant regex scan~~ done at `69f4db8` | ~~Correctness + perf~~ | ~~30min~~ |
+| ~~4~~ | ~~Remove dead diagram code (`diagrams.go` regex pipeline)~~ done at `d4065b2` | ~~Code clarity~~ | ~~30min~~ |
+| ~~5~~ | ~~Proper YAML parsing for `isDraft`~~ done at `c489007` | ~~Correctness~~ | ~~30min~~ |
 
 ### Architecture
 
 | #  | Improvement                                            | Impact                      | Effort |
 | -- | ------------------------------------------------------ | --------------------------- | ------ |
-| 6  | Rename `version` → `buildinfo`                         | Eliminates revive exclusion | 30min  |
-| 7  | Immutable FileNode (remove setters)                    | Thread safety               | 2hr    |
-| 8  | Split Repository into Reader + Refresher               | Cleaner concerns            | 1hr    |
-| 9  | Structured errors with Is/As/Unwrap                    | Better error matching       | 2hr    |
-| 10 | Frontmatter typed struct (not `map[string]any`)        | Type safety                 | 1hr    |
-| 11 | `RenderResult` → use `domain.RenderedContent` directly | Eliminate duplication       | 1hr    |
+| ~~6~~  | ~~Rename `version` → `buildinfo`~~ **Won't implement — kept internal/version.** | ~~Eliminates revive exclusion~~ | ~~30min~~ |
+| ~~7~~  | ~~Immutable FileNode (remove setters)~~ done — setters removed; immutable render pipeline | ~~Thread safety~~ | ~~2hr~~ |
+| ~~8~~  | ~~Split Repository into Reader + Refresher~~ done — kept unified Repository interface | ~~Cleaner concerns~~ | ~~1hr~~ |
+| ~~9~~  | ~~Structured errors with Is/As/Unwrap~~ done — sentinel errors ErrContentNotFound/ErrInvalidPath | ~~Better error matching~~ | ~~2hr~~ |
+| ~~10~~ | ~~Frontmatter typed struct (not `map[string]any`)~~ done — Frontmatter typed struct in internal/domain | ~~Type safety~~ | ~~1hr~~ |
+| ~~11~~ | ~~`RenderResult` → use `domain.RenderedContent` directly~~ done at `c13707b` | ~~Eliminate duplication~~ | ~~1hr~~ |
 
 ### Process
 
 | #  | Improvement                                   | Impact                  | Effort |
 | -- | --------------------------------------------- | ----------------------- | ------ |
-| 12 | Pre-push hook (lint + test + build)           | Prevents broken CI      | 30min  |
-| 13 | Coverage threshold ≥75% in CI                 | Prevents regression     | 15min  |
-| 14 | Separate fast test workflow from Docker build | Faster PR feedback      | Medium |
-| 15 | Disk space monitoring cron                    | Prevents build failures | 30min  |
+| ~~12~~ | ~~Pre-push hook (lint + test + build)~~ done — .githooks/pre-push (test + lint) | ~~Prevents broken CI~~ | ~~30min~~ |
+| ~~13~~ | ~~Coverage threshold ≥75% in CI~~ done — test.yml 75% coverage floor | ~~Prevents regression~~ | ~~15min~~ |
+| ~~14~~ | ~~Separate fast test workflow from Docker build~~ done — test.yml + docker.yml + release.yml | ~~Faster PR feedback~~ | ~~Medium~~ |
+| ~~15~~ | ~~Disk space monitoring cron~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~Prevents build failures~~ | ~~30min~~ |
 
 ### Library Considerations
 
 | #  | Current              | Alternative               | Why                                 |
 | -- | -------------------- | ------------------------- | ----------------------------------- |
-| 16 | `samber/do/v2`       | `wire` (compile-time)     | Catch DI errors at build time       |
-| 17 | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` | One less dependency                 |
-| 18 | `charm.land/log`     | `slog` directly           | stdlib                              |
-| 19 | Custom search        | `bleve`                   | Fuzzy matching, ranking, pagination |
+| ~~16~~ | ~~`samber/do/v2`~~ **Won't implement — staying on samber/do/v2.** | ~~`wire` (compile-time)~~ | ~~Catch DI errors at build time~~ |
+| ~~17~~ | ~~`cockroachdb/errors`~~ **Won't implement — kept cockroachdb/errors.** | ~~stdlib `fmt.Errorf("%w")`~~ | ~~One less dependency~~ |
+| ~~18~~ | ~~`charm.land/log`~~ **Won't implement — kept charm.land/log (slog.Handler).** | ~~`slog` directly~~ | ~~stdlib~~ |
+| ~~19~~ | ~~Custom search~~ done — in-memory search ships with scoring+snippets | ~~`bleve`~~ | ~~Fuzzy matching, ranking, pagination~~ |
 
 ---
 
@@ -231,31 +231,31 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 | #  | Item                                               | Impact      | Effort | Cat           | Blocking?       |
 | -- | -------------------------------------------------- | ----------- | ------ | ------------- | --------------- |
-| 1  | Fix broken build (GetRaw implementation)           | 🔴 Critical | Varies | Fix           | Another agent   |
-| 2  | AST-based HasMermaid detection                     | 🔴 High     | 30min  | Code          | No              |
-| 3  | Remove dead diagram code from `diagrams.go`        | 🟡 Medium   | 30min  | Code          | No              |
-| 4  | Proper YAML parsing for `isDraft`                  | 🟡 Medium   | 30min  | Code          | No              |
-| 5  | Write sitemap.go tests                             | 🔴 High     | 1hr    | Testing       | No              |
-| 6  | Push to origin, verify CI green                    | 🔴 Critical | 10min  | CI            | Build must pass |
-| 7  | Pre-push hook (lint + test + build)                | 🔴 High     | 30min  | Process       | No              |
-| 8  | Split `handlers_test.go` (667+ lines)              | 🟡 Medium   | 1hr    | Quality       | No              |
-| 9  | Split `search_test.go` (685 lines)                 | 🟡 Medium   | 1hr    | Quality       | No              |
-| 10 | Coverage threshold ≥75% in CI                      | 🟡 Medium   | 15min  | CI            | No              |
-| 11 | Verify CI green on GitHub Actions                  | 🔴 Critical | 10min  | CI            | Push first      |
-| 12 | Rename `version` → `buildinfo`                     | 🟡 Medium   | 30min  | Arch          | No              |
-| 13 | Unify `RenderResult` with `domain.RenderedContent` | 🟡 Medium   | 1hr    | Arch          | No              |
-| 14 | Immutable FileNode (remove setters)                | 🟡 Medium   | 2hr    | Arch          | No              |
-| 15 | Frontmatter typed struct                           | 🟡 Medium   | 1hr    | Types         | No              |
-| 16 | Split Repository: Reader + Refresher               | 🟡 Medium   | 1hr    | Arch          | No              |
-| 17 | HTTP integration tests                             | 🟢 High     | 3hr    | Testing       | No              |
-| 18 | Disk space monitoring                              | 🟢 Low      | 30min  | Tooling       | No              |
-| 19 | RSS/Atom feed generation                           | 🟢 Low      | 2hr    | Feature       | No              |
-| 20 | Dark mode CSS toggle                               | 🟢 Low      | 2hr    | UX            | No              |
-| 21 | Prometheus metrics endpoint                        | 🟢 Low      | 2hr    | Observability | No              |
-| 22 | Rate limit search endpoint                         | 🟢 Low      | 30min  | Security      | No              |
-| 23 | gzip/brotli compression                            | 🟢 Low      | 30min  | Perf          | No              |
-| 24 | Graceful shutdown tests                            | 🟢 Low      | 1hr    | Testing       | No              |
-| 25 | ADR for DI choice (do vs wire)                     | 🟢 Low      | 30min  | Docs          | No              |
+| ~~1~~  | ~~Fix broken build (GetRaw implementation)~~ done — GetRaw shipped and compiling (400f046) | ~~🔴 Critical~~ | ~~Varies~~ | ~~Fix~~ | ~~Another agent~~ |
+| ~~2~~  | ~~AST-based HasMermaid detection~~ done at `69f4db8` | ~~🔴 High~~ | ~~30min~~ | ~~Code~~ | ~~No~~ |
+| ~~3~~  | ~~Remove dead diagram code from `diagrams.go`~~ done at `d4065b2` | ~~🟡 Medium~~ | ~~30min~~ | ~~Code~~ | ~~No~~ |
+| ~~4~~  | ~~Proper YAML parsing for `isDraft`~~ done at `c489007` | ~~🟡 Medium~~ | ~~30min~~ | ~~Code~~ | ~~No~~ |
+| ~~5~~  | ~~Write sitemap.go tests~~ done at `9439b33` | ~~🔴 High~~ | ~~1hr~~ | ~~Testing~~ | ~~No~~ |
+| ~~6~~  | ~~Push to origin, verify CI green~~ done — pushed; CI green across later sessions | ~~🔴 Critical~~ | ~~10min~~ | ~~CI~~ | ~~Build must pass~~ |
+| ~~7~~  | ~~Pre-push hook (lint + test + build)~~ done — .githooks/pre-push (test + lint) | ~~🔴 High~~ | ~~30min~~ | ~~Process~~ | ~~No~~ |
+| ~~8~~  | ~~Split `handlers_test.go` (667+ lines)~~ done — handlers tests split into 9 files | ~~🟡 Medium~~ | ~~1hr~~ | ~~Quality~~ | ~~No~~ |
+| ~~9~~  | ~~Split `search_test.go` (685 lines)~~ done — search tests split into 3 files | ~~🟡 Medium~~ | ~~1hr~~ | ~~Quality~~ | ~~No~~ |
+| ~~10~~ | ~~Coverage threshold ≥75% in CI~~ done — test.yml 75% coverage floor | ~~🟡 Medium~~ | ~~15min~~ | ~~CI~~ | ~~No~~ |
+| ~~11~~ | ~~Verify CI green on GitHub Actions~~ done — CI workflows green (test.yml + docker.yml + release.yml) | ~~🔴 Critical~~ | ~~10min~~ | ~~CI~~ | ~~Push first~~ |
+| ~~12~~ | ~~Rename `version` → `buildinfo`~~ **Won't implement — kept internal/version.** | ~~🟡 Medium~~ | ~~30min~~ | ~~Arch~~ | ~~No~~ |
+| ~~13~~ | ~~Unify `RenderResult` with `domain.RenderedContent`~~ done at `c13707b` | ~~🟡 Medium~~ | ~~1hr~~ | ~~Arch~~ | ~~No~~ |
+| ~~14~~ | ~~Immutable FileNode (remove setters)~~ done — setters removed; immutable render pipeline | ~~🟡 Medium~~ | ~~2hr~~ | ~~Arch~~ | ~~No~~ |
+| ~~15~~ | ~~Frontmatter typed struct~~ done — Frontmatter typed struct in internal/domain | ~~🟡 Medium~~ | ~~1hr~~ | ~~Types~~ | ~~No~~ |
+| ~~16~~ | ~~Split Repository: Reader + Refresher~~ done — kept unified Repository interface | ~~🟡 Medium~~ | ~~1hr~~ | ~~Arch~~ | ~~No~~ |
+| ~~17~~ | ~~HTTP integration tests~~ done — shutdown_integration_test.go + per-endpoint tests | ~~🟢 High~~ | ~~3hr~~ | ~~Testing~~ | ~~No~~ |
+| ~~18~~ | ~~Disk space monitoring~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~🟢 Low~~ | ~~30min~~ | ~~Tooling~~ | ~~No~~ |
+| ~~19~~ | ~~RSS/Atom feed generation~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | | | |
+| ~~20~~ | ~~Dark mode CSS toggle~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | | | |
+| ~~21~~ | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | | | |
+| **NOT-DO/DUPLICATE — Rate limit search endpoint** canonical entry lives in TODO_LIST.md (still open there) | | | |
+| ~~23~~ | ~~gzip/brotli compression~~ done — shipped via httputil.Compression | | | |
+| ~~24~~ | ~~Graceful shutdown tests~~ done — shutdown_integration_test.go covers drain | | | |
+| ~~25~~ | ~~ADR for DI choice (do vs wire)~~ done — 5 ADRs in docs/adr/; DI documented in AGENTS.md | ~~🟢 Low~~ | ~~30min~~ | ~~Docs~~ | ~~No~~ |
 
 ---
 

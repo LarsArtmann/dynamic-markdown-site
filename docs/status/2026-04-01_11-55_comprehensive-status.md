@@ -197,14 +197,14 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 | ~~15~~ | ~~Disk space monitoring~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~🟢 Low~~ | ~~30min~~ | ~~Tooling~~ |
 | ~~16~~ | ~~Middleware chain as slice~~ done — httputil.Chain adopted (Recovery, RequestID, Compression) | ~~🟢 Low~~ | ~~30min~~ | ~~Arch~~ |
 | ~~17~~ | ~~`errgroup` for concurrent ops~~ **Won't implement — no concurrency need surfaced.** | ~~🟢 Low~~ | ~~1hr~~ | ~~Perf~~ |
-| 18 | RSS/Atom feed generation                 | 🟢 Low      | 2hr    | Feature       |
-| 19 | Dark mode CSS toggle                     | 🟢 Low      | 2hr    | UX            |
+| **NOT-DO/DUPLICATE — RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | |
+| **NOT-DO/DUPLICATE — Dark mode CSS toggle** canonical entry lives in ROADMAP.md (UI/UX) | |
 | ~~20~~ | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serving /metrics | ~~🟢 Low~~ | ~~2hr~~ | ~~Observability~~ |
-| 21 | Rate limit search endpoint               | 🟢 Low      | 30min  | Security      |
+| **NOT-DO/DUPLICATE — Rate limit search endpoint** canonical entry lives in TODO_LIST.md (still open there) | |
 | ~~22~~ | ~~gzip/brotli compression~~ done — httputil.Compression middleware (gzip >512B) | ~~🟢 Low~~ | ~~30min~~ | ~~Perf~~ |
 | ~~23~~ | ~~Graceful shutdown tests~~ done — shutdown_integration_test.go covers drain | ~~🟢 Low~~ | ~~1hr~~ | ~~Testing~~ |
-| ~~24~~ | ~~ETag/If-None-Match~~ done — shipped via httputil.Compression | ~~🟢 Low~~ | ~~1hr~~ | ~~Perf~~ |
-| 25 | Evaluate `wire` as DI replacement        | 🟢 Low      | 2hr    | Arch          |
+| **NOT-DO/DUPLICATE — ETag/If-None-Match** canonical entry lives in ROADMAP.md (Content Delivery); not implemented | |
+| **NOT-DO/DUPLICATE — Evaluate `wire` as DI replacement** staying on samber/do/v2; documented in AGENTS.md | |
 
 ---
 
