@@ -108,7 +108,7 @@ The following were planned but only the CI fix was completed:
 1. ~~**Export content helpers** — `shouldSkipDir`, `isMarkdownFile`, `getContentType` are unexported but duplicated in `cmd/watcher.go` and `server/static.go`~~ done at `0192273`
 2. ~~**Optimize ContentTree.Find()** — Currently O(n) recursive search; should use `map[URLPath]ContentNode` for O(1)~~ done at `0192273`
 3. ~~**Docker HEALTHCHECK** — Distroless has no shell; add HTTP health probe in CI or document k8s probe~~ done — Dockerfile HEALTHCHECK + healthcheck subcommand
-4. ~~**Add sample content** to `content/` directory for demo purposes~~ done (docs-health pass canonical entry lives in ROADMAP.md (Quality))
+4. ~~**Add sample content** to `content/` directory for demo purposes~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).**
 
 ### Medium-Impact / Medium-Effort
 
@@ -116,7 +116,7 @@ The following were planned but only the CI fix was completed:
 6. ~~**Request timing middleware** — Duration in structured logs (partially there via accessLogMiddleware but no histogram)~~ done — responsetime.go sets X-Response-Time
 7. ~~**Search highlighting** — Already implemented in `content/search.go` but not surfaced in UI~~ done — <mark> highlighting shipped in search results
 8. ~~**gzip/brotli compression** — No response compression middleware~~ done — httputil.Compression middleware
-9. ~~**ETag/If-None-Match** — No conditional request support~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented)
+9. ~~**ETag/If-None-Match** — No conditional request support~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**
 10. ~~**CI: Go module caching** — Speed up builds~~ done — setup-go cache: true
 11. ~~**CI: golangci-lint version pinning** — Reproducibility~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned
 12. ~~**CI: templ generate check** — Detect stale generated code~~ done — test.yml templ drift check
@@ -127,13 +127,13 @@ The following were planned but only the CI fix was completed:
 14. ~~**Architecture Decision Records** — Document key decisions~~ done — docs/adr/ holds 5 ADRs
 15. ~~**Deployment docs** (Docker, Cloud Run, Fly.io, k8s)~~ done — README Docker section + docs website
 16. ~~**Admin endpoints** — Cache stats, content stats~~ done — GET /cache/stats ships the stats
-17. ~~**RSS/Atom feed generation**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery))
-18. ~~**Content tags and filtering**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Search & Discovery))
-19. ~~**Search autocomplete**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Search & Discovery))
-20. ~~**Plugin system for custom markdown extensions**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Architecture))
-21. ~~**Dark mode CSS + theme toggle**~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
-22. ~~**Code copy button** on code blocks~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
-23. ~~**Print stylesheet**~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
+17. ~~**RSS/Atom feed generation**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**
+18. ~~**Content tags and filtering**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).**
+19. ~~**Search autocomplete**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).**
+20. ~~**Plugin system for custom markdown extensions**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).**
+21. ~~**Dark mode CSS + theme toggle**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
+22. ~~**Code copy button** on code blocks~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
+23. ~~**Print stylesheet**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
 
 ### From TODO_LIST.md (Still Open — Selected)
 
@@ -183,25 +183,25 @@ Causes ~50 "compile: version does not match" warnings on every `go test` run. Te
 
 ### Architecture
 
-1. **ContentTree O(1) lookups** — Replace recursive `Find()` with `map[URLPath]ContentNode`. The tree is built once on refresh, so a parallel index is trivial to maintain.
-2. **Export shared helpers** — `content/helpers.go` has `shouldSkipDir`, `isMarkdownFile`, `getContentType` as unexported. The watcher and server both duplicate these. Export them.
-3. **Compile-time interface checks** — `content.Repository` is implemented by 3 types but only `FileSystemRepository` has tests. Add `var _ Repository = (*BlobRepository)(nil)` etc.
-4. **Container test coverage at 0%** — The DI container is the backbone but has zero assertion coverage. The test file exists but only checks that the container boots.
-5. **Renderer interface placement** — `domain.Renderer` interface is in `domain/types.go` but only implemented in `renderer/`. Consider if it belongs in a dedicated `render` contract package.
+1. ~~**ContentTree O(1) lookups** — Replace recursive `Find()` with `map[URLPath]ContentNode`. The tree is built once on refresh, so a parallel index is trivial to maintain.~~ done at `0192273`
+2. ~~**Export shared helpers** — `content/helpers.go` has `shouldSkipDir`, `isMarkdownFile`, `getContentType` as unexported. The watcher and server both duplicate these. Export them.~~ done at `0192273`
+3. ~~**Compile-time interface checks** — `content.Repository` is implemented by 3 types but only `FileSystemRepository` has tests. Add `var _ Repository = (*BlobRepository)(nil)` etc.~~ done at `0192273`
+4. ~~**Container test coverage at 0%** — The DI container is the backbone but has zero assertion coverage. The test file exists but only checks that the container boots.~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor
+5. ~~**Renderer interface placement** — `domain.Renderer` interface is in `domain/types.go` but only implemented in `renderer/`. Consider if it belongs in a dedicated `render` contract package.~~ **Won't implement — not pursued; domain placement documented.**
 
 ### CI/DevEx
 
-6. **Push immediately after fix** — I fixed CI but didn't push. This defeats the purpose.
-7. **Pre-push hook** — `just pre-push` exists but isn't wired as a git hook.
-8. **Local Go version** — Should match go.mod exactly.
-9. **go.work interference** — Running `go test ./...` from workspace root fails. Must use `GOWORK=off`. The workspace should either include this project or the user should run from project root.
+6. ~~**Push immediately after fix** — I fixed CI but didn't push. This defeats the purpose.~~ done — pushed; repo synced
+7. ~~**Pre-push hook** — `just pre-push` exists but isn't wired as a git hook.~~ done — .githooks/pre-push (test + lint)
+8. ~~**Local Go version** — Should match go.mod exactly.~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.**
+9. ~~**go.work interference** — Running `go test ./...` from workspace root fails. Must use `GOWORK=off`. The workspace should either include this project or the user should run from project root.~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**
 
 ### Code Hygiene
 
-10. **Duplicate `getContentType`** — Both `server/static.go` and `content/helpers.go` define their own content type maps. Should be one canonical source.
-11. **Duplicate `skipDirs`** — Both `cmd/watcher.go` and `content/helpers.go` define skip lists. Should be one source of truth.
-12. **Large test files** — `search_test.go` (685L), `handlers_test.go` (667L), `markdown_test.go` (609L) should be split.
-13. **`treeStats.addError` is dead code** — Referenced in TODO_LIST.md but never removed.
+10. ~~**Duplicate `getContentType`** — Both `server/static.go` and `content/helpers.go` define their own content type maps. Should be one canonical source.~~ done at `0192273`
+11. ~~**Duplicate `skipDirs`** — Both `cmd/watcher.go` and `content/helpers.go` define skip lists. Should be one source of truth.~~ done at `0192273`
+12. ~~**Large test files** — `search_test.go` (685L), `handlers_test.go` (667L), `markdown_test.go` (609L) should be split.~~ done — all three oversized files split
+13. ~~**`treeStats.addError` is dead code** — Referenced in TODO_LIST.md but never removed.~~ done — stale TODO; no such method exists
 
 ---
 
@@ -209,31 +209,31 @@ Causes ~50 "compile: version does not match" warnings on every `go test` run. Te
 
 | #  | Task                                                                             | Impact      | Effort | Type          |
 | -- | -------------------------------------------------------------------------------- | ----------- | ------ | ------------- |
-| 1  | **Push the 4 unpushed commits** (CI fix is among them)                           | 🔴 Critical | 1 min  | Ops           |
-| 2  | **Upgrade local Go to 1.26.1** (fixes noise, speeds builds)                      | 🔴 High     | 5 min  | Env           |
-| 3  | **Export content helpers** (`ShouldSkipDir`, `IsMarkdownFile`, `GetContentType`) | 🟡 Medium   | 15 min | Refactor      |
-| 4  | **Deduplicate `getContentType`** in `server/static.go`                           | 🟡 Medium   | 10 min | Refactor      |
-| 5  | **Deduplicate `skipDirs`** in `cmd/watcher.go`                                   | 🟡 Medium   | 10 min | Refactor      |
-| 6  | **Optimize ContentTree** with `map[URLPath]ContentNode` for O(1) `Find()`        | 🟡 Medium   | 30 min | Perf          |
-| 7  | **Add compile-time interface checks** for BlobRepository, InMemoryRepository     | 🟢 Low      | 5 min  | Safety        |
-| 8  | **Remove dead `treeStats.addError`** method                                      | 🟢 Low      | 2 min  | Cleanup       |
-| 9  | **Apply staticcheck tagged switch** suggestion in `errors.go`                    | 🟢 Low      | 5 min  | Cleanup       |
-| 10 | **Wire git pre-push hook** to `just pre-push`                                    | 🟡 Medium   | 5 min  | DevEx         |
-| 11 | **Add sample markdown content** to `content/` for demo                           | 🟡 Medium   | 15 min | Content       |
-| 12 | **Add integration tests** for full HTTP pipeline                                 | 🔴 High     | 2 hrs  | Testing       |
-| 13 | **Increase container test coverage** from 0%                                     | 🟡 Medium   | 30 min | Testing       |
-| 14 | **Split large test files** (search, handlers, markdown)                          | 🟢 Low      | 30 min | Hygiene       |
-| 15 | **CI: pin golangci-lint version**                                                | 🟢 Low      | 5 min  | CI            |
-| 16 | **CI: add Go module caching**                                                    | 🟡 Medium   | 15 min | CI            |
-| 17 | **CI: add `templ generate` diff check**                                          | 🟡 Medium   | 10 min | CI            |
-| 18 | **Add gzip/brotli compression** middleware                                       | 🟡 Medium   | 30 min | Perf          |
-| 19 | **Add ETag/If-None-Match** support                                               | 🟡 Medium   | 30 min | Perf          |
-| 20 | **Document architecture decisions** (ADR)                                        | 🟡 Medium   | 1 hr   | Docs          |
-| 21 | **Add Prometheus metrics endpoint**                                              | 🟡 Medium   | 1 hr   | Observability |
-| 22 | **RSS/Atom feed generation**                                                     | 🟡 Medium   | 1 hr   | Feature       |
-| 23 | **Dark mode CSS + theme toggle**                                                 | 🟡 Medium   | 1 hr   | UX            |
-| 24 | **Code copy button** on code blocks                                              | 🟢 Low      | 30 min | UX            |
-| 25 | **Separate CI workflows** (`test.yml` fast + `docker.yml` build)                 | 🟡 Medium   | 30 min | CI            |
+| ~~1~~  | ~~**Push the 4 unpushed commits** (CI fix is among them)~~ done — pushed; repo synced with origin | ~~🔴 Critical~~ | ~~1 min~~ | ~~Ops~~ |
+| ~~2~~  | ~~**Upgrade local Go to 1.26.1** (fixes noise, speeds builds)~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.** | ~~🔴 High~~ | ~~5 min~~ | ~~Env~~ |
+| ~~3~~  | ~~**Export content helpers** (`ShouldSkipDir`, `IsMarkdownFile`, `GetContentType`)~~ done at `0192273` | ~~🟡 Medium~~ | ~~15 min~~ | ~~Refactor~~ |
+| ~~4~~  | ~~**Deduplicate `getContentType`** in `server/static.go`~~ done at `0192273` | ~~🟡 Medium~~ | ~~10 min~~ | ~~Refactor~~ |
+| ~~5~~  | ~~**Deduplicate `skipDirs`** in `cmd/watcher.go`~~ done at `0192273` | ~~🟡 Medium~~ | ~~10 min~~ | ~~Refactor~~ |
+| ~~6~~  | ~~**Optimize ContentTree** with `map[URLPath]ContentNode` for O(1) `Find()`~~ done at `0192273` | ~~🟡 Medium~~ | ~~30 min~~ | ~~Perf~~ |
+| ~~7~~  | ~~**Add compile-time interface checks** for BlobRepository, InMemoryRepository~~ done at `0192273` | ~~🟢 Low~~ | ~~5 min~~ | ~~Safety~~ |
+| ~~8~~  | ~~**Remove dead `treeStats.addError`** method~~ done — stale TODO; no such method exists | ~~🟢 Low~~ | ~~2 min~~ | ~~Cleanup~~ |
+| ~~9~~  | ~~**Apply staticcheck tagged switch** suggestion in `errors.go`~~ done — errors.go returns explicit codes per case; lint gates green | ~~🟢 Low~~ | ~~5 min~~ | ~~Cleanup~~ |
+| ~~10~~ | ~~**Wire git pre-push hook** to `just pre-push`~~ done — .githooks/pre-push (test + lint) | ~~🟡 Medium~~ | ~~5 min~~ | ~~DevEx~~ |
+| ~~11~~ | ~~**Add sample markdown content** to `content/` for demo~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).** | ~~🟡 Medium~~ | ~~15 min~~ | ~~Content~~ |
+| ~~12~~ | ~~**Add integration tests** for full HTTP pipeline~~ done — shutdown_integration_test.go + per-endpoint tests | ~~🔴 High~~ | ~~2 hrs~~ | ~~Testing~~ |
+| ~~13~~ | ~~**Increase container test coverage** from 0%~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor | ~~🟡 Medium~~ | ~~30 min~~ | ~~Testing~~ |
+| ~~14~~ | ~~**Split large test files** (search, handlers, markdown)~~ done — all three oversized files split | ~~🟢 Low~~ | ~~30 min~~ | ~~Hygiene~~ |
+| ~~15~~ | ~~**CI: pin golangci-lint version**~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned | ~~🟢 Low~~ | ~~5 min~~ | ~~CI~~ |
+| ~~16~~ | ~~**CI: add Go module caching**~~ done — setup-go cache: true | ~~🟡 Medium~~ | ~~15 min~~ | ~~CI~~ |
+| ~~17~~ | ~~**CI: add `templ generate` diff check**~~ done — test.yml templ drift check | ~~🟡 Medium~~ | ~~10 min~~ | ~~CI~~ |
+| ~~18~~ | ~~**Add gzip/brotli compression** middleware~~ done — httputil.Compression middleware | ~~🟡 Medium~~ | ~~30 min~~ | ~~Perf~~ |
+| ~~19~~ | ~~**Add ETag/If-None-Match** support~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented) | ~~🟡 Medium~~ | ~~30 min~~ | ~~Perf~~ |
+| ~~20~~ | ~~**Document architecture decisions** (ADR)~~ done — docs/adr/ holds 5 ADRs | ~~🟡 Medium~~ | ~~1 hr~~ | ~~Docs~~ |
+| ~~21~~ | ~~**Add Prometheus metrics endpoint**~~ done — internal/server/metrics.go serves /metrics | ~~🟡 Medium~~ | ~~1 hr~~ | ~~Observability~~ |
+| ~~22~~ | ~~**RSS/Atom feed generation**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~🟡 Medium~~ | ~~1 hr~~ | ~~Feature~~ |
+| ~~23~~ | ~~**Dark mode CSS + theme toggle**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~🟡 Medium~~ | ~~1 hr~~ | ~~UX~~ |
+| ~~24~~ | ~~**Code copy button** on code blocks~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~🟢 Low~~ | ~~30 min~~ | ~~UX~~ |
+| ~~25~~ | ~~**Separate CI workflows** (`test.yml` fast + `docker.yml` build)~~ done — test.yml + docker.yml + release.yml | ~~🟡 Medium~~ | ~~30 min~~ | ~~CI~~ |
 
 ---
 

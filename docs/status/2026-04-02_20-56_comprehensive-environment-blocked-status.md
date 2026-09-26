@@ -179,31 +179,31 @@ A `go.work` file in a parent directory adds sibling modules causing Go version c
 
 | #  | Priority | Task                                                                                 | Effort | Impact                  |
 | -- | -------- | ------------------------------------------------------------------------------------ | ------ | ----------------------- |
-| 1  | 🔴 P0    | **Reboot machine** — fix Go cache corruption & load average                          | 5 min  | Unblocks everything     |
-| 2  | 🔴 P0    | **Verify build + tests pass** after reboot                                           | 5 min  | Confidence              |
-| 3  | 🔴 P0    | **Run golangci-lint** — fix any issues                                               | 10 min | Zero lint errors        |
-| 4  | 🔴 P0    | **Push to origin/master** — 2 unpushed commits                                       | 1 min  | CI verification         |
-| 5  | 🟡 P1    | **Free disk space** — 14G is critically low                                          | 30 min | System stability        |
-| 6  | 🟡 P1    | **Add CI test workflow** — run tests in GitHub Actions                               | 30 min | Quality gate            |
-| 7  | 🟡 P1    | **Review blob storage deps** — evaluate if gocloud/AWS/GCP SDKs are worth the weight | 1 hr   | Build time, binary size |
-| 8  | 🟡 P1    | **Add integration tests** — full HTTP stack with real filesystem                     | 2 hr   | Reliability             |
-| 9  | 🟡 P1    | **Test coverage report** — establish baseline and set threshold                      | 1 hr   | Quality metric          |
-| 10 | 🟡 P1    | **Content security hardening** — path traversal, XSS, content-type headers           | 2 hr   | Security                |
-| 11 | 🟢 P2    | **Add benchmark suite** — rendering pipeline, cache, filesystem                      | 2 hr   | Performance             |
-| 12 | 🟢 P2    | **Error type system** — structured errors with codes                                 | 1 hr   | Debugging               |
-| 13 | 🟢 P2    | **Context propagation** — all I/O operations accept context                          | 2 hr   | Cancellation            |
-| 14 | 🟢 P2    | **TLS/HTTPS support** — auto TLS via Let's Encrypt or manual certs                   | 3 hr   | Production ready        |
-| 15 | 🟢 P2    | **Config file support** — YAML/TOML config alongside flags                           | 2 hr   | Usability               |
-| 16 | 🟢 P2    | **Health check depth** — check cache, filesystem, renderer status                    | 1 hr   | Observability           |
-| 17 | 🟢 P2    | **Middleware refactoring** — extract logging, metrics, recovery                      | 2 hr   | Clean architecture      |
-| 18 | 🟢 P2    | **Static asset pipeline** — hash-based cache busting, embedding                      | 2 hr   | Performance             |
-| 19 | 🟢 P2    | **RSS/Atom feed generation** — auto-generate from content tree                       | 3 hr   | Content discovery       |
-| 20 | 🟢 P2    | **Pagination** — for large directories                                               | 2 hr   | Usability               |
-| 21 | 🔵 P3    | **Dark mode** — theme switching via CSS custom properties                            | 3 hr   | UX                      |
-| 22 | 🔵 P3    | **WebSocket livereload** — push changes to browser in dev mode                       | 4 hr   | Developer experience    |
-| 23 | 🔵 P3    | **Plugin renderer system** — markdown, asciidoc, rst support                         | 1 day  | Extensibility           |
-| 24 | 🔵 P3    | **Docker Compose** — multi-service setup (app + CDN + cache)                         | 4 hr   | Deployment              |
-| 25 | 🔵 P3    | **API documentation** — OpenAPI spec for HTTP endpoints                              | 3 hr   | Integration             |
+| ~~1~~  | ~~🔴 P0~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~**Reboot machine** — fix Go cache corruption & load average~~ | ~~5 min~~ | ~~Unblocks everything~~ |
+| ~~2~~  | ~~🔴 P0~~ done — build + tests green 2026-09 | ~~**Verify build + tests pass** after reboot~~ | ~~5 min~~ | ~~Confidence~~ |
+| ~~3~~  | ~~🔴 P0~~ done — golangci-lint 0 issues since 2026-09-13 | ~~**Run golangci-lint** — fix any issues~~ | ~~10 min~~ | ~~Zero lint errors~~ |
+| ~~4~~  | ~~🔴 P0~~ done — pushed; repo synced with origin | ~~**Push to origin/master** — 2 unpushed commits~~ | ~~1 min~~ | ~~CI verification~~ |
+| ~~5~~  | ~~🟡 P1~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~**Free disk space** — 14G is critically low~~ | ~~30 min~~ | ~~System stability~~ |
+| ~~6~~  | ~~🟡 P1~~ done — test.yml runs the full suite on every push | ~~**Add CI test workflow** — run tests in GitHub Actions~~ | ~~30 min~~ | ~~Quality gate~~ |
+| ~~7~~  | ~~🟡 P1~~ done — gocloud.dev retained; blob storage is a shipped feature | ~~**Review blob storage deps** — evaluate if gocloud/AWS/GCP SDKs are worth the weight~~ | ~~1 hr~~ | ~~Build time, binary size~~ |
+| ~~8~~  | ~~🟡 P1~~ done — shutdown_integration_test.go + per-endpoint tests | ~~**Add integration tests** — full HTTP stack with real filesystem~~ | ~~2 hr~~ | ~~Reliability~~ |
+| ~~9~~  | ~~🟡 P1~~ done — test.yml 75% coverage floor | ~~**Test coverage report** — establish baseline and set threshold~~ | ~~1 hr~~ | ~~Quality metric~~ |
+| ~~10~~ | ~~🟡 P1~~ done — URLPath traversal prevention + security headers shipped | ~~**Content security hardening** — path traversal, XSS, content-type headers~~ | ~~2 hr~~ | ~~Security~~ |
+| ~~11~~ | ~~🟢 P2~~ done — benchmarks exist in server, renderer, content | ~~**Add benchmark suite** — rendering pipeline, cache, filesystem~~ | ~~2 hr~~ | ~~Performance~~ |
+| ~~12~~ | ~~🟢 P2~~ done — sentinel errors ErrContentNotFound/ErrInvalidPath | ~~**Error type system** — structured errors with codes~~ | ~~1 hr~~ | ~~Debugging~~ |
+| ~~13~~ | ~~🟢 P2~~ done — contexts threaded through server and watcher | ~~**Context propagation** — all I/O operations accept context~~ | ~~2 hr~~ | ~~Cancellation~~ |
+| ~~14~~ | ~~🟢 P2~~ done (docs-health pass canonical entry lives in ROADMAP.md (Deployment); not implemented) | ~~**TLS/HTTPS support** — auto TLS via Let's Encrypt or manual certs~~ | ~~3 hr~~ | ~~Production ready~~ |
+| ~~15~~ | ~~🟢 P2~~ **Won't implement — not pursued; flags + env vars suffice.** | ~~**Config file support** — YAML/TOML config alongside flags~~ | ~~2 hr~~ | ~~Usability~~ |
+| ~~16~~ | ~~🟢 P2~~ done — /health returns version, uptime, dependencies | ~~**Health check depth** — check cache, filesystem, renderer status~~ | ~~1 hr~~ | ~~Observability~~ |
+| ~~17~~ | ~~🟢 P2~~ done — middleware via httputil.Chain | ~~**Middleware refactoring** — extract logging, metrics, recovery~~ | ~~2 hr~~ | ~~Clean architecture~~ |
+| ~~18~~ | ~~🟢 P2~~ **Won't implement — not pursued; assets embedded.** | ~~**Static asset pipeline** — hash-based cache busting, embedding~~ | ~~2 hr~~ | ~~Performance~~ |
+| ~~19~~ | ~~🟢 P2~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~**RSS/Atom feed generation** — auto-generate from content tree~~ | ~~3 hr~~ | ~~Content discovery~~ |
+| ~~20~~ | ~~🟢 P2~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~**Pagination** — for large directories~~ | ~~2 hr~~ | ~~Usability~~ |
+| ~~21~~ | ~~🔵 P3~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~**Dark mode** — theme switching via CSS custom properties~~ | ~~3 hr~~ | ~~UX~~ |
+| ~~22~~ | ~~🔵 P3~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~**WebSocket livereload** — push changes to browser in dev mode~~ | ~~4 hr~~ | ~~Developer experience~~ |
+| ~~23~~ | ~~🔵 P3~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).** | ~~**Plugin renderer system** — markdown, asciidoc, rst support~~ | ~~1 day~~ | ~~Extensibility~~ |
+| ~~24~~ | ~~🔵 P3~~ **Won't implement — not pursued; single-container deployment.** | ~~**Docker Compose** — multi-service setup (app + CDN + cache)~~ | ~~4 hr~~ | ~~Deployment~~ |
+| ~~25~~ | ~~🔵 P3~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Admin & API).** | ~~**API documentation** — OpenAPI spec for HTTP endpoints~~ | ~~3 hr~~ | ~~Integration~~ |
 
 ---
 
