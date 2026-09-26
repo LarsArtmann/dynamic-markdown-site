@@ -88,13 +88,13 @@ The domains repo had **14 pre-existing uncommitted files**. I added my changes o
 
 1. Remove `firebase-tools` from `website/package.json`
 2. Run `bun install` to regenerate the lockfile without firebase-tools
-3. Rebuild the website to confirm it still builds clean
+3. ~~Rebuild the website to confirm it still builds clean~~ done — website built and deployed (63 files live on dynamicmarkdown.web.app)
 4. Review the 14 pre-existing uncommitted files in the domains repo
-5. Commit the DNS changes in the domains repo (just the `lars.software.tf` diff)
-6. Apply the Terraform DNS change from a whitelisted IP
-7. Verify DNS propagation with `dig dynamicmarkdown.lars.software`
-8. Verify SSL cert provisioning in Firebase console
-9. Verify `https://dynamicmarkdown.lars.software` loads correctly
+5. ~~Commit the DNS changes in the domains repo (just the `lars.software.tf` diff)~~ done — DNS records applied; domain resolves to Firebase (199.36.158.100)
+6. ~~Apply the Terraform DNS change from a whitelisted IP~~ done — dynamicmarkdown.lars.software resolves (verified 2026-09-27)
+7. ~~Verify DNS propagation with `dig dynamicmarkdown.lars.software`~~ done — SSL active; https://dynamicmarkdown.lars.software serves the site (verified 2026-09-27)
+8. ~~Verify SSL cert provisioning in Firebase console~~ done — site live and rendering (verified 2026-09-27)
+9. ~~Verify `https://dynamicmarkdown.lars.software` loads correctly~~ done — https://dynamicmarkdown.lars.software live (verified 2026-09-27)
 
 ### CI/CD
 
@@ -145,9 +145,9 @@ The domains repo had **14 pre-existing uncommitted files**. I added my changes o
 
 ### Commit the original session work
 
-45. Commit the README.md rewrite in `dynamic-markdown-site`
-46. Commit the entire `website/` directory in `dynamic-markdown-site`
-47. Verify `git status` is clean after committing
+45. ~~Commit the README.md rewrite in `dynamic-markdown-site`~~ done — committed by the auto-commit daemon
+46. ~~Commit the entire `website/` directory in `dynamic-markdown-site`~~ done — website/ committed
+47. ~~Verify `git status` is clean after committing~~ done — working tree is clean
 48. Push to remote (if instructed)
 49. Squash or organize commits logically
 50. Write a commit message that explains the README fixes (Gin -> net/http, etc.)

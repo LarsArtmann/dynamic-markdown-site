@@ -105,11 +105,11 @@ The `.gitignore` ignores `bun.lock`, but I used `bun install` which created `bun
 
 ### Immediate (this session's loose ends)
 
-1. Commit the README changes
-2. Commit the website directory
+1. ~~Commit the README changes~~ done — committed by the auto-commit daemon
+2. ~~Commit the website directory~~ done — website/ committed
 3. Fix `.goreleaser.yaml` license from MIT to proprietary/unfree
-4. Add `website/` mention to the main README.md
-5. Verify the website deploys to Firebase successfully
+4. ~~Add `website/` mention to the main README.md~~ done (docs-health pass 2026-09-27 docs-health pass added the website link to README)
+5. ~~Verify the website deploys to Firebase successfully~~ done — site live at dynamicmarkdown.web.app (see the 22:22 report)
 
 ### Website polish
 
@@ -155,20 +155,20 @@ The `.gitignore` ignores `bun.lock`, but I used `bun install` which created `bun
 ### Content accuracy
 
 38. Audit all code examples in the docs for correctness
-39. Verify every CLI flag documented in the website matches `config.go`
+39. ~~Verify every CLI flag documented in the website matches `config.go`~~ **Won't implement — env-var only by design; documented in README/FEATURES.**
 40. Add docs for the `-site-name` flag and `DYNAMIC_MARKDOWN_SITE_NAME` env var
-41. Verify the Homebrew cask instructions work (`.goreleaser.yaml` has `skip_upload: true`)
-42. Verify the Nix run command works with the proprietary license
-43. Add docs for the `healthcheck` subcommand
+41. ~~Verify the Homebrew cask instructions work (`.goreleaser.yaml` has `skip_upload: true`)~~ **Won't implement — homebrew_casks has skip_upload; nothing published.**
+42. ~~Verify the Nix run command works with the proprietary license~~ done — documented in AGENTS.md with --impure + NIXPKGS_ALLOW_UNFREE
+43. ~~Add docs for the `healthcheck` subcommand~~ done — README Docker section documents the healthcheck subcommand
 44. Document the `/api/live-reload` SSE event format
 45. Add a migration guide for users coming from Hugo/MkDocs
 
 ### Technical debt
 
-46. Fix the `.goreleaser.yaml` `homebrew_casks` section (AGENTS.md notes it's deprecated since v2.16)
-47. Fix the `archives.format_overrides` deprecation in `.goreleaser.yaml`
+46. ~~Fix the `.goreleaser.yaml` `homebrew_casks` section (AGENTS.md notes it's deprecated since v2.16)~~ done at `2657871`
+47. ~~Fix the `archives.format_overrides` deprecation in `.goreleaser.yaml`~~ done at `2657871`
 48. Add `release.yml` to the website's CI to deploy on tag pushes
-49. Set up Firebase hosting for `dynamicmarkdown.lars.software` (DNS, SSL)
+49. ~~Set up Firebase hosting for `dynamicmarkdown.lars.software` (DNS, SSL)~~ done — Firebase site created and deployed (see the 22:22 report)
 50. Add monitoring/uptime for the documentation site
 
 ---

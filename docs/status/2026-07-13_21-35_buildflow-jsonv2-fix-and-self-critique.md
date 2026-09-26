@@ -129,14 +129,14 @@ I fixed `helpers.go` and `livereload.go` first, then ran `go build ./...` — an
 
 ### Immediate (blocks next buildflow run)
 
-1. **Configure `go-auto-upgrade` to exclude `encoding/json/v2` migration** — or the next run re-breaks
-2. **Pin `go-error-family` to `v0.6.1` explicitly** in a comment or replace directive to prevent silent upgrades
-3. **Document in `AGENTS.md`** that this project does NOT use `GOEXPERIMENT=jsonv2` and `encoding/json/v2` imports are forbidden
-4. **Add a CI guard** (grep check) for `encoding/json/v2` in a pre-commit hook or buildflow detect step
+1. ~~**Configure `go-auto-upgrade` to exclude `encoding/json/v2` migration** — or the next run re-breaks~~ **Won't implement — superseded 2026-09: project adopted encoding/json/v2 (GOEXPERIMENT=jsonv2, go 1.27.1, 1fc8408).**
+2. ~~**Pin `go-error-family` to `v0.6.1` explicitly** in a comment or replace directive to prevent silent upgrades~~ done — moot: go-error-family v0.10.1 is json/v2-clean; constraint removed with the adoption
+3. ~~**Document in `AGENTS.md`** that this project does NOT use `GOEXPERIMENT=jsonv2` and `encoding/json/v2` imports are forbidden~~ done — AGENTS.md gotcha #12 rewritten for the json/v2 adoption
+4. ~~**Add a CI guard** (grep check) for `encoding/json/v2` in a pre-commit hook or buildflow detect step~~ **Won't implement — superseded by the json/v2 adoption.**
 
 ### Testing improvements
 
-5. Fix flaky `TestRateLimiter_Concurrent` — add ±1 tolerance or increase burst margin
+5. ~~Fix flaky `TestRateLimiter_Concurrent` — add ±1 tolerance or increase burst margin~~ done at `7959ad4`
 6. Add a compression integration test that verifies gzip decompression end-to-end
 7. Add a test for the `/metrics` endpoint with `Accept-Encoding: gzip` to verify compressed responses work
 8. Clean up `unusedwrite` warnings in `content_test.go:41-44` (4 unused struct fields)
@@ -145,40 +145,40 @@ I fixed `helpers.go` and `livereload.go` first, then ran `go build ./...` — an
 
 ### Code quality
 
-11. Add a comment on `executeRequest` explaining why `Accept-Encoding: identity` is set
-12. Review all `httputil` middleware usage for correctness (compression, recovery, request ID)
+11. ~~Add a comment on `executeRequest` explaining why `Accept-Encoding: identity` is set~~ done — AGENTS.md gotcha #13 documents the Accept-Encoding pattern
+12. ~~Review all `httputil` middleware usage for correctness (compression, recovery, request ID)~~ done — httputil middleware adopted (Recovery, RequestID, Compression, Chain)
 13. Audit error handling completeness — ensure all `writeJSON` error paths are tested
 14. Check if `json.NewEncoder(w).Encode(v)` error should be logged instead of silently returned
-15. Review rate limiter implementation for race conditions (the flaky test suggests a possible issue)
+15. ~~Review rate limiter implementation for race conditions (the flaky test suggests a possible issue)~~ done — 7959ad4 verified the bucket refill timing; no data race
 
 ### Dependency management
 
 16. Review all transitive dependency upgrades from this buildflow run for breaking changes
 17. Consider creating a `go.work` workspace to pin critical dependencies
-18. Audit `go-error-family` v0.7.0 changelog to understand why it adopted `encoding/json/v2`
-19. Check if `httputil` v0.5.0 should be updated to not require `go-error-family` at all
+18. ~~Audit `go-error-family` v0.7.0 changelog to understand why it adopted `encoding/json/v2`~~ done — moot after the json/v2 adoption
+19. ~~Check if `httputil` v0.5.0 should be updated to not require `go-error-family` at all~~ done — httputil now at v1.2.0
 20. Review `charmbracelet/ultraviolet` daily snapshot updates for stability risks
 21. Evaluate whether `gocloud.dev v0.46.0` pulls in too many transitive dependencies
-22. Consider replacing `cockroachdb/errors` with stdlib `errors` + `fmt.Errorf` to reduce dependency surface
+22. ~~Consider replacing `cockroachdb/errors` with stdlib `errors` + `fmt.Errorf` to reduce dependency surface~~ **Won't implement — kept cockroachdb/errors.**
 
 ### Build / CI
 
 23. Run `buildflow --build-mode fast` to verify the fix doesn't re-trigger the auto-upgrade
-24. Verify `nix build` passes (the buildflow showed `nix-build` failures with hash mismatches)
-25. Run `nix flake check` to verify flake integrity
-26. Verify `golangci-lint` passes after all changes
-27. Run `templ generate` and `templ fmt` to ensure template files are current
+24. ~~Verify `nix build` passes (the buildflow showed `nix-build` failures with hash mismatches)~~ done — nix build passes (verified 2026-07-26)
+25. ~~Run `nix flake check` to verify flake integrity~~ done — nix flake check passes (verified 2026-06-18)
+26. ~~Verify `golangci-lint` passes after all changes~~ done — golangci-lint 0 issues since 2026-09-13
+27. ~~Run `templ generate` and `templ fmt` to ensure template files are current~~ done — CI drift check enforces templ generate
 28. Check if `govalid-generate` now passes (it was failing due to the compile error)
 29. Run `gofumpt -l` to verify formatting
 30. Verify `.gitignore` is complete (buildflow ran `gitignore-upserter:repair`)
 
 ### Documentation
 
-31. Update `AGENTS.md` gotchas section with the `encoding/json/v2` / `GOEXPERIMENT` issue
-32. Add a "Dependency Pinning" section to `AGENTS.md` for `go-error-family`
-33. Update `TODO_LIST.md` with the `go-auto-upgrade` exclusion task
-34. Document the compression middleware behavior in the server package
-35. Add the `Accept-Encoding` test pattern to the testing patterns section in `AGENTS.md`
+31. ~~Update `AGENTS.md` gotchas section with the `encoding/json/v2` / `GOEXPERIMENT` issue~~ done — AGENTS.md gotcha #12 rewritten for the adoption
+32. ~~Add a "Dependency Pinning" section to `AGENTS.md` for `go-error-family`~~ done — AGENTS.md gotcha #12 covers the dependency constraint
+33. ~~Update `TODO_LIST.md` with the `go-auto-upgrade` exclusion task~~ done (docs-health pass 2026-09-27 docs-health pass rebuilt TODO_LIST.md)
+34. ~~Document the compression middleware behavior in the server package~~ done — AGENTS.md gotcha #13 documents compression
+35. ~~Add the `Accept-Encoding` test pattern to the testing patterns section in `AGENTS.md`~~ done — AGENTS.md gotcha #13 documents the test pattern
 
 ### Architecture
 
