@@ -117,31 +117,31 @@ Ranked by impact / effort ratio (Pareto: top 5 = 80% of value).
 
 | #  | Task                                                                                                 | Impact  | Effort | Notes                                                              |
 | -- | ---------------------------------------------------------------------------------------------------- | ------- | ------ | ------------------------------------------------------------------ |
-| 1  | Fix `nix flake check` `vendorHash` mismatch                                                          | 🔴 High | M      | Unblocks `nix run .#test`, `.#lint`, `.#build`.                    |
+| ~~1~~  | ~~Fix `nix flake check` `vendorHash` mismatch~~ done at `f4c0f4d` | ~~🔴 High~~ | ~~M~~ | ~~Unblocks `nix run .#test`, `.#lint`, `.#build`.~~ |
 | 2  | Add `goreleaser check` to `.github/workflows/release.yml`                                            | 🔴 High | XS     | Prevents deprecation drift; this session just fixed one.           |
-| 3  | Update `release:` footer to `brew install --cask dynamic-markdown-site`                              | 🟡 Med  | XS     | Documents the new cask install path.                               |
-| 4  | Add `--cask` to the install instructions in `README.md`                                              | 🟡 Med  | XS     | Same as #3 but for the public README.                              |
+| ~~3~~  | ~~Update `release:` footer to `brew install --cask dynamic-markdown-site`~~ done — .goreleaser.yaml:171 says brew install --cask | ~~🟡 Med~~ | ~~XS~~ | ~~Documents the new cask install path.~~ |
+| ~~4~~  | ~~Add `--cask` to the install instructions in `README.md`~~ done — moot: README has no brew install section | ~~🟡 Med~~ | ~~XS~~ | ~~Same as #3 but for the public README.~~ |
 | 5  | Move from `proxied` to `direct` Go modules in `flake.nix` (or pin a specific mirror commit)          | 🟡 Med  | S      | Stops the recurring hash drift.                                    |
-| 6  | Implement rate limiting on `/search` (TODO_LIST item)                                                | 🟡 Med  | S      | One IP flooding `/search?q=…` can hammer the search index.         |
-| 7  | Verify Docker artifact appears in GitHub Actions (TODO_LIST item)                                    | 🟡 Med  | XS     | One-line confirmation in the next release.                         |
-| 8  | Add `tap_migrations.json` to `LarsArtmann/homebrew-tap` if a Formula ever existed                    | 🟡 Med  | S      | Not strictly needed today (tap is empty), but document the policy. |
-| 9  | Remove stale "Stale:" items from `TODO_LIST.md`                                                      | 🟢 Low  | XS     | Cleanup only.                                                      |
-| 10 | Add `Last reviewed:` footer to `AGENTS.md` / `FEATURES.md`                                           | 🟢 Low  | XS     | Helps drift detection.                                             |
-| 11 | Implement search result pagination (TODO_LIST item)                                                  | 🟢 Low  | S      | Only needed at high cardinality.                                   |
-| 12 | Dark mode CSS and theme toggle (ROADMAP)                                                             | 🟢 Low  | M      | Popular ask; templ + CSS variables.                                |
-| 13 | Code copy button (ROADMAP)                                                                           | 🟢 Low  | XS     | A few lines of JS in `layout.templ`.                               |
-| 14 | gRPC/CLI generation for the search API (was in prior status reports)                                 | 🟡 Med  | L      | Defer to v0.2.0+.                                                  |
+| ~~6~~  | ~~Implement rate limiting on `/search` (TODO_LIST item)~~ **NOT-DO/DUPLICATE — canonical entry lives in TODO_LIST.md (still open there).** | ~~🟡 Med~~ | ~~S~~ | ~~One IP flooding `/search?q=…` can hammer the search index.~~ |
+| ~~7~~  | ~~Verify Docker artifact appears in GitHub Actions (TODO_LIST item)~~ **NOT-DO/DUPLICATE — canonical entry lives in TODO_LIST.md (still open there).** | ~~🟡 Med~~ | ~~XS~~ | ~~One-line confirmation in the next release.~~ |
+| ~~8~~  | ~~Add `tap_migrations.json` to `LarsArtmann/homebrew-tap` if a Formula ever existed~~ **Won't implement — homebrew tap is empty; nothing ever shipped to migrate.** | ~~🟡 Med~~ | ~~S~~ | ~~Not strictly needed today (tap is empty), but document the policy.~~ |
+| ~~9~~  | ~~Remove stale "Stale:" items from `TODO_LIST.md`~~ done (docs-health pass 2026-09-27 docs-health pass rebuilt TODO_LIST.md) | ~~🟢 Low~~ | ~~XS~~ | ~~Cleanup only.~~ |
+| ~~10~~ | ~~Add `Last reviewed:` footer to `AGENTS.md` / `FEATURES.md`~~ **Won't implement — docs carry Last updated comments instead.** | ~~🟢 Low~~ | ~~XS~~ | ~~Helps drift detection.~~ |
+| ~~11~~ | ~~Implement search result pagination (TODO_LIST item)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~🟢 Low~~ | ~~S~~ | ~~Only needed at high cardinality.~~ |
+| ~~12~~ | ~~Dark mode CSS and theme toggle (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~🟢 Low~~ | ~~M~~ | ~~Popular ask; templ + CSS variables.~~ |
+| ~~13~~ | ~~Code copy button (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~🟢 Low~~ | ~~XS~~ | ~~A few lines of JS in `layout.templ`.~~ |
+| ~~14~~ | ~~gRPC/CLI generation for the search API (was in prior status reports)~~ **Won't implement — not pursued.** | ~~🟡 Med~~ | ~~L~~ | ~~Defer to v0.2.0+.~~ |
 | 15 | ETag / `If-None-Match` support (ROADMAP)                                                             | 🟢 Low  | S      | Drop-in for `static/*` responses.                                  |
-| 16 | gzip/brotli compression (ROADMAP)                                                                    | 🟢 Low  | S      | `compress` middleware; ~10 lines.                                  |
-| 17 | Wire `cache.Warm()` for the most-recent N pages on startup (ROADMAP)                                 | 🟢 Low  | M      | Use `AllPaths()` from content tree.                                |
-| 18 | pprof endpoint behind a flag (ROADMAP)                                                               | 🟢 Low  | XS     | `net/http/pprof` + flag gate.                                      |
-| 19 | OpenTelemetry tracing (ROADMAP)                                                                      | 🟢 Low  | L      | Big surface; defer.                                                |
-| 20 | Kubernetes manifests (ROADMAP)                                                                       | 🟢 Low  | S      | Single Deployment + Service + Ingress.                             |
-| 21 | RSS/Atom feed (ROADMAP)                                                                              | 🟢 Low  | S      | Walk `AllPaths()`; filter drafts.                                  |
-| 22 | `sitemap.xml` — **already implemented** per FEATURES.md:207 but unverified end-to-end                | 🟢 Low  | XS     | Confirm with a smoke test.                                         |
-| 23 | Sample markdown content in `content/` (ROADMAP: "Add sample markdown content to content/ directory") | 🟢 Low  | S      | One demo page per feature.                                         |
-| 24 | Mutation testing (ROADMAP)                                                                           | 🟢 Low  | M      | `go-mutesting` integration.                                        |
-| 25 | Plugin system design doc (ROADMAP)                                                                   | 🟢 Low  | L      | ADR-grade write-up before any code.                                |
+| ~~16~~ | ~~gzip/brotli compression (ROADMAP)~~ done — httputil.Compression middleware | ~~🟢 Low~~ | ~~S~~ | ~~`compress` middleware; ~10 lines.~~ |
+| ~~17~~ | ~~Wire `cache.Warm()` for the most-recent N pages on startup (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Performance & Caching).** | ~~🟢 Low~~ | ~~M~~ | ~~Use `AllPaths()` from content tree.~~ |
+| ~~18~~ | ~~pprof endpoint behind a flag (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Observability).** | ~~🟢 Low~~ | ~~XS~~ | ~~`net/http/pprof` + flag gate.~~ |
+| ~~19~~ | ~~OpenTelemetry tracing (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Observability).** | ~~🟢 Low~~ | ~~L~~ | ~~Big surface; defer.~~ |
+| ~~20~~ | ~~Kubernetes manifests (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Deployment).** | ~~🟢 Low~~ | ~~S~~ | ~~Single Deployment + Service + Ingress.~~ |
+| ~~21~~ | ~~RSS/Atom feed (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~🟢 Low~~ | ~~S~~ | ~~Walk `AllPaths()`; filter drafts.~~ |
+| ~~22~~ | ~~`sitemap.xml` — **already implemented** per FEATURES.md:207 but unverified end-to-end~~ done — comprehensive sitemap tests shipped | ~~🟢 Low~~ | ~~XS~~ | ~~Confirm with a smoke test.~~ |
+| ~~23~~ | ~~Sample markdown content in `content/` (ROADMAP: "Add sample markdown content to content/ directory")~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).** | ~~🟢 Low~~ | ~~S~~ | ~~One demo page per feature.~~ |
+| ~~24~~ | ~~Mutation testing (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).** | ~~🟢 Low~~ | ~~M~~ | ~~`go-mutesting` integration.~~ |
+| ~~25~~ | ~~Plugin system design doc (ROADMAP)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).** | ~~🟢 Low~~ | ~~L~~ | ~~ADR-grade write-up before any code.~~ |
 
 ---
 
