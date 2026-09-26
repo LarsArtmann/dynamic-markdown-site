@@ -148,30 +148,30 @@ A `go.work` file in a parent directory adds sibling modules causing Go version c
 
 ### Code Quality
 
-1. **Reduce dependency weight** — gocloud.dev, AWS SDK, GCP SDK, MongoDB driver pull in 1000+ transitive deps. Evaluate if blob storage really needs all of these.
-2. **Interface segregation** — `content.Repository` is broad; consider splitting read/write/refresh
-3. **Error types** — use custom error types instead of sentinel errors for better programmatic handling
-4. **Context propagation** — ensure all I/O operations accept `context.Context`
+1. ~~**Reduce dependency weight** — gocloud.dev, AWS SDK, GCP SDK, MongoDB driver pull in 1000+ transitive deps. Evaluate if blob storage really needs all of these.~~ done — gocloud.dev retained; blob storage is a shipped feature
+2. ~~**Interface segregation** — `content.Repository` is broad; consider splitting read/write/refresh~~ **Won't implement — not pursued; unified Repository documented.**
+3. ~~**Error types** — use custom error types instead of sentinel errors for better programmatic handling~~ done — sentinel errors shipped
+4. ~~**Context propagation** — ensure all I/O operations accept `context.Context`~~ done — contexts threaded through server and watcher
 
 ### Testing
 
-5. **Test coverage gate** — add minimum coverage threshold to CI
-6. **Integration tests** — test the full HTTP stack with real filesystem
-7. **Race detection in CI** — run `-race` on CI (where memory is available) instead of locally
-8. **Test names** — use `Test<Package>_<Function>_<Scenario>` convention consistently
+5. ~~**Test coverage gate** — add minimum coverage threshold to CI~~ done — test.yml 75% coverage floor
+6. ~~**Integration tests** — test the full HTTP stack with real filesystem~~ done — per-endpoint tests + shutdown integration test
+7. ~~**Race detection in CI** — run `-race` on CI (where memory is available) instead of locally~~ done — CI runs -race on every push
+8. ~~**Test names** — use `Test<Package>_<Function>_<Scenario>` convention consistently~~ done — table-driven tests named per scenario
 
 ### Operations
 
-9. **Monitoring** — add health check depth (cache status, filesystem access)
-10. **Graceful degradation** — what happens when cache is full? When disk is full?
-11. **Configuration validation** — fail fast on invalid config, don't silently default
-12. **Structured errors** — return error codes in HTTP responses for client consumption
+9. ~~**Monitoring** — add health check depth (cache status, filesystem access)~~ done — /health returns version, uptime, dependencies
+10. ~~**Graceful degradation** — what happens when cache is full? When disk is full?~~ **Won't implement — not pursued.**
+11. ~~**Configuration validation** — fail fast on invalid config, don't silently default~~ done — config validation with descriptive errors
+12. ~~**Structured errors** — return error codes in HTTP responses for client consumption~~ **Won't implement — not pursued.**
 
 ### Architecture
 
-13. **Plugin system** — make renderers pluggable (markdown, asciidoc, rst)
-14. **Middleware chain** — extract logging, metrics, recovery into proper middleware
-15. **Static asset pipeline** — consider embedding with hash-based cache busting
+13. ~~**Plugin system** — make renderers pluggable (markdown, asciidoc, rst)~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).**
+14. ~~**Middleware chain** — extract logging, metrics, recovery into proper middleware~~ done — middleware via httputil.Chain
+15. ~~**Static asset pipeline** — consider embedding with hash-based cache busting~~ **Won't implement — not pursued; assets embedded.**
 
 ---
 

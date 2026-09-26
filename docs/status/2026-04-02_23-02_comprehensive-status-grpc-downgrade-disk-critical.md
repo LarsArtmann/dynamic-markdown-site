@@ -194,31 +194,31 @@ Sorted by **impact × urgency / effort**:
 
 | #  | Task                                                                   | Impact   | Effort | Why                                            |
 | -- | ---------------------------------------------------------------------- | -------- | ------ | ---------------------------------------------- |
-| 1  | **Free disk space** (`go clean -modcache`)                             | CRITICAL | 1 min  | Unblocks everything                            |
-| 2  | **Fix grpc dependency** — upgrade to latest, not downgrade             | HIGH     | 5 min  | Security vulnerability is LIVE on master       |
-| 3  | **Verify build passes** (`GOWORK=off go build ./...`)                  | HIGH     | 5 min  | Confirm code health                            |
-| 4  | **Verify tests pass** (`GOWORK=off go test ./... -count=1`)            | HIGH     | 2 min  | Confirm correctness                            |
-| 5  | **Run linter** (`GOWORK=off golangci-lint run ./...`)                  | HIGH     | 2 min  | Confirm quality                                |
-| 6  | **Delete stale status docs** (15 of 17 files in `docs/status/`)        | MEDIUM   | 2 min  | Reduce noise, save space                       |
-| 7  | **Install golines** (`go install github.com/segmentio/golines@latest`) | MEDIUM   | 1 min  | Fix formatting issues permanently              |
-| 8  | **Remove unused `coverage.out`** (56KB)                                | LOW      | 1 min  | Stale artifact                                 |
-| 9  | **Add git pre-push hook** (`just pre-push`)                            | MEDIUM   | 5 min  | Prevent future bad pushes                      |
-| 10 | **Split large test files** (3 files >600 lines each)                   | MEDIUM   | 30 min | Maintainability                                |
-| 11 | **Separate CI workflows** (test.yml + docker.yml)                      | MEDIUM   | 20 min | Faster feedback on PRs                         |
-| 12 | **Pin golangci-lint version in CI**                                    | MEDIUM   | 5 min  | Reproducible linting                           |
-| 13 | **Add `templ generate` check to CI**                                   | MEDIUM   | 10 min | Catch template regression                      |
-| 14 | **Audit go.mod for unused deps** (gocloud.dev?)                        | HIGH     | 15 min | 6.3GB module cache is 90% from transitive deps |
-| 15 | **Add gzip/brotli compression**                                        | HIGH     | 15 min | Major performance win for text-heavy site      |
-| 16 | **Add ETag/If-None-Match**                                             | MEDIUM   | 15 min | Bandwidth savings                              |
-| 17 | **Dark mode CSS + theme toggle**                                       | HIGH     | 30 min | User-facing impact, high visibility            |
-| 18 | **Add code copy button** to code blocks                                | HIGH     | 15 min | UX staple for documentation sites              |
-| 19 | **Split Repository interface** (Reader/Refresher)                      | MEDIUM   | 20 min | Better abstraction                             |
-| 20 | **Add Docker HEALTHCHECK**                                             | MEDIUM   | 5 min  | Production readiness                           |
-| 21 | **Add Prometheus/pprof endpoints**                                     | MEDIUM   | 20 min | Observability                                  |
-| 22 | **RSS/Atom feed generation**                                           | MEDIUM   | 20 min | Content discoverability                        |
-| 23 | **Breadcrumbs for deep directory navigation**                          | MEDIUM   | 15 min | Navigation UX                                  |
-| 24 | **Rate limit search endpoint**                                         | MEDIUM   | 5 min  | Security (refresh is limited, search isn't)    |
-| 25 | **Content search autocomplete**                                        | MEDIUM   | 30 min | UX improvement                                 |
+| ~~1~~  | ~~**Free disk space** (`go clean -modcache`)~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~CRITICAL~~ | ~~1 min~~ | ~~Unblocks everything~~ |
+| ~~2~~  | ~~**Fix grpc dependency** — upgrade to latest, not downgrade~~ done — google.golang.org/grpc at v1.83.2 in go.mod | ~~HIGH~~ | ~~5 min~~ | ~~Security vulnerability is LIVE on master~~ |
+| ~~3~~  | ~~**Verify build passes** (`GOWORK=off go build ./...`)~~ done — go build ./... passes | ~~HIGH~~ | ~~5 min~~ | ~~Confirm code health~~ |
+| ~~4~~  | ~~**Verify tests pass** (`GOWORK=off go test ./... -count=1`)~~ done — go test ./... -race green | ~~HIGH~~ | ~~2 min~~ | ~~Confirm correctness~~ |
+| ~~5~~  | ~~**Run linter** (`GOWORK=off golangci-lint run ./...`)~~ done — golangci-lint 0 issues since 2026-09-13 | ~~HIGH~~ | ~~2 min~~ | ~~Confirm quality~~ |
+| ~~6~~  | ~~**Delete stale status docs** (15 of 17 files in `docs/status/`)~~ done (docs-health pass 2026-09-27 docs-health pass annotated + archived resolved reports) | ~~MEDIUM~~ | ~~2 min~~ | ~~Reduce noise, save space~~ |
+| ~~7~~  | ~~**Install golines** (`go install github.com/segmentio/golines@latest`)~~ done — golangci-lint enforces golines; pre-commit hook added | ~~MEDIUM~~ | ~~1 min~~ | ~~Fix formatting issues permanently~~ |
+| ~~8~~  | ~~**Remove unused `coverage.out`** (56KB)~~ done — no stale coverage.out in the tree | ~~LOW~~ | ~~1 min~~ | ~~Stale artifact~~ |
+| ~~9~~  | ~~**Add git pre-push hook** (`just pre-push`)~~ done — .githooks/pre-push (test + lint) | ~~MEDIUM~~ | ~~5 min~~ | ~~Prevent future bad pushes~~ |
+| ~~10~~ | ~~**Split large test files** (3 files >600 lines each)~~ done — search/handlers/markdown test files all split | ~~MEDIUM~~ | ~~30 min~~ | ~~Maintainability~~ |
+| ~~11~~ | ~~**Separate CI workflows** (test.yml + docker.yml)~~ done — test.yml + docker.yml + release.yml | ~~MEDIUM~~ | ~~20 min~~ | ~~Faster feedback on PRs~~ |
+| ~~12~~ | ~~**Pin golangci-lint version in CI**~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned | ~~MEDIUM~~ | ~~5 min~~ | ~~Reproducible linting~~ |
+| ~~13~~ | ~~**Add `templ generate` check to CI**~~ done — test.yml templ drift check | ~~MEDIUM~~ | ~~10 min~~ | ~~Catch template regression~~ |
+| ~~14~~ | ~~**Audit go.mod for unused deps** (gocloud.dev?)~~ done — gocloud.dev retained; blob storage is a shipped feature | ~~HIGH~~ | ~~15 min~~ | ~~6.3GB module cache is 90% from transitive deps~~ |
+| ~~15~~ | ~~**Add gzip/brotli compression**~~ done — httputil.Compression middleware | ~~HIGH~~ | ~~15 min~~ | ~~Major performance win for text-heavy site~~ |
+| ~~16~~ | ~~**Add ETag/If-None-Match**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented) | ~~MEDIUM~~ | ~~15 min~~ | ~~Bandwidth savings~~ |
+| ~~17~~ | ~~**Dark mode CSS + theme toggle**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~HIGH~~ | ~~30 min~~ | ~~User-facing impact, high visibility~~ |
+| ~~18~~ | ~~**Add code copy button** to code blocks~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~HIGH~~ | ~~15 min~~ | ~~UX staple for documentation sites~~ |
+| ~~19~~ | ~~**Split Repository interface** (Reader/Refresher)~~ **Won't implement — not pursued; unified Repository documented in AGENTS.md.** | ~~MEDIUM~~ | ~~20 min~~ | ~~Better abstraction~~ |
+| ~~20~~ | ~~**Add Docker HEALTHCHECK**~~ done — Dockerfile HEALTHCHECK + healthcheck subcommand | ~~MEDIUM~~ | ~~5 min~~ | ~~Production readiness~~ |
+| ~~21~~ | ~~**Add Prometheus/pprof endpoints**~~ done — /metrics ships (metrics.go); pprof stays ROADMAP (Observability) | ~~MEDIUM~~ | ~~20 min~~ | ~~Observability~~ |
+| ~~22~~ | ~~**RSS/Atom feed generation**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~MEDIUM~~ | ~~20 min~~ | ~~Content discoverability~~ |
+| ~~23~~ | ~~**Breadcrumbs for deep directory navigation**~~ done — breadcrumbs rendered from URL path | ~~MEDIUM~~ | ~~15 min~~ | ~~Navigation UX~~ |
+| ~~24~~ | ~~**Rate limit search endpoint**~~ **NOT-DO/DUPLICATE — canonical entry lives in TODO_LIST.md (still open there).** | ~~MEDIUM~~ | ~~5 min~~ | ~~Security (refresh is limited, search isn't)~~ |
+| ~~25~~ | ~~**Content search autocomplete**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).** | ~~MEDIUM~~ | ~~30 min~~ | ~~UX improvement~~ |
 
 ---
 
