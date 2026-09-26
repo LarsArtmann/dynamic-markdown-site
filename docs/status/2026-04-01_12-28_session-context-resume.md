@@ -316,3 +316,9 @@ This decision affects everything else — no other work can proceed while the bu
 - `internal/content/draft.go` — Replace with YAML parsing
 - `internal/content/draft_test.go` — Add tests for `draft: yes`, `draft: True`, etc.
 - `internal/server/sitemap.go` — Needs tests
+
+---
+
+## Resolution (2026-09-27 docs-health pass)
+
+The build break resolved itself in the direction the report hoped: `GetRaw` shipped and compiles (`400f046`), the AST Mermaid detection landed (`69f4db8`), dead diagram code was removed (`d4065b2`), and draft parsing uses yaml.v3 (`c489007`). All items resolved inline above.
