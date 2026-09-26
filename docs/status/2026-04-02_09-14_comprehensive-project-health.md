@@ -109,27 +109,27 @@ The project is **production-ready** and exceeds industry standards for Go projec
 
 ### High Priority (Next Sprint)
 
-1. **Integration Test Suite** - End-to-end HTTP testing with real server
-2. **Prometheus Metrics** - `/metrics` endpoint for monitoring
-3. **Request Timing Middleware** - Performance tracking
-4. **Dark Mode** - CSS theme toggle
-5. **Code Copy Button** - One-click copying
+1. ~~**Integration Test Suite** - End-to-end HTTP testing with real server~~ done — shutdown_integration_test.go + per-endpoint handler tests
+2. ~~**Prometheus Metrics** - `/metrics` endpoint for monitoring~~ done — internal/server/metrics.go serves /metrics
+3. ~~**Request Timing Middleware** - Performance tracking~~ done — responsetime.go sets X-Response-Time
+4. ~~**Dark Mode** - CSS theme toggle~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
+5. ~~**Code Copy Button** - One-click copying~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
 
 ### Medium Priority (Backlog)
 
-6. **Search Autocomplete** - Typeahead suggestions
-7. **Diagram Zoom** - For large D2/Mermaid diagrams
-8. **Directory Pagination** - For large directories
-9. **Cache Dashboard** - Admin UI for metrics
-10. **RSS/Atom Feed** - Content syndication
+6. ~~**Search Autocomplete** - Typeahead suggestions~~ done (docs-health pass canonical entry lives in ROADMAP.md (Search & Discovery))
+7. ~~**Diagram Zoom** - For large D2/Mermaid diagrams~~ done (docs-health pass canonical entry lives in ROADMAP.md (Rendering & Content))
+8. ~~**Directory Pagination** - For large directories~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
+9. ~~**Cache Dashboard** - Admin UI for metrics~~ done — GET /cache/stats ships the metrics; a UI dashboard lives in ROADMAP.md
+10. ~~**RSS/Atom Feed** - Content syndication~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery))
 
 ### Low Priority (Future)
 
-11. **Content Analytics** - View tracking
-12. **Plugin System** - Custom extensions
-13. **Internationalization** - Multi-language
-14. **WebSocket Live Reload** - Replace SSE
-15. **Kubernetes Manifests** - K8s deployment
+11. ~~**Content Analytics** - View tracking~~ done (docs-health pass canonical entry lives in ROADMAP.md (Admin & API))
+12. ~~**Plugin System** - Custom extensions~~ done (docs-health pass canonical entry lives in ROADMAP.md (Architecture))
+13. ~~**Internationalization** - Multi-language~~ done (docs-health pass canonical entry lives in ROADMAP.md (Internationalization))
+14. ~~**WebSocket Live Reload** - Replace SSE~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery))
+15. ~~**Kubernetes Manifests** - K8s deployment~~ done (docs-health pass canonical entry lives in ROADMAP.md (Deployment))
 
 ---
 
@@ -295,15 +295,15 @@ cacheHitRatio := prometheus.NewGauge(...)
 
 | #  | Task                                 | Impact   | Effort | Owner |
 | -- | ------------------------------------ | -------- | ------ | ----- |
-| 1  | Integration test suite               | Critical | High   | TBD   |
-| 2  | Prometheus metrics endpoint          | High     | Medium | TBD   |
-| 3  | Request timing middleware            | High     | Low    | TBD   |
+| ~~1~~  | ~~Integration test suite~~ done — shutdown_integration_test.go + per-endpoint tests | ~~Critical~~ | ~~High~~ | ~~TBD~~ |
+| ~~2~~  | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | ~~High~~ | ~~Medium~~ | ~~TBD~~ |
+| ~~3~~  | ~~Request timing middleware~~ done — responsetime.go sets X-Response-Time | ~~High~~ | ~~Low~~ | ~~TBD~~ |
 | 4  | Dark mode / theme toggle             | High     | Medium | TBD   |
 | 5  | Code copy button                     | Medium   | Low    | TBD   |
-| 6  | Split `handlers_test.go` (914 lines) | Medium   | Medium | TBD   |
-| 7  | Split `search_test.go` (685 lines)   | Medium   | Medium | TBD   |
-| 8  | Architecture Decision Records        | Medium   | Low    | TBD   |
-| 9  | Deployment documentation             | High     | Medium | TBD   |
+| ~~6~~  | ~~Split `handlers_test.go` (914 lines)~~ done — split into 9 files | ~~Medium~~ | ~~Medium~~ | ~~TBD~~ |
+| ~~7~~  | ~~Split `search_test.go` (685 lines)~~ done — split into 3 files | ~~Medium~~ | ~~Medium~~ | ~~TBD~~ |
+| ~~8~~  | ~~Architecture Decision Records~~ done — docs/adr/ holds 5 ADRs | ~~Medium~~ | ~~Low~~ | ~~TBD~~ |
+| ~~9~~  | ~~Deployment documentation~~ done — README Docker section + docs website | ~~High~~ | ~~Medium~~ | ~~TBD~~ |
 | 10 | Diagram zoom functionality           | Medium   | Low    | TBD   |
 
 ### 🟡 Medium Priority
@@ -312,7 +312,7 @@ cacheHitRatio := prometheus.NewGauge(...)
 | -- | --------------------------- | ------ | ------ | ----- |
 | 11 | Search autocomplete         | Medium | Medium | TBD   |
 | 12 | Directory pagination        | Medium | Medium | TBD   |
-| 13 | Cache stats dashboard       | Low    | Medium | TBD   |
+| ~~13~~ | ~~Cache stats dashboard~~ done — GET /cache/stats ships the metrics | ~~Low~~ | ~~Medium~~ | ~~TBD~~ |
 | 14 | RSS/Atom feed               | Medium | Medium | TBD   |
 | 15 | Keyboard navigation         | High   | Low    | TBD   |
 | 16 | Print stylesheet            | Low    | Low    | TBD   |
@@ -328,8 +328,8 @@ cacheHitRatio := prometheus.NewGauge(...)
 | 21 | Internationalization          | Medium | High   | TBD   |
 | 22 | WebSocket live reload         | Low    | Medium | TBD   |
 | 23 | Kubernetes manifests          | Low    | Medium | TBD   |
-| 24 | Benchmark regression tracking | Low    | Medium | TBD   |
-| 25 | Mutation testing              | Low    | High   | TBD   |
+| ~~24~~ | ~~Benchmark regression tracking~~ done (docs-health pass canonical entry lives in ROADMAP.md (Performance & Caching)) | ~~Low~~ | ~~Medium~~ | ~~TBD~~ |
+| ~~25~~ | ~~Mutation testing~~ done (docs-health pass canonical entry lives in ROADMAP.md (Quality)) | ~~Low~~ | ~~High~~ | ~~TBD~~ |
 
 ---
 

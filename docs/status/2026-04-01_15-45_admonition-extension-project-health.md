@@ -104,7 +104,7 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 | ~~13~~ | ~~🟡~~ done — Dockerfile HEALTHCHECK + healthcheck subcommand | ~~**Add Docker HEALTHCHECK** instruction~~ | ~~Small~~ | ~~Container orchestration~~ |
 | ~~14~~ | ~~🟡~~ done — search/handlers/markdown test files all split | ~~**Split large test files** (search_test.go 685 lines, handlers_test.go 667 lines)~~ | ~~Medium~~ | ~~Maintainability~~ |
 | ~~15~~ | ~~🟡~~ done — test.yml 75% coverage floor | ~~**Add coverage enforcement** to CI (≥75% threshold)~~ | ~~Small~~ | ~~Quality gate~~ |
-| 16 | 🟡       | **Rate limit search endpoint** (currently only /refresh is rate-limited)          | Small  | Abuse prevention                    |
+| **NOT-DO/DUPLICATE — Rate limit search endpoint** canonical entry lives in TODO_LIST.md (still open there) | | | |
 | ~~17~~ | ~~🟡~~ done — httputil.Compression middleware | ~~**Add gzip/brotli compression** middleware~~ | ~~Medium~~ | ~~Performance (30-70% size reduction)~~ |
 | **NOT-DO/DUPLICATE — Add ETag/If-None-Match support** canonical entry lives in ROADMAP.md (Content Delivery); not implemented | | | |
 | **NOT-DO/DUPLICATE — Kubernetes manifests** canonical entry lives in ROADMAP.md (Deployment) | | | |

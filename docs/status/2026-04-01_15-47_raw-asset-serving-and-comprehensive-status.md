@@ -110,16 +110,16 @@
 
 ## e) WHAT WE SHOULD IMPROVE 🔧
 
-1. **Fix Go version mismatch** — This is blocking clean coverage reports and is trivially fixable
-2. **Tag v0.1.0** — Code is stable, tests pass, just needs a git tag and CI validation
-3. **Validate CI end-to-end** — Push to a PR, confirm the whole pipeline runs green
-4. **Add integration tests** — The biggest testing gap. Real filesystem repo → HTTP handler → HTML response
-5. **Split large test files** — `search_test.go` (685 lines), `handlers_test.go` (667+ lines), `markdown_test.go` (609 lines)
-6. **Container package coverage** — Currently 0%. DI container is critical infrastructure with zero test coverage
-7. **Structured error types** — Use `errors.Is`/`errors.As`/`Unwrap` pattern consistently (partially done with cockroachdb/errors)
-8. **Security audit** — Dependencies have known vulnerabilities (flagged in previous reports, never addressed)
-9. **Cache headers for rendered content** — Raw files now get `Cache-Control`, but rendered markdown pages don't
-10. **Content-Type consistency** — `getContentType` exists in both `content/helpers.go` and `server/static.go`. Should consolidate
+1. ~~**Fix Go version mismatch** — This is blocking clean coverage reports and is trivially fixable~~ **Won't implement — obsolete: toolchain now managed via GOTOOLCHAIN=auto + Nix; go.mod at 1.27.1.**
+2. ~~**Tag v0.1.0** — Code is stable, tests pass, just needs a git tag and CI validation~~ done at `67f7632`
+3. ~~**Validate CI end-to-end** — Push to a PR, confirm the whole pipeline runs green~~ done — workflows green across later sessions (latest full run 2026-09-13)
+4. ~~**Add integration tests** — The biggest testing gap. Real filesystem repo → HTTP handler → HTML response~~ done — govulncheck findings fixed; dependabot grouped updates configured
+5. ~~**Split large test files** — `search_test.go` (685 lines), `handlers_test.go` (667+ lines), `markdown_test.go` (609 lines)~~ done — shutdown_integration_test.go + per-endpoint handler tests
+6. ~~**Container package coverage** — Currently 0%. DI container is critical infrastructure with zero test coverage~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor
+7. ~~**Structured error types** — Use `errors.Is`/`errors.As`/`Unwrap` pattern consistently (partially done with cockroachdb/errors)~~ done — golangci-lint 0 issues since 2026-09-13
+8. ~~**Security audit** — Dependencies have known vulnerabilities (flagged in previous reports, never addressed)~~ done at `0192273`
+9. ~~**Cache headers for rendered content** — Raw files now get `Cache-Control`, but rendered markdown pages don't~~ done — test.yml regenerates templ and fails on diff
+10. ~~**Content-Type consistency** — `getContentType` exists in both `content/helpers.go` and `server/static.go`. Should consolidate~~ done — test.yml 75% coverage floor
 
 ---
 
@@ -127,31 +127,31 @@
 
 | #  | Priority    | Item                                                           | Effort |
 | -- | ----------- | -------------------------------------------------------------- | ------ |
-| 1  | 🔴 Critical | Fix Go 1.26.1/1.26.0 tool version mismatch                     | S      |
-| 2  | 🔴 Critical | Tag v0.1.0 release                                             | S      |
-| 3  | 🔴 Critical | Validate CI pipeline end-to-end with a real PR                 | M      |
-| 4  | 🔴 Critical | Address GitHub security vulnerabilities in dependencies        | M      |
-| 5  | 🟡 High     | Add integration test suite (filesystem repo → HTTP → HTML)     | L      |
-| 6  | 🟡 High     | Add container package tests (0% → 80%+)                        | M      |
-| 7  | 🟡 High     | Fix `stringscutsuffix` hint in `handlers.go:203`               | S      |
-| 8  | 🟡 High     | Consolidate `getContentType` (exists in 2 packages)            | S      |
-| 9  | 🟡 High     | Add `templ generate` check to CI                               | S      |
-| 10 | 🟡 High     | Add coverage threshold enforcement to CI (≥75%)                | S      |
-| 11 | 🟡 High     | Split `search_test.go`, `handlers_test.go`, `markdown_test.go` | M      |
-| 12 | 🟡 High     | Add Docker HEALTHCHECK to Dockerfile                           | S      |
-| 13 | 🟡 High     | Add gzip/brotli compression middleware                         | M      |
-| 14 | 🟡 High     | Add ETag/If-None-Match support                                 | M      |
-| 15 | 🟡 High     | Add git pre-push hook calling `just pre-push`                  | S      |
-| 16 | 🟢 Medium   | Add request timing middleware                                  | S      |
-| 17 | 🟢 Medium   | Add structured health check (version, uptime, deps)            | M      |
-| 18 | 🟢 Medium   | Add Prometheus metrics endpoint                                | M      |
-| 19 | 🟢 Medium   | Implement search result highlighting                           | M      |
-| 20 | 🟢 Medium   | Add breadcrumbs for deep navigation                            | M      |
-| 21 | 🟢 Medium   | Create architecture decision records (ADRs)                    | M      |
-| 22 | 🟢 Medium   | Dark mode CSS + theme toggle                                   | M      |
-| 23 | 🟢 Medium   | Add RSS/Atom feed generation                                   | M      |
-| 24 | 🟢 Medium   | Add CONTRIBUTING.md                                            | S      |
-| 25 | 🟢 Medium   | Kubernetes / Cloud Run deployment manifests                    | L      |
+| ~~1~~  | ~~🔴 Critical~~ **Won't implement — obsolete: GOTOOLCHAIN=auto + Nix manage the toolchain.** | ~~Fix Go 1.26.1/1.26.0 tool version mismatch~~ | ~~S~~ |
+| ~~2~~  | ~~🔴 Critical~~ done at `67f7632` | ~~Tag v0.1.0 release~~ | ~~S~~ |
+| ~~3~~  | ~~🔴 Critical~~ done — workflows green across later sessions | ~~Validate CI pipeline end-to-end with a real PR~~ | ~~M~~ |
+| ~~4~~  | ~~🔴 Critical~~ done — govulncheck fixed; dependabot configured (e7bafaf) | ~~Address GitHub security vulnerabilities in dependencies~~ | ~~M~~ |
+| ~~5~~  | ~~🟡 High~~ done — shutdown_integration_test.go + per-endpoint tests | ~~Add integration test suite (filesystem repo → HTTP → HTML)~~ | ~~L~~ |
+| ~~6~~  | ~~🟡 High~~ done — container_test.go rewritten 2026-09 | ~~Add container package tests (0% → 80%+)~~ | ~~M~~ |
+| ~~7~~  | ~~🟡 High~~ done — golangci-lint 0 issues | ~~Fix `stringscutsuffix` hint in `handlers.go:203`~~ | ~~S~~ |
+| ~~8~~  | ~~🟡 High~~ done at `0192273` | ~~Consolidate `getContentType` (exists in 2 packages)~~ | ~~S~~ |
+| ~~9~~  | ~~🟡 High~~ done — test.yml templ drift check | ~~Add `templ generate` check to CI~~ | ~~S~~ |
+| ~~10~~ | ~~🟡 High~~ done — test.yml 75% floor | ~~Add coverage threshold enforcement to CI (≥75%)~~ | ~~S~~ |
+| ~~11~~ | ~~🟡 High~~ done — search/handlers/markdown test files all split | ~~Split `search_test.go`, `handlers_test.go`, `markdown_test.go`~~ | ~~M~~ |
+| ~~12~~ | ~~🟡 High~~ done — Dockerfile HEALTHCHECK + healthcheck subcommand | ~~Add Docker HEALTHCHECK to Dockerfile~~ | ~~S~~ |
+| ~~13~~ | ~~🟡 High~~ done — httputil.Compression middleware | ~~Add gzip/brotli compression middleware~~ | ~~M~~ |
+| **NOT-DO/DUPLICATE — Add ETag/If-None-Match support** canonical entry lives in ROADMAP.md (Content Delivery); not implemented | | |
+| ~~15~~ | ~~🟡 High~~ done — .githooks/pre-push (test + lint) | ~~Add git pre-push hook calling `just pre-push`~~ | ~~S~~ |
+| ~~16~~ | ~~🟢 Medium~~ done — responsetime.go sets X-Response-Time | ~~Add request timing middleware~~ | ~~S~~ |
+| ~~17~~ | ~~🟢 Medium~~ done — /health returns version, uptime, dependencies | ~~Add structured health check (version, uptime, deps)~~ | ~~M~~ |
+| ~~18~~ | ~~🟢 Medium~~ done — internal/server/metrics.go serves /metrics | ~~Add Prometheus metrics endpoint~~ | ~~M~~ |
+| ~~19~~ | ~~🟢 Medium~~ done — content/search.go wraps matches in <mark> | ~~Implement search result highlighting~~ | ~~M~~ |
+| ~~20~~ | ~~🟢 Medium~~ done — breadcrumbs rendered from URL path | ~~Add breadcrumbs for deep navigation~~ | ~~M~~ |
+| ~~21~~ | ~~🟢 Medium~~ done — docs/adr/ holds 5 ADRs | ~~Create architecture decision records (ADRs)~~ | ~~M~~ |
+| **NOT-DO/DUPLICATE — Dark mode CSS + theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | |
+| **NOT-DO/DUPLICATE — Add RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | | |
+| ~~24~~ | ~~🟢 Medium~~ done — CONTRIBUTING.md exists | ~~Add CONTRIBUTING.md~~ | ~~S~~ |
+| **NOT-DO/DUPLICATE — Kubernetes / Cloud Run deployment manifests** canonical entry lives in ROADMAP.md (Deployment) | | |
 
 ---
 
