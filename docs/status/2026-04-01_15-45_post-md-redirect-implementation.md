@@ -99,37 +99,37 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 
 ### High Priority (Next Sprint)
 
-1. **GitHub Security Vulnerabilities** - Address dependabot alerts
-2. **Integration Test Suite** - End-to-end HTTP testing
-3. **Request Timing Middleware** - Performance metrics
-4. **Prometheus Metrics Endpoint** - `/metrics` for monitoring
-5. **Container Test Coverage** - DI container currently at 0%
+1. ~~**GitHub Security Vulnerabilities** - Address dependabot alerts~~ done — govulncheck findings fixed; dependabot grouped updates configured (e7bafaf)
+2. ~~**Integration Test Suite** - End-to-end HTTP testing~~ done — shutdown_integration_test.go + per-endpoint handler tests
+3. ~~**Request Timing Middleware** - Performance metrics~~ done — internal/server/responsetime.go sets X-Response-Time
+4. ~~**Prometheus Metrics Endpoint** - `/metrics` for monitoring~~ done — internal/server/metrics.go serves /metrics
+5. ~~**Container Test Coverage** - DI container currently at 0%~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor
 
 ### Medium Priority (Backlog)
 
-6. **Dark Mode / Theme Toggle** - CSS + JS implementation
-7. **Code Copy Button** - One-click copying for code blocks
-8. **Diagram Zoom** - For large D2/Mermaid diagrams
-9. **Search Autocomplete** - Typeahead suggestions
-10. **Pagination** - For large directories
-11. **Cache Statistics Dashboard** - Admin UI for cache metrics
-12. **RSS/Atom Feed** - Content syndication
-13. **Keyboard Navigation** - Accessibility shortcuts
-14. **Print Stylesheet** - Optimized for printing
-15. **Related Content** - "You might also like" suggestions
+6. ~~**Dark Mode / Theme Toggle** - CSS + JS implementation~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
+7. ~~**Code Copy Button** - One-click copying for code blocks~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
+8. ~~**Diagram Zoom** - For large D2/Mermaid diagrams~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Rendering & Content).**
+9. ~~**Search Autocomplete** - Typeahead suggestions~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).**
+10. ~~**Pagination** - For large directories~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
+11. ~~**Cache Statistics Dashboard** - Admin UI for cache metrics~~ done — `GET /cache/stats` ships the metrics; a UI dashboard lives in ROADMAP.md (Performance & Caching).
+12. ~~**RSS/Atom Feed** - Content syndication~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**
+13. ~~**Keyboard Navigation** - Accessibility shortcuts~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
+14. ~~**Print Stylesheet** - Optimized for printing~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**
+15. ~~**Related Content** - "You might also like" suggestions~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).**
 
 ### Low Priority (Future)
 
-16. **Content Analytics** - View tracking
-17. **Plugin System** - Custom markdown extensions
-18. **Internationalization** - Multi-language support
-19. **Content Versioning** - Git-based history
-20. **Distributed Tracing** - OpenTelemetry integration
-21. **Redis Cache** - Distributed caching option
-22. **Mutation Testing** - Test quality verification
-23. **Benchmark Regression** - CI performance tracking
-24. **Kubernetes Manifests** - K8s deployment configs
-25. **WebSocket Live Reload** - Replace SSE with WebSockets
+16. ~~**Content Analytics** - View tracking~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Admin & API, analytics integration).**
+17. ~~**Plugin System** - Custom markdown extensions~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).**
+18. ~~**Internationalization** - Multi-language support~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Internationalization).**
+19. ~~**Content Versioning** - Git-based history~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Rendering & Content).**
+20. ~~**Distributed Tracing** - OpenTelemetry integration~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Observability).**
+21. ~~**Redis Cache** - Distributed caching option~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Performance & Caching).**
+22. ~~**Mutation Testing** - Test quality verification~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).**
+23. ~~**Benchmark Regression** - CI performance tracking~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Performance & Caching).**
+24. ~~**Kubernetes Manifests** - K8s deployment configs~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Deployment).**
+25. ~~**WebSocket Live Reload** - Replace SSE with WebSockets~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**
 
 ---
 
@@ -150,19 +150,19 @@ The codebase is in excellent shape. No critical issues identified.
 
 ### Immediate (This Week)
 
-1. **Container Package Tests** (Priority: 🔴 Critical)
-   - Currently 0% coverage
-   - Add tests for `New()` and `Shutdown()`
-   - Mock service provider testing
+1. ~~**Container Package Tests** (Priority: 🔴 Critical)~~ done — container_test.go rewritten 2026-09; New/Shutdown covered
+   ~~- Currently 0% coverage~~
+   ~~- Add tests for `New()` and `Shutdown()`~~
+   ~~- Mock service provider testing~~
 
-2. **Split Oversized Test Files** (Priority: 🟡 Medium)
-   - `handlers_test.go` → `handlers_*.go` by feature
-   - `search_test.go` → `search_*.go` by function
-   - Improves maintainability and parallelization
+2. ~~**Split Oversized Test Files** (Priority: 🟡 Medium)~~ done — all three oversized files split by feature
+   ~~- `handlers_test.go` → `handlers_*.go` by feature~~
+   ~~- `search_test.go` → `search_*.go` by function~~
+   ~~- Improves maintainability and parallelization~~
 
-3. **Linter Cleanup** (Priority: 🟢 Low)
-   - Fix 9 remaining non-critical warnings
-   - Add exclusions or refactor code
+3. ~~**Linter Cleanup** (Priority: 🟢 Low)~~ done — golangci-lint 0 issues since 2026-09-13
+   ~~- Fix 9 remaining non-critical warnings~~
+   ~~- Add exclusions or refactor code~~
 
 ### Short Term (Next 2 Weeks)
 
@@ -200,41 +200,41 @@ The codebase is in excellent shape. No critical issues identified.
 
 | #  | Task                                    | Impact   | Effort | Package              |
 | -- | --------------------------------------- | -------- | ------ | -------------------- |
-| 1  | Add container package tests             | Critical | Medium | `internal/container` |
-| 2  | Address GitHub security vulnerabilities | High     | Low    | Dependencies         |
-| 3  | Split `handlers_test.go` (914 lines)    | High     | Medium | `internal/server`    |
-| 4  | Split `search_test.go` (685 lines)      | High     | Medium | `internal/content`   |
-| 5  | Split `markdown_test.go` (611 lines)    | Medium   | Medium | `internal/renderer`  |
-| 6  | Fix Go 1.26.1 environment mismatch      | Medium   | Low    | CI/CD                |
-| 7  | Add integration test suite              | High     | High   | `internal/test`      |
-| 8  | Implement request timing middleware     | Medium   | Low    | `internal/server`    |
-| 9  | Add Prometheus metrics endpoint         | Medium   | Medium | `internal/server`    |
-| 10 | Clean up remaining 9 linter warnings    | Low      | Low    | Various              |
+| ~~1~~  | ~~Add container package tests~~ done — container_test.go rewritten 2026-09 | ~~Critical~~ | ~~Medium~~ | ~~`internal/container`~~ |
+| ~~2~~  | ~~Address GitHub security vulnerabilities~~ done — govulncheck clean; dependabot configured | ~~High~~ | ~~Low~~ | ~~Dependencies~~ |
+| ~~3~~  | ~~Split `handlers_test.go` (914 lines)~~ done — split into 9 files | ~~High~~ | ~~Medium~~ | ~~`internal/server`~~ |
+| ~~4~~  | ~~Split `search_test.go` (685 lines)~~ done — split into 3 files | ~~High~~ | ~~Medium~~ | ~~`internal/content`~~ |
+| ~~5~~  | ~~Split `markdown_test.go` (611 lines)~~ done — split into 4 files | ~~Medium~~ | ~~Medium~~ | ~~`internal/renderer`~~ |
+| ~~6~~  | ~~Fix Go 1.26.1 environment mismatch~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~Medium~~ | ~~Low~~ | ~~CI/CD~~ |
+| ~~7~~  | ~~Add integration test suite~~ done — shutdown_integration_test.go + per-endpoint tests | ~~High~~ | ~~High~~ | ~~`internal/test`~~ |
+| ~~8~~  | ~~Implement request timing middleware~~ done — responsetime.go sets X-Response-Time | ~~Medium~~ | ~~Low~~ | ~~`internal/server`~~ |
+| ~~9~~  | ~~Add Prometheus metrics endpoint~~ done — metrics.go serves /metrics | ~~Medium~~ | ~~Medium~~ | ~~`internal/server`~~ |
+| ~~10~~ | ~~Clean up remaining 9 linter warnings~~ done — golangci-lint 0 issues since 2026-09-13 | ~~Low~~ | ~~Low~~ | ~~Various~~ |
 
 ### 🟡 Medium Priority (Do Soon)
 
 | #  | Task                        | Impact | Effort | Package                       |
 | -- | --------------------------- | ------ | ------ | ----------------------------- |
-| 11 | Dark mode / theme toggle    | High   | Medium | `templates/` + CSS            |
-| 12 | Add code copy button        | Medium | Low    | `templates/` + JS             |
-| 13 | Diagram zoom functionality  | Medium | Low    | `templates/` + JS             |
-| 14 | Search autocomplete         | Medium | Medium | `internal/server` + JS        |
-| 15 | Directory pagination        | Medium | Medium | `internal/server` + templates |
-| 16 | Cache stats dashboard       | Low    | Medium | `internal/server` + templates |
-| 17 | RSS/Atom feed generation    | Medium | Medium | `internal/server`             |
-| 18 | Keyboard navigation         | High   | Low    | `templates/` + JS             |
-| 19 | Print stylesheet            | Low    | Low    | `templates/` + CSS            |
-| 20 | Related content suggestions | Medium | High   | `internal/content`            |
+| **NOT-DO/DUPLICATE — Dark mode / theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| **NOT-DO/DUPLICATE — Add code copy button** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| **NOT-DO/DUPLICATE — Diagram zoom functionality** canonical entry lives in ROADMAP.md (Rendering & Content) | | | |
+| **NOT-DO/DUPLICATE — Search autocomplete** canonical entry lives in ROADMAP.md (Search & Discovery) | | | |
+| **NOT-DO/DUPLICATE — Directory pagination** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| ~~16~~ | ~~Cache stats dashboard~~ done — GET /cache/stats ships hits/misses/evictions/ratio | ~~Low~~ | ~~Medium~~ | ~~`internal/server` + templates~~ |
+| **NOT-DO/DUPLICATE — RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
+| **NOT-DO/DUPLICATE — Keyboard navigation** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| **NOT-DO/DUPLICATE — Print stylesheet** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| **NOT-DO/DUPLICATE — Related content suggestions** canonical entry lives in ROADMAP.md (Search & Discovery) | | | |
 
 ### 🟢 Low Priority (Do Later)
 
 | #  | Task                        | Impact | Effort | Package               |
 | -- | --------------------------- | ------ | ------ | --------------------- |
-| 21 | Content analytics           | Low    | High   | New package           |
-| 22 | Plugin system architecture  | High   | High   | Design + impl         |
-| 23 | Internationalization (i18n) | Medium | High   | `templates/` + domain |
-| 24 | WebSocket live reload       | Low    | Medium | `internal/server`     |
-| 25 | Kubernetes manifests        | Low    | Medium | `k8s/` directory      |
+| **NOT-DO/DUPLICATE — Content analytics** canonical entry lives in ROADMAP.md (Admin & API) | | | |
+| **NOT-DO/DUPLICATE — Plugin system architecture** canonical entry lives in ROADMAP.md (Architecture) | | | |
+| **NOT-DO/DUPLICATE — Internationalization (i18n)** canonical entry lives in ROADMAP.md (Internationalization) | | | |
+| **NOT-DO/DUPLICATE — WebSocket live reload** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
+| **NOT-DO/DUPLICATE — Kubernetes manifests** canonical entry lives in ROADMAP.md (Deployment) | | | |
 
 ---
 
@@ -303,3 +303,9 @@ The codebase is in excellent shape. No critical issues identified.
 _Report generated: 2026-04-01 15:45_\
 _Status reports in docs/status/: 3 files_\
 _Latest: This report_
+
+---
+
+## Resolution (2026-09-27 docs-health pass)
+
+All items resolved inline. The §G draft question settled on option A: `draft: true` files are excluded from the site entirely — documented in FEATURES.md (Content Filtering) and the frontmatter table.

@@ -75,13 +75,13 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 
 ## e) WHAT WE SHOULD IMPROVE 🎯
 
-1. **Integration tests** — No end-to-end tests exist. The renderer, server, and content packages are tested in isolation but never together.
-2. **Container package tests** — 0% coverage on DI wiring is a risk. A misconfigured container only fails at runtime.
-3. **Admonition edge cases** — Nested blockquotes in alerts, alert inside list items, `[!TYPE]` not at start of blockquote.
-4. **Update FEATURES.md** — Now 3 features behind: admonition blocks, sitemap.xml, and the recent AST-based mermaid detection.
-5. **Pre-push hooks** — `just pre-push` exists but isn't wired as a git hook. Easy win for CI safety.
-6. **CI golangci-lint version pinning** — Currently unpinned, could break on new releases.
-7. **Go module caching in CI** — Every run downloads all dependencies. Significant speed win available.
+1. ~~**Integration tests** — No end-to-end tests exist. The renderer, server, and content packages are tested in isolation but never together.~~ done — shutdown_integration_test.go + per-endpoint handler tests
+2. ~~**Container package tests** — 0% coverage on DI wiring is a risk. A misconfigured container only fails at runtime.~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor
+3. ~~**Admonition edge cases** — Nested blockquotes in alerts, alert inside list items, `[!TYPE]` not at start of blockquote.~~ done at `2b8a745`
+4. ~~**Update FEATURES.md** — Now 3 features behind: admonition blocks, sitemap.xml, and the recent AST-based mermaid detection.~~ done — FEATURES.md documents admonitions, sitemap, robots.txt
+5. ~~**Pre-push hooks** — `just pre-push` exists but isn't wired as a git hook. Easy win for CI safety.~~ done — .githooks/pre-push runs tests + golangci-lint
+6. ~~**CI golangci-lint version pinning** — Currently unpinned, could break on new releases.~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned in test.yml
+7. ~~**Go module caching in CI** — Every run downloads all dependencies. Significant speed win available.~~ done — setup-go cache: true in workflows
 
 ---
 
@@ -89,30 +89,30 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 
 | #  | Priority | Item                                                                              | Effort | Impact                              |
 | -- | -------- | --------------------------------------------------------------------------------- | ------ | ----------------------------------- |
-| 1  | 🔴       | **Address GitHub security vulnerabilities** in dependencies (`go vuln check`)     | Small  | Critical — supply chain             |
-| 2  | 🔴       | **Fix local Go cache corruption** (reported in prior status)                      | Small  | Developer experience                |
-| 3  | 🔴       | **Add `templ generate` check to CI** — detect stale generated templates           | Small  | Prevents silent breakage            |
-| 4  | 🟡       | **Write integration tests** for HTTP endpoints (full request lifecycle)           | Medium | Confidence in shipping              |
-| 5  | 🟡       | **Container package tests** — DI wiring, service lifecycle, shutdown order        | Medium | Runtime safety                      |
-| 6  | 🟡       | **Add git pre-push hook** calling `just pre-push`                                 | Small  | Catch issues before CI              |
-| 7  | 🟡       | **Pin golangci-lint version** in GitHub Actions workflow                          | Small  | CI stability                        |
-| 8  | 🟡       | **Add Go module caching** in CI (`actions/cache` or `setup-go` cache)             | Small  | 2-5x CI speedup                     |
-| 9  | 🟡       | **Update FEATURES.md** with admonition blocks, sitemap, AST mermaid detection     | Small  | Documentation accuracy              |
-| 10 | 🟡       | **Update CHANGELOG.md** with recent features since v0.1.0                         | Small  | Release tracking                    |
-| 11 | 🟡       | **Add Prometheus metrics endpoint** (`/metrics`)                                  | Medium | Observability                       |
-| 12 | 🟡       | **Structured health check** with version, uptime, cache stats                     | Small  | Production readiness                |
-| 13 | 🟡       | **Add Docker HEALTHCHECK** instruction                                            | Small  | Container orchestration             |
-| 14 | 🟡       | **Split large test files** (search_test.go 685 lines, handlers_test.go 667 lines) | Medium | Maintainability                     |
-| 15 | 🟡       | **Add coverage enforcement** to CI (≥75% threshold)                               | Small  | Quality gate                        |
+| ~~1~~  | ~~🔴~~ done — govulncheck findings fixed; dependabot grouped updates (e7bafaf) | ~~**Address GitHub security vulnerabilities** in dependencies (`go vuln check`)~~ | ~~Small~~ | ~~Critical — supply chain~~ |
+| ~~2~~  | ~~🔴~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~**Fix local Go cache corruption** (reported in prior status)~~ | ~~Small~~ | ~~Developer experience~~ |
+| ~~3~~  | ~~🔴~~ done — test.yml regenerates templ and fails on diff | ~~**Add `templ generate` check to CI** — detect stale generated templates~~ | ~~Small~~ | ~~Prevents silent breakage~~ |
+| ~~4~~  | ~~🟡~~ done — shutdown_integration_test.go + per-endpoint tests | ~~**Write integration tests** for HTTP endpoints (full request lifecycle)~~ | ~~Medium~~ | ~~Confidence in shipping~~ |
+| ~~5~~  | ~~🟡~~ done — container_test.go rewritten 2026-09 | ~~**Container package tests** — DI wiring, service lifecycle, shutdown order~~ | ~~Medium~~ | ~~Runtime safety~~ |
+| ~~6~~  | ~~🟡~~ done — .githooks/pre-push (test + lint) | ~~**Add git pre-push hook** calling `just pre-push`~~ | ~~Small~~ | ~~Catch issues before CI~~ |
+| ~~7~~  | ~~🟡~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned | ~~**Pin golangci-lint version** in GitHub Actions workflow~~ | ~~Small~~ | ~~CI stability~~ |
+| ~~8~~  | ~~🟡~~ done — setup-go cache: true | ~~**Add Go module caching** in CI (`actions/cache` or `setup-go` cache)~~ | ~~Small~~ | ~~2-5x CI speedup~~ |
+| ~~9~~  | ~~🟡~~ done — FEATURES.md documents admonitions + sitemap + robots | ~~**Update FEATURES.md** with admonition blocks, sitemap, AST mermaid detection~~ | ~~Small~~ | ~~Documentation accuracy~~ |
+| ~~10~~ | ~~🟡~~ done — CHANGELOG [Unreleased] carries the admonition entry | ~~**Update CHANGELOG.md** with recent features since v0.1.0~~ | ~~Small~~ | ~~Release tracking~~ |
+| ~~11~~ | ~~🟡~~ done — internal/server/metrics.go serves /metrics | ~~**Add Prometheus metrics endpoint** (`/metrics`)~~ | ~~Medium~~ | ~~Observability~~ |
+| ~~12~~ | ~~🟡~~ done — /health returns version, uptime, dependencies | ~~**Structured health check** with version, uptime, cache stats~~ | ~~Small~~ | ~~Production readiness~~ |
+| ~~13~~ | ~~🟡~~ done — Dockerfile HEALTHCHECK + healthcheck subcommand | ~~**Add Docker HEALTHCHECK** instruction~~ | ~~Small~~ | ~~Container orchestration~~ |
+| ~~14~~ | ~~🟡~~ done — search/handlers/markdown test files all split | ~~**Split large test files** (search_test.go 685 lines, handlers_test.go 667 lines)~~ | ~~Medium~~ | ~~Maintainability~~ |
+| ~~15~~ | ~~🟡~~ done — test.yml 75% coverage floor | ~~**Add coverage enforcement** to CI (≥75% threshold)~~ | ~~Small~~ | ~~Quality gate~~ |
 | 16 | 🟡       | **Rate limit search endpoint** (currently only /refresh is rate-limited)          | Small  | Abuse prevention                    |
-| 17 | 🟡       | **Add gzip/brotli compression** middleware                                        | Medium | Performance (30-70% size reduction) |
-| 18 | 🟡       | **Add ETag/If-None-Match** support                                                | Medium | Bandwidth + caching                 |
-| 19 | 🟢       | **Kubernetes manifests** (Deployment + Service + ConfigMap)                       | Medium | Deployment flexibility              |
-| 20 | 🟢       | **Add pprof profiling endpoint** (behind build tag or dev mode)                   | Small  | Production debugging                |
-| 21 | 🟢       | **Code copy button** on fenced code blocks                                        | Small  | UX improvement                      |
-| 22 | 🟢       | **Print stylesheet**                                                              | Small  | UX improvement                      |
-| 23 | 🟢       | **RSS/Atom feed generation**                                                      | Medium | Content distribution                |
-| 24 | 🟢       | **Dark/light mode toggle** (currently dark-only)                                  | Medium | User preference                     |
+| ~~17~~ | ~~🟡~~ done — httputil.Compression middleware | ~~**Add gzip/brotli compression** middleware~~ | ~~Medium~~ | ~~Performance (30-70% size reduction)~~ |
+| **NOT-DO/DUPLICATE — Add ETag/If-None-Match support** canonical entry lives in ROADMAP.md (Content Delivery); not implemented | | | |
+| **NOT-DO/DUPLICATE — Kubernetes manifests** canonical entry lives in ROADMAP.md (Deployment) | | | |
+| **NOT-DO/DUPLICATE — Add pprof profiling endpoint** canonical entry lives in ROADMAP.md (Observability) | | | |
+| **NOT-DO/DUPLICATE — Code copy button** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| **NOT-DO/DUPLICATE — Print stylesheet** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| **NOT-DO/DUPLICATE — RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
+| **NOT-DO/DUPLICATE — Dark/light mode toggle** canonical entry lives in ROADMAP.md (UI/UX) | | | |
 
 ---
 
