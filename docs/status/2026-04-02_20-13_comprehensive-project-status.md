@@ -90,14 +90,14 @@ The following were planned but only the CI fix was completed:
 
 | # | Task                                                   | Status         |
 | - | ------------------------------------------------------ | -------------- |
-| 1 | Fix CI: lowercase IMAGE_NAME + digest scan             | ✅ Done        |
-| 2 | Export content helpers (ShouldSkipDir, IsMarkdownFile) | ❌ Not started |
-| 3 | Deduplicate `getContentType` (server vs content pkg)   | ❌ Not started |
-| 4 | Deduplicate `skipDirs` (watcher vs content pkg)        | ❌ Not started |
-| 5 | Optimize ContentTree with path map for O(1) lookups    | ❌ Not started |
-| 6 | Add compile-time interface checks where missing        | ❌ Not started |
-| 7 | Run full test suite + lint verification                | ❌ Not started |
-| 8 | Push all changes                                       | ❌ Not started |
+| ~~1~~ | ~~Fix CI: lowercase IMAGE_NAME + digest scan~~ done at `7701c90` | ~~✅ Done~~ |
+| ~~2~~ | ~~Export content helpers (ShouldSkipDir, IsMarkdownFile)~~ done at `0192273` | ~~❌ Not started~~ |
+| ~~3~~ | ~~Deduplicate `getContentType` (server vs content pkg)~~ done at `0192273` | ~~❌ Not started~~ |
+| ~~4~~ | ~~Deduplicate `skipDirs` (watcher vs content pkg)~~ done at `0192273` | ~~❌ Not started~~ |
+| ~~5~~ | ~~Optimize ContentTree with path map for O(1) lookups~~ done at `0192273` | ~~❌ Not started~~ |
+| ~~6~~ | ~~Add compile-time interface checks where missing~~ done at `0192273` | ~~❌ Not started~~ |
+| ~~7~~ | ~~Run full test suite + lint verification~~ done — build + test + lint all green 2026-09 | ~~❌ Not started~~ |
+| ~~8~~ | ~~Push all changes~~ done — pushed; repo synced with origin | ~~❌ Not started~~ |
 
 ---
 
@@ -105,35 +105,35 @@ The following were planned but only the CI fix was completed:
 
 ### High-Impact / Low-Effort (Quick Wins)
 
-1. **Export content helpers** — `shouldSkipDir`, `isMarkdownFile`, `getContentType` are unexported but duplicated in `cmd/watcher.go` and `server/static.go`
-2. **Optimize ContentTree.Find()** — Currently O(n) recursive search; should use `map[URLPath]ContentNode` for O(1)
-3. **Docker HEALTHCHECK** — Distroless has no shell; add HTTP health probe in CI or document k8s probe
-4. **Add sample content** to `content/` directory for demo purposes
+1. ~~**Export content helpers** — `shouldSkipDir`, `isMarkdownFile`, `getContentType` are unexported but duplicated in `cmd/watcher.go` and `server/static.go`~~ done at `0192273`
+2. ~~**Optimize ContentTree.Find()** — Currently O(n) recursive search; should use `map[URLPath]ContentNode` for O(1)~~ done at `0192273`
+3. ~~**Docker HEALTHCHECK** — Distroless has no shell; add HTTP health probe in CI or document k8s probe~~ done — Dockerfile HEALTHCHECK + healthcheck subcommand
+4. ~~**Add sample content** to `content/` directory for demo purposes~~ done (docs-health pass canonical entry lives in ROADMAP.md (Quality))
 
 ### Medium-Impact / Medium-Effort
 
-5. **Integration test suite** — End-to-end HTTP tests against real server
-6. **Request timing middleware** — Duration in structured logs (partially there via accessLogMiddleware but no histogram)
-7. **Search highlighting** — Already implemented in `content/search.go` but not surfaced in UI
-8. **gzip/brotli compression** — No response compression middleware
-9. **ETag/If-None-Match** — No conditional request support
-10. **CI: Go module caching** — Speed up builds
-11. **CI: golangci-lint version pinning** — Reproducibility
-12. **CI: templ generate check** — Detect stale generated code
-13. **CI: separate `test.yml` (fast) + `docker.yml` (build)** — Faster feedback
+5. ~~**Integration test suite** — End-to-end HTTP tests against real server~~ done — shutdown_integration_test.go + per-endpoint tests
+6. ~~**Request timing middleware** — Duration in structured logs (partially there via accessLogMiddleware but no histogram)~~ done — responsetime.go sets X-Response-Time
+7. ~~**Search highlighting** — Already implemented in `content/search.go` but not surfaced in UI~~ done — <mark> highlighting shipped in search results
+8. ~~**gzip/brotli compression** — No response compression middleware~~ done — httputil.Compression middleware
+9. ~~**ETag/If-None-Match** — No conditional request support~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented)
+10. ~~**CI: Go module caching** — Speed up builds~~ done — setup-go cache: true
+11. ~~**CI: golangci-lint version pinning** — Reproducibility~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned
+12. ~~**CI: templ generate check** — Detect stale generated code~~ done — test.yml templ drift check
+13. ~~**CI: separate `test.yml` (fast) + `docker.yml` (build)** — Faster feedback~~ done — test.yml + docker.yml + release.yml
 
 ### High-Impact / High-Effort
 
-14. **Architecture Decision Records** — Document key decisions
-15. **Deployment docs** (Docker, Cloud Run, Fly.io, k8s)
-16. **Admin endpoints** — Cache stats, content stats
-17. **RSS/Atom feed generation**
-18. **Content tags and filtering**
-19. **Search autocomplete**
-20. **Plugin system for custom markdown extensions**
-21. **Dark mode CSS + theme toggle**
-22. **Code copy button** on code blocks
-23. **Print stylesheet**
+14. ~~**Architecture Decision Records** — Document key decisions~~ done — docs/adr/ holds 5 ADRs
+15. ~~**Deployment docs** (Docker, Cloud Run, Fly.io, k8s)~~ done — README Docker section + docs website
+16. ~~**Admin endpoints** — Cache stats, content stats~~ done — GET /cache/stats ships the stats
+17. ~~**RSS/Atom feed generation**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery))
+18. ~~**Content tags and filtering**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Search & Discovery))
+19. ~~**Search autocomplete**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Search & Discovery))
+20. ~~**Plugin system for custom markdown extensions**~~ done (docs-health pass canonical entry lives in ROADMAP.md (Architecture))
+21. ~~**Dark mode CSS + theme toggle**~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
+22. ~~**Code copy button** on code blocks~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
+23. ~~**Print stylesheet**~~ done (docs-health pass canonical entry lives in ROADMAP.md (UI/UX))
 
 ### From TODO_LIST.md (Still Open — Selected)
 

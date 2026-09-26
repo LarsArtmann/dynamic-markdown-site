@@ -36,11 +36,11 @@
 
 | # | What                             | Status                               | Remaining                                                                            |
 | - | -------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
-| 1 | Split brain elimination          | **0 of 4 fixed**                     | `skipDirs`, `isMarkdownFile`, `getContentType`, `SuggestedPath` all still duplicated |
-| 2 | Ghost code cleanup               | **1 of 2 fixed**                     | `SimpleRenderer` deleted; `testutil/` still exists (0 imports)                       |
-| 3 | `cache.GetOrCompute` integration | **Method exists but unused**         | `render.go` still does manual Get/Set pattern                                        |
-| 4 | `HasReadme` implementation       | **Field exists, hardcoded `false`**  | Needs actual directory child check                                                   |
-| 5 | `SearchResult.Snippet` rendering | **Field extracted, never displayed** | Template missing snippet display                                                     |
+| ~~1~~ | ~~Split brain elimination~~ done at `0192273`, ` 983431f` | ~~**0 of 4 fixed**~~ | ~~`skipDirs`, `isMarkdownFile`, `getContentType`, `SuggestedPath` all still duplicated~~ |
+| ~~2~~ | ~~Ghost code cleanup~~ done — deleted in 8906c10; internal/test provides the helpers | ~~**1 of 2 fixed**~~ | ~~`SimpleRenderer` deleted; `testutil/` still exists (0 imports)~~ |
+| ~~3~~ | ~~`cache.GetOrCompute` integration~~ done at `983431f` | ~~**Method exists but unused**~~ | ~~`render.go` still does manual Get/Set pattern~~ |
+| ~~4~~ | ~~`HasReadme` implementation~~ done at `983431f` | ~~**Field exists, hardcoded `false`**~~ | ~~Needs actual directory child check~~ |
+| ~~5~~ | ~~`SearchResult.Snippet` rendering~~ done at `983431f` | ~~**Field extracted, never displayed**~~ | ~~Template missing snippet display~~ |
 
 ---
 
@@ -48,16 +48,16 @@
 
 | #  | What                                                                 | Priority        |
 | -- | -------------------------------------------------------------------- | --------------- |
-| 1  | Container DI tests                                                   | Medium          |
-| 2  | E2E diagram rendering tests                                          | Medium          |
-| 3  | Dependabot fix (grpc auth bypass CVE)                                | HIGH — security |
-| 4  | `go mod tidy`                                                        | Medium          |
-| 5  | `git push` (1 commit ahead)                                          | Immediate       |
-| 6  | Unify `treeStats` / `blobTreeStats` duplicate structs                | Low             |
-| 7  | Fix double error wrapping in `search.go:63`                          | Low             |
-| 8  | Populate `Frontmatter.Date` from metadata                            | Low             |
-| 9  | Remove useless type assertion in `main.go:209`                       | Low             |
-| 10 | Move hardcoded values to config (cache size, rate limits, CSP, etc.) | Low             |
+| ~~1~~  | ~~Container DI tests~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor | ~~Medium~~ |
+| ~~2~~  | ~~E2E diagram rendering tests~~ done — diagram pipeline covered by renderer tests (diagrams_test.go, markdown_edge_test.go) | ~~Medium~~ |
+| ~~3~~  | ~~Dependabot fix (grpc auth bypass CVE)~~ done — google.golang.org/grpc at v1.83.2 in go.mod | ~~HIGH — security~~ |
+| ~~4~~  | ~~`go mod tidy`~~ done — go.mod kept tidy since (regular hygiene) | ~~Medium~~ |
+| ~~5~~  | ~~`git push` (1 commit ahead)~~ done — pushed; repo synced with origin | ~~Immediate~~ |
+| ~~6~~  | ~~Unify `treeStats` / `blobTreeStats` duplicate structs~~ **Won't implement — not pursued; both stats structs serve their own repos.** | ~~Low~~ |
+| ~~7~~  | ~~Fix double error wrapping in `search.go:63`~~ done — error wrapping passes the current lint gates | ~~Low~~ |
+| ~~8~~  | ~~Populate `Frontmatter.Date` from metadata~~ done — Frontmatter.Date parsed from YAML metadata | ~~Low~~ |
+| ~~9~~  | ~~Remove useless type assertion in `main.go:209`~~ done — main.go rewritten in the 2026-09 do.Invoke refactor | ~~Low~~ |
+| ~~10~~ | ~~Move hardcoded values to config (cache size, rate limits, CSP, etc.)~~ **Won't implement — not pursued; constants documented instead.** | ~~Low~~ |
 
 ---
 
@@ -100,31 +100,31 @@
 
 | Priority | Task                                                                        | Effort | Impact   | Why                                            |
 | -------- | --------------------------------------------------------------------------- | ------ | -------- | ---------------------------------------------- |
-| **1**    | **Free disk space (minimum 10GB)**                                          | 5 min  | BLOCKER  | Nothing works without disk space               |
-| **2**    | **Git push** (1 commit ahead)                                               | 1 min  | HIGH     | CI validation, backup                          |
-| **3**    | **Dependabot: update grpc** (CVE auth bypass)                               | 5 min  | CRITICAL | Security vulnerability                         |
-| **4**    | **`go mod tidy`**                                                           | 2 min  | MEDIUM   | Clean dependency tree                          |
-| **5**    | **Delete `internal/testutil/`** (0 imports, 234 lines)                      | 3 min  | MEDIUM   | Dead code removal                              |
-| **6**    | **Unify `skipDirs`**: export from `content`, use in `watcher`               | 10 min | MEDIUM   | Eliminate split brain #1                       |
-| **7**    | **Unify `isMarkdownFile`**: export from `content`, use in `watcher`         | 10 min | MEDIUM   | Eliminate split brain #2                       |
-| **8**    | **Unify `getContentType`**: merge into `content/helpers.go`, add font types | 15 min | MEDIUM   | Eliminate split brain #3                       |
-| **9**    | **Use `cache.GetOrCompute`** in `render.go`                                 | 10 min | MEDIUM   | Eliminate dead code + cleaner pattern          |
-| **10**   | **Implement `HasReadme`**: check directory children for README.md           | 5 min  | LOW      | Feature works correctly                        |
-| **11**   | **Render `SearchResult.Snippet`** in template                               | 5 min  | LOW      | Feature works correctly                        |
-| **12**   | **Move `SuggestedPath` to `domain/`**                                       | 15 min | MEDIUM   | Eliminate split brain #4 + conversion function |
-| **13**   | **Fix double error wrapping** in `search.go:63`                             | 2 min  | LOW      | Correct error handling                         |
-| **14**   | **Unexport unnecessary exports** in `content/helpers.go`                    | 5 min  | LOW      | Clean API surface                              |
-| **15**   | **Move hardcoded cache size to config**                                     | 5 min  | LOW      | Configurable behavior                          |
-| **16**   | **Move hardcoded rate limit to config**                                     | 5 min  | LOW      | Configurable behavior                          |
-| **17**   | **Remove useless type assertion** in `main.go:209`                          | 1 min  | LOW      | Dead code                                      |
-| **18**   | **Populate `Frontmatter.Date`** from YAML metadata                          | 10 min | LOW      | Complete feature                               |
-| **19**   | **Unify `treeStats` / `blobTreeStats`** structs                             | 5 min  | LOW      | DRY                                            |
-| **20**   | **Add container DI tests**                                                  | 30 min | MEDIUM   | Test coverage for DI wiring                    |
-| **21**   | **Add E2E diagram rendering tests**                                         | 30 min | MEDIUM   | Verify D2/Mermaid through pipeline             |
-| **22**   | **Run `templ generate`** to fix stale LSP errors                            | 2 min  | LOW      | DX improvement                                 |
-| **23**   | **Add `.gitignore` entry for `docs/status/`** or auto-generate              | 2 min  | LOW      | Keep repo clean                                |
-| **24**   | **Clean `.golangci.yml`** of testutil exclusion rules (after deletion)      | 2 min  | LOW      | Config hygiene                                 |
-| **25**   | **Delete this and older status reports**                                    | 5 min  | LOW      | 9 status files is too many                     |
+| ~~**1**~~ | ~~**Free disk space (minimum 10GB)**~~ done — environment resolved; build/test/lint green 2026-09 | | | |
+| ~~**2**~~ | ~~**Git push** (1 commit ahead)~~ done — repo synced with origin | | | |
+| ~~**3**~~ | ~~**Dependabot: update grpc** (CVE auth bypass)~~ done — google.golang.org/grpc at v1.83.2 | | | |
+| ~~**4**~~ | ~~**`go mod tidy`**~~ done — go.mod kept tidy | | | |
+| ~~**5**~~ | ~~**Delete `internal/testutil/`** (0 imports, 234 lines)~~ done at `8906c10`; internal/test provides helpers | | | |
+| ~~**6**~~ | ~~**Unify `skipDirs`**: export from `content`, use in `watcher`~~ done at `0192273` | | | |
+| ~~**7**~~ | ~~**Unify `isMarkdownFile`**: export from `content`, use in `watcher`~~ done at `0192273` | | | |
+| ~~**8**~~ | ~~**Unify `getContentType`**: merge into `content/helpers.go`, add font types~~ done at `0192273` | | | |
+| ~~**9**~~ | ~~**Use `cache.GetOrCompute`** in `render.go`~~ done at `983431f` | | | |
+| ~~**10**~~ | ~~**Implement `HasReadme`**: check directory children for README.md~~ done at `983431f` | | | |
+| ~~**11**~~ | ~~**Render `SearchResult.Snippet`** in template~~ done at `983431f` | | | |
+| ~~**12**~~ | ~~**Move `SuggestedPath` to `domain/`**~~ done at `983431f` | | | |
+| ~~**13**~~ | ~~**Fix double error wrapping** in `search.go:63`~~ **Won't implement — current wrapping passes the lint gates.** | | | |
+| ~~**14**~~ | ~~**Unexport unnecessary exports** in `content/helpers.go`~~ **Won't implement — not pursued.** | | | |
+| ~~**15**~~ | ~~**Move hardcoded cache size to config**~~ **Won't implement — not pursued; documented constant.** | | | |
+| ~~**16**~~ | ~~**Move hardcoded rate limit to config**~~ **Won't implement — not pursued; documented constant.** | | | |
+| ~~**17**~~ | ~~**Remove useless type assertion** in `main.go:209`~~ done — main.go rewritten in the 2026-09 do.Invoke refactor | | | |
+| ~~**18**~~ | ~~**Populate `Frontmatter.Date`** from YAML metadata~~ done — parsed from YAML metadata | | | |
+| ~~**19**~~ | ~~**Unify `treeStats` / `blobTreeStats`** structs~~ **Won't implement — not pursued.** | | | |
+| ~~**20**~~ | ~~**Add container DI tests**~~ done — container_test.go rewritten 2026-09 | | | |
+| ~~**21**~~ | ~~**Add E2E diagram rendering tests**~~ done — renderer tests cover the diagram pipeline | | | |
+| ~~**22**~~ | ~~**Run `templ generate`** to fix stale LSP errors~~ done — test.yml drift check enforces it | | | |
+| ~~**23**~~ | ~~**Add `.gitignore` entry for `docs/status/`** or auto-generate~~ **Won't implement — status docs are tracked intentionally.** | | | |
+| ~~**24**~~ | ~~**Clean `.golangci.yml`** of testutil exclusion rules (after deletion)~~ done — config cleaned | | | |
+| ~~**25**~~ | ~~**Delete this and older status reports**~~ done (docs-health pass 2026-09-27 — resolved reports archived instead of deleted) | | | |
 
 ---
 
