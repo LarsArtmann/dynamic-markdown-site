@@ -34,52 +34,52 @@
 
 | Step | Task                                   | Impact       | Work   | Command/Action   |
 | ---- | -------------------------------------- | ------------ | ------ | ---------------- |
-| 1.1  | Add `cache-clean` to justfile          | **CRITICAL** | 2 min  | Edit justfile    |
-| 1.2  | Run `just cache-clean`                 | **CRITICAL** | 1 min  | just cache-clean |
-| 1.3  | Verify `go build ./...`                | HIGH         | 30 sec | go build ./...   |
-| 1.4  | Verify `go test ./internal/domain/...` | HIGH         | 30 sec | go test          |
+| ~~1.1~~  | ~~Add `cache-clean` to justfile~~ **Won't implement — justfile removed; go clean -cache documented instead.** | ~~**CRITICAL**~~ | ~~2 min~~ | ~~Edit justfile~~ |
+| ~~1.2~~  | ~~Run `just cache-clean`~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~**CRITICAL**~~ | ~~1 min~~ | ~~just cache-clean~~ |
+| ~~1.3~~  | ~~Verify `go build ./...`~~ done — go build ./... passes | ~~HIGH~~ | ~~30 sec~~ | ~~go build ./...~~ |
+| ~~1.4~~  | ~~Verify `go test ./internal/domain/...`~~ done — go test ./... green | ~~HIGH~~ | ~~30 sec~~ | ~~go test~~ |
 
 ### Phase 2: Code Quality Verification (High Impact, Medium Work)
 
 | Step | Task                          | Impact | Work   | Verification      |
 | ---- | ----------------------------- | ------ | ------ | ----------------- |
-| 2.1  | Run `go test ./...`           | HIGH   | 5 min  | All packages pass |
-| 2.2  | Run `just lint`               | HIGH   | 3 min  | Zero lint errors  |
-| 2.3  | Fix any remaining lint issues | MEDIUM | varies | Commit each fix   |
+| ~~2.1~~  | ~~Run `go test ./...`~~ done — full suite passes | ~~HIGH~~ | ~~5 min~~ | ~~All packages pass~~ |
+| ~~2.2~~  | ~~Run `just lint`~~ done — golangci-lint 0 issues | ~~HIGH~~ | ~~3 min~~ | ~~Zero lint errors~~ |
+| ~~2.3~~  | ~~Fix any remaining lint issues~~ done — no remaining lint debt | ~~MEDIUM~~ | ~~varies~~ | ~~Commit each fix~~ |
 
 ### Phase 3: Type System Architecture Improvements (High Impact, High Work)
 
 | Step | Task                                         | Impact | Work   | Notes                              |
 | ---- | -------------------------------------------- | ------ | ------ | ---------------------------------- |
-| 3.1  | Review `domain.Renderer` interface           | HIGH   | 30 min | Check if it belongs in domain      |
-| 3.2  | Consider `Result[T]` type for error handling | MEDIUM | 1 hr   | Use github.com/samber/mo or custom |
-| 3.3  | Add `Option[T]` type for optional values     | MEDIUM | 1 hr   | Draft field, optional metadata     |
-| 3.4  | Review URLPath validation                    | MEDIUM | 30 min | Could use net/url more             |
+| ~~3.1~~  | ~~Review `domain.Renderer` interface~~ done at `4233fdc` | ~~HIGH~~ | ~~30 min~~ | ~~Check if it belongs in domain~~ |
+| ~~3.2~~  | ~~Consider `Result[T]` type for error handling~~ **Won't implement — not idiomatic Go here; plain errors kept.** | ~~MEDIUM~~ | ~~1 hr~~ | ~~Use github.com/samber/mo or custom~~ |
+| ~~3.3~~  | ~~Add `Option[T]` type for optional values~~ **Won't implement — not idiomatic Go here; plain fields kept.** | ~~MEDIUM~~ | ~~1 hr~~ | ~~Draft field, optional metadata~~ |
+| ~~3.4~~  | ~~Review URLPath validation~~ done — URLPath validation ships with sentinel errors | ~~MEDIUM~~ | ~~30 min~~ | ~~Could use net/url more~~ |
 
 ### Phase 4: Established Libraries Integration (Medium Impact, Medium Work)
 
 | Step | Task                                | Impact | Work | Library                                   |
 | ---- | ----------------------------------- | ------ | ---- | ----------------------------------------- |
-| 4.1  | Replace custom cache with ristretto | MEDIUM | 2 hr | github.com/dgraph-io/ristretto            |
-| 4.2  | Use lo for functional operations    | MEDIUM | 1 hr | github.com/samber/lo (already in go.mod!) |
-| 4.3  | Add structured logging with slog    | MEDIUM | 1 hr | Use charm.land/log properly               |
-| 4.4  | Use validator for config validation | LOW    | 1 hr | github.com/go-playground/validator        |
+| ~~4.1~~  | ~~Replace custom cache with ristretto~~ **Won't implement — Otter retained (otter/v2); ADR-0003.** | ~~MEDIUM~~ | ~~2 hr~~ | ~~github.com/dgraph-io/ristretto~~ |
+| ~~4.2~~  | ~~Use lo for functional operations~~ done — samber/lo is a direct dependency and used | ~~MEDIUM~~ | ~~1 hr~~ | ~~github.com/samber/lo (already in go.mod!)~~ |
+| ~~4.3~~  | ~~Add structured logging with slog~~ done — charm.land/log wired as slog handler | ~~MEDIUM~~ | ~~1 hr~~ | ~~Use charm.land/log properly~~ |
+| ~~4.4~~  | ~~Use validator for config validation~~ **Won't implement — config validation kept hand-rolled and typed.** | ~~LOW~~ | ~~1 hr~~ | ~~github.com/go-playground/validator~~ |
 
 ### Phase 5: Testing Infrastructure (Medium Impact, Low Work)
 
 | Step | Task                                     | Impact | Work   | Notes                   |
 | ---- | ---------------------------------------- | ------ | ------ | ----------------------- |
-| 5.1  | Add `just test-watch` command            | MEDIUM | 10 min | File watching for tests |
-| 5.2  | Add `just test-short` for quick feedback | MEDIUM | 5 min  | Skip integration tests  |
-| 5.3  | Add test fixtures for markdown files     | LOW    | 30 min | Reusable test content   |
+| ~~5.1~~  | ~~Add `just test-watch` command~~ **Won't implement — not pursued; CI + pre-push cover the loop.** | ~~MEDIUM~~ | ~~10 min~~ | ~~File watching for tests~~ |
+| ~~5.2~~  | ~~Add `just test-short` for quick feedback~~ **Won't implement — not pursued; suite is fast enough.** | ~~MEDIUM~~ | ~~5 min~~ | ~~Skip integration tests~~ |
+| ~~5.3~~  | ~~Add test fixtures for markdown files~~ done — internal/test file helpers shipped | ~~LOW~~ | ~~30 min~~ | ~~Reusable test content~~ |
 
 ### Phase 6: Documentation & Tooling (Low Impact, Low Work)
 
 | Step | Task                                        | Impact | Work   | Notes                      |
 | ---- | ------------------------------------------- | ------ | ------ | -------------------------- |
-| 6.1  | Update AGENTS.md with cache troubleshooting | LOW    | 20 min | Document what we learned   |
-| 6.2  | Add `just doctor` command                   | LOW    | 15 min | Check prerequisites        |
-| 6.3  | Clean up old status reports                 | LOW    | 5 min  | Archive or delete old ones |
+| ~~6.1~~  | ~~Update AGENTS.md with cache troubleshooting~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~LOW~~ | ~~20 min~~ | ~~Document what we learned~~ |
+| ~~6.2~~  | ~~Add `just doctor` command~~ **Won't implement — not pursued.** | ~~LOW~~ | ~~15 min~~ | ~~Check prerequisites~~ |
+| ~~6.3~~  | ~~Clean up old status reports~~ done (docs-health pass 2026-09-27 docs-health pass archived resolved reports) | ~~LOW~~ | ~~5 min~~ | ~~Archive or delete old ones~~ |
 
 ---
 
@@ -178,15 +178,15 @@ type Frontmatter struct {
 
 ### Should Add
 
-3. **github.com/samber/mo** — Monads (Option, Result, Either)
-   - OR implement our own (simple enough)
-4. **github.com/dgraph-io/ristretto** — Production cache
-   - More battle-tested than otter
-   - Better metrics and eviction policies
+3. ~~**github.com/samber/mo** — Monads (Option, Result, Either)~~ **Won't implement — not pursued; plain Go errors kept.**
+   ~~- OR implement our own (simple enough)~~
+4. ~~**github.com/dgraph-io/ristretto** — Production cache~~ **Won't implement — Otter retained (otter/v2).**
+   ~~- More battle-tested than otter~~
+   ~~- Better metrics and eviction policies~~
 
-5. **github.com/go-playground/validator** — Struct validation
-   - Tag-based validation
-   - Better than manual checks
+5. ~~**github.com/go-playground/validator** — Struct validation~~ **Won't implement — config validation kept hand-rolled and typed.**
+   ~~- Tag-based validation~~
+   ~~- Better than manual checks~~
 
 ---
 
@@ -215,12 +215,12 @@ A command or approach that will 100% fix this without requiring system reboot.
 
 ## 7. Immediate Next Actions (If Cache Fixed)
 
-1. **Verify types_test.go fix** — `go test ./internal/domain/...`
-2. **Add cache-clean to justfile** — Document the fix
-3. **Run full test suite** — `go test ./...`
-4. **Run linter** — `just lint`
-5. **Commit any fixes** — One per logical change
-6. **Push to origin** — `git push`
+1. ~~**Verify types_test.go fix** — `go test ./internal/domain/...`~~ done — types_test.go fix verified; suite green
+2. ~~**Add cache-clean to justfile** — Document the fix~~ **Won't implement — justfile removed; automation via flake.nix + .githooks.**
+3. ~~**Run full test suite** — `go test ./...`~~ done — full suite passes under -race
+4. ~~**Run linter** — `just lint`~~ done — golangci-lint 0 issues since 2026-09-13
+5. ~~**Commit any fixes** — One per logical change~~ done — all fixes committed by the auto-commit daemon
+6. ~~**Push to origin** — `git push`~~ done — pushed; repo synced with origin
 
 ---
 

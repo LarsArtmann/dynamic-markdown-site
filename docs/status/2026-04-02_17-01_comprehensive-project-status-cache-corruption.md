@@ -53,11 +53,11 @@ d7358d3 docs(features): add admonition blocks, sitemap, robots.txt, and fix draf
 
 ## c) NOT STARTED ⏳
 
-1. Full test suite with race detector (`go test ./... -race`)
-2. Complete lint check (`golangci-lint run ./...`)
-3. Docker workflow verification
-4. Final commit for docker.yml change
-5. Push to origin/master
+1. ~~Full test suite with race detector (`go test ./... -race`)~~ done — full suite passes under -race (latest runs green)
+2. ~~Complete lint check (`golangci-lint run ./...`)~~ done — golangci-lint 0 issues since 2026-09-13
+3. ~~Docker workflow verification~~ done — docker.yml green in later runs
+4. ~~Final commit for docker.yml change~~ done at `227f551`
+5. ~~Push to origin/master~~ done — repo synced with origin
 
 ---
 
@@ -102,16 +102,16 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 
 ### Immediate Actions
 
-1. **Fix build cache** — Top priority, blocks everything
-2. **Add `just cache-clean` command** — Documented way to fix this
-3. **Add memory limits** — Prevent future OOM during race tests
-4. **Document troubleshooting** — Cache corruption recovery steps
+1. ~~**Fix build cache** — Top priority, blocks everything~~ **Won't implement — obsolete: 2026-04 macOS cache corruption; current env unaffected.**
+2. ~~**Add `just cache-clean` command** — Documented way to fix this~~ **Won't implement — justfile removed; automation via flake.nix + .githooks.**
+3. ~~**Add memory limits** — Prevent future OOM during race tests~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**
+4. ~~**Document troubleshooting** — Cache corruption recovery steps~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**
 
 ### Process Improvements
 
-5. Run race tests on smaller packages individually, not full suite
-6. Add pre-flight cache check before long-running operations
-7. Consider using `GOTMPDIR` for isolation
+5. ~~Run race tests on smaller packages individually, not full suite~~ done — CI runs the full race suite on every push
+6. ~~Add pre-flight cache check before long-running operations~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**
+7. ~~Consider using `GOTMPDIR` for isolation~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**
 
 ---
 
@@ -119,43 +119,43 @@ rm: cannot remove '/Users/larsartmann/Library/Caches/go-build/61': Directory not
 
 ### Critical (P0)
 
-1. Fix Go build cache corruption
-2. Verify `go build ./...` passes
-3. Run `go test ./...` successfully
-4. Run `golangci-lint run ./...`
-5. Commit docker.yml change with detailed message
+1. ~~Fix Go build cache corruption~~ done — environment resolved; build/test/lint green 2026-09
+2. ~~Verify `go build ./...` passes~~ done — go build ./... passes
+3. ~~Run `go test ./...` successfully~~ done — go test ./... -race green
+4. ~~Run `golangci-lint run ./...`~~ done — golangci-lint 0 issues
+5. ~~Commit docker.yml change with detailed message~~ done at `227f551`
 
 ### High Priority (P1)
 
-6. Push all changes to origin/master
-7. Verify CI passes
-8. Clean up status report files (8 already exist)
-9. Update CHANGELOG.md with current date
-10. Archive old status reports
+6. ~~Push all changes to origin/master~~ done — pushed; repo synced
+7. ~~Verify CI passes~~ done — workflows green across later sessions
+8. ~~Clean up status report files (8 already exist)~~ done (docs-health pass 2026-09-27 docs-health pass annotated + archived the backlog)
+9. ~~Update CHANGELOG.md with current date~~ done — CHANGELOG [Unreleased] maintained
+10. ~~Archive old status reports~~ done (docs-health pass 2026-09-27 docs-health pass archived resolved reports)
 
 ### Medium Priority (P2)
 
-11. Add `just cache-clean` command to justfile
-12. Document cache troubleshooting in AGENTS.md
-13. Add memory profiling for race tests
-14. Review test coverage gaps (container at 0.0%)
-15. Add integration test for full server startup
+11. ~~Add `just cache-clean` command to justfile~~ **Won't implement — justfile removed; automation via flake.nix + .githooks.**
+12. ~~Document cache troubleshooting in AGENTS.md~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**
+13. ~~Add memory profiling for race tests~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**
+14. ~~Review test coverage gaps (container at 0.0%)~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor
+15. ~~Add integration test for full server startup~~ done — shutdown_integration_test.go starts the real server
 
 ### Lower Priority (P3)
 
-16. Add benchmarks for admonition extension
-17. Review TODO comments in codebase
-18. Add more edge case tests for diagram extension
-19. Optimize CSS bundle size
-20. Add frontend performance tests
+16. ~~Add benchmarks for admonition extension~~ **Won't implement — not pursued; renderer benchmarks already exist.**
+17. ~~Review TODO comments in codebase~~ **Won't implement — no stale TODO debt remains.**
+18. ~~Add more edge case tests for diagram extension~~ done — markdown_edge_test.go + diagrams_test.go cover edge cases
+19. ~~Optimize CSS bundle size~~ **Won't implement — not pursued.**
+20. ~~Add frontend performance tests~~ **Won't implement — not pursued.**
 
 ### Future/Optional (P4)
 
-21. Add GitHub Actions for automated releases
-22. Implement search index caching
-23. Add OpenTelemetry tracing
-24. Create deployment documentation
-25. Write architecture decision records (ADRs)
+21. ~~Add GitHub Actions for automated releases~~ done — release.yml runs GoReleaser on tags
+22. ~~Implement search index caching~~ **Won't implement — in-memory search adequate at current scale.**
+23. ~~Add OpenTelemetry tracing~~ done (docs-health pass canonical entry lives in ROADMAP.md (Observability))
+24. ~~Create deployment documentation~~ done — README Docker section + docs website
+25. ~~Write architecture decision records (ADRs)~~ done — docs/adr/ holds 5 ADRs
 
 ---
 
@@ -201,10 +201,10 @@ A reliable command or approach to fully nuke and recreate the Go build cache wit
 
 **Fix the Go build cache corruption**, then resume with:
 
-1. `go test ./...`
-2. `golangci-lint run ./...`
-3. Commit docker.yml change
-4. Push to origin
+1. ~~`go test ./...`~~ done — environment resolved; build/test/lint green 2026-09
+2. ~~`golangci-lint run ./...`~~ done — environment resolved; build/test/lint green 2026-09
+3. ~~Commit docker.yml change~~ done — environment resolved; build/test/lint green 2026-09
+4. ~~Push to origin~~ done — pushed; repo synced with origin
 
 ---
 
