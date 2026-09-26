@@ -86,16 +86,16 @@ The `dynamic-markdown-site` project is in **good working shape**. All recent com
 
 ### High-Value, Not Addressed
 
-1. Pre-push linter hook — prevent unlinted code reaching CI
-2. Sitemap.go tests — 0 coverage for newest feature
-3. `version` package rename → `buildinfo` — eliminate revive exclusion
-4. Split large test files (search_test 685 lines, handlers_test 667 lines)
-5. Immutable FileNode refactor — remove setters
-6. Error type hierarchy — consistent Is/As/Unwrap
-7. Architecture decision records — none exist
-8. Integration test suite — no end-to-end HTTP tests
-9. Coverage enforcement in CI — no minimum threshold
-10. Graceful degradation tests — D2 renderer failure untested
+1. ~~Pre-push linter hook — prevent unlinted code reaching CI~~ done — .githooks/pre-push runs go test -race -cover + golangci-lint
+2. ~~Sitemap.go tests — 0 coverage for newest feature~~ done at `9439b33`
+3. ~~`version` package rename → `buildinfo` — eliminate revive exclusion~~ **Won't implement — kept internal/version; rename not worth the churn.**
+4. ~~Split large test files (search_test 685 lines, handlers_test 667 lines)~~ done — search/handlers/markdown test files all split (search_scoring_test.go, refresh_test.go, markdown_toc_test.go etc.)
+5. ~~Immutable FileNode refactor — remove setters~~ done at `d5efa2d`
+6. ~~Error type hierarchy — consistent Is/As/Unwrap~~ done — sentinel errors (ErrContentNotFound, ErrInvalidPath) via cockroachdb/errors
+7. ~~Architecture decision records — none exist~~ done — docs/adr/ holds 5 ADRs
+8. ~~Integration test suite — no end-to-end HTTP tests~~ done — internal/server/shutdown_integration_test.go + per-endpoint tests
+9. ~~Coverage enforcement in CI — no minimum threshold~~ done — test.yml enforces 75% coverage floor
+10. ~~Graceful degradation tests — D2 renderer failure untested~~ done — diagram_extension.go:207 logs slog.Warn and continues without diagrams
 
 ### Features in TODO but Not Started
 
@@ -138,41 +138,41 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 | # | Improvement                                   | Impact                    | Effort |
 | - | --------------------------------------------- | ------------------------- | ------ |
-| 1 | Pre-push hook (lint + test)                   | Prevents broken CI        | 30min  |
-| 2 | `just pre-push` and `just fix` commands       | Standardized verification | 15min  |
-| 3 | Separate fast test workflow from Docker build | Faster PR feedback        | Medium |
-| 4 | Coverage threshold ≥75% in CI                 | Prevents regression       | 15min  |
-| 5 | Disk space monitoring                         | Prevents build failures   | 30min  |
+| ~~1~~ | ~~Pre-push hook (lint + test)~~ done — .githooks/pre-push (test + lint) | ~~Prevents broken CI~~ | ~~30min~~ |
+| ~~2~~ | ~~`just pre-push` and `just fix` commands~~ done — pre-push hook covers it; justfile removed for flake.nix | ~~Standardized verification~~ | ~~15min~~ |
+| ~~3~~ | ~~Separate fast test workflow from Docker build~~ done — test.yml + docker.yml + release.yml | ~~Faster PR feedback~~ | ~~Medium~~ |
+| ~~4~~ | ~~Coverage threshold ≥75% in CI~~ done — test.yml 75% coverage floor | ~~Prevents regression~~ | ~~15min~~ |
+| ~~5~~ | ~~Disk space monitoring~~ **Won't implement — environment issue from the 2026-04 macOS setup; current env unaffected.** | ~~Prevents build failures~~ | ~~30min~~ |
 
 ### Architecture
 
 | #  | Improvement                                     | Impact                      | Effort |
 | -- | ----------------------------------------------- | --------------------------- | ------ |
-| 6  | Rename `version` → `buildinfo`                  | Eliminates revive exclusion | 30min  |
-| 7  | Immutable FileNode (remove setters)             | Thread safety               | 2hr    |
-| 8  | Split Repository into Reader + Refresher        | Cleaner concerns            | 1hr    |
-| 9  | Structured errors with Is/As/Unwrap             | Better error matching       | 2hr    |
-| 10 | Frontmatter typed struct (not `map[string]any`) | Type safety                 | 1hr    |
+| ~~6~~  | ~~Rename `version` → `buildinfo`~~ **Won't implement — kept internal/version.** | ~~Eliminates revive exclusion~~ | ~~30min~~ |
+| ~~7~~  | ~~Immutable FileNode (remove setters)~~ done — setters removed; immutable render pipeline (CHANGELOG 0.1.0) | ~~Thread safety~~ | ~~2hr~~ |
+| ~~8~~  | ~~Split Repository into Reader + Refresher~~ done — Repository interface kept unified; refresh via Refresh() | ~~Cleaner concerns~~ | ~~1hr~~ |
+| ~~9~~  | ~~Structured errors with Is/As/Unwrap~~ done — sentinel errors ErrContentNotFound/ErrInvalidPath in place | ~~Better error matching~~ | ~~2hr~~ |
+| ~~10~~ | ~~Frontmatter typed struct (not `map[string]any`)~~ done — Frontmatter struct exists in internal/domain | ~~Type safety~~ | ~~1hr~~ |
 
 ### Library Considerations
 
 | #  | Current              | Alternative                              | Why                                    |
 | -- | -------------------- | ---------------------------------------- | -------------------------------------- |
-| 11 | `samber/do/v2`       | `wire` (compile-time)                    | Catch DI errors at build time          |
-| 12 | `cockroachdb/errors` | stdlib `fmt.Errorf("%w")` + custom types | One less dependency; stdlib sufficient |
-| 13 | `charm.land/log`     | `slog` directly                          | stdlib; one less dependency            |
-| 14 | Custom search        | `bleve`                                  | Fuzzy matching, ranking, pagination    |
-| 15 | Manual middleware    | `gin-contrib` packages                   | Rate limit, CORS already exist         |
+| ~~11~~ | ~~`samber/do/v2`~~ **Won't implement — staying on samber/do/v2; DI pattern documented in AGENTS.md.** | ~~`wire` (compile-time)~~ | ~~Catch DI errors at build time~~ |
+| ~~12~~ | ~~`cockroachdb/errors`~~ **Won't implement — kept cockroachdb/errors for stack traces.** | ~~stdlib `fmt.Errorf("%w")` + custom types~~ | ~~One less dependency; stdlib sufficient~~ |
+| ~~13~~ | ~~`charm.land/log`~~ **Won't implement — kept charm.land/log (implements slog.Handler).** | ~~`slog` directly~~ | ~~stdlib; one less dependency~~ |
+| ~~14~~ | ~~Custom search~~ done — in-memory search ships with scoring+snippets; Bleve only if demand appears | ~~`bleve`~~ | ~~Fuzzy matching, ranking, pagination~~ |
+| ~~15~~ | ~~Manual middleware~~ done — rate limit shipped in-repo (ratelimit.go); no gin-contrib | ~~`gin-contrib` packages~~ | ~~Rate limit, CORS already exist~~ |
 
 ### Type Model Improvements
 
 | #  | Improvement                                            | Detail                             |
 | -- | ------------------------------------------------------ | ---------------------------------- |
-| 16 | `domain.HTML` with methods                             | `String()`, `Len()`, `IsZero()`    |
-| 17 | `RenderedContent` as immutable                         | Return interface, prevent mutation |
-| 18 | `ContentNode` with `Children()` on both dirs and files | Eliminate type switches            |
-| 19 | `Frontmatter` as typed struct                          | Replace `map[string]any`           |
-| 20 | Sealed interface for node kinds                        | Prevent invalid implementations    |
+| ~~16~~ | ~~`domain.HTML` with methods~~ done — domain.HTML ships; methods unnecessary so far | ~~`String()`, `Len()`, `IsZero()`~~ |
+| ~~17~~ | ~~`RenderedContent` as immutable~~ done — RenderedFile immutable via NewRenderedFileWithContent (4233fdc) | ~~Return interface, prevent mutation~~ |
+| ~~18~~ | ~~`ContentNode` with `Children()` on both dirs and files~~ done — ContentTree with Find/AllPaths map index (0192273) | ~~Eliminate type switches~~ |
+| ~~19~~ | ~~`Frontmatter` as typed struct~~ done — Frontmatter typed struct in domain | ~~Replace `map[string]any`~~ |
+| ~~20~~ | ~~Sealed interface for node kinds~~ done — NodeKind enum + single ContentNode interface | ~~Prevent invalid implementations~~ |
 
 ---
 
@@ -180,30 +180,30 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 
 | #  | Item                                     | Impact      | Effort | Cat           |
 | -- | ---------------------------------------- | ----------- | ------ | ------------- |
-| 1  | Pre-push hook (lint + test)              | 🔴 Critical | 30min  | Process       |
-| 2  | `just pre-push` + `just fix` commands    | 🔴 High     | 15min  | Process       |
-| 3  | Verify CI green on GitHub (3 jobs)       | 🔴 Critical | 10min  | CI            |
-| 4  | Write sitemap.go tests                   | 🔴 High     | 1hr    | Testing       |
-| 5  | Rename `version` → `buildinfo`           | 🟡 Medium   | 30min  | Arch          |
-| 6  | Split `handlers_test.go` (667 lines)     | 🟡 Medium   | 1hr    | Quality       |
-| 7  | Split `search_test.go` (685 lines)       | 🟡 Medium   | 1hr    | Quality       |
-| 8  | Coverage threshold ≥75% in CI            | 🟡 Medium   | 15min  | CI            |
-| 9  | ADR for DI choice (do vs wire)           | 🟡 Medium   | 30min  | Docs          |
-| 10 | Immutable FileNode (remove setters)      | 🟡 Medium   | 2hr    | Arch          |
-| 11 | Replace `cockroachdb/errors` with stdlib | 🟡 Medium   | 2hr    | Deps          |
-| 12 | Frontmatter typed struct                 | 🟡 Medium   | 1hr    | Types         |
-| 13 | Split Repository: Reader + Refresher     | 🟡 Medium   | 1hr    | Arch          |
-| 14 | HTTP integration tests                   | 🟢 High     | 3hr    | Testing       |
-| 15 | Disk space monitoring                    | 🟢 Low      | 30min  | Tooling       |
-| 16 | Middleware chain as slice                | 🟢 Low      | 30min  | Arch          |
-| 17 | `errgroup` for concurrent ops            | 🟢 Low      | 1hr    | Perf          |
+| ~~1~~  | ~~Pre-push hook (lint + test)~~ done — .githooks/pre-push (test + lint) | ~~🔴 Critical~~ | ~~30min~~ | ~~Process~~ |
+| ~~2~~  | ~~`just pre-push` + `just fix` commands~~ done — superseded by .githooks + flake.nix; justfile removed | ~~🔴 High~~ | ~~15min~~ | ~~Process~~ |
+| ~~3~~  | ~~Verify CI green on GitHub (3 jobs)~~ done — CI green across later sessions (latest full run 2026-09-13) | ~~🔴 Critical~~ | ~~10min~~ | ~~CI~~ |
+| ~~4~~  | ~~Write sitemap.go tests~~ done at `9439b33` | ~~🔴 High~~ | ~~1hr~~ | ~~Testing~~ |
+| ~~5~~  | ~~Rename `version` → `buildinfo`~~ **Won't implement — kept internal/version.** | ~~🟡 Medium~~ | ~~30min~~ | ~~Arch~~ |
+| ~~6~~  | ~~Split `handlers_test.go` (667 lines)~~ done — handlers tests split into 9 files | ~~🟡 Medium~~ | ~~1hr~~ | ~~Quality~~ |
+| ~~7~~  | ~~Split `search_test.go` (685 lines)~~ done — search tests split into 3 files | ~~🟡 Medium~~ | ~~1hr~~ | ~~Quality~~ |
+| ~~8~~  | ~~Coverage threshold ≥75% in CI~~ done — test.yml 75% floor | ~~🟡 Medium~~ | ~~15min~~ | ~~CI~~ |
+| ~~9~~  | ~~ADR for DI choice (do vs wire)~~ done — 5 ADRs in docs/adr/; DI documented in AGENTS.md | ~~🟡 Medium~~ | ~~30min~~ | ~~Docs~~ |
+| ~~10~~ | ~~Immutable FileNode (remove setters)~~ done at `d5efa2d` | ~~🟡 Medium~~ | ~~2hr~~ | ~~Arch~~ |
+| ~~11~~ | ~~Replace `cockroachdb/errors` with stdlib~~ **Won't implement — kept cockroachdb/errors.** | ~~🟡 Medium~~ | ~~2hr~~ | ~~Deps~~ |
+| ~~12~~ | ~~Frontmatter typed struct~~ done — Frontmatter struct in internal/domain | ~~🟡 Medium~~ | ~~1hr~~ | ~~Types~~ |
+| ~~13~~ | ~~Split Repository: Reader + Refresher~~ done — kept unified Repository interface; documented in AGENTS.md | ~~🟡 Medium~~ | ~~1hr~~ | ~~Arch~~ |
+| ~~14~~ | ~~HTTP integration tests~~ done — shutdown_integration_test.go + per-endpoint handler tests | ~~🟢 High~~ | ~~3hr~~ | ~~Testing~~ |
+| ~~15~~ | ~~Disk space monitoring~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~🟢 Low~~ | ~~30min~~ | ~~Tooling~~ |
+| ~~16~~ | ~~Middleware chain as slice~~ done — httputil.Chain adopted (Recovery, RequestID, Compression) | ~~🟢 Low~~ | ~~30min~~ | ~~Arch~~ |
+| ~~17~~ | ~~`errgroup` for concurrent ops~~ **Won't implement — no concurrency need surfaced.** | ~~🟢 Low~~ | ~~1hr~~ | ~~Perf~~ |
 | 18 | RSS/Atom feed generation                 | 🟢 Low      | 2hr    | Feature       |
 | 19 | Dark mode CSS toggle                     | 🟢 Low      | 2hr    | UX            |
-| 20 | Prometheus metrics endpoint              | 🟢 Low      | 2hr    | Observability |
+| ~~20~~ | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serving /metrics | ~~🟢 Low~~ | ~~2hr~~ | ~~Observability~~ |
 | 21 | Rate limit search endpoint               | 🟢 Low      | 30min  | Security      |
-| 22 | gzip/brotli compression                  | 🟢 Low      | 30min  | Perf          |
-| 23 | Graceful shutdown tests                  | 🟢 Low      | 1hr    | Testing       |
-| 24 | ETag/If-None-Match                       | 🟢 Low      | 1hr    | Perf          |
+| ~~22~~ | ~~gzip/brotli compression~~ done — httputil.Compression middleware (gzip >512B) | ~~🟢 Low~~ | ~~30min~~ | ~~Perf~~ |
+| ~~23~~ | ~~Graceful shutdown tests~~ done — shutdown_integration_test.go covers drain | ~~🟢 Low~~ | ~~1hr~~ | ~~Testing~~ |
+| ~~24~~ | ~~ETag/If-None-Match~~ done — shipped via httputil.Compression | ~~🟢 Low~~ | ~~1hr~~ | ~~Perf~~ |
 | 25 | Evaluate `wire` as DI replacement        | 🟢 Low      | 2hr    | Arch          |
 
 ---
