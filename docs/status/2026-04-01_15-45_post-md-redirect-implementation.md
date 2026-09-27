@@ -18,7 +18,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Core Features (100% Complete)
 
 | Feature                          | Status | Notes                                 |
-| -------------------------------- | ------ | ------------------------------------- |
+| --- | --- | --- |
 | Markdown rendering with Goldmark | ✅     | Full GFM + extensions                 |
 | Syntax highlighting (Chroma)     | ✅     | 200+ languages                        |
 | D2 diagram support               | ✅     | Server-side SVG rendering             |
@@ -44,7 +44,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Infrastructure (100% Complete)
 
 | Component                | Status | Notes                         |
-| ------------------------ | ------ | ----------------------------- |
+| --- | --- | --- |
 | Docker multi-stage build | ✅     | Distroless nonroot runtime    |
 | GitHub Actions CI/CD     | ✅     | Test, lint, build, smoke test |
 | Multi-arch Docker images | ✅     | linux/amd64 + linux/arm64     |
@@ -55,7 +55,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Code Quality (100% Complete)
 
 | Metric            | Value             | Status |
-| ----------------- | ----------------- | ------ |
+| --- | --- | --- |
 | Test Coverage     | ~80% avg          | ✅     |
 | Linter Compliance | 0 critical issues | ✅     |
 | Parallel Tests    | 100+ functions    | ✅     |
@@ -69,7 +69,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Test Coverage Gaps
 
 | Package              | Coverage      | Target | Gap           |
-| -------------------- | ------------- | ------ | ------------- |
+| --- | --- | --- | --- |
 | `internal/container` | 0.0%          | 75%    | 🔴 Critical   |
 | `internal/content`   | 72.6%         | 80%    | 🟡 Minor      |
 | `internal/domain`    | 75.8%         | 80%    | 🟢 Close      |
@@ -78,7 +78,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Linter Warnings (Non-Critical)
 
 | Issue                        | Count | Severity | Location                                |
-| ---------------------------- | ----- | -------- | --------------------------------------- |
+| --- | --- | --- | --- |
 | `cyclop` complexity 11       | 1     | Low      | `helpers.go:52`                         |
 | `errcheck` unchecked errors  | 2     | Low      | `admonition_extension.go:274-275`       |
 | `exhaustruct` missing fields | 2     | Low      | `admonition.go`, `sitemap.go`           |
@@ -88,7 +88,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Test File Sizes (Need Splitting)
 
 | File               | Lines | Target | Excess  |
-| ------------------ | ----- | ------ | ------- |
+| --- | --- | --- | --- |
 | `handlers_test.go` | 914   | ~400   | +514 🔴 |
 | `search_test.go`   | 685   | ~400   | +285 🟡 |
 | `markdown_test.go` | 611   | ~400   | +211 🟡 |
@@ -199,7 +199,7 @@ The codebase is in excellent shape. No critical issues identified.
 ### 🔴 High Priority (Do First)
 
 | #  | Task                                    | Impact   | Effort | Package              |
-| -- | --------------------------------------- | -------- | ------ | -------------------- |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~Add container package tests~~ done — container_test.go rewritten 2026-09 | ~~Critical~~ | ~~Medium~~ | ~~`internal/container`~~ |
 | ~~2~~  | ~~Address GitHub security vulnerabilities~~ done — govulncheck clean; dependabot configured | ~~High~~ | ~~Low~~ | ~~Dependencies~~ |
 | ~~3~~  | ~~Split `handlers_test.go` (914 lines)~~ done — split into 9 files | ~~High~~ | ~~Medium~~ | ~~`internal/server`~~ |
@@ -214,7 +214,7 @@ The codebase is in excellent shape. No critical issues identified.
 ### 🟡 Medium Priority (Do Soon)
 
 | #  | Task                        | Impact | Effort | Package                       |
-| -- | --------------------------- | ------ | ------ | ----------------------------- |
+| --- | --- | --- | --- | --- |
 | **NOT-DO/DUPLICATE — Dark mode / theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | | |
 | **NOT-DO/DUPLICATE — Add code copy button** canonical entry lives in ROADMAP.md (UI/UX) | | | |
 | **NOT-DO/DUPLICATE — Diagram zoom functionality** canonical entry lives in ROADMAP.md (Rendering & Content) | | | |
@@ -229,7 +229,7 @@ The codebase is in excellent shape. No critical issues identified.
 ### 🟢 Low Priority (Do Later)
 
 | #  | Task                        | Impact | Effort | Package               |
-| -- | --------------------------- | ------ | ------ | --------------------- |
+| --- | --- | --- | --- | --- |
 | **NOT-DO/DUPLICATE — Content analytics** canonical entry lives in ROADMAP.md (Admin & API) | | | |
 | **NOT-DO/DUPLICATE — Plugin system architecture** canonical entry lives in ROADMAP.md (Architecture) | | | |
 | **NOT-DO/DUPLICATE — Internationalization (i18n)** canonical entry lives in ROADMAP.md (Internationalization) | | | |
@@ -263,7 +263,7 @@ The codebase is in excellent shape. No critical issues identified.
 ## Metrics Snapshot
 
 | Metric              | Value                            | Trend        |
-| ------------------- | -------------------------------- | ------------ |
+| --- | --- | --- |
 | Total Lines of Code | ~8,500                           | Stable       |
 | Test Functions      | 100+                             | ⬆️ Growing    |
 | Test Coverage       | 80.3% (server), 84.3% (renderer) | ⬆️ Improving  |

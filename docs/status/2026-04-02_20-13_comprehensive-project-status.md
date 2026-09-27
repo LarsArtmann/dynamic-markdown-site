@@ -71,7 +71,7 @@ The project is **functionally complete and production-capable**. All core featur
 ### Test Coverage (from latest run)
 
 | Package              | Coverage                                                 |
-| -------------------- | -------------------------------------------------------- |
+| --- | --- |
 | `internal/cache`     | **100.0%**                                               |
 | `internal/config`    | **90.5%**                                                |
 | `internal/renderer`  | **84.7%**                                                |
@@ -89,7 +89,7 @@ The project is **functionally complete and production-capable**. All core featur
 The following were planned but only the CI fix was completed:
 
 | # | Task                                                   | Status         |
-| - | ------------------------------------------------------ | -------------- |
+| --- | --- | --- |
 | ~~1~~ | ~~Fix CI: lowercase IMAGE_NAME + digest scan~~ done at `7701c90` | ~~✅ Done~~ |
 | ~~2~~ | ~~Export content helpers (ShouldSkipDir, IsMarkdownFile)~~ done at `0192273` | ~~❌ Not started~~ |
 | ~~3~~ | ~~Deduplicate `getContentType` (server vs content pkg)~~ done at `0192273` | ~~❌ Not started~~ |
@@ -208,7 +208,7 @@ Causes ~50 "compile: version does not match" warnings on every `go test` run. Te
 ## F) TOP 25 THINGS TO DO NEXT (Sorted by Impact × Ease)
 
 | #  | Task                                                                             | Impact      | Effort | Type          |
-| -- | -------------------------------------------------------------------------------- | ----------- | ------ | ------------- |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~**Push the 4 unpushed commits** (CI fix is among them)~~ done — pushed; repo synced with origin | ~~🔴 Critical~~ | ~~1 min~~ | ~~Ops~~ |
 | ~~2~~  | ~~**Upgrade local Go to 1.26.1** (fixes noise, speeds builds)~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.** | ~~🔴 High~~ | ~~5 min~~ | ~~Env~~ |
 | ~~3~~  | ~~**Export content helpers** (`ShouldSkipDir`, `IsMarkdownFile`, `GetContentType`)~~ done at `0192273` | ~~🟡 Medium~~ | ~~15 min~~ | ~~Refactor~~ |
@@ -261,7 +261,7 @@ This is blocking the `just test` command from working without `GOWORK=off` and i
 ## Session Timeline
 
 | Time   | What happened                                                                      |
-| ------ | ---------------------------------------------------------------------------------- |
+| --- | --- |
 | ~18:30 | Investigated CI failures via `gh run list` + `gh run view --log-failed`            |
 | ~18:35 | First CI fix: hardcoded lowercase image name (commit `227f551`)                    |
 | ~18:45 | Full codebase research (41 files read)                                             |

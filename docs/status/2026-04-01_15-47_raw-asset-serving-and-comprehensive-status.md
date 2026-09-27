@@ -22,7 +22,7 @@
 **Solution implemented across 6 files:**
 
 | File                                  | Change                                                                                      |
-| ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| --- | --- |
 | `internal/content/repository.go`      | Added `RawFile` type + `GetRaw(path)` to `Repository` interface                             |
 | `internal/content/filesystem.go`      | `FileSystemRepository.GetRaw()` — resolves URL→FS path, security checks, reads non-md files |
 | `internal/content/blob.go`            | `BlobRepository.GetRaw()` — reads non-md blobs from GCS/S3/Azure                            |
@@ -126,7 +126,7 @@
 ## f) Top 25 Things We Should Get Done Next
 
 | #  | Priority    | Item                                                           | Effort |
-| -- | ----------- | -------------------------------------------------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~1~~  | ~~🔴 Critical~~ **Won't implement — obsolete: GOTOOLCHAIN=auto + Nix manage the toolchain.** | ~~Fix Go 1.26.1/1.26.0 tool version mismatch~~ | ~~S~~ |
 | ~~2~~  | ~~🔴 Critical~~ done at `67f7632` | ~~Tag v0.1.0 release~~ | ~~S~~ |
 | ~~3~~  | ~~🔴 Critical~~ done — workflows green across later sessions | ~~Validate CI pipeline end-to-end with a real PR~~ | ~~M~~ |

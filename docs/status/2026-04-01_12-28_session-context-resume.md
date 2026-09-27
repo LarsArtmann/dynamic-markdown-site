@@ -20,7 +20,7 @@
 ### Core Features (Production-Ready)
 
 | Feature                                | Files                                          | Status                                     |
-| -------------------------------------- | ---------------------------------------------- | ------------------------------------------ |
+| --- | --- | --- |
 | Goldmark markdown rendering            | `renderer/markdown.go`                         | ✅ Full pipeline with extensions           |
 | D2 diagram rendering (server-side SVG) | `renderer/diagrams.go`, `diagram_extension.go` | ✅ AST-based via custom goldmark extension |
 | Mermaid diagram support (client-side)  | `renderer/diagrams.go`                         | ✅ HTML escape + CDN load                  |
@@ -50,7 +50,7 @@
 ### Code Quality (Before Breaking Changes)
 
 | Metric                | Value                   |
-| --------------------- | ----------------------- |
+| --- | --- |
 | Production LOC        | 6,123                   |
 | Test LOC              | 6,807                   |
 | Test/Code ratio       | 1.11:1                  |
@@ -189,7 +189,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Critical (Do First)
 
 | # | Improvement                                                        | Impact                | Effort |
-| - | ------------------------------------------------------------------ | --------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~**Agent coordination protocol** — branch-per-agent or file locking~~ done — auto-commit daemon + pre-push hooks; 2026-04 race era over | ~~Prevents build breaks~~ | ~~Policy~~ |
 | ~~2~~ | ~~Always verify with `go test -count=1 ./...` not just `go build`~~ done — CI + pre-push run full test suite on every push | ~~Catches real errors~~ | ~~Habit~~ |
 | ~~3~~ | ~~AST-based `HasMermaid` — eliminate redundant regex scan~~ done at `69f4db8` | ~~Correctness + perf~~ | ~~30min~~ |
@@ -199,7 +199,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Architecture
 
 | #  | Improvement                                            | Impact                      | Effort |
-| -- | ------------------------------------------------------ | --------------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~6~~  | ~~Rename `version` → `buildinfo`~~ **Won't implement — kept internal/version.** | ~~Eliminates revive exclusion~~ | ~~30min~~ |
 | ~~7~~  | ~~Immutable FileNode (remove setters)~~ done — setters removed; immutable render pipeline | ~~Thread safety~~ | ~~2hr~~ |
 | ~~8~~  | ~~Split Repository into Reader + Refresher~~ done — kept unified Repository interface | ~~Cleaner concerns~~ | ~~1hr~~ |
@@ -210,7 +210,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Process
 
 | #  | Improvement                                   | Impact                  | Effort |
-| -- | --------------------------------------------- | ----------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~12~~ | ~~Pre-push hook (lint + test + build)~~ done — .githooks/pre-push (test + lint) | ~~Prevents broken CI~~ | ~~30min~~ |
 | ~~13~~ | ~~Coverage threshold ≥75% in CI~~ done — test.yml 75% coverage floor | ~~Prevents regression~~ | ~~15min~~ |
 | ~~14~~ | ~~Separate fast test workflow from Docker build~~ done — test.yml + docker.yml + release.yml | ~~Faster PR feedback~~ | ~~Medium~~ |
@@ -219,7 +219,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Library Considerations
 
 | #  | Current              | Alternative               | Why                                 |
-| -- | -------------------- | ------------------------- | ----------------------------------- |
+| --- | --- | --- | --- |
 | ~~16~~ | ~~`samber/do/v2`~~ **Won't implement — staying on samber/do/v2.** | ~~`wire` (compile-time)~~ | ~~Catch DI errors at build time~~ |
 | ~~17~~ | ~~`cockroachdb/errors`~~ **Won't implement — kept cockroachdb/errors.** | ~~stdlib `fmt.Errorf("%w")`~~ | ~~One less dependency~~ |
 | ~~18~~ | ~~`charm.land/log`~~ **Won't implement — kept charm.land/log (slog.Handler).** | ~~`slog` directly~~ | ~~stdlib~~ |
@@ -230,7 +230,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ## F. TOP 25 NEXT ITEMS (Impact/Effort Sort)
 
 | #  | Item                                               | Impact      | Effort | Cat           | Blocking?       |
-| -- | -------------------------------------------------- | ----------- | ------ | ------------- | --------------- |
+| --- | --- | --- | --- | --- | --- |
 | ~~1~~  | ~~Fix broken build (GetRaw implementation)~~ done — GetRaw shipped and compiling (400f046) | ~~🔴 Critical~~ | ~~Varies~~ | ~~Fix~~ | ~~Another agent~~ |
 | ~~2~~  | ~~AST-based HasMermaid detection~~ done at `69f4db8` | ~~🔴 High~~ | ~~30min~~ | ~~Code~~ | ~~No~~ |
 | ~~3~~  | ~~Remove dead diagram code from `diagrams.go`~~ done at `d4065b2` | ~~🟡 Medium~~ | ~~30min~~ | ~~Code~~ | ~~No~~ |
@@ -283,7 +283,7 @@ This decision affects everything else — no other work can proceed while the bu
 ## Environment
 
 | Item        | Value                                        |
-| ----------- | -------------------------------------------- |
+| --- | --- |
 | Go          | 1.26.1 darwin/arm64                          |
 | Disk        | 7.8 GB free / 229 GB (97% full)              |
 | Branch      | `master` (2 commits ahead of origin)         |

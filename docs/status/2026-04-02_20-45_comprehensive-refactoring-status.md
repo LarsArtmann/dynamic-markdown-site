@@ -128,7 +128,7 @@ Significant refactoring work completed across 2 sessions. CI pipeline fixed, cod
 ### Architecture
 
 | Area                     | Issue                                                       | Impact                   | Effort                                       |
-| ------------------------ | ----------------------------------------------------------- | ------------------------ | -------------------------------------------- |
+| --- | --- | --- | --- |
 | `gocloud.dev` dependency | Pulls in Google Cloud SDK, Azure SDK, AWS SDK               | Slow builds, huge binary | Medium — consider interface + plugin pattern |
 | Container tests          | 0.0% coverage on DI container                               | Untested wiring          | Low — straightforward tests                  |
 | Content search           | Linear scan of all files                                    | Poor perf on large repos | Medium — add inverted index                  |
@@ -138,7 +138,7 @@ Significant refactoring work completed across 2 sessions. CI pipeline fixed, cod
 ### Code Quality
 
 | Area                     | Issue                                               | Fix                        |
-| ------------------------ | --------------------------------------------------- | -------------------------- |
+| --- | --- | --- |
 | Domain tree immutability | `SetChildren()` breaks immutability contract        | Remove or make private     |
 | `filterEmptyDirectories` | Returns `bool` AND mutates — confusing              | Split into query + command |
 | `shouldComeAfter` sort   | Unexported, untested                                | Export and test            |
@@ -148,7 +148,7 @@ Significant refactoring work completed across 2 sessions. CI pipeline fixed, cod
 ### DevEx
 
 | Area                             | Issue                           | Fix                                                     |
-| -------------------------------- | ------------------------------- | ------------------------------------------------------- |
+| --- | --- | --- |
 | `GOWORK=off` required            | Parent go.work interferes       | Add project to go.work or use directory-specific config |
 | Go 1.26.0 vs 1.26.1              | Noisy warnings on every build   | Upgrade local Go                                        |
 | No Makefile/Justfile integration | Commands scattered across docs  | Already has justfile — document it                      |
@@ -234,7 +234,7 @@ Lint status: NOT RUN
 ### Modified Files (uncommitted)
 
 | File                                   | Change                                                | Lines   |
-| -------------------------------------- | ----------------------------------------------------- | ------- |
+| --- | --- | --- |
 | `cmd/dynamic-markdown-site/watcher.go` | Use `content.ShouldSkipDir`, `content.IsMarkdownFile` | -13/+6  |
 | `internal/content/blob.go`             | Add `var _ Repository = (*BlobRepository)(nil)`       | +2      |
 | `internal/content/filesystem.go`       | Add `var _ Repository = (*FileSystemRepository)(nil)` | +2      |

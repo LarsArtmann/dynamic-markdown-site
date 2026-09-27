@@ -12,7 +12,7 @@
 ### Admonition Extension (this session)
 
 | Item                        | Details                                                                                                                                              |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- |
 | Goldmark extension          | `internal/renderer/admonition_extension.go` — AST transformer that detects `> [!TYPE]` blockquotes and converts to styled `<div class="admonition">` |
 | 6 alert types               | NOTE (blue), TIP (green), IMPORTANT (purple), WARNING (amber), CAUTION (red), CRITICAL (intense red with glow)                                       |
 | CSS styles                  | `internal/server/static/css/site.css` — 95 lines of themed admonition styles                                                                         |
@@ -23,7 +23,7 @@
 ### Project-Wide (cumulative from all sessions)
 
 | Area                                       | Status                                                                         | Coverage   |
-| ------------------------------------------ | ------------------------------------------------------------------------------ | ---------- |
+| --- | --- | --- |
 | Core server                                | Fully functional — serves markdown as website                                  | —          |
 | Renderer (Goldmark + Chroma)               | 84.3%                                                                          | Tests pass |
 | Server (handlers, routing, middleware)     | 80.3%                                                                          | Tests pass |
@@ -48,7 +48,7 @@
 ## b) PARTIALLY DONE 🔧
 
 | Item                 | What's Done                    | What's Missing                                                                                                        |
-| -------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | Admonition extension | Core parsing + rendering + CSS | Only blockquotes with `[!TYPE]` on first line; no `> [!NOTE]<br>` inline variant; no `!!! note` Python-Markdown style |
 | Features.md          | Comprehensive feature catalog  | Missing admonition/alert block documentation                                                                          |
 | CHANGELOG.md         | v0.1.0 changelog exists        | Needs update for admonition feature                                                                                   |
@@ -66,7 +66,7 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 ## d) TOTALLY FUCKED UP 💥
 
 | Issue                           | Severity | Details                                                                                                                                                      |
-| ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| --- | --- | --- |
 | `.golangci.yml` missing         | MEDIUM   | Referenced in TODO_LIST.md but doesn't exist on disk. Linter config is unversioned or was deleted. CI may run with defaults instead of the 75-linter config. |
 | `container` package 0% coverage | LOW      | `internal/container` shows `coverage: 0.0%` — the DI wiring is completely untested                                                                           |
 | `golangci_lint_ls` stale cache  | LOW      | LSP keeps reporting `undefined: east.RawHTML` at line 157 even after the reference was removed. IDE may show false errors until cache is cleared.            |
@@ -88,7 +88,7 @@ Key gaps: integration tests, Prometheus metrics, admin dashboard, Kubernetes man
 ## f) Top 24 Things We Should Get Done Next
 
 | #  | Priority | Item                                                                              | Effort | Impact                              |
-| -- | -------- | --------------------------------------------------------------------------------- | ------ | ----------------------------------- |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~🔴~~ done — govulncheck findings fixed; dependabot grouped updates (e7bafaf) | ~~**Address GitHub security vulnerabilities** in dependencies (`go vuln check`)~~ | ~~Small~~ | ~~Critical — supply chain~~ |
 | ~~2~~  | ~~🔴~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~**Fix local Go cache corruption** (reported in prior status)~~ | ~~Small~~ | ~~Developer experience~~ |
 | ~~3~~  | ~~🔴~~ done — test.yml regenerates templ and fails on diff | ~~**Add `templ generate` check to CI** — detect stale generated templates~~ | ~~Small~~ | ~~Prevents silent breakage~~ |

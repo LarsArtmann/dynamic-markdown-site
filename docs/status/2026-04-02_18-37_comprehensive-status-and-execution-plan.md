@@ -15,7 +15,7 @@
 ## a) FULLY DONE
 
 | #  | What                                                                | Commit               | Impact                              |
-| -- | ------------------------------------------------------------------- | -------------------- | ----------------------------------- |
+| --- | --- | --- | --- |
 | 1  | Lint fixes across renderer, content, sitemap, config                | `b4e23b6`, `24b0195` | Zero lint issues achieved           |
 | 2  | `domain.Renderer` interface introduced                              | `4233fdc`            | Dependency inversion for rendering  |
 | 3  | `RenderedContent` struct + `NewRenderedFileWithContent` constructor | `4233fdc`            | Type-safe rendered output           |
@@ -35,7 +35,7 @@
 ## b) PARTIALLY DONE
 
 | # | What                             | Status                               | Remaining                                                                            |
-| - | -------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~Split brain elimination~~ done at `0192273`, ` 983431f` | ~~**0 of 4 fixed**~~ | ~~`skipDirs`, `isMarkdownFile`, `getContentType`, `SuggestedPath` all still duplicated~~ |
 | ~~2~~ | ~~Ghost code cleanup~~ done — deleted in 8906c10; internal/test provides the helpers | ~~**1 of 2 fixed**~~ | ~~`SimpleRenderer` deleted; `testutil/` still exists (0 imports)~~ |
 | ~~3~~ | ~~`cache.GetOrCompute` integration~~ done at `983431f` | ~~**Method exists but unused**~~ | ~~`render.go` still does manual Get/Set pattern~~ |
@@ -47,7 +47,7 @@
 ## c) NOT STARTED
 
 | #  | What                                                                 | Priority        |
-| -- | -------------------------------------------------------------------- | --------------- |
+| --- | --- | --- |
 | ~~1~~  | ~~Container DI tests~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor | ~~Medium~~ |
 | ~~2~~  | ~~E2E diagram rendering tests~~ done — diagram pipeline covered by renderer tests (diagrams_test.go, markdown_edge_test.go) | ~~Medium~~ |
 | ~~3~~  | ~~Dependabot fix (grpc auth bypass CVE)~~ done — google.golang.org/grpc at v1.83.2 in go.mod | ~~HIGH — security~~ |
@@ -64,7 +64,7 @@
 ## d) TOTALLY FUCKED UP
 
 | # | What                          | Severity  | Details                                                                                                                                                                 |
-| - | ----------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- | --- |
 | 1 | **Disk space**                | CRITICAL  | 229GB disk at 98%. Go build cache cleared 3x today. Tests can't run when disk < 2GB. This is the #1 blocker for ALL development.                                        |
 | 2 | **Stale LSP diagnostics**     | ANNOYING  | gopls shows phantom errors in `container.go:192` and `errors.go:35,71` — code is correct, but LSP cache is corrupted. Requires `templ generate` + LSP restart to clear. |
 | 3 | **Go build cache corruption** | RECURRING | Cache gets corrupted when disk hits 100%. Had to `go clean -cache` three times today. Each rebuild takes 3-5 minutes.                                                   |
@@ -99,7 +99,7 @@
 ## f) Top 25 Things To Do Next (Sorted by Impact / Effort)
 
 | Priority | Task                                                                        | Effort | Impact   | Why                                            |
-| -------- | --------------------------------------------------------------------------- | ------ | -------- | ---------------------------------------------- |
+| --- | --- | --- | --- | --- |
 | ~~**1**~~ | ~~**Free disk space (minimum 10GB)**~~ done — environment resolved; build/test/lint green 2026-09 | | | |
 | ~~**2**~~ | ~~**Git push** (1 commit ahead)~~ done — repo synced with origin | | | |
 | ~~**3**~~ | ~~**Dependabot: update grpc** (CVE auth bypass)~~ done — google.golang.org/grpc at v1.83.2 | | | |

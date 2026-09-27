@@ -12,7 +12,7 @@
 The 12-item execution plan from the deep-reflection session is **fully complete**. All code changes are committed and build/test cleanly locally. However, **CI is RED** — the latest push (commit `88e3367`) has **26 lint errors** and a security scan failure. This is the single most urgent issue blocking the project.
 
 | Metric       | Status                                                |
-| ------------ | ----------------------------------------------------- |
+| --- | --- |
 | Build        | ✅ `go build ./...` passes                            |
 | Tests        | ✅ All 9 packages pass, 0 failures                    |
 | Vet          | ✅ `go vet ./...` clean                               |
@@ -28,7 +28,7 @@ The 12-item execution plan from the deep-reflection session is **fully complete*
 ### 12-Item Execution Plan (100% Complete)
 
 | #  | Commit    | What                                                                        |
-| -- | --------- | --------------------------------------------------------------------------- |
+| --- | --- | --- |
 | 1  | planning  | Reflected on mistakes, created prioritized execution plan                   |
 | 2  | `400f046` | Reverted unsafe `.md` fallback hack (type assertion + shadowing)            |
 | 3  | `0148795` | Root cause fix: `FileSystemRepository` strips `.md` from URL paths          |
@@ -117,7 +117,7 @@ The latest CI run (`23851819894`) **failed** with 26 lint errors. Build and test
 **Breakdown by linter:**
 
 | Linter             | Count | Files                                                                                        |
-| ------------------ | ----- | -------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | `noctx`            | 7     | `sitemap_test.go` — `NewRequest` instead of `NewRequestWithContext`                          |
 | `golines`          | 4     | `admonition_extension.go`, `admonition_extension_test.go`, `diagram_extension.go`, `file.go` |
 | `revive`           | 4     | `admonition_extension.go` — missing comments on exports, unused param                        |
@@ -172,7 +172,7 @@ Ordered by impact-to-effort ratio. Fix CI first, then improve quality, then add 
 ### Tier 1: Fix CI (CRITICAL — do today)
 
 | # | Task                                                                                                | Effort | Impact              |
-| - | --------------------------------------------------------------------------------------------------- | ------ | ------------------- |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~Fix 26 CI lint errors (noctx, golines, revive, errcheck, exhaustruct, goconst, funlen, testifylint)~~ done — golangci-lint 0 issues since 2026-09-13 | ~~15 min~~ | ~~Unblocks CI~~ |
 | ~~2~~ | ~~Add golangci-lint exclusion rules for intentional globals (`hasMermaidKey`, `alertTitles`)~~ done — intentional globals carry nolint with rationale | ~~5 min~~ | ~~Clean lint~~ |
 | ~~3~~ | ~~Add `golines` to CI pipeline or pre-push hook to prevent formatting drift~~ done — golangci-lint enforces golines; pre-commit hook added | ~~10 min~~ | ~~Prevents recurrence~~ |
@@ -182,7 +182,7 @@ Ordered by impact-to-effort ratio. Fix CI first, then improve quality, then add 
 ### Tier 2: Quality (do this week)
 
 | #  | Task                                                          | Effort | Impact              |
-| -- | ------------------------------------------------------------- | ------ | ------------------- |
+| --- | --- | --- | --- |
 | ~~6~~  | ~~Add integration tests for HTTP → markdown → HTML pipeline~~ done — shutdown_integration_test.go + per-endpoint tests | ~~2h~~ | ~~Confidence~~ |
 | ~~7~~  | ~~Add graceful shutdown tests~~ done — shutdown_integration_test.go covers drain | ~~30 min~~ | ~~Coverage~~ |
 | ~~8~~  | ~~Add rate limiter tests~~ done — ratelimit_test.go + refresh_test.go | ~~30 min~~ | ~~Coverage~~ |
@@ -196,7 +196,7 @@ Ordered by impact-to-effort ratio. Fix CI first, then improve quality, then add 
 ### Tier 3: Features (do next sprint)
 
 | #  | Task                                                            | Effort | Impact                |
-| -- | --------------------------------------------------------------- | ------ | --------------------- |
+| --- | --- | --- | --- |
 | **NOT-DO/DUPLICATE — Dark mode CSS + theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | |
 | **NOT-DO/DUPLICATE — Code copy button on code blocks** canonical entry lives in ROADMAP.md (UI/UX) | | |
 | **NOT-DO/DUPLICATE — RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | | |
@@ -289,7 +289,7 @@ sitemap_test.go:244 use assert.InEpsilon instead of direct float compare
 ## Test Coverage by Package
 
 | Package                     | Coverage | Lines of Code |
-| --------------------------- | -------- | ------------- |
+| --- | --- | --- |
 | `internal/cache`            | 100.0%   | ~200          |
 | `internal/config`           | 90.5%    | ~300          |
 | `internal/renderer`         | 84.3%    | ~600          |

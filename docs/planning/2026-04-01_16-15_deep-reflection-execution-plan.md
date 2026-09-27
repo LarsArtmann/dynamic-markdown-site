@@ -61,7 +61,7 @@
 ### g) Ghost Systems Found
 
 | Ghost System                 | Location                   | Value?                                                    | Action                          |
-| ---------------------------- | -------------------------- | --------------------------------------------------------- | ------------------------------- |
+| --- | --- | --- | --- |
 | `testutil` package (3 files) | `internal/testutil/`       | **Has value** — good test infrastructure, just unused     | Integrate or delete             |
 | `cache.GetOrCompute()`       | `cache/html.go:47`         | **Has value** — atomic cache-or-render, prevents stampede | Integrate into `render.go`      |
 | `SimpleRenderer`             | `renderer/markdown.go:270` | **No value** — only used in own test                      | Delete                          |
@@ -85,7 +85,7 @@
 ### j) Split Brains Found
 
 | Split Brain          | Location A                 | Location B                   | Fix                                        |
-| -------------------- | -------------------------- | ---------------------------- | ------------------------------------------ |
+| --- | --- | --- | --- |
 | `SuggestedPath` type | `server/suggestions.go:14` | `templates/layout.templ:290` | Single type in `domain/`                   |
 | `skipDirs` list      | `content/helpers.go:14`    | `watcher.go:134`             | Export from `content/`                     |
 | `isMarkdownFile`     | `content/helpers.go:46`    | `watcher.go:164`             | Already exported from `content/`           |
@@ -154,7 +154,7 @@ graph TD
 Sorted by importance/impact/effort/customer-value.
 
 | #  | Task                                                                                                                                 | Effort | Impact                                | Customer Value                 |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------------------------------------- | ------------------------------ |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~Fix all 18 local lint errors (noctx, golines, revive, errcheck, exhaustruct, goconst, funlen, testifylint, gochecknoglobals, cyclop)~~ done — golangci-lint 0 issues since 2026-09-13 | ~~45 min~~ | ~~🔴 Unblocks CI~~ | ~~Users get working diagrams~~ |
 | ~~2~~  | ~~Wire DI renderer into server: NewServer accepts `Renderer` interface, container passes diagram-enabled renderer~~ done at `4233fdc` | ~~60 min~~ | ~~🔴 Fixes broken diagrams~~ | ~~Diagrams work in production~~ |
 | ~~3~~  | ~~Add E2E test: HTTP → diagram markdown → rendered SVG/mermaid output~~ done — renderer tests cover the diagram pipeline end to end | ~~45 min~~ | ~~🔴 Prevents regression~~ | ~~Confidence in diagram feature~~ |
@@ -187,7 +187,7 @@ Sorted by importance/impact/effort/customer-value.
 Sorted by importance/impact/effort. Each task is a single self-contained commit.
 
 | #  | Task                                                                                    | Parent | Est    | Impact |
-| -- | --------------------------------------------------------------------------------------- | ------ | ------ | ------ |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~Fix `sitemap_test.go`: replace `NewRequest` → `NewRequestWithContext` (7 call sites)~~ done — golangci-lint 0 issues since 2026-09-13 | ~~T1~~ | ~~8 min~~ | ~~🔴~~ |
 | ~~2~~  | ~~Fix `golines` formatting: `file.go:130`~~ done — golangci-lint 0 issues since 2026-09-13 | ~~T1~~ | ~~3 min~~ | ~~🔴~~ |
 | ~~3~~  | ~~Fix `golines` formatting: `admonition_extension.go`~~ done — golangci-lint 0 issues since 2026-09-13 | ~~T1~~ | ~~3 min~~ | ~~🔴~~ |
@@ -359,7 +359,7 @@ The `GoldmarkRenderer` already satisfies this interface. No wrapper needed.
 ## Customer Value Mapping
 
 | Task                | How It Creates Customer Value                                            |
-| ------------------- | ------------------------------------------------------------------------ |
+| --- | --- |
 | Fix CI lint         | Green CI → faster iteration → fewer bugs shipped                         |
 | Wire DI renderer    | **Diagrams render in production** — the #1 advertised feature was broken |
 | Delete dead code    | Faster builds, less confusion, easier onboarding                         |

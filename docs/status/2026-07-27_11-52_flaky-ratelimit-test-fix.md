@@ -113,7 +113,7 @@ time-based tests. 10. Add a regression guard: a `testing.Short()` skip or a stre
 (`-count=100`) in CI for the concurrent test to catch future drift. 11. Document the token-bucket refill rate formula in the `rateLimiter` doc
 comment (one line) so future readers don't mis-derive the refill speed. 12. Review whether `burst = maxRequests` is the intended semantics (burst equals
 the per-window cap) vs. a smaller burst + steady refill.
-   _Resolutions (2026-09-27 docs-health pass): 7 done — swept in the 2026-07-27 16:41 session; 8 open (TODO_LIST "test that intentionally exercises token refill"); 9 **Won't implement — decided 2026-07-27: keep `newBurstOnlyLimiter`; `x/time/rate` has no clock seam (YAGNI).**; 10 open (TODO_LIST "`-count` repetition guard"); 11 done — token-bucket formula documented on the `rateLimiter` type; 12 open (TODO_LIST burst-semantics decision / ROADMAP Open Questions)._
+   _Resolutions (2026-09-27 docs-health pass): 7 done — swept in the 2026-07-27 16:41 session; 8 open (TODO_LIST "test that intentionally exercises token refill"); 9 **Won't implement — decided 2026-07-27: keep `newBurstOnlyLimiter`; `x/time/rate` has no clock seam (YAGNI).**; 10 open (TODO_LIST "`-count` repetition guard"); 11 open (no formula doc comment on `rateLimiter` yet; tracked via TODO_LIST burst-semantics item); 12 open (TODO_LIST burst-semantics decision / ROADMAP Open Questions)._
 
 **General test-suite health (noticed, not investigated):** 13. The `internal/container` package takes ~7.9s under race — investigate
 whether DI container tests can be sped up. 14. Add a CI step that runs flaky-prone tests with `-count` repetition. 15. Add a project-wide lint gate that fails CI on `golangci-lint` findings.

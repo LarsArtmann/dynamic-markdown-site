@@ -9,7 +9,7 @@
 ## System State at Time of Report
 
 | Metric               | Value                                              | Status                                    |
-| -------------------- | -------------------------------------------------- | ----------------------------------------- |
+| --- | --- | --- |
 | System load          | **337/335/332** (1/5/15 min)                       | 🔴 CRITICAL — ~50x overcommit on ~8 cores |
 | Disk usage           | **96% (218G/229G)**                                | 🔴 CRITICAL — 12GB free                   |
 | Memory pressure      | High — 3,782 free pages (58MB) of 16384-byte pages | 🔴 CRITICAL                               |
@@ -196,7 +196,7 @@
 ### Critical (Fix Now)
 
 | # | Area   | Issue                                                          | Impact             | Effort |
-| - | ------ | -------------------------------------------------------------- | ------------------ | ------ |
+| --- | --- | --- | --- | --- |
 | ~~1~~ | ~~System~~ done — environment resolved; cache/load issues gone with the 2026-04 macOS setup | ~~Reboot to fix cache corruption and reduce load~~ | ~~Everything blocked~~ | ~~2 min~~ |
 | ~~2~~ | ~~Disk~~ done — environment resolved; disk healthy | ~~Free up 50GB+ — clean Go cache, Docker images, build artifacts~~ | ~~System stability~~ | ~~10 min~~ |
 | ~~3~~ | ~~Push~~ done — pushed; repo synced with origin | ~~3 unpushed commits risk data loss~~ | ~~Data safety~~ | ~~1 min~~ |
@@ -204,7 +204,7 @@
 ### High Priority (Fix This Week)
 
 | # | Area       | Issue                                   | Impact                           | Effort |
-| - | ---------- | --------------------------------------- | -------------------------------- | ------ |
+| --- | --- | --- | --- | --- |
 | ~~4~~ | ~~Go version~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.** | ~~Upgrade local to 1.26.1~~ | ~~Eliminates ~50 warnings~~ | ~~5 min~~ |
 | ~~5~~ | ~~go.work~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~Add project to `~/projects/go.work`~~ | ~~Removes `GOWORK=off` requirement~~ | ~~2 min~~ |
 | ~~6~~ | ~~Deps~~ done — gocloud.dev retained; blob storage is a shipped feature | ~~Evaluate removing `gocloud.dev`~~ | ~~200MB+ build time reduction~~ | ~~Medium~~ |
@@ -214,7 +214,7 @@
 ### Medium Priority (Fix This Month)
 
 | #  | Area    | Issue                                                  | Impact                         | Effort  |
-| -- | ------- | ------------------------------------------------------ | ------------------------------ | ------- |
+| --- | --- | --- | --- | --- |
 | ~~9~~  | ~~Domain~~ done — setters removed; immutable render pipeline | ~~Remove `SetChildren()` or make private~~ | ~~Immutability contract~~ | ~~Trivial~~ |
 | ~~10~~ | ~~Domain~~ done — sorted rendering via node ordering; tests green | ~~Export and test `shouldComeAfter`~~ | ~~Sort correctness~~ | ~~Low~~ |
 | ~~11~~ | ~~Content~~ done — filter logic split by concern | ~~Split `filterEmptyDirectories` into query+command~~ | ~~Clarity~~ | ~~Low~~ |
@@ -226,7 +226,7 @@
 ### Low Priority (Nice to Have)
 
 | #  | Area     | Issue                                      |
-| -- | -------- | ------------------------------------------ |
+| --- | --- | --- |
 | ~~16~~ | ~~Features~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented) | ~~ETag/If-None-Match HTTP caching~~ |
 | ~~17~~ | ~~Features~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~RSS/Atom feed generation~~ |
 | ~~18~~ | ~~Features~~ done — sitemap.xml shipped (4c21153) | ~~sitemap.xml for SEO~~ |
@@ -291,7 +291,7 @@
 The machine has been at 300+ load average across all three sessions today. This is ~40x the number of CPU cores. The top processes are:
 
 | Process         | CPU         | Memory | Notes                                                   |
-| --------------- | ----------- | ------ | ------------------------------------------------------- |
+| --- | --- | --- | --- |
 | iTerm2          | 126%        | 693MB  | Likely rendering massive scrollback from this session   |
 | WindowServer    | 53%         | 140MB  | macOS display server — high load from all the rendering |
 | Go compile (×6) | ~100% total | ~800MB | Full recompilation from cache corruption                |

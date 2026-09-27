@@ -20,7 +20,7 @@ The `dynamic-markdown-site` project is in **good working shape**. All recent com
 ### CI Pipeline Fixes (Primary Objective — COMPLETE)
 
 | What                           | Commit    | Detail                                                                                           |
-| ------------------------------ | --------- | ------------------------------------------------------------------------------------------------ |
+| --- | --- | --- |
 | `.golangci.yml` exclusion gaps | `06de1c8` | Fixed config.go cyclop, blob.go gocognit, version.go revive; removed dead `pkg/errors` exclusion |
 | `diagramNode` exhaustruct fix  | `6c0423c` | Added `BaseBlock: ast.BaseBlock{}` initialization                                                |
 | `config.go` cyclop reduction   | `fd89f13` | Decomposed `Load()` into 4 focused methods                                                       |
@@ -33,7 +33,7 @@ The `dynamic-markdown-site` project is in **good working shape**. All recent com
 ### Features Added and Verified Working
 
 | Feature                   | Files                                       | Status                            |
-| ------------------------- | ------------------------------------------- | --------------------------------- |
+| --- | --- | --- |
 | robots.txt endpoint       | `server/robots.go`, `server/robots_test.go` | ✅ Dynamic sitemap URL            |
 | sitemap.xml endpoint      | `server/sitemap.go`                         | ✅ Priority/changetime heuristics |
 | Draft content filtering   | `content/draft.go`, `content/filesystem.go` | ✅ YAML `draft: true`             |
@@ -45,7 +45,7 @@ The `dynamic-markdown-site` project is in **good working shape**. All recent com
 ### Code Quality Metrics
 
 | Metric               | Value                       |
-| -------------------- | --------------------------- |
+| --- | --- |
 | Production LOC       | 4,607                       |
 | Test LOC             | 6,716                       |
 | Test/Code ratio      | 1.46:1                      |
@@ -137,7 +137,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Process
 
 | # | Improvement                                   | Impact                    | Effort |
-| - | --------------------------------------------- | ------------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~Pre-push hook (lint + test)~~ done — .githooks/pre-push (test + lint) | ~~Prevents broken CI~~ | ~~30min~~ |
 | ~~2~~ | ~~`just pre-push` and `just fix` commands~~ done — pre-push hook covers it; justfile removed for flake.nix | ~~Standardized verification~~ | ~~15min~~ |
 | ~~3~~ | ~~Separate fast test workflow from Docker build~~ done — test.yml + docker.yml + release.yml | ~~Faster PR feedback~~ | ~~Medium~~ |
@@ -147,7 +147,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Architecture
 
 | #  | Improvement                                     | Impact                      | Effort |
-| -- | ----------------------------------------------- | --------------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~6~~  | ~~Rename `version` → `buildinfo`~~ **Won't implement — kept internal/version.** | ~~Eliminates revive exclusion~~ | ~~30min~~ |
 | ~~7~~  | ~~Immutable FileNode (remove setters)~~ done — setters removed; immutable render pipeline (CHANGELOG 0.1.0) | ~~Thread safety~~ | ~~2hr~~ |
 | ~~8~~  | ~~Split Repository into Reader + Refresher~~ done — Repository interface kept unified; refresh via Refresh() | ~~Cleaner concerns~~ | ~~1hr~~ |
@@ -157,7 +157,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Library Considerations
 
 | #  | Current              | Alternative                              | Why                                    |
-| -- | -------------------- | ---------------------------------------- | -------------------------------------- |
+| --- | --- | --- | --- |
 | ~~11~~ | ~~`samber/do/v2`~~ **Won't implement — staying on samber/do/v2; DI pattern documented in AGENTS.md.** | ~~`wire` (compile-time)~~ | ~~Catch DI errors at build time~~ |
 | ~~12~~ | ~~`cockroachdb/errors`~~ **Won't implement — kept cockroachdb/errors for stack traces.** | ~~stdlib `fmt.Errorf("%w")` + custom types~~ | ~~One less dependency; stdlib sufficient~~ |
 | ~~13~~ | ~~`charm.land/log`~~ **Won't implement — kept charm.land/log (implements slog.Handler).** | ~~`slog` directly~~ | ~~stdlib; one less dependency~~ |
@@ -167,7 +167,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ### Type Model Improvements
 
 | #  | Improvement                                            | Detail                             |
-| -- | ------------------------------------------------------ | ---------------------------------- |
+| --- | --- | --- |
 | ~~16~~ | ~~`domain.HTML` with methods~~ done — domain.HTML ships; methods unnecessary so far | ~~`String()`, `Len()`, `IsZero()`~~ |
 | ~~17~~ | ~~`RenderedContent` as immutable~~ done — RenderedFile immutable via NewRenderedFileWithContent (4233fdc) | ~~Return interface, prevent mutation~~ |
 | ~~18~~ | ~~`ContentNode` with `Children()` on both dirs and files~~ done — ContentTree with Find/AllPaths map index (0192273) | ~~Eliminate type switches~~ |
@@ -179,7 +179,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ## F. TOP 25 NEXT ITEMS (Impact/Effort Sort)
 
 | #  | Item                                     | Impact      | Effort | Cat           |
-| -- | ---------------------------------------- | ----------- | ------ | ------------- |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~Pre-push hook (lint + test)~~ done — .githooks/pre-push (test + lint) | ~~🔴 Critical~~ | ~~30min~~ | ~~Process~~ |
 | ~~2~~  | ~~`just pre-push` + `just fix` commands~~ done — superseded by .githooks + flake.nix; justfile removed | ~~🔴 High~~ | ~~15min~~ | ~~Process~~ |
 | ~~3~~  | ~~Verify CI green on GitHub (3 jobs)~~ done — CI green across later sessions (latest full run 2026-09-13) | ~~🔴 Critical~~ | ~~10min~~ | ~~CI~~ |
@@ -213,7 +213,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 **Should this project stay with `samber/do/v2` or migrate to Google `wire` for compile-time DI?**
 
 | `samber/do/v2` (current)     | `wire` (alternative)               |
-| ---------------------------- | ---------------------------------- |
+| --- | --- |
 | Runtime DI — flexible        | **Compile-time** — errors at build |
 | No code gen step             | Requires `wire` code gen           |
 | Graceful shutdown built-in   | Manual shutdown orchestration      |
@@ -227,7 +227,7 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 ## Environment
 
 | Item        | Value                             |
-| ----------- | --------------------------------- |
+| --- | --- |
 | Go          | 1.26.1 darwin/arm64               |
 | Disk        | 6.9GB free / 229GB                |
 | Branch      | `master` (up to date with origin) |

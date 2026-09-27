@@ -130,7 +130,7 @@ The project is in a **functionally complete but environment-blocked state**. The
 ### 2. System Resources — CRITICAL 🔴
 
 | Metric       | Value                          | Status                  |
-| ------------ | ------------------------------ | ----------------------- |
+| --- | --- | --- |
 | Disk         | 215G/229G used (14G free, 94%) | 🔴 Critical             |
 | Load Average | 397 / 342 / 249                | 🔴 Extremely overloaded |
 | RAM          | 24 GB (unknown usage)          | ⚠️ Unknown               |
@@ -178,7 +178,7 @@ A `go.work` file in a parent directory adds sibling modules causing Go version c
 ## F) TOP #25 THINGS TO DO NEXT
 
 | #  | Priority | Task                                                                                 | Effort | Impact                  |
-| -- | -------- | ------------------------------------------------------------------------------------ | ------ | ----------------------- |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~🔴 P0~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~**Reboot machine** — fix Go cache corruption & load average~~ | ~~5 min~~ | ~~Unblocks everything~~ |
 | ~~2~~  | ~~🔴 P0~~ done — build + tests green 2026-09 | ~~**Verify build + tests pass** after reboot~~ | ~~5 min~~ | ~~Confidence~~ |
 | ~~3~~  | ~~🔴 P0~~ done — golangci-lint 0 issues since 2026-09-13 | ~~**Run golangci-lint** — fix any issues~~ | ~~10 min~~ | ~~Zero lint errors~~ |

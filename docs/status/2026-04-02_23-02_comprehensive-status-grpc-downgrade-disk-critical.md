@@ -17,7 +17,7 @@
 ### Committed & Pushed to origin/master
 
 | # | Commit        | Task                                               | Status   |
-| - | ------------- | -------------------------------------------------- | -------- |
+| --- | --- | --- | --- |
 | 1 | `8906c10`     | Delete testutil package (ghost, 0 imports)         | **DONE** |
 | 2 | Prior session | Unify skipDirs list (content vs watcher)           | **DONE** |
 | 3 | Prior session | Unify isMarkdownFile (content vs watcher)          | **DONE** |
@@ -52,7 +52,7 @@
 ## b) PARTIALLY DONE
 
 | Task                             | What's Done                                                | What's Missing                                                                                                                                                                                                                 |
-| -------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| --- | --- | --- |
 | **grpc/Dependabot security fix** | go.mod changed from v1.77.0 to v1.68.1                     | **DOWNGRADED instead of upgraded.** The Dependabot alert was for v1.77.0 or earlier. The fix should upgrade to latest (v1.80+). Current v1.68.1 is WORSE. Need `go get google.golang.org/grpc@latest && go mod tidy`.          |
 | **Build/Test/Lint verification** | Code changes compile-tested in prior session before commit | **Not verified this session.** Go build cache was corrupted then cleared. Disk at 99.9% prevents rebuilding (6.3GB module cache + 1.8GB build cache). No `go build`, `go test`, or `golangci-lint` has completed this session. |
 | **Status docs cleanup**          | 17 status docs exist in `docs/status/` (3,759 lines)       | Most are stale session artifacts. Only 2-3 have lasting value. Should be archived/deleted.                                                                                                                                     |
@@ -130,7 +130,7 @@ Additionally, `go mod tidy` pulled in gocloud.dev v0.40.0 (down from v0.45.0) an
 **Severity: ENVIRONMENT BLOCKER**
 
 | Path                                          | Size       |
-| --------------------------------------------- | ---------- |
+| --- | --- |
 | Go module cache (`~/go/pkg/mod/`)             | 6.3GB      |
 | Go build cache (`~/Library/Caches/go-build/`) | 1.8GB      |
 | **Total recoverable**                         | **~8.1GB** |
@@ -193,7 +193,7 @@ The previous session's comprehensive context document is accurate but highlights
 Sorted by **impact × urgency / effort**:
 
 | #  | Task                                                                   | Impact   | Effort | Why                                            |
-| -- | ---------------------------------------------------------------------- | -------- | ------ | ---------------------------------------------- |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~**Free disk space** (`go clean -modcache`)~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~CRITICAL~~ | ~~1 min~~ | ~~Unblocks everything~~ |
 | ~~2~~  | ~~**Fix grpc dependency** — upgrade to latest, not downgrade~~ done — google.golang.org/grpc at v1.83.2 in go.mod | ~~HIGH~~ | ~~5 min~~ | ~~Security vulnerability is LIVE on master~~ |
 | ~~3~~  | ~~**Verify build passes** (`GOWORK=off go build ./...`)~~ done — go build ./... passes | ~~HIGH~~ | ~~5 min~~ | ~~Confirm code health~~ |
@@ -248,7 +248,7 @@ For a **markdown-to-HTML web server**, this is enormous dependency overhead. The
 ## Environment State
 
 | Metric           | Value                                                  |
-| ---------------- | ------------------------------------------------------ |
+| --- | --- |
 | Disk free        | **2.1GB / 229GB (99.9% full)**                         |
 | Go version       | 1.26.1 darwin/arm64                                    |
 | Go module cache  | 6.3GB                                                  |
@@ -262,7 +262,7 @@ For a **markdown-to-HTML web server**, this is enormous dependency overhead. The
 ## Key Commits (Recent)
 
 | Hash      | Message                                                                       |
-| --------- | ----------------------------------------------------------------------------- |
+| --- | --- |
 | `983431f` | refactor: consolidate domain types and improve content rendering architecture |
 | `8906c10` | refactor: remove testutil package and update linter config                    |
 | `ba6eae6` | docs(status): full comprehensive status                                       |
@@ -271,7 +271,7 @@ For a **markdown-to-HTML web server**, this is enormous dependency overhead. The
 ## Go Module State
 
 | Dependency                                 | Version | Note                                              |
-| ------------------------------------------ | ------- | ------------------------------------------------- |
+| --- | --- | --- |
 | `google.golang.org/grpc`                   | v1.68.1 | **DOWNGRADED** from v1.77.0 — needs fix           |
 | `gocloud.dev`                              | v0.40.0 | **DOWNGRADED** from v0.45.0 — investigate removal |
 | `go.opentelemetry.io/contrib/.../otelgrpc` | v0.58.0 | Updated transitively                              |

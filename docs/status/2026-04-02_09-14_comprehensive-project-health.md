@@ -25,7 +25,7 @@ The project is **production-ready** and exceeds industry standards for Go projec
 ### Core Features (100% Complete)
 
 | Feature                          | Status | Evidence                        |
-| -------------------------------- | ------ | ------------------------------- |
+| --- | --- | --- |
 | Markdown rendering with Goldmark | ✅     | `internal/renderer/markdown.go` |
 | Syntax highlighting (Chroma)     | ✅     | Integrated in renderer          |
 | D2 diagram support               | ✅     | Server-side SVG rendering       |
@@ -51,7 +51,7 @@ The project is **production-ready** and exceeds industry standards for Go projec
 ### Quality Metrics (Industry-Leading)
 
 | Metric            | Value     | Status           |
-| ----------------- | --------- | ---------------- |
+| --- | --- | --- |
 | **Linter Issues** | **0**     | ✅ **Perfect**   |
 | Test Coverage     | ~80% avg  | ✅ Excellent     |
 | Race Detection    | Clean     | ✅ Verified      |
@@ -62,7 +62,7 @@ The project is **production-ready** and exceeds industry standards for Go projec
 ### Infrastructure (Production-Ready)
 
 | Component                | Status | Details                  |
-| ------------------------ | ------ | ------------------------ |
+| --- | --- | --- |
 | Docker multi-stage build | ✅     | Distroless nonroot       |
 | GitHub Actions CI/CD     | ✅     | Test, lint, build, smoke |
 | Multi-arch images        | ✅     | amd64 + arm64            |
@@ -78,7 +78,7 @@ The project is **production-ready** and exceeds industry standards for Go projec
 ### Test Coverage Analysis
 
 | Package              | Coverage | Status       | Gap                |
-| -------------------- | -------- | ------------ | ------------------ |
+| --- | --- | --- | --- |
 | `internal/cache`     | 100%     | ✅ Perfect   | None               |
 | `internal/config`    | 90.5%    | ✅ Excellent | Minor              |
 | `internal/content`   | 72.6%    | 🟡 Good      | Content indexing   |
@@ -93,7 +93,7 @@ The project is **production-ready** and exceeds industry standards for Go projec
 ### Documentation Status
 
 | Document                      | Status         | Last Updated      |
-| ----------------------------- | -------------- | ----------------- |
+| --- | --- | --- |
 | README.md                     | ✅ Complete    | Recently          |
 | CHANGELOG.md                  | ✅ Complete    | v0.1.0            |
 | FEATURES.md                   | ✅ Complete    | Admonitions added |
@@ -229,7 +229,7 @@ cacheHitRatio := prometheus.NewGauge(...)
 #### 5. Split Oversized Test Files
 
 | File               | Lines | Target |
-| ------------------ | ----- | ------ |
+| --- | --- | --- |
 | `handlers_test.go` | 914   | 400    |
 | `search_test.go`   | 685   | 400    |
 | `markdown_test.go` | 611   | 400    |
@@ -294,7 +294,7 @@ cacheHitRatio := prometheus.NewGauge(...)
 ### 🔴 High Priority
 
 | #  | Task                                 | Impact   | Effort | Owner |
-| -- | ------------------------------------ | -------- | ------ | ----- |
+| --- | --- | --- | --- | --- |
 | ~~1~~  | ~~Integration test suite~~ done — shutdown_integration_test.go + per-endpoint tests | ~~Critical~~ | ~~High~~ | ~~TBD~~ |
 | ~~2~~  | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | ~~High~~ | ~~Medium~~ | ~~TBD~~ |
 | ~~3~~  | ~~Request timing middleware~~ done — responsetime.go sets X-Response-Time | ~~High~~ | ~~Low~~ | ~~TBD~~ |
@@ -309,7 +309,7 @@ cacheHitRatio := prometheus.NewGauge(...)
 ### 🟡 Medium Priority
 
 | #  | Task                        | Impact | Effort | Owner |
-| -- | --------------------------- | ------ | ------ | ----- |
+| --- | --- | --- | --- | --- |
 | **NOT-DO/DUPLICATE — Search autocomplete** canonical entry lives in ROADMAP.md (Search & Discovery) | | | |
 | **NOT-DO/DUPLICATE — Directory pagination** canonical entry lives in ROADMAP.md (UI/UX) | | | |
 | ~~13~~ | ~~Cache stats dashboard~~ done — GET /cache/stats ships the metrics | ~~Low~~ | ~~Medium~~ | ~~TBD~~ |
@@ -324,7 +324,7 @@ cacheHitRatio := prometheus.NewGauge(...)
 ### 🟢 Low Priority
 
 | #  | Task                          | Impact | Effort | Owner |
-| -- | ----------------------------- | ------ | ------ | ----- |
+| --- | --- | --- | --- | --- |
 | **NOT-DO/DUPLICATE — Internationalization** canonical entry lives in ROADMAP.md (Internationalization) | | | |
 | **NOT-DO/DUPLICATE — WebSocket live reload** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
 | **NOT-DO/DUPLICATE — Kubernetes manifests** canonical entry lives in ROADMAP.md (Deployment) | | | |
@@ -379,7 +379,7 @@ Add metrics to measure cache hit ratio over time, then decide if warming is need
 ## Metrics Snapshot
 
 | Metric               | Value     | Trend      |
-| -------------------- | --------- | ---------- |
+| --- | --- | --- |
 | Linter Issues        | **0**     | ✅ Perfect |
 | Test Functions       | 100+      | ⬆️ Growing  |
 | Avg Test Coverage    | ~80%      | ➡️ Stable   |

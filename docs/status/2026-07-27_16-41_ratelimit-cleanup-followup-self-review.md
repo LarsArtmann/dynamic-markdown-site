@@ -31,8 +31,8 @@
 1. **The flaky `TestGracefulShutdownStopsInFlightRequests`.** It failed once this session. I flagged it and moved on. Root cause unknown. Given the user's standing instruction ("keep going until everything works"), leaving a failing-on-first-try test uninvestigated is arguably not meeting the bar.
 2. **`visitors`-map eviction (TTL + sweep goroutine).** Production memory leak. Flagged in AGENTS.md, not implemented.
 3. **A test that intentionally exercises token refill.** The suite avoids refill rather than covering it. The time-based behavior of `rate.Every` is untested.
-4. **Project-wide audit of every `newRateLimiter` caller** for the exact-count-vs-refill class. I only covered the `internal/server` rate-limit + refresh tests.
-5. **CI gate that fails on `golangci-lint` findings / runs flaky tests with `-count`.** Pre-existing findings in tree suggest no enforced gate.
+4. ~~**Project-wide audit of every `newRateLimiter` caller** for the exact-count-vs-refill class. I only covered the `internal/server` rate-limit + refresh tests.~~ done — audit complete 2026-09-27 — only callers are handlers.go:41 (production) and ratelimit_test.go
+5. ~~**CI gate that fails on `golangci-lint` findings / runs flaky tests with `-count`.** Pre-existing findings in tree suggest no enforced gate.~~ done — CI test.yml runs golangci-lint (v2.12.2 pinned); the -count repetition step remains open
 
 ---
 
@@ -69,11 +69,11 @@
 
 **Directly tied to this session (high priority):**
 
-1. Run `git fetch`, then re-check `git log origin/master..HEAD` to learn the TRUE publication state of `7959ad4`, `ff1c98b`, `1d4ae5a`. If any are unpushed, decide on message accuracy before push.
+1. ~~Run `git fetch`, then re-check `git log origin/master..HEAD` to learn the TRUE publication state of `7959ad4`, `ff1c98b`, `1d4ae5a`. If any are unpushed, decide on message accuracy before push.~~ done — repo synced with origin as of 2026-09-13 (all session work pushed)
 2. Investigate root cause of `TestGracefulShutdownStopsInFlightRequests` flakiness (timing of in-flight request vs. shutdown signal at `shutdown_integration_test.go:97`).
 3. Make the full `go test ./... -race` suite pass DETERMINISTICALLY (not on retry) — at minimum on the server package.
 4. Verify the daemon's commit messages for `ff1c98b` and `1d4ae5a` are accurate; if not and unpushed, correct.
-5. Actually attempt the `makezero` rewrite on `suggestions.go` Levenshtein DP and judge readability honestly.
+5. ~~Actually attempt the `makezero` rewrite on `suggestions.go` Levenshtein DP and judge readability honestly.~~ done at `11470e9`
 
 **Rate-limiter correctness & design:**
 
@@ -88,15 +88,15 @@
 **Test-suite quality (noticed, not investigated):**
 
 13. `internal/server/content_test.go` emits 4 `gopls unusedwrite` diagnostics (`Content`, `ContentType`, `ModTime`, `Size` written, never read) — dead test setup.
-14. Pre-existing `golangci-lint`: `makezero` ×3 (`suggestions.go:97,99`, `suggestions_test.go:11`), `unparam` ×1 (`sitemap_test.go:75` `dirPath` always `"/docs"`).
+14. ~~Pre-existing `golangci-lint`: `makezero` ×3 (`suggestions.go:97,99`, `suggestions_test.go:11`), `unparam` ×1 (`sitemap_test.go:75` `dirPath` always `"/docs"`).~~ done — makezero ×3 and unparam ×1 fixed on 2026-09-13
 15. `internal/container` package takes ~7.9s under race — investigate speeding up DI container tests.
-16. Add a CI gate that fails on `golangci-lint` findings (findings exist in tree → no gate).
+16. ~~Add a CI gate that fails on `golangci-lint` findings (findings exist in tree → no gate).~~ done — CI test.yml runs golangci-lint (GOLANGCI_LINT_VERSION v2.12.2 pinned)
 17. Add a CI step running flaky-prone tests with `-count` repetition.
 18. Add a regression guard: `-run TestRateLimiter_Concurrent -count=100` in CI.
 
 **Process / documentation:**
 
-19. Reconcile the prior session's status doc — its "c) NOT STARTED" items are now mostly done; consider annotation (or leave per point-in-time-report philosophy).
+19. ~~Reconcile the prior session's status doc — its "c) NOT STARTED" items are now mostly done; consider annotation (or leave per point-in-time-report philosophy).~~ done (docs-health pass 2026-09-27 docs-health pass annotated the historical reports inline)
 20. The `adf75ce` commit message lists ~12 test scenarios that do not exist (file has 3 tests). Same misleading-message class as `7959ad4`.
 21. Add a daemon flag/convention so auto-generated commit messages are clearly marked as auto-generated.
 22. One-line doc comment on `newRateLimiter` documenting the token-bucket refill formula (`rate.Every(window/maxRequests)`).

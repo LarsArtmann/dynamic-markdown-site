@@ -33,7 +33,7 @@
 ### Phase 1: Unblock Everything (Highest Impact, Low Work)
 
 | Step | Task                                   | Impact       | Work   | Command/Action   |
-| ---- | -------------------------------------- | ------------ | ------ | ---------------- |
+| --- | --- | --- | --- | --- |
 | ~~1.1~~  | ~~Add `cache-clean` to justfile~~ **Won't implement — justfile removed; go clean -cache documented instead.** | ~~**CRITICAL**~~ | ~~2 min~~ | ~~Edit justfile~~ |
 | ~~1.2~~  | ~~Run `just cache-clean`~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~**CRITICAL**~~ | ~~1 min~~ | ~~just cache-clean~~ |
 | ~~1.3~~  | ~~Verify `go build ./...`~~ done — go build ./... passes | ~~HIGH~~ | ~~30 sec~~ | ~~go build ./...~~ |
@@ -42,7 +42,7 @@
 ### Phase 2: Code Quality Verification (High Impact, Medium Work)
 
 | Step | Task                          | Impact | Work   | Verification      |
-| ---- | ----------------------------- | ------ | ------ | ----------------- |
+| --- | --- | --- | --- | --- |
 | ~~2.1~~  | ~~Run `go test ./...`~~ done — full suite passes | ~~HIGH~~ | ~~5 min~~ | ~~All packages pass~~ |
 | ~~2.2~~  | ~~Run `just lint`~~ done — golangci-lint 0 issues | ~~HIGH~~ | ~~3 min~~ | ~~Zero lint errors~~ |
 | ~~2.3~~  | ~~Fix any remaining lint issues~~ done — no remaining lint debt | ~~MEDIUM~~ | ~~varies~~ | ~~Commit each fix~~ |
@@ -50,7 +50,7 @@
 ### Phase 3: Type System Architecture Improvements (High Impact, High Work)
 
 | Step | Task                                         | Impact | Work   | Notes                              |
-| ---- | -------------------------------------------- | ------ | ------ | ---------------------------------- |
+| --- | --- | --- | --- | --- |
 | ~~3.1~~  | ~~Review `domain.Renderer` interface~~ done at `4233fdc` | ~~HIGH~~ | ~~30 min~~ | ~~Check if it belongs in domain~~ |
 | ~~3.2~~  | ~~Consider `Result[T]` type for error handling~~ **Won't implement — not idiomatic Go here; plain errors kept.** | ~~MEDIUM~~ | ~~1 hr~~ | ~~Use github.com/samber/mo or custom~~ |
 | ~~3.3~~  | ~~Add `Option[T]` type for optional values~~ **Won't implement — not idiomatic Go here; plain fields kept.** | ~~MEDIUM~~ | ~~1 hr~~ | ~~Draft field, optional metadata~~ |
@@ -59,7 +59,7 @@
 ### Phase 4: Established Libraries Integration (Medium Impact, Medium Work)
 
 | Step | Task                                | Impact | Work | Library                                   |
-| ---- | ----------------------------------- | ------ | ---- | ----------------------------------------- |
+| --- | --- | --- | --- | --- |
 | ~~4.1~~  | ~~Replace custom cache with ristretto~~ **Won't implement — Otter retained (otter/v2); ADR-0003.** | ~~MEDIUM~~ | ~~2 hr~~ | ~~github.com/dgraph-io/ristretto~~ |
 | ~~4.2~~  | ~~Use lo for functional operations~~ done — samber/lo is a direct dependency and used | ~~MEDIUM~~ | ~~1 hr~~ | ~~github.com/samber/lo (already in go.mod!)~~ |
 | ~~4.3~~  | ~~Add structured logging with slog~~ done — charm.land/log wired as slog handler | ~~MEDIUM~~ | ~~1 hr~~ | ~~Use charm.land/log properly~~ |
@@ -68,7 +68,7 @@
 ### Phase 5: Testing Infrastructure (Medium Impact, Low Work)
 
 | Step | Task                                     | Impact | Work   | Notes                   |
-| ---- | ---------------------------------------- | ------ | ------ | ----------------------- |
+| --- | --- | --- | --- | --- |
 | ~~5.1~~  | ~~Add `just test-watch` command~~ **Won't implement — not pursued; CI + pre-push cover the loop.** | ~~MEDIUM~~ | ~~10 min~~ | ~~File watching for tests~~ |
 | ~~5.2~~  | ~~Add `just test-short` for quick feedback~~ **Won't implement — not pursued; suite is fast enough.** | ~~MEDIUM~~ | ~~5 min~~ | ~~Skip integration tests~~ |
 | ~~5.3~~  | ~~Add test fixtures for markdown files~~ done — internal/test file helpers shipped | ~~LOW~~ | ~~30 min~~ | ~~Reusable test content~~ |
@@ -76,7 +76,7 @@
 ### Phase 6: Documentation & Tooling (Low Impact, Low Work)
 
 | Step | Task                                        | Impact | Work   | Notes                      |
-| ---- | ------------------------------------------- | ------ | ------ | -------------------------- |
+| --- | --- | --- | --- | --- |
 | ~~6.1~~  | ~~Update AGENTS.md with cache troubleshooting~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~LOW~~ | ~~20 min~~ | ~~Document what we learned~~ |
 | ~~6.2~~  | ~~Add `just doctor` command~~ **Won't implement — not pursued.** | ~~LOW~~ | ~~15 min~~ | ~~Check prerequisites~~ |
 | ~~6.3~~  | ~~Clean up old status reports~~ done (docs-health pass 2026-09-27 docs-health pass archived resolved reports) | ~~LOW~~ | ~~5 min~~ | ~~Archive or delete old ones~~ |

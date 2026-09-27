@@ -129,7 +129,7 @@ Followed the samber-do-best-practices skill:
 
 1. Diagnose & fix the `test-coverage` BuildFlow step failure (exit status 1; suspect container coverage shift from the DO-1 refactor).
 2. Decide & execute the PHANTOM_TYPE policy (44 findings) — see question 1.
-3. Confirm go-structure-linter AGENTS.md finding is green in a fresh full run (line count now exactly 377).
+3. ~~Confirm go-structure-linter AGENTS.md finding is green in a fresh full run (line count now exactly 377).~~ done (docs-health pass 2026-09-27 pass brought AGENTS.md to 356 lines (under the 377 budget))
 4. Run a full `buildflow` to confirm 0 remaining error+ findings.
 5. `git sync` / push the 7 pending commits (pre-push hook currently passes).
 6. Add coverage tests for the new `do.Invoke` error paths in `internal/container` (currently 0.0% package coverage).
@@ -177,14 +177,14 @@ Followed the samber-do-best-practices skill:
 **Documentation/process:**
 39. Document the nolint suppression conventions in CONTRIBUTING.md (currently only in AGENTS.md).
 40. Add `//nolint:erraudit` directives to an `erraudit nolint-audit` staleness routine so suppressions get revisited.
-41. Run docs-health HARVEST on this report's section (f) into TODO_LIST.md / ROADMAP.md.
+41. ~~Run docs-health HARVEST on this report's section (f) into TODO_LIST.md / ROADMAP.md.~~ done (docs-health pass 2026-09-27 docs-health pass harvested this section into TODO_LIST.md / ROADMAP.md)
 42. Record the makezero `always: true` policy in a Go style doc (it contradicts common Go style; newcomers will trip on it).
 43. Consider CI workflow running BuildFlow on schedule so findings gate drift is visible.
 
 **Smaller cleanups:**
 44. Delete `/tmp/bf-branching.json` / `/tmp/bf-clean.json` analysis artifacts.
-45. Review dependabot grouped config covers Go + Actions + pnpm ecosystems.
-46. Verify remaining workflow action pins are current SHAs (cosign-installer, setup-go, checkout, goreleaser).
+45. ~~Review dependabot grouped config covers Go + Actions + pnpm ecosystems.~~ done at `e7bafaf`
+46. ~~Verify remaining workflow action pins are current SHAs (cosign-installer, setup-go, checkout, goreleaser).~~ done — sbom-action pinned to a full SHA in release.yml (done in-session; other pins reviewed 2026-09-13)
 47. Consider domain-typing the defensible PHANTOM_TYPE subset (search `query`, rate-limit `ip`) even if the gate policy goes another way.
 48. `renderSearch`/`getPathSuggestions` string params: candidate for `domain.QueryPath` if policy allows.
 49. Add a test for `Container.Config()`/`Logger()` error paths when the injector is empty.
