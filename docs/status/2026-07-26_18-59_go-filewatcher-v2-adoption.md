@@ -78,21 +78,21 @@ Nothing. The migration is clean and working. The one thing worth calling out: I 
 ### High priority
 
 1. Add integration test for `watchForChanges` (temp dir + markdown write + assert refresh)
-2. Fix pre-existing flaky `TestRateLimiter_Concurrent` test (race condition in token bucket assertion)
-3. Remove `goexperiment.jsonv2` from `.golangci.yml` build-tags (project doesn't use json/v2)
-4. Commit the uncommitted `flake.nix` vendorHash change (or let daemon pick it up)
+2. ~~Fix pre-existing flaky `TestRateLimiter_Concurrent` test (race condition in token bucket assertion)~~ done at `7959ad4`
+3. ~~Remove `goexperiment.jsonv2` from `.golangci.yml` build-tags (project doesn't use json/v2)~~ **Won't implement — superseded 2026-09: project adopted encoding/json/v2 (GOEXPERIMENT=jsonv2, go 1.27.1).**
+4. ~~Commit the uncommitted `flake.nix` vendorHash change (or let daemon pick it up)~~ done — flake.nix committed by the auto-commit daemon
 
 ### Medium priority
 
-5. Fix pre-existing `gochecknoglobals` / `nolintlint` warnings in `internal/content/helpers.go`
+5. ~~Fix pre-existing `gochecknoglobals` / `nolintlint` warnings in `internal/content/helpers.go`~~ done — SkipDirs nolint directive fixed (moved above the declaration, stale qualifier dropped) on 2026-09-13
 6. Consider upgrading `go-error-family` to latest explicitly (v0.9.0 is currently indirect via go-filewatcher — make it a documented direct dep or pin it)
 7. Add `go-filewatcher` middleware for structured logging of watch events (the library supports `WithMiddleware`)
 8. Consider `WithPollInterval` for the watcher if users run dev mode on NFS/Docker volumes
 9. Consider `WithGitignore()` option for the watcher (go-filewatcher supports `.gitignore`-aware filtering natively)
 10. Consider per-path debounce (`WithPerPathDebounce`) instead of global debounce — currently a 5-file save triggers one refresh, which is fine, but per-path would be more precise
 11. Consider exposing watcher config (debounce delay, extensions) as CLI flags/env vars instead of hardcoded constants
-12. Upgrade `go.mod` Go version from 1.26.4 to match nix-provided 1.26.5
-13. Add `golangci-lint run` to CI (verify it's actually running in `.github/workflows/`)
+12. ~~Upgrade `go.mod` Go version from 1.26.4 to match nix-provided 1.26.5~~ done — go.mod now declares go 1.27.1 (toolchain auto-managed)
+13. ~~Add `golangci-lint run` to CI (verify it's actually running in `.github/workflows/`)~~ done — golangci-lint runs in test.yml (GOLANGCI_LINT_VERSION pinned)
 14. Add `nix flake check` to CI
 
 ### Low priority / future
@@ -130,8 +130,8 @@ Nothing. The migration is clean and working. The one thing worth calling out: I 
 45. Add observability: log watcher stats on shutdown (total events, filtered, errors)
 46. Consider using `filepath.WalkDir` instead of `filepath.Walk` in `internal/content/filesystem.go` for better performance (unrelated but noticed during research)
 47. Review whether `content.ShouldSkipDir` is still needed in `filesystem.go` now that the watcher uses `content.SkipDirs` directly
-48. Add a CHANGELOG entry for the go-filewatcher adoption
-49. Consider adding `go-filewatcher` to the project's FEATURES.md
+48. ~~Add a CHANGELOG entry for the go-filewatcher adoption~~ done (docs-health pass 2026-09-27 pass added the go-filewatcher adoption entry to CHANGELOG [Unreleased])
+49. ~~Consider adding `go-filewatcher` to the project's FEATURES.md~~ done (docs-health pass 2026-09-27 pass updated FEATURES.md to go-filewatcher/v2)
 50. Update the nix devShell to ensure `go-filewatcher` source is available for `gopls` (may need `go mod download`)
 
 ---

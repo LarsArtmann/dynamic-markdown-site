@@ -47,7 +47,7 @@
 
 - [ ] Add RSS/Atom feed generation
 - [ ] Implement WebSocket live reload
-- [ ] Add gzip/brotli compression
+- [ ] Add brotli encoding (gzip already ships via `httputil.Compression`)
 
 - [ ] Add ETag/If-None-Match support
 

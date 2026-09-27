@@ -99,13 +99,13 @@ Nothing — the scope was small and completed.
 
 **Directly tied to this session (high priority):**
 
-1. Remove/trim the comment added to `TestRateLimiter_Concurrent` (rule
-   violation).
-2. Harden `TestRateLimiter_Allow` against refill flakiness.
-3. Harden `TestRateLimiter_DifferentIPs` against refill flakiness.
-4. Update `AGENTS.md` gotcha #10 with the exact-count-vs-refill guidance.
-5. Run `golangci-lint run ./internal/server/...` on the changed file.
-6. Commit the fix once cleaned up.
+1. ~~Remove/trim the comment added to `TestRateLimiter_Concurrent` (rule~~ done at `7959ad4`
+   ~~violation).~~
+2. ~~Harden `TestRateLimiter_Allow` against refill flakiness.~~ done at `7959ad4`
+3. ~~Harden `TestRateLimiter_DifferentIPs` against refill flakiness.~~ done at `7959ad4`
+4. ~~Update `AGENTS.md` gotcha #10 with the exact-count-vs-refill guidance.~~ done at `7959ad4`, ` 1d4ae5a`
+5. ~~Run `golangci-lint run ./internal/server/...` on the changed file.~~ done — golangci-lint run on changed files, zero findings (2026-07-27 12:17 session)
+6. ~~Commit the fix once cleaned up.~~ done at `7959ad4`
 
 **Rate-limiter / test-quality follow-ups:** 7. Audit every test that calls `newRateLimiter` for the same exact-count trap. 8. Add a test that _intentionally_ exercises refill (using a controlled wait)
 so refill behavior is actually covered, not just avoided. 9. Evaluate a clock-injection seam for `rateLimiter` for deterministic
@@ -113,23 +113,25 @@ time-based tests. 10. Add a regression guard: a `testing.Short()` skip or a stre
 (`-count=100`) in CI for the concurrent test to catch future drift. 11. Document the token-bucket refill rate formula in the `rateLimiter` doc
 comment (one line) so future readers don't mis-derive the refill speed. 12. Review whether `burst = maxRequests` is the intended semantics (burst equals
 the per-window cap) vs. a smaller burst + steady refill.
+   _Resolutions (2026-09-27 docs-health pass): 7 done — swept in the 2026-07-27 16:41 session; 8 open (TODO_LIST "test that intentionally exercises token refill"); 9 **Won't implement — decided 2026-07-27: keep `newBurstOnlyLimiter`; `x/time/rate` has no clock seam (YAGNI).**; 10 open (TODO_LIST "`-count` repetition guard"); 11 done — token-bucket formula documented on the `rateLimiter` type; 12 open (TODO_LIST burst-semantics decision / ROADMAP Open Questions)._
 
 **General test-suite health (noticed, not investigated):** 13. The `internal/container` package takes ~7.9s under race — investigate
 whether DI container tests can be sped up. 14. Add a CI step that runs flaky-prone tests with `-count` repetition. 15. Add a project-wide lint gate that fails CI on `golangci-lint` findings.
+   _Resolutions (2026-09-27 docs-health pass): 13 open; 14 open (TODO_LIST); 15 done — CI `test.yml` runs golangci-lint (v2.12.2 pinned)._
 
 _Scope note:_ Per session instructions, items beyond #6 were not researched —
 they are observations surfaced during this fix, not audited claims.
 
 ## g) Questions I Cannot Answer Myself
 
-1. **Comment policy for this fix:** Should I delete the 7-line comment I added
-   to the test (strict adherence to "never add comments"), or keep a one-line
-   rationale since the `time.Hour` choice is non-obvious without it?
-2. **Scope of hardening:** Do you want me to also change the sibling tests
-   (`Allow`, `DifferentIPs`) to long windows now as a preventive measure, or
-   leave them since they aren't currently failing?
-3. **Commit now?** Should I commit this fix (and any follow-up cleanup) on the
-   current `master` branch, or stage it on a feature branch?
+1. ~~**Comment policy for this fix:** Should I delete the 7-line comment I added~~ done — resolved in the 12:17 session — 7959ad4 was published; decision: document, do not amend
+   ~~to the test (strict adherence to "never add comments"), or keep a one-line~~
+   ~~rationale since the `time.Hour` choice is non-obvious without it?~~
+2. ~~**Scope of hardening:** Do you want me to also change the sibling tests~~ done — resolved in the 12:17 session — keep the pragmatic helper
+   ~~(`Allow`, `DifferentIPs`) to long windows now as a preventive measure, or~~
+   ~~leave them since they aren't currently failing?~~
+3. ~~**Commit now?** Should I commit this fix (and any follow-up cleanup) on the~~ done — resolved in the 16:41 session — tightened to 10×200 + 5×429 (1d4ae5a)
+   ~~current `master` branch, or stage it on a feature branch?~~
 
 ---
 
