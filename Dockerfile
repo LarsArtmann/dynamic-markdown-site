@@ -3,6 +3,8 @@ FROM golang:1.27-alpine AS builder
 ARG VERSION=dev
 ARG COMMIT=unknown
 ARG BUILD_DATE=unknown
+# Keep in sync with TEMPL_VERSION in test.yml and the templ version in go.mod.
+ARG TEMPL_VERSION=v0.3.1020
 
 ENV CGO_ENABLED=0 \
     GOEXPERIMENT=jsonv2
@@ -15,6 +17,11 @@ RUN go mod download
 COPY cmd ./cmd
 COPY internal ./internal
 COPY templates ./templates
+
+# Generated *_templ.go files are gitignored; every build generates them
+# (nix preBuild, CI, and here).
+RUN go install github.com/a-h/templ/cmd/templ@${TEMPL_VERSION} \
+    && templ generate
 
 RUN go build -trimpath \
     -tags netgo,osusergo \
