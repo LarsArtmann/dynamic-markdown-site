@@ -1,6 +1,32 @@
 # Library Integration Report — Dynamic Markdown Site
 
-**Generated:** 2026-05-13 | **Updated:** 2026-06-13 | **Codebase:** `github.com/larsartmann/dynamic-markdown-site`
+**Generated:** 2026-05-13 | **Updated:** 2026-09-27 | **Codebase:** `github.com/larsartmann/dynamic-markdown-site`
+
+---
+
+## 2026-09-27 Refresh (verified against go.mod)
+
+Direct dependencies (17) at current pins:
+
+| Library | Version | Role | Notes |
+| --- | --- | --- | --- |
+| charm.land/log/v2 | v2.0.1 | Structured logging (slog.Handler) | |
+| a-h/templ | v0.3.1020 | Type-safe HTML templates | CLI version must match go.mod (AGENTS.md gotcha #8) |
+| alecthomas/chroma/v2 | v2.27.0 | Syntax highlighting | |
+| cockroachdb/errors | v1.14.0 | Error wrapping with stack traces | |
+| larsartmann/go-filewatcher/v2 | v2.3.0 | Dev-mode file watching | Replaced raw fsnotify (2026-07-26); ignore filter matches ANY path component (AGENTS.md gotcha #16) |
+| larsartmann/httputil | v1.2.0 | Recovery/Compression/RequestID/Chain | Compression: gzip+deflate bundled; br/zstd wireable via WriterFactories (evaluated & declined, see ROADMAP) |
+| maypok86/otter/v2 | v2.3.0 | HTML cache | Background goroutines: always Close() |
+| samber/do/v2 | v2.1.0 | Dependency injection | do.Invoke (error-returning) only; never MustInvoke |
+| samber/lo | v1.53.0 | Generic helpers | |
+| stretchr/testify | v1.12.1 | Test assertions | |
+| yuin/goldmark (+highlighting, meta) | v1.8.6 | Markdown rendering | |
+| gocloud.dev | v0.46.0 | Blob storage (S3/GCS/Azure/file) | Large transitive tree; review pending (ROADMAP) |
+| golang.org/x/time | v0.16.0 | Token-bucket rate limiting | |
+| gopkg.in/yaml.v3 | v3.0.1 | YAML (frontmatter) | |
+| oss.terrastruct.com/d2 | v0.7.2 | D2 diagram rendering | Optional at runtime; graceful degradation |
+
+Stale rows in the 2026-06-13 tables below: `fsnotify` was superseded by `go-filewatcher/v2`; `httputil` moved from v0.2.0 to v1.2.0 (json/v2 era, AGENTS.md gotcha #12). Sections below that date are kept as historical assessment; per-library usage-depth commentary remains accurate unless noted.
 
 ---
 

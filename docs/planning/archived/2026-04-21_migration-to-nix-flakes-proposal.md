@@ -2,7 +2,7 @@
 
 **Author:** Lars Artmann
 **Date:** 2026-04-21
-**Status:** Draft — Pending Review
+**Status:** ~~Draft — Pending Review~~ **IMPLEMENTED — archived 2026-09-27.** The proposal was adopted: `flake.nix` now owns the build (`buildGoModule`), devShell, checks (`build`/`test`/`format`), and apps (`test`/`lint`); CI runs `nix flake check`. This document is historical record.
 **Scope:** Replace ad-hoc toolchain management with a deterministic Nix Flakes setup
 
 ---

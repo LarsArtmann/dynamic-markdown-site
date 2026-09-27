@@ -88,6 +88,7 @@ dynamic-markdown-site [flags]
 | `-storage-url` |         | Blob storage URL: `file://`, `s3://`, `gs://`, `azblob://`            |
 | `-log-level`   | `info`  | Log level: `debug`, `info`, `warn`, `error`                           |
 | `-cache`       | `true`  | Enable HTML response caching                                          |
+| `-cache-size`  | `10000` | Maximum number of cached HTML pages                                   |
 | `-dev`         | `false` | Development mode: disables cache, enables file watching & live reload |
 | `-timeout`     | `30s`   | HTTP request timeout                                                  |
 
@@ -101,6 +102,7 @@ DYNAMIC_MARKDOWN_ROOT=./docs
 DYNAMIC_MARKDOWN_STORAGE_URL=s3://my-bucket/docs
 DYNAMIC_MARKDOWN_LOG_LEVEL=debug
 DYNAMIC_MARKDOWN_CACHE=false
+DYNAMIC_MARKDOWN_CACHE_SIZE=5000
 DYNAMIC_MARKDOWN_DEV=true
 DYNAMIC_MARKDOWN_TIMEOUT=60s
 DYNAMIC_MARKDOWN_SITE_NAME="My Wiki"
