@@ -73,6 +73,7 @@
 - [ ] Design plugin system for custom markdown extensions
 - [ ] Split Repository interface (Reader/Refresher)
 - [ ] Structured error types (Is/As/Unwrap)
+- [ ] Targeted strong-ID adoption for genuinely identifier-shaped values (top candidates from the 2026-09-27 PHANTOM_TYPE triage: `ratelimit` visitor `ip`, search `query`, sitemap `baseURL`; NOT bools like `HasMermaid` or internal plumbing like `errMsg`)
 - [ ] Review `gocloud.dev` dependency weight (large transitive tree for blob storage; evaluate modularization or interface + plugin pattern)
 
 ### Internationalization
@@ -87,7 +88,8 @@
 ## ❓ Open Questions
 
 - **Rate-limiter burst semantics:** is `burst = maxRequests` (full-window burst up front, then trickle) the intended production behavior, or should burst be smaller with steady refill? Affects tests and docs. (Raised 2026-07-27.)
-- **PHANTOM_TYPE findings-gate policy:** should the BuildFlow `branching-flow` gate hard-require phantom types for all string parameters (44 findings), or be advisory with targeted domain types? See `docs/status/2026-09-13_14-52` §g1.
+- **PHANTOM_TYPE findings-gate policy — DECIDED 2026-09-27 (autonomous, under blanket execution approval):** the gate stays at `error+` severity. Current BuildFlow classifies all `branching-flow` PHANTOM_TYPE suggestions as warning/info (66 + 17 across 25 files, triaged 2026-09-27 — mostly string params like `query`, `ip`, `title`, `baseURL`; zero at error level), so the findings gate is green without suppression. Bulk-rebranding 66 params is rejected for now: many are internal plumbing (`errMsg`, `context`, test helpers) where branded types add ceremony without safety. Targeted adoption lives under Architecture below; revisit if the linter promotes findings to error severity.
+- **proxyVendor → direct dependency:** `gocloud.dev`'s proxy vendor setup vs. promoting to a direct dependency — re-evaluate when the blob-storage abstraction work (Architecture) is picked up. (Harvested 2026-09-27 from June-era reports.)
 
 ## 🚢 Deployment
 
