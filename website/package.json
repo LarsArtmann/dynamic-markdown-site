@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "firebase-tools": "^15.30.2",
     "html-validate": "^11.16.0",
     "typescript": "^7.0.2"
   },

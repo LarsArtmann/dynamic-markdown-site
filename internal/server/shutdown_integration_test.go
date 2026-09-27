@@ -40,8 +40,17 @@ func TestGracefulShutdownStopsInFlightRequests(t *testing.T) {
 		t.Fatalf("listen: %v", err)
 	}
 
+	// Wrap the handler to signal when the in-flight request reaches it.
+	handlerStarted := make(chan struct{}, 1)
+
 	httpSrv := &http.Server{
-		Handler:           srv.Handler(),
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			select {
+			case handlerStarted <- struct{}{}:
+			default:
+			}
+			srv.Handler().ServeHTTP(w, r)
+		}),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
@@ -75,8 +84,14 @@ func TestGracefulShutdownStopsInFlightRequests(t *testing.T) {
 		respCh <- resp
 	}()
 
-	// Give the request time to start.
-	time.Sleep(10 * time.Millisecond)
+	// Shutdown closes accepted connections that have not started processing
+	// (StateNew), so it must wait for proof the handler is active; otherwise
+	// the "in-flight" request can be cut before its response is written.
+	select {
+	case <-handlerStarted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("request never reached the handler")
+	}
 
 	// Shutdown the server with a 2s grace period.
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
