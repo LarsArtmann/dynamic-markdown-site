@@ -134,7 +134,7 @@ nix:
       name: nur-packages
     homepage: https://github.com/LarsArtmann/dynamic-markdown-site
     description: "Blazing-fast markdown site generator with live reload"
-    license: LicenseRef-Proprietary
+    license: unfree
     formatter: nixfmt
     path: pkgs/dynamic-markdown-site/default.nix
     install: |

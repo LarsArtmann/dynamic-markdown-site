@@ -287,9 +287,9 @@ The `templ` CLI version must match `go.mod`. If the CLI is newer, it generates c
 
 Rate limiting uses `golang.org/x/time/rate` (token bucket). No background goroutines. `Stop()` is a no-op kept for API compatibility. Tests that assert **exact** allowed-counts MUST use a window long enough that no token refills during the test (the package uses the `newBurstOnlyLimiter(burst)` helper, which sets `burst = maxRequests` with a `time.Hour` window). With a short window like `time.Second`, the bucket refills on wall-clock time and goroutine-scheduling latency can admit one extra token, producing flaky off-by-one failures (e.g. 101 instead of 100). **Known limitation:** the per-IP `visitors` map grows unbounded — every distinct client IP adds an entry that is never evicted, so sustained traffic from many IPs is a memory leak. A TTL + periodic sweep is the fix, but it was out of scope for the flakiness work.
 
-### 11. GoReleaser License Mismatch
+### 11. GoReleaser License Metadata
 
-The `.goreleaser.yaml` declares `license: MIT` in 4 places (homebrew_casks, nfpms, nix, scoops sections), but the `LICENSE` file is proprietary and `flake.nix` correctly uses `licenses.unfree`. This is a **pre-existing inconsistency** that causes Homebrew/Scoop/Nix to publish wrong license metadata. (The previous `archives.format_overrides` and `brews` deprecations mentioned here have already been fixed — `formats: ["zip"]` and `homebrew_casks` are now used.)
+**Fixed 2026-09-27:** `.goreleaser.yaml` previously claimed `license: MIT` in 4 places (homebrew_casks, nfpms, nix, scoops) while the `LICENSE` file is proprietary. Now: homebrew_casks/nfpms/scoops use SPDX `LicenseRef-Proprietary`, the nix section uses `unfree` (matching `flake.nix`), and `goreleaser check` validates green. Note the publisher-specific validation: the nix section only accepts nixpkgs license names (`unfree`), not SPDX `LicenseRef-` IDs.
 
 ### 12. encoding/json/v2 Is the Server Standard
 
