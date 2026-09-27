@@ -15,7 +15,7 @@ be discussed in an issue first.
 
 ## Development Setup
 
-The project uses [Nix flakes](https://nixos.wiki/wiki/Flakes) for reproducible
+The project uses [Nix flakes](https://nix.dev/manual/nix/stable/command-ref/new-cli/nix3-flake) for reproducible
 development environments. From the project root:
 
 ```bash

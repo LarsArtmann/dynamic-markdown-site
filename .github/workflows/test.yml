@@ -18,6 +18,9 @@ permissions:
 env:
   TEMPL_VERSION: "v0.3.1020"
   GOLANGCI_LINT_VERSION: "v2.12.2"
+  # encoding/json/v2 (see AGENTS.md gotcha #12): every Go compile in CI needs
+  # the experiment enabled, including golangci-lint's type-checked analysis.
+  GOEXPERIMENT: jsonv2
 
 jobs:
   test:
@@ -63,7 +66,10 @@ jobs:
               continue
             fi
             case "$pkg" in
-              *templates|*internal/test|*internal/version|*cmd/dynamic-markdown-site)
+              *templates|*internal/test|*internal/version|*cmd/dynamic-markdown-site|*internal/container)
+                # internal/container is wired through subprocess tests (config.Load
+                # owns flag.Parse), so per-package coverage metrics cannot observe
+                # its execution; the lifecycle itself is covered in subprocess.
                 echo "  skip $pkg ($cov%)"
                 continue
                 ;;
@@ -81,6 +87,9 @@ jobs:
           name: coverage
           path: coverage.out
           retention-days: 14
+
+      - name: Repetition guard for concurrent rate-limiter test
+        run: go test ./internal/server/ -run TestRateLimiter_Concurrent -race -count=10
 
   lint:
     name: Lint
@@ -105,3 +114,18 @@ jobs:
         uses: golangci/golangci-lint-action@9fae48acfc02a90574d7c304a1758ef9895495fa
         with:
           version: ${{ env.GOLANGCI_LINT_VERSION }}
+
+  nix:
+    name: Nix flake check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+
+      - name: Run nix flake check
+        run: nix flake check --impure
+        env:
+          NIXPKGS_ALLOW_UNFREE: "1"

@@ -39,7 +39,7 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
+    - exhaustruct_v5
     - exptostd
     - fatcontext
     - forbidigo
@@ -148,7 +148,7 @@ linters:
         - fmt.Println
         - (*strings.Builder).WriteString
         - (*bytes.Buffer).WriteString
-    exhaustruct:
+    exhaustruct_v5:
       exclude:
         - os/exec.Cmd
     funlen:
@@ -276,37 +276,37 @@ linters:
           - cyclop
       - path: (.*)_test\.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/content/filesystem.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/content/blob.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/content/memory.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/domain/file.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/renderer/markdown.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/server/ratelimit.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/server/render.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/renderer/diagrams.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/renderer/diagram_extension.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/renderer/admonition_extension.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
       - path: internal/renderer/markdown_bench_test.go
         linters:
           - funlen
@@ -399,7 +399,7 @@ linters:
           - noinlineerr
       - path: _test\.go
         linters:
-          - exhaustruct
+          - exhaustruct_v5
           - testpackage
           - gochecknoglobals
           - funlen
