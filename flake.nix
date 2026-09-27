@@ -53,7 +53,7 @@
             "-X github.com/larsartmann/dynamic-markdown-site/internal/version.BuildDate=unknown"
           ];
 
-          pkg = pkgs.buildGoModule {
+          pkg = pkgs.buildGoModule.override { go = pkgs.go_1_27; } {
             inherit
               pname
               version
@@ -72,7 +72,10 @@
               templ generate
             '';
 
-            env.CGO_ENABLED = 0;
+            env = {
+              CGO_ENABLED = 0;
+              GOEXPERIMENT = "jsonv2";
+            };
             tags = [
               "netgo"
               "osusergo"
@@ -118,8 +121,11 @@
               program = pkgs.lib.getExe (
                 pkgs.writeShellApplication {
                   name = "run-test";
-                  runtimeInputs = [ pkgs.go_1_26 ];
-                  text = "go test -race -v -coverprofile=coverage.out ./...";
+                  runtimeInputs = [ pkgs.go_1_27 ];
+                  text = ''
+                    export GOEXPERIMENT=jsonv2
+                    go test -race -v -coverprofile=coverage.out ./...
+                  '';
                 }
               );
             };
@@ -130,10 +136,13 @@
                 pkgs.writeShellApplication {
                   name = "run-lint";
                   runtimeInputs = [
-                    pkgs.go_1_26
+                    pkgs.go_1_27
                     pkgs.golangci-lint
                   ];
-                  text = "golangci-lint run ./...";
+                  text = ''
+                    export GOEXPERIMENT=jsonv2
+                    golangci-lint run ./...
+                  '';
                 }
               );
             };
@@ -152,14 +161,16 @@
             };
 
             GOWORK = "off";
+            GOEXPERIMENT = "jsonv2";
           };
 
           devShells.ci = pkgs.mkShellNoCC {
             packages = [
-              pkgs.go_1_26
+              pkgs.go_1_27
               pkgs.golangci-lint
             ];
             GOWORK = "off";
+            GOEXPERIMENT = "jsonv2";
           };
 
           treefmt.settings = {
