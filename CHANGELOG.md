@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+> **Tag metadata note (2026-09-27):** the existing tags `v0.1.0`, `v0.2.0`, and `v0.3.0` are all annotated tags pointing at the same commit (`67f7632`, 2026-05-17), so their names do not correspond to the CHANGELOG entries below — `v0.2.0`/`v0.3.0` carry no distinct release state. They are left in place rather than rewritten (published refs are history); the next properly cut tag supersedes them.
+
 ### Added
 
 - Request timing middleware — `X-Response-Time` header on every response (`internal/server/responsetime.go`)

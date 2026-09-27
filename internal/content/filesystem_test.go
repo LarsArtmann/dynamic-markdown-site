@@ -209,19 +209,7 @@ func TestFileSystemRepository_Get(t *testing.T) {
 	})
 
 	t.Run("get nested file node", func(t *testing.T) {
-		tmpDir := t.TempDir()
-
-		subDir := filepath.Join(tmpDir, "docs")
-		if err := os.Mkdir(subDir, 0o755); err != nil {
-			t.Fatalf("failed to create subdirectory: %v", err)
-		}
-
-		writeTestFile(t, subDir, "guide.md", "# Guide")
-
-		repo, err := NewFileSystemRepository(tmpDir)
-		if err != nil {
-			t.Fatalf("NewFileSystemRepository() error = %v", err)
-		}
+		repo := newNestedDocsRepo(t)
 
 		path := domain.MustURLPath("/docs/guide")
 
@@ -236,19 +224,7 @@ func TestFileSystemRepository_Get(t *testing.T) {
 	})
 
 	t.Run("get directory node", func(t *testing.T) {
-		tmpDir := t.TempDir()
-
-		subDir := filepath.Join(tmpDir, "docs")
-		if err := os.Mkdir(subDir, 0o755); err != nil {
-			t.Fatalf("failed to create subdirectory: %v", err)
-		}
-
-		writeTestFile(t, subDir, "guide.md", "# Guide")
-
-		repo, err := NewFileSystemRepository(tmpDir)
-		if err != nil {
-			t.Fatalf("NewFileSystemRepository() error = %v", err)
-		}
+		repo := newNestedDocsRepo(t)
 
 		path := domain.MustURLPath("/docs")
 
@@ -688,4 +664,26 @@ func TestFileSystemRepository_GetRaw(t *testing.T) {
 		_, err = repo.GetRaw(urlPath)
 		assertNotFoundErr(t, err, "GetRaw")
 	})
+}
+
+// newNestedDocsRepo builds a repository from a temp dir containing docs/guide.md,
+// the shared fixture for the nested-path test cases.
+func newNestedDocsRepo(t *testing.T) *FileSystemRepository {
+	t.Helper()
+
+	tmpDir := t.TempDir()
+
+	subDir := filepath.Join(tmpDir, "docs")
+	if err := os.Mkdir(subDir, 0o755); err != nil {
+		t.Fatalf("failed to create subdirectory: %v", err)
+	}
+
+	writeTestFile(t, subDir, "guide.md", "# Guide")
+
+	repo, err := NewFileSystemRepository(tmpDir)
+	if err != nil {
+		t.Fatalf("NewFileSystemRepository() error = %v", err)
+	}
+
+	return repo
 }

@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
-	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 )
 
 func TestStaticFileServing(t *testing.T) {
@@ -30,34 +30,34 @@ func TestStaticFileServing(t *testing.T) {
 func TestRawFileServing(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	// Add a raw file (non-markdown) to the in-memory repo.
-	p, err := domain.NewURLPath("/robots.txt")
-	if err != nil {
-		t.Fatalf("invalid path: %v", err)
+	tmpDir := t.TempDir()
+
+	rawBody := []byte("sample raw payload")
+
+	if err := os.WriteFile(filepath.Join(tmpDir, "data.txt"), rawBody, 0o600); err != nil {
+		t.Fatalf("write raw file: %v", err)
 	}
 
-	raw := &content.RawFile{
-		Content:     []byte("User-agent: *\nAllow: /\n"),
-		ContentType: "text/plain; charset=utf-8",
-		ModTime:     time.Now(),
-		Size:        27,
+	repo, err := content.NewFileSystemRepository(tmpDir)
+	if err != nil {
+		t.Fatalf("NewFileSystemRepository() error = %v", err)
 	}
-	_ = raw
-	_ = p
 
 	srv := newTestServer(t, repo)
 	handler := newTestHandler(srv)
 
-	// We just need to assert that the handler is wired and the route resolves.
-	rec := httptest.NewRecorder()
-	handler.ServeHTTP(
-		rec,
-		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil),
-	)
+	rec := executeRequest(handler, "/data.txt")
 
-	if rec.Code != http.StatusOK && rec.Code != http.StatusInternalServerError {
-		t.Errorf("status = %d, want 200 or 500", rec.Code)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+
+	if got := rec.Body.String(); got != string(rawBody) {
+		t.Errorf("body = %q, want %q", got, string(rawBody))
+	}
+
+	if ct := rec.Header().Get("Content-Type"); ct != content.GetContentType("data.txt") {
+		t.Errorf("Content-Type = %q, want %q", ct, content.GetContentType("data.txt"))
 	}
 }
 

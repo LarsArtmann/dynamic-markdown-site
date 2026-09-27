@@ -88,6 +88,7 @@
               homepage = "https://github.com/LarsArtmann/dynamic-markdown-site";
               license = licenses.unfree;
               mainProgram = pname;
+              platforms = lib.platforms.unix;
               maintainers = [
                 {
                   name = "Lars Artmann";
