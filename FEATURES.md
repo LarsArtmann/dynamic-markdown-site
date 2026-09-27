@@ -122,7 +122,7 @@ When a path is not found:
 
 Dev mode (`-dev` flag) enables:
 
-- **File watching** via fsnotify — monitors all `.md`/`.markdown` files recursively
+- **File watching** via [go-filewatcher/v2](https://github.com/larsartmann/go-filewatcher) — monitors all `.md`/`.markdown` files recursively, skips content-excluded directories, and shuts down cleanly via context cancellation
 - **500ms debounce** — batches rapid changes
 - **SSE endpoint** (`/api/live-reload`) — browser receives reload events
 - **Toast notifications** — connection status in the bottom-right corner
@@ -142,6 +142,10 @@ Dev mode (`-dev` flag) enables:
 - Compile-time HTML safety — no runtime template errors
 - Typed props structs — IDE autocomplete, compiler checks
 - No string concatenation for HTML — injection-safe by default
+
+### Request Timing
+
+Every response carries an `X-Response-Time` header (`internal/server/responsetime.go`) for latency triage without touching client code.
 
 ---
 

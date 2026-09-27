@@ -6,6 +6,8 @@ A type-safe, high-performance Go web server that turns any directory of markdown
 
 Point it at a folder of `.md` files (or an S3/GCS bucket) and get a fully functional documentation site in seconds. No static-site generator, no build step, no database.
 
+> **Live docs:** [dynamicmarkdown.lars.software](https://dynamicmarkdown.lars.software) — full documentation site for this project (Astro + Starlight, source in [`website/`](website/)).
+
 ## Highlights
 
 - **Zero config** — drop markdown files in a directory, run the binary

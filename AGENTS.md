@@ -8,14 +8,14 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 
 **Key Technologies:**
 
-- Go 1.26.3 with modules
+- Go 1.27+ with modules (`GOEXPERIMENT=jsonv2` required — see gotcha 12)
 - Standard `net/http` with Go 1.22+ method routing (no Gin)
 - Goldmark + Chroma for markdown rendering with syntax highlighting
 - Templ for type-safe HTML templates
 - samber/do/v2 for dependency injection
-- charm.land/log for structured logging
+- charm.land/log/v2 for structured logging (implements `slog.Handler`)
 - golang.org/x/time/rate for rate limiting
-- Otter for HTML caching
+- Otter/v2 for HTML caching
 - gocloud.dev for blob storage (S3, GCS, filesystem)
 - D2 + Mermaid for diagram rendering
 - go-filewatcher/v2 for dev-mode file watching (replaces raw fsnotify)
@@ -78,24 +78,30 @@ go mod tidy
 
 ## Project Structure
 
+```
+cmd/dynamic-markdown-site/   # main.go, watcher.go (go-filewatcher), healthcheck.go
+internal/cache/              # Otter/v2 HTML cache (GetOrCompute)
+internal/config/             # flags, env overrides, blob storage config
+internal/container/          # samber/do/v2 wiring; accessors return (T, error)
+internal/content/            # Repository impls: filesystem, blob, memory + search
+internal/domain/             # URLPath, nodes, Frontmatter, Renderer, SuggestedPath
+internal/renderer/           # Goldmark + Chroma + admonition/diagram extensions
+internal/server/             # handlers, middleware, SSE live reload, metrics
+internal/test/               # shared test fixtures (file helpers)
+internal/version/            # version/commit injected via ldflags
+templates/                   # layout.templ — run `templ generate` after edits
+website/                     # Astro + Starlight docs site (dynamicmarkdown.lars.software)
+```
+
+Detailed architecture tree: [README.md](README.md#architecture).
+
 ---
 
 ## Code Patterns
 
 ### Dependency Injection
 
-Uses `samber/do/v2`. Register providers in `container.New()`:
-
-```go
-func New() (*Container, error) {
-    injector := do.New()
-    do.Provide(injector, provideConfig)
-    do.Provide(injector, provideLogger)
-    // ...
-}
-```
-
-Resolve dependencies with `do.Invoke` (returns error) — never `do.MustInvoke`, which panics at runtime. Provider closures resolve dependencies the same way, and `main.go` handles the errors from the container's typed accessors:
+Uses `samber/do/v2`. Register providers in `container.New()`; resolve with `do.Invoke` (returns error) — never `do.MustInvoke`, which panics at runtime:
 
 ```go
 cfg, err := do.Invoke[*config.Config](i)
@@ -104,22 +110,11 @@ if err != nil {
 }
 ```
 
+The container's typed accessors (`Config()`, `Logger()`, `Repository()`, `Server()`) also return `(T, error)`; `main.go` handles those errors.
+
 ### Repository Pattern
 
-Content stored in `internal/content/` with interface:
-
-```go
-type Repository interface {
-    Get(path domain.URLPath) (domain.ContentNode, error)
-    GetRaw(path domain.URLPath) (*RawFile, error)
-    Root() (*domain.DirectoryNode, error)
-    Refresh() domain.RefreshResult
-    LastModified() time.Time
-    AllPaths() []domain.URLPath
-}
-```
-
-Implementations:
+Content stored in `internal/content/` behind the `content.Repository` interface (`Get`, `GetRaw`, `Root`, `Refresh`, `LastModified`, `AllPaths` — see `internal/content/repository.go`). Implementations:
 
 - `FileSystemRepository` - reads from disk
 - `BlobRepository` - reads from S3/GCS/Azure via gocloud.dev
@@ -200,7 +195,8 @@ Log levels via `-log-level` flag or `DYNAMIC_MARKDOWN_LOG_LEVEL` env var.
 ```go
 func newTestServer(t *testing.T, repo content.Repository) *Server {
     t.Helper()
-    return NewServer(repo, content.NewSearcher(repo), slog.New(slog.DiscardHandler), cache.NewHTMLCache(100))
+    return NewServer(repo, content.NewSearcher(repo), slog.New(slog.DiscardHandler),
+        cache.NewHTMLCache(100), renderer.NewGoldmarkRenderer(), false, "Test Site")
 }
 ```
 
@@ -225,8 +221,10 @@ for _, tt := range tests {
 
 ### Mock Repositories
 
+Embed the interface to override only what you need (see `internal/test/` for ready-made fixtures):
+
 ```go
-type FailingRepository struct{}
+type FailingRepository struct{ content.Repository }
 func (f *FailingRepository) Get(_ domain.URLPath) (domain.ContentNode, error) {
     return nil, content.ErrContentNotFound
 }
@@ -263,25 +261,11 @@ File watcher only runs in dev mode (`-dev` flag). It uses `github.com/larsartman
 
 ### 4. Frontmatter Support
 
-Markdown files support YAML frontmatter:
-
-```yaml
----
-title: "Page Title"
-description: "Page description"
-author: "Author Name"
-tags: ["tag1", "tag2"]
-draft: false
----
-```
+Markdown files support YAML frontmatter (`title`, `description`, `author`, `tags`, `draft` — see FEATURES.md for the full field table).
 
 ### 5. Templ Generation
 
-After editing `templates/*.templ` files, run:
-
-```bash
-templ generate
-```
+After editing `templates/*.templ` files, run `templ generate` (CI fails on drift).
 
 ### 6. Hidden Files/Directories
 
@@ -343,18 +327,7 @@ Full-mode buildflow fails on remaining severity error+ findings (`branching-flow
 
 ### Environment Variables
 
-Prefix: `DYNAMIC_MARKDOWN_`
-
-| Variable                       | Description      |
-| ------------------------------ | ---------------- |
-| `DYNAMIC_MARKDOWN_PORT`        | Server port      |
-| `DYNAMIC_MARKDOWN_ROOT`        | Root directory   |
-| `DYNAMIC_MARKDOWN_STORAGE_URL` | Blob storage URL |
-| `DYNAMIC_MARKDOWN_LOG_LEVEL`   | Log level        |
-| `DYNAMIC_MARKDOWN_CACHE`       | Enable caching   |
-| `DYNAMIC_MARKDOWN_DEV`         | Dev mode         |
-| `DYNAMIC_MARKDOWN_TIMEOUT`     | Request timeout  |
-| `DYNAMIC_MARKDOWN_SITE_NAME`   | Site name        |
+Every flag has an env override: `DYNAMIC_MARKDOWN_` + uppercase flag name (`DYNAMIC_MARKDOWN_PORT`, `DYNAMIC_MARKDOWN_ROOT`, `DYNAMIC_MARKDOWN_STORAGE_URL`, `DYNAMIC_MARKDOWN_LOG_LEVEL`, `DYNAMIC_MARKDOWN_CACHE`, `DYNAMIC_MARKDOWN_DEV`, `DYNAMIC_MARKDOWN_TIMEOUT`), plus `DYNAMIC_MARKDOWN_SITE_NAME` (env only, no flag).
 
 ---
 
