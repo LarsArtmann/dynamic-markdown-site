@@ -5,8 +5,8 @@
 
 ## 🔴 Critical (Pipeline & Correctness)
 
-- [ ] Confirm the first fully-green CI run lands (Test, Build Docker Image including the Trivy security-scan, Website, Nix flake check)
-  - Fixed 2026-09-27: the vendorHash staleness that red the `Nix flake check` job after the dependency bumps was repaired via `buildflow -s nix-hash-fix --fix` (5/5 targets, 0 findings locally); the Trivy gate now uses `ignore-unfixed` so the unfixable x/crypto use-advisory (GO-2026-5932, package not linked into the binary) cannot red it. Verify the banner clears on the next master push.
+- [x] Confirm the first fully-green CI run lands (Test, Build Docker Image including the Trivy security-scan, Website, Nix flake check)
+  - **Confirmed 2026-09-27:** run `36332656665` — build ✓ + security-scan ✓ (Trivy gate green under the new CRITICAL+HIGH + ignore-unfixed policy); sibling run `36332656732` — Nix flake check ✓, Lint ✓, Unit + integration tests ✓; Website ✓ (28 s). Root causes fixed earlier the same day: stale `vendorHash.nix` after the dependency bumps (repaired via `nix-hash-fix`), missing `GOEXPERIMENT=jsonv2` in CI, and the Dockerfile that copied a prebuilt binary no step produced.
 - [x] Confirm the 3 moderate Dependabot alerts auto-resolve after the next push (`uuid`, `stream-json`, `csv-parse`)
   - Confirmed 2026-09-27: alerts API reports **0 open** after the `firebase-tools` removal + lockfile regen.
 
