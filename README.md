@@ -173,7 +173,7 @@ graph LR
 | `/*path`           | GET      | Markdown file or directory listing                 |
 | `/health`          | GET      | Health check with dependency status (JSON)         |
 | `/refresh`         | GET/POST | Refresh content from source (rate limited: 10/min) |
-| `/search`          | GET      | Full-text search (`?q=query`)                      |
+| `/search`          | GET      | Full-text search (`?q=query`, `page`, `pageSize`; rate limited: 30/min) |
 | `/sitemap.xml`     | GET      | XML sitemap for search engines                     |
 | `/robots.txt`      | GET      | Robots file for crawlers                           |
 | `/metrics`         | GET      | Prometheus-format metrics                          |

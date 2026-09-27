@@ -208,7 +208,7 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/*path`           | GET      | Markdown file or subdirectory listing         |
 | `/health`          | GET      | Health check — returns `{"status":"healthy"}` |
 | `/refresh`         | GET/POST | Reload content from source (rate limited)     |
-| `/search`          | GET      | Full-text search — `?q=query`                 |
+| `/search`          | GET      | Full-text search — `?q=query` (paginated, rate limited) |
 | `/static/*`        | GET      | Embedded static assets (CSS, favicon)         |
 | `/sitemap.xml`     | GET      | XML sitemap for search engine crawlers        |
 | `/robots.txt`      | GET      | robots.txt with sitemap reference             |

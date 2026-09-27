@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -359,9 +360,10 @@ templ ErrorView(props ErrorViewProps) {
 
 // SearchViewProps contains properties for the search view.
 type SearchViewProps struct {
-	Layout  LayoutProps
-	Query   string
-	Results []content.SearchResult
+	Layout     LayoutProps
+	Query      string
+	Results    []content.SearchResult
+	Pagination domain.SearchPagination
 }
 
 // SearchView renders the search page.
@@ -389,12 +391,32 @@ templ SearchView(props SearchViewProps) {
 					if len(props.Results) == 0 {
 						<p class="search-empty">No results found for "{ props.Query }"</p>
 					} else {
-						<p class="search-count">{ fmt.Sprintf("%d result(s) for", len(props.Results)) } <strong>{ props.Query }</strong></p>
+						<p class="search-count">
+							{ fmt.Sprintf("Showing %d-%d of %d result(s) for", props.Pagination.FirstResult(), props.Pagination.LastResult(), props.Pagination.Total) }
+							<strong>{ props.Query }</strong>
+						</p>
 						<div class="search-results-list">
 							for _, result := range props.Results {
 								@SearchResultCard(result)
 							}
 						</div>
+						if props.Pagination.TotalPages > 1 {
+							<nav class="search-pagination" aria-label="Search result pages">
+								if props.Pagination.HasPrev() {
+									<a
+										href={ templ.SafeURL("/search?q=" + url.QueryEscape(props.Query) + "&page=" + strconv.Itoa(props.Pagination.Page-1)) }
+										rel="prev"
+									>Previous</a>
+								}
+								<span class="search-page-info">{ fmt.Sprintf("Page %d of %d", props.Pagination.Page, props.Pagination.TotalPages) }</span>
+								if props.Pagination.HasNext() {
+									<a
+										href={ templ.SafeURL("/search?q=" + url.QueryEscape(props.Query) + "&page=" + strconv.Itoa(props.Pagination.Page+1)) }
+										rel="next"
+									>Next</a>
+								}
+							</nav>
+						}
 					}
 				</div>
 			}

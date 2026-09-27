@@ -41,6 +41,7 @@ func NewServer(
 ) *Server {
 	rl := newRateLimiter(10, time.Minute)
 	srl := newRateLimiter(searchRateLimit, time.Minute)
+	lr := NewLiveReload(log)
 
 	return &Server{
 		repo:               repo,
