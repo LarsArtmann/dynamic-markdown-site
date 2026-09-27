@@ -187,3 +187,30 @@ func TestWatchForChanges_ExitsOnContextCancel(t *testing.T) {
 	cancel, done := startWatcher(t, root, fsRepo)
 	stopWatcher(t, cancel, done)
 }
+
+func TestWatchForChanges_RefreshesOnMarkdownExtensionWrite(t *testing.T) {
+	t.Parallel()
+
+	root := newWatchRoot(t)
+
+	fsRepo, err := content.NewFileSystemRepository(root)
+	if err != nil {
+		t.Fatalf("NewFileSystemRepository: %v", err)
+	}
+
+	repo := &countingRepository{Repository: fsRepo}
+
+	cancel, done := startWatcher(t, root, repo)
+
+	if err := os.WriteFile(filepath.Join(root, "notes.markdown"), []byte("# Notes\n"), 0o600); err != nil {
+		t.Fatalf("write .markdown file: %v", err)
+	}
+
+	waitForRefreshes(t, repo, 1, 5*time.Second)
+
+	if !containsPath(repo.AllPaths(), "/notes") {
+		t.Error("watcher did not refresh the repository with the new .markdown file")
+	}
+
+	stopWatcher(t, cancel, done)
+}

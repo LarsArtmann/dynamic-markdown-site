@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -494,6 +495,10 @@ func TestCompressionGzipRoundTrip(t *testing.T) {
 		t.Fatalf("Content-Encoding = %q, want gzip", got)
 	}
 
+	if vary := rec.Header().Values("Vary"); !slices.Contains(vary, "Accept-Encoding") {
+		t.Errorf("Vary = %v, want it to include Accept-Encoding", vary)
+	}
+
 	reader, err := gzip.NewReader(rec.Body)
 	if err != nil {
 		t.Fatalf("gzip.NewReader: %v", err)
@@ -507,5 +512,65 @@ func TestCompressionGzipRoundTrip(t *testing.T) {
 
 	if !strings.Contains(string(decoded), "The quick brown fox") {
 		t.Error("decoded body lost the markdown content")
+	}
+}
+
+func TestRateLimitedJSONBodyShape(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		path string
+	}{
+		{name: "refresh", path: "/refresh"},
+		{name: "search", path: "/search?q=findme"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler := newSeededSearchServer(t, 1)
+
+			rec := executeRequest(handler, tt.path)
+			for range 50 {
+				if rec.Code == http.StatusTooManyRequests {
+					break
+				}
+
+				rec = executeRequest(handler, tt.path)
+			}
+
+			if rec.Code != http.StatusTooManyRequests {
+				t.Fatalf("never rate limited: last status = %d", rec.Code)
+			}
+
+			var body struct {
+				Status    string    `json:"status"`
+				Message   string    `json:"message"`
+				Limit     string    `json:"limit"`
+				Timestamp time.Time `json:"timestamp"`
+			}
+
+			if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
+				t.Fatalf("unmarshal 429 body: %v", err)
+			}
+
+			if body.Status != jsonStatusError {
+				t.Errorf("status = %q, want %q", body.Status, jsonStatusError)
+			}
+
+			if body.Message == "" {
+				t.Error("message is empty")
+			}
+
+			if body.Limit == "" {
+				t.Error("limit is empty")
+			}
+
+			if body.Timestamp.IsZero() {
+				t.Error("timestamp is zero")
+			}
+		})
 	}
 }
