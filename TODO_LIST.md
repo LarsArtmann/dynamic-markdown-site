@@ -5,6 +5,9 @@
 
 ## 🔴 Critical (Pipeline & Correctness)
 
+- [ ] Triage the 3 moderate Dependabot vulnerabilities GitHub flagged on `master` (2026-09-27 push banner: github.com/LarsArtmann/dynamic-markdown-site/security/dependabot)
+  - Found during the 2026-09-27 push; likely Go-side deps (distinct from the `website/` pnpm-audit item below). Bump or dismiss with rationale, then confirm the banner clears.
+
 - [ ] Get a full BuildFlow run green
   - As of `docs/status/2026-09-13_14-52`: `test-coverage` step failed undiagnosed (suspect container coverage shift); go-structure-linter AGENTS.md finding needs a fresh full-run confirmation. `go test ./... -race` is green locally (re-verified 2026-09-27), so the step gate is the open question.
 - [ ] Decide & execute the PHANTOM_TYPE findings-gate policy (44 remaining error+ findings)
