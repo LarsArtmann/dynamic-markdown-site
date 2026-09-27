@@ -94,6 +94,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Security
 
+- **Dependency bumps clearing the Trivy gobinary findings** — `google.golang.org/grpc` v1.83.2→v1.84.0 (CVE-2026-33186, critical), AWS SDK v2/smithy bumps (EventStream medium), and `go.opentelemetry.io/otel*` → v1.47.0-rc.1 (CVE-2026-29181/39883, high). The otel RC is an accepted tradeoff: the fixes exist only on the RC train, the packages are indirect transitives of gocloud.dev's cloud drivers, and the full suite passes under `-race`; revisit when v1.47.0 goes stable
+- **Trivy gate policy set in `docker.yml`** — hard-fail on CRITICAL/HIGH remains, plus `ignore-unfixed: true`: the remaining `golang.org/x/crypto` use-advisory (GO-2026-5932) has no fixed version and its `openpgp` package is not linked into the binary (`go mod why` confirms), so an unfixable advisory can no longer red the release gate; SARIF still uploads everything else to the Security tab
+- **Branch protection enabled on `master`** — required status check `Unit + integration tests`, no force pushes, no deletions, linear history required, admins exempt (`enforce_admins: false`) so the auto-commit daemon keeps pushing directly; non-admin pushes must pass CI
 - **`firebase-tools` removed from `website/` devDependencies** — a 2026-07-13 debugging artifact that dragged in 6 moderate advisory paths (`stream-json`, `csv-parse`, `uuid`, …); the regenerated lockfile has zero known vulnerabilities, and `pnpm audit` now runs as a CI gate on `website/**` changes
 - **License-check step skipped with rationale** — go-licenses aborts on json/v2 std packages (upstream google/go-licenses#128); documented in `.buildflow.yml`
 - Pinned `anchore/sbom-action/download-syft` to a full commit SHA in `release.yml`

@@ -362,4 +362,16 @@ Build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:
 
 `FileSystemRepository`/`BlobRepository` swap `r.tree` during `Refresh()` while HTTP readers traverse it. The shared helpers (`getFromTree`, `rootFromTree`, `allPaths`) take `**domain.ContentTree` and dereference under the read lock — always pass `&r.tree`, never `r.tree` (passing the value reads the pointer outside the lock; that race shipped undetected until the watcher integration test, fixed 2026-09-27).
 
+### 18. Local Gates Must Mirror CI Invocation-by-Invocation
+
+Three red-CI pushes on 2026-09-27 came from "a similar command passed locally":
+
+- CI runs `golangci-lint config verify` (strict) in addition to `golangci-lint run` — always run both (the stale `exhaustruct` exclude block passed `run` but failed `verify`).
+- CI builds Docker from git, where the gitignored `templates/*_templ.go` is ABSENT — a dirty working tree can mask a broken image build; the Dockerfile builder generates it.
+- After ANY `go.mod`/`go.sum` change, re-run `NIXPKGS_ALLOW_UNFREE=1 nix flake check --impure` before pushing — `vendorHash.nix` goes stale and only surfaces in CI's `nix flake check` job. Repair with `env -u GOTOOLCHAIN buildflow -s nix-hash-fix --fix` (takes minutes; the 60s performance budget can make the verify pass report a phantom remaining finding — re-run once to confirm 0 findings).
+
+### 19. Branch Protection Exempts the Daemon; Trivy Gate Ignores Unfixed
+
+`master` protection (enabled 2026-09-27) requires the `Unit + integration tests` check with `enforce_admins: false` — the owner-owned auto-commit daemon pushes straight to master as admin and bypasses; do NOT "fix" the apparently-missing enforcement. The Docker `security-scan` job hard-fails on CRITICAL/HIGH with `ignore-unfixed: true`: unfixable advisories (e.g. GO-2026-5932 x/crypto/openpgp — package not linked into the binary) cannot red the gate; Dependabot alerts remain the module-level signal. otel sits on `v1.47.0-rc.1` by documented decision (ROADMAP) — re-pin to stable when the fixes ship stable.
+
 ---
