@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - README hero image — rendered site preview (OG image from the live docs site)
 - `scripts/check-report-annotations.sh` — verifies every archived report carries inline resolution markers
 - `docs/status/README.md` — living/archived report index
+- `.markdownlint.yml` — MD013 (line length) disabled with rationale; the repo's docs deliberately use long lines (status-report tables, AGENTS.md gotchas)
 - Request timing middleware — `X-Response-Time` header on every response (`internal/server/responsetime.go`)
 - Dependabot config with weekly grouped minor/patch updates (Go modules, Actions, pnpm)
 - dprint formatter config for JSON/YAML/Config files
@@ -50,6 +51,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Dependency injection hardened** — all `do.MustInvoke` call sites replaced with error-returning `do.Invoke`; container accessors now return `(T, error)` (Cache/Renderer/Searcher accessors removed as dead code)
 - **File watching rewritten on `go-filewatcher/v2`** — 181 lines of hand-rolled fsnotify boilerplate replaced with 85 lines; watcher now shuts down cleanly via the SIGINT/SIGTERM context
 - Upgraded to `charm.land/log/v2`, `otter/v2`, `httputil` v1.2.0, `go-filewatcher/v2` v2.3.0
+- **`package.nix` now injects version ldflags** — it previously shipped a binary reporting `Version=dev`; all three build systems (flake, overlay, Dockerfile) inject the `internal/version` flags (duplication accepted: no mechanism spans nix + Docker)
+- GitHub Actions group bumped across all four workflows via Dependabot (trivy-action v0.36.0, CodeQL action v4.38.2 completing the v3→v4 migration ahead of the December 2026 deprecation, plus checkout/buildx/login/metadata/attest/upload pins)
+- Docker workflow gained a `concurrency` group — overlapping master pushes cancel superseded 25-minute image builds instead of queueing them
 - Website flake apps switched from npm to pnpm
 - Refactored frontmatter draft parsing to use `yaml.v3` for proper boolean handling
 - Simplified static file embedding pattern using `//go:embed`
@@ -71,6 +75,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Dead test setup in `TestRawFileServing`** — unused `RawFile`/`URLPath` writes (`gopls unusedwrite`) replaced by a real raw-file round-trip through the handler
 - **Duplicated nested-repo fixture in `filesystem_test.go`** — extracted `newNestedDocsRepo` helper
 - **Deprecated `exhaustruct` migrated to `exhaustruct_v5`** in `.golangci.yml`
+- Stale doc comment in `internal/version` — usage example said `-X main.version=…` but the real injection contract is `internal/version.Version`; fixed to match the flags every build system passes
 - **Dead `nixos.wiki` link (403)** in CONTRIBUTING.md replaced with the official Nix manual
 - **Missing `platforms` attribute** added to the flake package meta
 - Flaky `TestRateLimiter_Concurrent` — exact-count assertions now use the `newBurstOnlyLimiter` helper (1-hour window, negligible refill); sibling tests hardened the same way
