@@ -111,7 +111,10 @@ func FuzzNewSearchPagination(f *testing.F) {
 		}
 
 		if p.End() < p.Offset()+p.PageSize && p.End() != p.Total {
-			t.Fatalf("window smaller than page size without hitting total: offset=%d end=%d total=%d", p.Offset(), p.End(), p.Total)
+			t.Fatalf(
+				"window smaller than page size without hitting total: offset=%d end=%d total=%d",
+				p.Offset(), p.End(), p.Total,
+			)
 		}
 	})
 }
