@@ -17,7 +17,7 @@ permissions:
 
 env:
   TEMPL_VERSION: "v0.3.1020"
-  GOLANGCI_LINT_VERSION: "v2.12.2"
+  GOLANGCI_LINT_VERSION: "v2.13.2"
   # encoding/json/v2 (see AGENTS.md gotcha #12): every Go compile in CI needs
   # the experiment enabled, including golangci-lint's type-checked analysis.
   GOEXPERIMENT: jsonv2
