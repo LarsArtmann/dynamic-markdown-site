@@ -104,6 +104,8 @@ Header breadcrumb trail generated from the URL path, with the current page marke
 - **Highlighting**: matches wrapped in `<mark>` tags
 - **Snippets**: context window around each match with ellipsis
 - **Results**: sorted by relevance score descending
+- **Pagination**: `page` (1-based, clamped) and `pageSize` (default 20, max 100) query params with Previous/Next pager controls
+- **Rate limited**: 30 requests per minute per IP
 
 ### Smart 404 Pages
 

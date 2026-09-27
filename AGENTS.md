@@ -339,7 +339,7 @@ Every flag has an env override: `DYNAMIC_MARKDOWN_` + uppercase flag name (`DYNA
 | `/*path`           | GET      | Content (markdown or directory) |
 | `/health`          | GET      | Health check                    |
 | `/refresh`         | GET/POST | Refresh content (rate limited)  |
-| `/search`          | GET      | Search content (`?q=query`)     |
+| `/search`          | GET      | Search content (`?q=query`, paginated, rate limited 30/min) |
 | `/sitemap.xml`     | GET      | XML sitemap                     |
 | `/robots.txt`      | GET      | Robots file                     |
 | `/metrics`         | GET      | Prometheus-format metrics       |
@@ -352,5 +352,13 @@ Every flag has an env override: `DYNAMIC_MARKDOWN_` + uppercase flag name (`DYNA
 ## Website build gotcha (pnpm 11)
 
 Build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:` (`esbuild: true`) — pnpm v11 ignores `pnpm.*` in `package.json` and silently skips unapproved postinstall scripts, so `astro build` then fails on a missing esbuild binary. A placeholder value (e.g. `esbuild: set this to true or false`) silently disables the whole key (cmdguard incident, fixed 2026-09-19).
+
+### 16. Watcher Ignore Filter Matches Any Path Component
+
+`go-filewatcher`'s `FilterIgnoreDirs` matches a directory name anywhere in the event path (e.g. `tmp` matches `/tmp/x/…`), so running dev mode with `-root` under an ancestor named `tmp`, `temp`, `build`, `dist`, `vendor`, or `node_modules` silently watches nothing — every event is filtered out. Tests must create watch roots under the package directory, not `t.TempDir()` (surfaced by the watcher integration test, 2026-09-27).
+
+### 17. Repository Tree Pointers Are Read Under Lock
+
+`FileSystemRepository`/`BlobRepository` swap `r.tree` during `Refresh()` while HTTP readers traverse it. The shared helpers (`getFromTree`, `rootFromTree`, `allPaths`) take `**domain.ContentTree` and dereference under the read lock — always pass `&r.tree`, never `r.tree` (passing the value reads the pointer outside the lock; that race shipped undetected until the watcher integration test, fixed 2026-09-27).
 
 ---
