@@ -52,12 +52,12 @@ func NewFileSystemRepository(rootDir string) (*FileSystemRepository, error) {
 
 // Get retrieves a content node by URL path.
 func (r *FileSystemRepository) Get(path domain.URLPath) (domain.ContentNode, error) {
-	return getFromTree(r.tree, &r.mu, path)
+	return getFromTree(&r.tree, &r.mu, path)
 }
 
 // Root returns the root directory.
 func (r *FileSystemRepository) Root() (*domain.DirectoryNode, error) {
-	return rootFromTree(r.tree, &r.mu)
+	return rootFromTree(&r.tree, &r.mu)
 }
 
 // LastModified returns when the content was last indexed.
@@ -67,7 +67,7 @@ func (r *FileSystemRepository) LastModified() time.Time {
 
 // AllPaths returns all URL paths in the repository.
 func (r *FileSystemRepository) AllPaths() []domain.URLPath {
-	return allPaths(r.tree, &r.mu)
+	return allPaths(&r.tree, &r.mu)
 }
 
 // GetRaw retrieves a non-markdown file directly from the filesystem.

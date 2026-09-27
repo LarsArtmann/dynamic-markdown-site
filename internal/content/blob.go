@@ -55,12 +55,12 @@ func NewBlobRepository(ctx context.Context, bucketURL string) (*BlobRepository, 
 
 // Get retrieves a content node by URL path.
 func (r *BlobRepository) Get(p domain.URLPath) (domain.ContentNode, error) {
-	return getFromTree(r.tree, &r.mu, p)
+	return getFromTree(&r.tree, &r.mu, p)
 }
 
 // Root returns the root directory.
 func (r *BlobRepository) Root() (*domain.DirectoryNode, error) {
-	return rootFromTree(r.tree, &r.mu)
+	return rootFromTree(&r.tree, &r.mu)
 }
 
 // LastModified returns when the content was last indexed.
@@ -70,7 +70,7 @@ func (r *BlobRepository) LastModified() time.Time {
 
 // AllPaths returns all URL paths in the repository.
 func (r *BlobRepository) AllPaths() []domain.URLPath {
-	return allPaths(r.tree, &r.mu)
+	return allPaths(&r.tree, &r.mu)
 }
 
 // Refresh rebuilds the content tree from blob storage and returns statistics.
