@@ -140,11 +140,14 @@
 49. Add `astro check` + `pnpm audit` to the pre-push hook's fast mode if BuildFlow supports JS providers per-directory by then.
 50. Schedule the deferred T19 screenshot session (needs a browser: `nix run nixpkgs#chromium` or playwright install) and replace the OG embed.
 
-## g) QUESTIONS I CANNOT ANSWER MYSELF
+## g) QUESTIONS I CANNOT ANSWER MYSELF — ANSWERED 2026-09-27 ~18:15 (blanket "GET SHIT DONE" mandate)
 
 1. **otel on a release candidate:** keep `go.opentelemetry.io/otel v1.47.0-rc.1` to clear the two Trivy HIGHs now, or revert to stable v1.46.0 and accept a red Trivy job (or a relaxed gate policy) until v1.47.0 goes stable? My lean: keep the RC, but it's your release line.
+   → **RESOLVED: kept.** Suite green under `-race` (incl. `-shuffle=on`); Trivy HIGHs cleared in CI (run 36329699902); revert trigger recorded in ROADMAP + AGENTS.md gotcha #19.
 2. **Branch protection:** the repo has none, and your auto-commit daemon pushes straight to `master` — if I enable protection (require the now-green `Test` + `Website` checks, PR-only for humans), the daemon's direct pushes break. Which rules do you want, or should master stay open?
+   → **RESOLVED: enabled, daemon-compatible.** Required check `Unit + integration tests` (the only check running on every PR), force-push/deletion denied, linear history required, `enforce_admins: false` — three subsequent owner pushes succeeded post-enable, proving the daemon path.
 3. **Trivy gate policy + discussions:** should `security-scan` hard-fail on any CRITICAL/HIGH (current, causing the red), fail on CRITICAL only, or report-only with SARIF upload? And I flipped `has_discussions=true` via API to make the issue-template link valid — keep it, or turn it back off and re-point the template?
+   → **RESOLVED: CRITICAL+HIGH hard-fail + `ignore-unfixed: true`, Discussions kept.** The openpgp advisory is module-level noise (package not linked; `go mod why` = not needed); SARIF still uploads fixable findings. Proven: security-scan green on the first policy run.
 
 ---
 
