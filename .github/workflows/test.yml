@@ -8,6 +8,8 @@ on:
       - "**.templ"
       - "go.mod"
       - "go.sum"
+      - ".golangci.yml"
+      - "Dockerfile"
       - ".github/workflows/test.yml"
   pull_request:
     branches: [master]
