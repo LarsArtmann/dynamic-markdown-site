@@ -362,9 +362,7 @@ Build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:
 
 `FileSystemRepository`/`BlobRepository` swap `r.tree` during `Refresh()` while HTTP readers traverse it. The shared helpers (`getFromTree`, `rootFromTree`, `allPaths`) take `**domain.ContentTree` and dereference under the read lock — always pass `&r.tree`, never `r.tree` (passing the value reads the pointer outside the lock; that race shipped undetected until the watcher integration test, fixed 2026-09-27).
 
-### 18. Local Gates Must Mirror CI Invocation-by-Invocation
-
-Three red-CI pushes on 2026-09-27 came from "a similar command passed locally":
+### 18. Local Gates Must Mirror CI Invocation-by-Invocation (2026-09-27: three red pushes)
 
 - CI runs `golangci-lint config verify` (strict) in addition to `golangci-lint run` — always run both (the stale `exhaustruct` exclude block passed `run` but failed `verify`).
 - CI builds Docker from git, where the gitignored `templates/*_templ.go` is ABSENT — a dirty working tree can mask a broken image build; the Dockerfile builder generates it.
