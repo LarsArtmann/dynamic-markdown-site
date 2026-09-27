@@ -14,5 +14,12 @@ auto_fix: true
 # pnpm-lock.yaml, and the provider ignores per-directory config (tool_paths).
 # Excluded per buildflow's own recommendation; audit website deps directly via
 # `cd website && pnpm audit` until buildflow supports subdirectory projects.
+#
+# license-check (go-licenses) cannot run against this repo: GOEXPERIMENT=jsonv2
+# (encoding/json/v2 imports) plus the downloaded go 1.27 toolchain make
+# go-licenses abort with "Package ... does not have module info" on std
+# packages (upstream google/go-licenses#128). Re-enable when upstream supports
+# the experiment.
 skip_steps:
   - pnpm-audit
+  - license-check
