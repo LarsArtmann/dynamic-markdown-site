@@ -215,26 +215,26 @@ The codebase is in excellent shape. No critical issues identified.
 
 | #  | Task                        | Impact | Effort | Package                       |
 | --- | --- | --- | --- | --- |
-| **NOT-DO/DUPLICATE — Dark mode / theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | | |
-| **NOT-DO/DUPLICATE — Add code copy button** canonical entry lives in ROADMAP.md (UI/UX) | | | |
-| **NOT-DO/DUPLICATE — Diagram zoom functionality** canonical entry lives in ROADMAP.md (Rendering & Content) | | | |
-| **NOT-DO/DUPLICATE — Search autocomplete** canonical entry lives in ROADMAP.md (Search & Discovery) | | | |
-| **NOT-DO/DUPLICATE — Directory pagination** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Rendering & Content).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
 | ~~16~~ | ~~Cache stats dashboard~~ done — GET /cache/stats ships hits/misses/evictions/ratio | ~~Low~~ | ~~Medium~~ | ~~`internal/server` + templates~~ |
-| **NOT-DO/DUPLICATE — RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
-| **NOT-DO/DUPLICATE — Keyboard navigation** canonical entry lives in ROADMAP.md (UI/UX) | | | |
-| **NOT-DO/DUPLICATE — Print stylesheet** canonical entry lives in ROADMAP.md (UI/UX) | | | |
-| **NOT-DO/DUPLICATE — Related content suggestions** canonical entry lives in ROADMAP.md (Search & Discovery) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).** | ~~—~~ | ~~—~~ |
 
 ### 🟢 Low Priority (Do Later)
 
 | #  | Task                        | Impact | Effort | Package               |
 | --- | --- | --- | --- | --- |
-| **NOT-DO/DUPLICATE — Content analytics** canonical entry lives in ROADMAP.md (Admin & API) | | | |
-| **NOT-DO/DUPLICATE — Plugin system architecture** canonical entry lives in ROADMAP.md (Architecture) | | | |
-| **NOT-DO/DUPLICATE — Internationalization (i18n)** canonical entry lives in ROADMAP.md (Internationalization) | | | |
-| **NOT-DO/DUPLICATE — WebSocket live reload** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
-| **NOT-DO/DUPLICATE — Kubernetes manifests** canonical entry lives in ROADMAP.md (Deployment) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Admin & API).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).** | ~~—~~ | ~~—~~ |
+| ~~`funlen` too long~~ | ~~1~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Internationalization).** | ~~Low~~ | ~~`filesystem_test.go:513`~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Deployment).** | ~~—~~ | ~~—~~ |
 
 ---
 

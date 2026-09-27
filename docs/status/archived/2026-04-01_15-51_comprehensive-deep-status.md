@@ -197,16 +197,16 @@ Ordered by impact-to-effort ratio. Fix CI first, then improve quality, then add 
 
 | #  | Task                                                            | Effort | Impact                |
 | --- | --- | --- | --- |
-| **NOT-DO/DUPLICATE — Dark mode CSS + theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | |
-| **NOT-DO/DUPLICATE — Code copy button on code blocks** canonical entry lives in ROADMAP.md (UI/UX) | | |
-| **NOT-DO/DUPLICATE — RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | | |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ |
 | ~~18~~ | ~~Gzip/brotli compression middleware~~ done — httputil.Compression middleware | ~~1h~~ | ~~Performance~~ |
-| **NOT-DO/DUPLICATE — ETag/If-None-Match support** canonical entry lives in ROADMAP.md (Content Delivery); not implemented | | |
-| **NOT-DO/DUPLICATE — Print stylesheet** canonical entry lives in ROADMAP.md (UI/UX) | | |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery); not implemented.** | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ |
 | ~~21~~ | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | ~~2h~~ | ~~Observability~~ |
 | ~~22~~ | ~~Architecture decision records~~ done — docs/adr/ holds 5 ADRs | ~~1h~~ | ~~Documentation~~ |
 | ~~23~~ | ~~CONTRIBUTING.md~~ done — CONTRIBUTING.md exists | ~~30 min~~ | ~~Open source readiness~~ |
-| **NOT-DO/DUPLICATE — Sample markdown content in `content/` directory** canonical entry lives in ROADMAP.md (Quality) | | |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).** | ~~—~~ |
 | ~~25~~ | ~~Separate CI workflows: `test.yml` (fast) + `docker.yml` (build)~~ done — test.yml + docker.yml + release.yml | ~~1h~~ | ~~CI speed~~ |
 
 ---

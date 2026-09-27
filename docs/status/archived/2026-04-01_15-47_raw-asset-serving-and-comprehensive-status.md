@@ -140,7 +140,7 @@
 | ~~11~~ | ~~🟡 High~~ done — search/handlers/markdown test files all split | ~~Split `search_test.go`, `handlers_test.go`, `markdown_test.go`~~ | ~~M~~ |
 | ~~12~~ | ~~🟡 High~~ done — Dockerfile HEALTHCHECK + healthcheck subcommand | ~~Add Docker HEALTHCHECK to Dockerfile~~ | ~~S~~ |
 | ~~13~~ | ~~🟡 High~~ done — httputil.Compression middleware | ~~Add gzip/brotli compression middleware~~ | ~~M~~ |
-| **NOT-DO/DUPLICATE — Add ETag/If-None-Match support** canonical entry lives in ROADMAP.md (Content Delivery); not implemented | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes / Cloud Run deployment manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery); not implemented.** | ~~—~~ |
 | ~~15~~ | ~~🟡 High~~ done — .githooks/pre-push (test + lint) | ~~Add git pre-push hook calling `just pre-push`~~ | ~~S~~ |
 | ~~16~~ | ~~🟢 Medium~~ done — responsetime.go sets X-Response-Time | ~~Add request timing middleware~~ | ~~S~~ |
 | ~~17~~ | ~~🟢 Medium~~ done — /health returns version, uptime, dependencies | ~~Add structured health check (version, uptime, deps)~~ | ~~M~~ |
@@ -148,10 +148,10 @@
 | ~~19~~ | ~~🟢 Medium~~ done — content/search.go wraps matches in <mark> | ~~Implement search result highlighting~~ | ~~M~~ |
 | ~~20~~ | ~~🟢 Medium~~ done — breadcrumbs rendered from URL path | ~~Add breadcrumbs for deep navigation~~ | ~~M~~ |
 | ~~21~~ | ~~🟢 Medium~~ done — docs/adr/ holds 5 ADRs | ~~Create architecture decision records (ADRs)~~ | ~~M~~ |
-| **NOT-DO/DUPLICATE — Dark mode CSS + theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | |
-| **NOT-DO/DUPLICATE — Add RSS/Atom feed generation** canonical entry lives in ROADMAP.md (Content Delivery) | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes / Cloud Run deployment manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes / Cloud Run deployment manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ |
 | ~~24~~ | ~~🟢 Medium~~ done — CONTRIBUTING.md exists | ~~Add CONTRIBUTING.md~~ | ~~S~~ |
-| **NOT-DO/DUPLICATE — Kubernetes / Cloud Run deployment manifests** canonical entry lives in ROADMAP.md (Deployment) | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes / Cloud Run deployment manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Deployment).** | ~~—~~ |
 
 ---
 

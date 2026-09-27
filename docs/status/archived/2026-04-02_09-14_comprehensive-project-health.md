@@ -298,36 +298,36 @@ cacheHitRatio := prometheus.NewGauge(...)
 | ~~1~~  | ~~Integration test suite~~ done — shutdown_integration_test.go + per-endpoint tests | ~~Critical~~ | ~~High~~ | ~~TBD~~ |
 | ~~2~~  | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | ~~High~~ | ~~Medium~~ | ~~TBD~~ |
 | ~~3~~  | ~~Request timing middleware~~ done — responsetime.go sets X-Response-Time | ~~High~~ | ~~Low~~ | ~~TBD~~ |
-| **NOT-DO/DUPLICATE — Dark mode / theme toggle** canonical entry lives in ROADMAP.md (UI/UX) | | | |
-| **NOT-DO/DUPLICATE — Code copy button** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
 | ~~6~~  | ~~Split `handlers_test.go` (914 lines)~~ done — split into 9 files | ~~Medium~~ | ~~Medium~~ | ~~TBD~~ |
 | ~~7~~  | ~~Split `search_test.go` (685 lines)~~ done — split into 3 files | ~~Medium~~ | ~~Medium~~ | ~~TBD~~ |
 | ~~8~~  | ~~Architecture Decision Records~~ done — docs/adr/ holds 5 ADRs | ~~Medium~~ | ~~Low~~ | ~~TBD~~ |
 | ~~9~~  | ~~Deployment documentation~~ done — README Docker section + docs website | ~~High~~ | ~~Medium~~ | ~~TBD~~ |
-| **NOT-DO/DUPLICATE — Diagram zoom functionality** canonical entry lives in ROADMAP.md (Rendering & Content) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Rendering & Content).** | ~~—~~ | ~~—~~ |
 
 ### 🟡 Medium Priority
 
 | #  | Task                        | Impact | Effort | Owner |
 | --- | --- | --- | --- | --- |
-| **NOT-DO/DUPLICATE — Search autocomplete** canonical entry lives in ROADMAP.md (Search & Discovery) | | | |
-| **NOT-DO/DUPLICATE — Directory pagination** canonical entry lives in ROADMAP.md (UI/UX) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
 | ~~13~~ | ~~Cache stats dashboard~~ done — GET /cache/stats ships the metrics | ~~Low~~ | ~~Medium~~ | ~~TBD~~ |
-| **NOT-DO/DUPLICATE — RSS/Atom feed** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
-| **NOT-DO/DUPLICATE — Keyboard navigation** canonical entry lives in ROADMAP.md (UI/UX) | | | |
-| **NOT-DO/DUPLICATE — Print stylesheet** canonical entry lives in ROADMAP.md (UI/UX) | | | |
-| **NOT-DO/DUPLICATE — Related content suggestions** canonical entry lives in ROADMAP.md (Search & Discovery) | | | |
-| **NOT-DO/DUPLICATE — Content analytics** canonical entry lives in ROADMAP.md (Admin & API) | | | |
-| **NOT-DO/DUPLICATE — Plugin system design** canonical entry lives in ROADMAP.md (Architecture) | | | |
-| **NOT-DO/DUPLICATE — API documentation** canonical entry lives in ROADMAP.md (Admin & API) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Admin & API).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Admin & API).** | ~~—~~ | ~~—~~ |
 
 ### 🟢 Low Priority
 
 | #  | Task                          | Impact | Effort | Owner |
 | --- | --- | --- | --- | --- |
-| **NOT-DO/DUPLICATE — Internationalization** canonical entry lives in ROADMAP.md (Internationalization) | | | |
-| **NOT-DO/DUPLICATE — WebSocket live reload** canonical entry lives in ROADMAP.md (Content Delivery) | | | |
-| **NOT-DO/DUPLICATE — Kubernetes manifests** canonical entry lives in ROADMAP.md (Deployment) | | | |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Internationalization).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Deployment).** | ~~—~~ | ~~—~~ |
 | ~~24~~ | ~~Benchmark regression tracking~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Performance & Caching).** | ~~Low~~ | ~~Medium~~ | ~~TBD~~ |
 | ~~25~~ | ~~Mutation testing~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).** | ~~Low~~ | ~~High~~ | ~~TBD~~ |
 

@@ -249,12 +249,12 @@ RSS/Atom feeds, content tags, dark mode, search autocomplete, pagination, admin 
 | ~~16~~ | ~~Split Repository: Reader + Refresher~~ done — kept unified Repository interface | ~~🟡 Medium~~ | ~~1hr~~ | ~~Arch~~ | ~~No~~ |
 | ~~17~~ | ~~HTTP integration tests~~ done — shutdown_integration_test.go + per-endpoint tests | ~~🟢 High~~ | ~~3hr~~ | ~~Testing~~ | ~~No~~ |
 | ~~18~~ | ~~Disk space monitoring~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~🟢 Low~~ | ~~30min~~ | ~~Tooling~~ | ~~No~~ |
-| ~~19~~ | ~~RSS/Atom feed generation~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | | | |
-| ~~20~~ | ~~Dark mode CSS toggle~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | | | |
-| ~~21~~ | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | | | |
-| **NOT-DO/DUPLICATE — Rate limit search endpoint** canonical entry lives in TODO_LIST.md (still open there) | | | |
-| ~~23~~ | ~~gzip/brotli compression~~ done — shipped via httputil.Compression | | | |
-| ~~24~~ | ~~Graceful shutdown tests~~ done — shutdown_integration_test.go covers drain | | | |
+| ~~19~~ | ~~RSS/Atom feed generation~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~20~~ | ~~Dark mode CSS toggle~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~21~~ | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~NOT-DO/DUPLICATE — Rate limit search endpoint canonical entry lives in TODO_LIST.md (still open there)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in TODO_LIST.md (still open there).** | ~~—~~ | ~~—~~ |
+| ~~23~~ | ~~gzip/brotli compression~~ done — shipped via httputil.Compression | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~24~~ | ~~Graceful shutdown tests~~ done — shutdown_integration_test.go covers drain | ~~—~~ | ~~—~~ | ~~—~~ |
 | ~~25~~ | ~~ADR for DI choice (do vs wire)~~ done — 5 ADRs in docs/adr/; DI documented in AGENTS.md | ~~🟢 Low~~ | ~~30min~~ | ~~Docs~~ | ~~No~~ |
 
 ---

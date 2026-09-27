@@ -100,31 +100,31 @@
 
 | Priority | Task                                                                        | Effort | Impact   | Why                                            |
 | --- | --- | --- | --- | --- |
-| ~~**1**~~ | ~~**Free disk space (minimum 10GB)**~~ done — environment resolved; build/test/lint green 2026-09 | | | |
-| ~~**2**~~ | ~~**Git push** (1 commit ahead)~~ done — repo synced with origin | | | |
-| ~~**3**~~ | ~~**Dependabot: update grpc** (CVE auth bypass)~~ done — google.golang.org/grpc at v1.83.2 | | | |
-| ~~**4**~~ | ~~**`go mod tidy`**~~ done — go.mod kept tidy | | | |
-| ~~**5**~~ | ~~**Delete `internal/testutil/`** (0 imports, 234 lines)~~ done at `8906c10`; internal/test provides helpers | | | |
-| ~~**6**~~ | ~~**Unify `skipDirs`**: export from `content`, use in `watcher`~~ done at `0192273` | | | |
-| ~~**7**~~ | ~~**Unify `isMarkdownFile`**: export from `content`, use in `watcher`~~ done at `0192273` | | | |
-| ~~**8**~~ | ~~**Unify `getContentType`**: merge into `content/helpers.go`, add font types~~ done at `0192273` | | | |
-| ~~**9**~~ | ~~**Use `cache.GetOrCompute`** in `render.go`~~ done at `983431f` | | | |
-| ~~**10**~~ | ~~**Implement `HasReadme`**: check directory children for README.md~~ done at `983431f` | | | |
-| ~~**11**~~ | ~~**Render `SearchResult.Snippet`** in template~~ done at `983431f` | | | |
-| ~~**12**~~ | ~~**Move `SuggestedPath` to `domain/`**~~ done at `983431f` | | | |
-| ~~**13**~~ | ~~**Fix double error wrapping** in `search.go:63`~~ **Won't implement — current wrapping passes the lint gates.** | | | |
-| ~~**14**~~ | ~~**Unexport unnecessary exports** in `content/helpers.go`~~ **Won't implement — not pursued.** | | | |
-| ~~**15**~~ | ~~**Move hardcoded cache size to config**~~ **Won't implement — not pursued; documented constant.** | | | |
-| ~~**16**~~ | ~~**Move hardcoded rate limit to config**~~ **Won't implement — not pursued; documented constant.** | | | |
-| ~~**17**~~ | ~~**Remove useless type assertion** in `main.go:209`~~ done — main.go rewritten in the 2026-09 do.Invoke refactor | | | |
-| ~~**18**~~ | ~~**Populate `Frontmatter.Date`** from YAML metadata~~ done — parsed from YAML metadata | | | |
-| ~~**19**~~ | ~~**Unify `treeStats` / `blobTreeStats`** structs~~ **Won't implement — not pursued.** | | | |
-| ~~**20**~~ | ~~**Add container DI tests**~~ done — container_test.go rewritten 2026-09 | | | |
-| ~~**21**~~ | ~~**Add E2E diagram rendering tests**~~ done — renderer tests cover the diagram pipeline | | | |
-| ~~**22**~~ | ~~**Run `templ generate`** to fix stale LSP errors~~ done — test.yml drift check enforces it | | | |
-| ~~**23**~~ | ~~**Add `.gitignore` entry for `docs/status/`** or auto-generate~~ **Won't implement — status docs are tracked intentionally.** | | | |
-| ~~**24**~~ | ~~**Clean `.golangci.yml`** of testutil exclusion rules (after deletion)~~ done — config cleaned | | | |
-| ~~**25**~~ | ~~**Delete this and older status reports**~~ done (docs-health pass 2026-09-27 — resolved reports archived instead of deleted) | | | |
+| ~~**1**~~ | ~~**Free disk space (minimum 10GB)**~~ done — environment resolved; build/test/lint green 2026-09 | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**2**~~ | ~~**Git push** (1 commit ahead)~~ done — repo synced with origin | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**3**~~ | ~~**Dependabot: update grpc** (CVE auth bypass)~~ done — google.golang.org/grpc at v1.83.2 | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**4**~~ | ~~**`go mod tidy`**~~ done — go.mod kept tidy | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**5**~~ | ~~**Delete `internal/testutil/`** (0 imports, 234 lines)~~ done at `8906c10`; internal/test provides helpers | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**6**~~ | ~~**Unify `skipDirs`**: export from `content`, use in `watcher`~~ done at `0192273` | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**7**~~ | ~~**Unify `isMarkdownFile`**: export from `content`, use in `watcher`~~ done at `0192273` | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**8**~~ | ~~**Unify `getContentType`**: merge into `content/helpers.go`, add font types~~ done at `0192273` | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**9**~~ | ~~**Use `cache.GetOrCompute`** in `render.go`~~ done at `983431f` | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**10**~~ | ~~**Implement `HasReadme`**: check directory children for README.md~~ done at `983431f` | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**11**~~ | ~~**Render `SearchResult.Snippet`** in template~~ done at `983431f` | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**12**~~ | ~~**Move `SuggestedPath` to `domain/`**~~ done at `983431f` | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**13**~~ | ~~**Fix double error wrapping** in `search.go:63`~~ **Won't implement — current wrapping passes the lint gates.** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**14**~~ | ~~**Unexport unnecessary exports** in `content/helpers.go`~~ **Won't implement — not pursued.** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**15**~~ | ~~**Move hardcoded cache size to config**~~ **Won't implement — not pursued; documented constant.** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**16**~~ | ~~**Move hardcoded rate limit to config**~~ **Won't implement — not pursued; documented constant.** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**17**~~ | ~~**Remove useless type assertion** in `main.go:209`~~ done — main.go rewritten in the 2026-09 do.Invoke refactor | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**18**~~ | ~~**Populate `Frontmatter.Date`** from YAML metadata~~ done — parsed from YAML metadata | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**19**~~ | ~~**Unify `treeStats` / `blobTreeStats`** structs~~ **Won't implement — not pursued.** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**20**~~ | ~~**Add container DI tests**~~ done — container_test.go rewritten 2026-09 | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**21**~~ | ~~**Add E2E diagram rendering tests**~~ done — renderer tests cover the diagram pipeline | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**22**~~ | ~~**Run `templ generate`** to fix stale LSP errors~~ done — test.yml drift check enforces it | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**23**~~ | ~~**Add `.gitignore` entry for `docs/status/`** or auto-generate~~ **Won't implement — status docs are tracked intentionally.** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**24**~~ | ~~**Clean `.golangci.yml`** of testutil exclusion rules (after deletion)~~ done — config cleaned | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~**25**~~ | ~~**Delete this and older status reports**~~ done (docs-health pass 2026-09-27 — resolved reports archived instead of deleted) | ~~—~~ | ~~—~~ | ~~—~~ |
 
 ---
 
