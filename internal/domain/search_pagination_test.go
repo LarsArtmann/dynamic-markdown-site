@@ -75,3 +75,43 @@ func TestSearchPaginationWindow(t *testing.T) {
 		t.Error("first page should not have prev")
 	}
 }
+
+func FuzzNewSearchPagination(f *testing.F) {
+	f.Add(0, "", "")
+	f.Add(1, "1", "10")
+	f.Add(57, "-5", "99999999999999999999")
+	f.Add(1000, "999999", "0")
+	f.Add(3, "abc", "-2")
+
+	f.Fuzz(func(t *testing.T, total int, pageParam, pageSizeParam string) {
+		p := NewSearchPagination(total, pageParam, pageSizeParam)
+
+		if p.Page < 1 {
+			t.Fatalf("Page = %d, want >= 1", p.Page)
+		}
+
+		if p.TotalPages < 1 {
+			t.Fatalf("TotalPages = %d, want >= 1", p.TotalPages)
+		}
+
+		if p.Page > p.TotalPages {
+			t.Fatalf("Page = %d exceeds TotalPages = %d", p.Page, p.TotalPages)
+		}
+
+		if p.PageSize < 1 || p.PageSize > SearchPageSizeMax {
+			t.Fatalf("PageSize = %d, want in [1, %d]", p.PageSize, SearchPageSizeMax)
+		}
+
+		if p.End() < p.Offset() {
+			t.Fatalf("End = %d below Offset = %d", p.End(), p.Offset())
+		}
+
+		if p.End() > p.Total {
+			t.Fatalf("End = %d exceeds Total = %d", p.End(), p.Total)
+		}
+
+		if p.End() < p.Offset()+p.PageSize && p.End() != p.Total {
+			t.Fatalf("window smaller than page size without hitting total: offset=%d end=%d total=%d", p.Offset(), p.End(), p.Total)
+		}
+	})
+}
