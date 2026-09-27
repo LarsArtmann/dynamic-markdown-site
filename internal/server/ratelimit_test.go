@@ -115,7 +115,10 @@ func TestRateLimiter_EvictsIdleVisitors(t *testing.T) {
 
 	rl.mu.Lock()
 	rl.visitors["10.0.0.1"] = &visitor{limiter: rate.NewLimiter(rl.rate, rl.burst), lastSeen: time.Now()}
-	rl.visitors["10.0.0.2"] = &visitor{limiter: rate.NewLimiter(rl.rate, rl.burst), lastSeen: time.Now().Add(-rl.ttl - time.Second)}
+	rl.visitors["10.0.0.2"] = &visitor{
+		limiter:  rate.NewLimiter(rl.rate, rl.burst),
+		lastSeen: time.Now().Add(-rl.ttl - time.Second),
+	}
 	rl.mu.Unlock()
 
 	rl.evictIdle(time.Now())
@@ -209,8 +212,10 @@ func TestRateLimiter_RefillsTokens(t *testing.T) {
 	rl := newRateLimiter(2, 100*time.Millisecond)
 	defer rl.Stop()
 
-	if !rl.checkRateLimit("10.5.0.1") || !rl.checkRateLimit("10.5.0.1") {
-		t.Fatal("bucket should start full: two requests allowed")
+	for range 2 {
+		if !rl.checkRateLimit("10.5.0.1") {
+			t.Fatal("bucket should start full: first two requests allowed")
+		}
 	}
 
 	if rl.checkRateLimit("10.5.0.1") {

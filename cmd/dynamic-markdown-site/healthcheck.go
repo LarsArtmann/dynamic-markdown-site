@@ -48,7 +48,7 @@ func runHealthcheck() error {
 
 	url := "http://" + *addr + "/health" //nolint:branching-flow // flag.String returns non-nil
 
-	client := &http.Client{ //nolint:exhaustruct // use defaults
+	client := &http.Client{ //nolint:exhaustruct_v5 // use defaults
 		Timeout: time.Duration(*timeoutSec) * time.Second, //nolint:branching-flow // flag.Int returns non-nil
 	}
 

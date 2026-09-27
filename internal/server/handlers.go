@@ -17,17 +17,17 @@ import (
 )
 
 type Server struct {
-	repo               content.Repository
-	searcher           content.Searchable
-	renderer           domain.Renderer
-	logger             *slog.Logger
-	rateLimiter        *rateLimiter
-	searchRateLimiter  *rateLimiter
-	cache              *cache.HTMLCache
-	liveReload         *LiveReload
-	devMode            bool
-	siteName           string
-	startedAt          time.Time
+	repo              content.Repository
+	searcher          content.Searchable
+	renderer          domain.Renderer
+	logger            *slog.Logger
+	rateLimiter       *rateLimiter
+	searchRateLimiter *rateLimiter
+	cache             *cache.HTMLCache
+	liveReload        *LiveReload
+	devMode           bool
+	siteName          string
+	startedAt         time.Time
 }
 
 func NewServer(
@@ -44,17 +44,17 @@ func NewServer(
 	lr := NewLiveReload(log)
 
 	return &Server{
-		repo:               repo,
-		searcher:           searcher,
-		renderer:           renderer,
-		logger:             log,
-		rateLimiter:        rl,
-		searchRateLimiter:  srl,
-		cache:              htmlCache,
-		liveReload:         lr,
-		devMode:            devMode,
-		siteName:           siteName,
-		startedAt:          time.Now(),
+		repo:              repo,
+		searcher:          searcher,
+		renderer:          renderer,
+		logger:            log,
+		rateLimiter:       rl,
+		searchRateLimiter: srl,
+		cache:             htmlCache,
+		liveReload:        lr,
+		devMode:           devMode,
+		siteName:          siteName,
+		startedAt:         time.Now(),
 	}
 }
 

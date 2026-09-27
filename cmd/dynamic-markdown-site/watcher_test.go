@@ -28,7 +28,10 @@ func (c *countingRepository) Refresh() domain.RefreshResult {
 func newWatchRoot(t *testing.T) string {
 	t.Helper()
 
-	root, err := os.MkdirTemp(".", "watcher-test-")
+	// t.TempDir() lives under /tmp, whose "tmp" path component the watcher's
+	// ignore filter matches anywhere in a path (AGENTS.md gotcha #16), so the
+	// watched root must be created inside the package directory instead.
+	root, err := os.MkdirTemp(".", "watcher-test-") //nolint:usetesting // see comment above
 	if err != nil {
 		t.Fatalf("create watch root: %v", err)
 	}
@@ -42,7 +45,7 @@ func startWatcher(
 	t *testing.T,
 	root string,
 	repo content.Repository,
-) (cancel context.CancelFunc, done <-chan struct{}) {
+) (context.CancelFunc, <-chan struct{}) {
 	t.Helper()
 
 	ctx, cancel := context.WithCancel(context.Background())

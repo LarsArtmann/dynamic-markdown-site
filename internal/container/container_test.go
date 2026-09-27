@@ -40,11 +40,6 @@ func assertNoShutdownError(t *testing.T, c *Container) {
 	}
 }
 
-
-
-
-
-
 func newInProcessContainer(t *testing.T) *Container {
 	t.Helper()
 
