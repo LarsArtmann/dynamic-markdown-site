@@ -47,7 +47,7 @@
 
 - [ ] Add RSS/Atom feed generation
 - [ ] Implement WebSocket live reload
-- [ ] Add brotli encoding (gzip already ships via `httputil.Compression`)
+- [ ] Add brotli encoding — EVALUATED & DECLINED 2026-09-27: `httputil` v1.2.0 can wire `br` via `WriterFactories`, but it bundles no brotli encoder, so adopting it means a new direct dependency (e.g. andybalholm/brotli) for a 10-20% gain on already-gzipped HTML. Revisit if payload sizes or bandwidth costs grow (gzip parity is regression-tested in `handlers_test.go`).
 
 - [ ] Add ETag/If-None-Match support
 

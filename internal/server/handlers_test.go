@@ -1,11 +1,14 @@
 package server
 
 import (
+	"compress/gzip"
 	"context"
 	"encoding/json/v2"
 	"errors"
+	"io"
 	"log/slog"
 	"net/http"
+	"path/filepath"
 	"net/http/httptest"
 	"os"
 	"strings"
@@ -452,4 +455,57 @@ func (f *FailingRepository) AllPaths() []domain.URLPath {
 // Ensure test content directory exists for benchmark tests.
 func init() {
 	_ = os.MkdirAll("test-content", 0o755)
+}
+
+func TestCompressionGzipRoundTrip(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+
+	body := []byte("# Compression\n\n" + strings.Repeat("The quick brown fox jumps over the lazy dog.\n\n", 40))
+
+	if err := os.WriteFile(filepath.Join(root, "big.md"), body, 0o600); err != nil {
+		t.Fatalf("write markdown: %v", err)
+	}
+
+	repo, err := content.NewFileSystemRepository(root)
+	if err != nil {
+		t.Fatalf("NewFileSystemRepository: %v", err)
+	}
+
+	handler := newTestHandler(newTestServer(t, repo))
+
+	req := httptest.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		"/big",
+		nil,
+	)
+	req.Header.Set("Accept-Encoding", "gzip")
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+
+	if got := rec.Header().Get("Content-Encoding"); got != "gzip" {
+		t.Fatalf("Content-Encoding = %q, want gzip", got)
+	}
+
+	reader, err := gzip.NewReader(rec.Body)
+	if err != nil {
+		t.Fatalf("gzip.NewReader: %v", err)
+	}
+	defer reader.Close()
+
+	decoded, err := io.ReadAll(reader)
+	if err != nil {
+		t.Fatalf("gzip round-trip: %v", err)
+	}
+
+	if !strings.Contains(string(decoded), "The quick brown fox") {
+		t.Error("decoded body lost the markdown content")
+	}
 }

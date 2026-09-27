@@ -45,6 +45,7 @@ type Config struct {
 	StorageURL   string
 	LogLevel     string
 	CacheEnabled bool
+	CacheSize    int
 	DevMode      bool
 	Timeout      time.Duration
 	SiteName     string
@@ -58,6 +59,7 @@ func DefaultConfig() *Config {
 		StorageURL:   "",
 		LogLevel:     logLevelInfo,
 		CacheEnabled: true,
+		CacheSize:    10_000,
 		DevMode:      false,
 		Timeout:      30 * time.Second,
 		SiteName:     "Site",
@@ -93,6 +95,7 @@ func (c *Config) defineAndParseFlags() {
 	flag.StringVar(&c.StorageURL, "storage-url", c.StorageURL,
 		"Blob storage URL (e.g., file:///path, s3://bucket/prefix, gs://bucket/prefix)")
 	flag.BoolVar(&c.CacheEnabled, "cache", c.CacheEnabled, "Enable response caching")
+	flag.IntVar(&c.CacheSize, "cache-size", c.CacheSize, "Maximum number of cached HTML pages")
 	flag.BoolVar(&c.DevMode, "dev", c.DevMode, "Development mode (disables caching)")
 	flag.DurationVar(&c.Timeout, "timeout", c.Timeout, "Request timeout")
 
@@ -110,6 +113,7 @@ func (c *Config) applyEnvironmentOverrides() {
 	c.applyEnvString("DYNAMIC_MARKDOWN_LOG_LEVEL", func(v string) { c.LogLevel = v })
 	c.applyEnvString("DYNAMIC_MARKDOWN_STORAGE_URL", func(v string) { c.StorageURL = v })
 	c.applyEnvBool("DYNAMIC_MARKDOWN_CACHE", func(v bool) { c.CacheEnabled = v })
+	c.applyEnvInt("DYNAMIC_MARKDOWN_CACHE_SIZE", func(v int) { c.CacheSize = v })
 	c.applyEnvBool("DYNAMIC_MARKDOWN_DEV", func(v bool) { c.DevMode = v })
 	c.applyEnvDuration("DYNAMIC_MARKDOWN_TIMEOUT", func(v time.Duration) { c.Timeout = v })
 	c.applyEnvString("DYNAMIC_MARKDOWN_SITE_NAME", func(v string) { c.SiteName = v })
@@ -126,6 +130,14 @@ func (c *Config) applyEnvUint16(key string, apply func(uint16)) {
 func (c *Config) applyEnvString(key string, apply func(string)) {
 	if val := os.Getenv(key); val != "" {
 		apply(val)
+	}
+}
+
+func (c *Config) applyEnvInt(key string, apply func(int)) {
+	if val := os.Getenv(key); val != "" {
+		if n, err := strconv.Atoi(val); err == nil {
+			apply(n)
+		}
 	}
 }
 
@@ -170,6 +182,11 @@ func (c *Config) validate() error {
 	// Validate port
 	if c.Port == 0 {
 		return errors.Wrap(errInvalidPort, fmt.Sprintf("port=%d", c.Port))
+	}
+
+	// Validate cache size
+	if c.CacheSize < 1 {
+		return errors.Wrapf(errInvalidCacheSize, "cache_size=%d", c.CacheSize)
 	}
 
 	// Validate storage - either StorageURL (blob) or RootDir (filesystem)
