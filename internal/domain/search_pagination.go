@@ -27,6 +27,8 @@ type SearchPagination struct {
 // against the total result count. Invalid or out-of-range values fall back
 // to sane bounds instead of erroring.
 func NewSearchPagination(total int, pageParam, pageSizeParam string) SearchPagination {
+	total = max(total, 0)
+
 	pageSize := SearchPageSizeDefault
 	if n, err := strconv.Atoi(pageSizeParam); err == nil {
 		switch {
