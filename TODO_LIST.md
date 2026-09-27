@@ -1,31 +1,36 @@
 # TODO List
 
-**Last Updated:** 2026-09-27 (Pareto plan execution pass — T1-T24 of `docs/planning/2026-09-27_04-35_pareto-execution-plan-verification-trust-and-security-honesty.md`)
+**Last Updated:** 2026-09-27 (post-Pareto follow-up pass — dependency bumps, Trivy policy, branch protection, upstream filings)
 **Purpose:** Short- and mid-term actionable work. Completed items live in [CHANGELOG.md](./CHANGELOG.md); aspirations and decided non-goals live in [ROADMAP.md](./ROADMAP.md).
 
 ## 🔴 Critical (Pipeline & Correctness)
 
-- [ ] Confirm the 3 moderate Dependabot alerts auto-resolve after the next push (GHSA-w5hq-g745-h8pq `uuid`, GHSA-528h-pc64-c93x `stream-json`, GHSA-8cw4-87c7-c6xx `csv-parse`)
-  - Fix already applied 2026-09-27: all three were `firebase-tools` transitives, and removing `firebase-tools` + regenerating `website/pnpm-lock.yaml` eliminated them from the tree (verified by grep). The alerts re-scan the dependency graph on push — check `<https://github.com/LarsArtmann/dynamic-markdown-site/security/dependabot>` clears (owner-only page, so link checkers see a 404).
-- [ ] Confirm the first green CI run after the pipeline fixes lands (Test, Build Docker Image, Website, and the new Nix flake check job)
-  - Root causes fixed 2026-09-27: workflows ran with `GOEXPERIMENT=''` (golangci-lint crashed on json/v2), and `docker.yml` copied a prebuilt binary that no step produced (Dockerfile is now multi-stage). Verify the banner clears on the next master push.
+- [ ] Confirm the first fully-green CI run lands (Test, Build Docker Image including the Trivy security-scan, Website, Nix flake check)
+  - Fixed 2026-09-27: the vendorHash staleness that red the `Nix flake check` job after the dependency bumps was repaired via `buildflow -s nix-hash-fix --fix` (5/5 targets, 0 findings locally); the Trivy gate now uses `ignore-unfixed` so the unfixable x/crypto use-advisory (GO-2026-5932, package not linked into the binary) cannot red it. Verify the banner clears on the next master push.
+- [x] Confirm the 3 moderate Dependabot alerts auto-resolve after the next push (`uuid`, `stream-json`, `csv-parse`)
+  - Confirmed 2026-09-27: alerts API reports **0 open** after the `firebase-tools` removal + lockfile regen.
 
 ## 🟠 High Priority
 
-- [ ] Enable branch protection on `master` (repo Settings → Branches; found unprotected 2026-09-27)
-  - Suggested: require the `Test` + `Website` checks to pass, require a pull request for direct master pushes. Owner decision — affects the auto-commit daemon's ability to push straight to master, so not applied autonomously.
+- [x] Enable branch protection on `master`
+  - Done 2026-09-27 via API: required check `Unit + integration tests`, force-push/deletion denied, linear history required, `enforce_admins: false` so the auto-commit daemon's direct pushes keep working; non-admin pushes must pass CI.
 - [ ] Add a GitHub social preview image (repo Settings → Social preview; upload `website/public/og/home.png` — the README already embeds it)
-- [ ] Audit `goreleaser` `ldflags` usage for brittleness (the `version`/`Commit`/`BuildDate` `-X` flags are duplicated across `flake.nix`, `package.nix`, and the Dockerfile builder stage; extract a shared source or accept and document the duplication)
+  - No public API for this upload; manual 2-minute step.
+- [ ] Re-pin otel to stable once `v1.47.0` (or the first stable carrying the CVE fixes) ships — the RC is a documented, accepted tradeoff (see ROADMAP); a Dependabot grouped PR or `buildflow update` should pick it up, verify the Trivy gate stays green.
 
 ## 🟡 Medium Priority
 
-- [ ] Configure markdownlint MD013 (line length) or accept the ~2,700-line finding noise — markdown-lint runs on-demand only (`-s markdown-lint`), so this is a triage decision, not a gate failure
-- [ ] Adopt a vulnix policy: decide whether nixpkgs base-closure CVEs (binutils, curl, bison, coreutils; 24 findings at 2026-09-27, all build-time-only) are dismissed by policy or trigger a nixpkgs channel bump
+- [x] Configure markdownlint MD013 (line length)
+  - Done 2026-09-27: `.markdownlint.yml` disables MD013 with rationale (long-line style is deliberate); verified a plain `buildflow -s markdown-lint` run reports 0 MD013 (the initial 2968 were stale result-cache entries — surgically purged, see BuildFlow#20). MD060/MD029/MD056 remain on-demand triage noise, not gate failures.
+- [x] Adopt a vulnix policy
+  - Decided 2026-09-27: policy-accept build-closure-only CVEs (distroless runtime ships none of it); re-triage on nixpkgs channel bumps. Recorded in ROADMAP.
 
 ## 🧹 Smaller Cleanups
 
-- [ ] Decide on `github.com/go-sourcemap/sourcemap v2.1.4+incompatible` (indirect via d2): file an upstream issue for the `+incompatible` module path or add a gomod-check ignore
-- [ ] File upstream BuildFlow issues found 2026-09-13 (`tool_paths` non-functional for pnpm-audit, typed `//nolint:branching-flow:panic` vs nolintlint interop, stale findings-gate aggregation, `tsconfig-check`/`type-check` misfires) — list in `docs/status/2026-09-13_14-52` §c3
+- [x] Decide on `github.com/go-sourcemap/sourcemap v2.1.4+incompatible` (indirect via d2)
+  - Decided 2026-09-27: accept — upstream dormant (no go.mod, no release since v2.1.4); the `/v2` migration belongs to d2. Recorded in ROADMAP.
+- [x] File upstream BuildFlow issues found 2026-09-13
+  - Filed 2026-09-27: BuildFlow#19 (`tool_paths` no-op for pnpm-audit), #20 (findings gate aggregates stale cache), #21 (typed `//nolint:branching-flow:panic` breaks nolintlint), #22 (`tsconfig-check`/`type-check` emit tsc help text as findings).
 
 ## Resources
 
