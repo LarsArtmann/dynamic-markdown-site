@@ -10,6 +10,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Search result pagination — `page` (1-based, clamped) and `pageSize` (default 20, max 100) query params on `/search`, with Previous/Next pager controls in the results view (`internal/domain/search_pagination.go`)
+- Rate limiting for `/search` — 30 requests per minute per IP, separate bucket from `/refresh`, JSON 429 with limit metadata
+- Configurable HTML cache size — `-cache-size` flag / `DYNAMIC_MARKDOWN_CACHE_SIZE` env (default 10000, validated ≥ 1)
+- GitHub issue templates (bug, feature request), `SECURITY.md` with private vulnerability reporting, and `CODEOWNERS`
+- Website CI workflow (`website.yml`) — pnpm install with frozen lockfile, `pnpm audit` gate, `astro check`, and `astro build`, path-triggered on `website/**`
+- `nix flake check` job in CI (NixPKGS unfree flag set; catches flake drift at PR time)
+- Repetition guard (`-count=10 -race`) for the concurrent rate-limiter test in CI
+- Multi-stage Dockerfile (golang builder → distroless static) — the image now builds itself from source with ldflags metadata
+- README hero image — rendered site preview (OG image from the live docs site)
+- `scripts/check-report-annotations.sh` — verifies every archived report carries inline resolution markers
+- `docs/status/README.md` — living/archived report index
 - Request timing middleware — `X-Response-Time` header on every response (`internal/server/responsetime.go`)
 - Dependabot config with weekly grouped minor/patch updates (Go modules, Actions, pnpm)
 - dprint formatter config for JSON/YAML/Config files
@@ -29,6 +40,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - **Migrated server JSON to `encoding/json/v2`** — requires `GOEXPERIMENT=jsonv2` and a `go 1.27+` toolchain (`go.mod` now declares `go 1.27.1`); supersedes the earlier "stable encoding/json only" policy
+- **Nix builds pinned to Go 1.27 with `GOEXPERIMENT=jsonv2`** — `flake.nix` overrides `buildGoModule` with `go_1_27`, exports the experiment in build/shells, and single-sources the vendor hash in `vendorHash.nix` (flake and overlay can no longer drift); all gates pass
+- **CI runs with `GOEXPERIMENT=jsonv2`** — the Test/Lint/Docker workflows previously compiled without the experiment (golangci-lint crashed in go/types on json/v2 packages); `internal/container` is excluded from the per-package coverage threshold because it is subprocess-tested (config.Load owns flag.Parse)
+- **PHANTOM_TYPE findings policy decided** — the BuildFlow findings gate stays at `error+`; all 83 branching-flow suggestions are warning/info and triaged (targeted strong-ID candidates listed in ROADMAP), no suppressions added
+- **Brotli compression evaluated and declined** — httputil can wire `br` via WriterFactories but bundles no encoder; adoption would add a direct dependency for a marginal gain over active gzip (gzip parity is regression-tested); revisit if payload sizes grow
+- **Changelog automation (git-cliff) declined** — curated manual entries beat daemon-generated noise at this release cadence
+- **Mermaid CDN pinned to minor** — `mermaid@11.17` instead of floating `@11`
+- **`assets/` directory advisory dismissed** — static assets are website-scoped (`website/public/`) and embedded server assets live in `internal/server/static/`; a top-level `assets/` dir would be structure noise, not improvement
 - **Dependency injection hardened** — all `do.MustInvoke` call sites replaced with error-returning `do.Invoke`; container accessors now return `(T, error)` (Cache/Renderer/Searcher accessors removed as dead code)
 - **File watching rewritten on `go-filewatcher/v2`** — 181 lines of hand-rolled fsnotify boilerplate replaced with 85 lines; watcher now shuts down cleanly via the SIGINT/SIGTERM context
 - Upgraded to `charm.land/log/v2`, `otter/v2`, `httputil` v1.2.0, `go-filewatcher/v2` v2.3.0
@@ -43,6 +61,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Published license metadata lied (`MIT` vs proprietary)** — `.goreleaser.yaml` homebrew/nfpms/scoops now use SPDX `LicenseRef-Proprietary`, the nix section uses `unfree` (matching flake.nix); `goreleaser check` validates green
+- **Rate limiter memory leak** — the per-IP `visitors` map grew without bound; a sweep goroutine (1-minute tick) now evicts visitors idle beyond 3× the window, `Stop()` terminates the sweep and is idempotent, and burst semantics (full-window burst + steady refill) are documented on `newRateLimiter`
+- **Timing flake in `TestGracefulShutdownStopsInFlightRequests`** — the 10 ms sleep raced connection acceptance, and `http.Server.Shutdown` closes accepted-but-unprocessed connections, cutting the "in-flight" request; the test now waits for a handler-started signal (verified 50/50 under `-race` + CPU load)
+- **Data race between content refresh and HTTP reads** — `FileSystemRepository`/`BlobRepository` read `r.tree` outside the lock; the shared tree helpers now take `**domain.ContentTree` and dereference under the read lock (found by the new watcher integration test)
+- **Token refill untested** — new test exercises `rate.Every` refill behavior with polling tolerance (no wall-clock exact-count assertions)
+- **`internal/container` coverage invisible** — 0% → 52.7% via in-process accessor/provider tests (error paths, full wiring graph, blob error); the five subprocess tests merged into one lifecycle test (6.5 s → 2.2 s under `-race`)
+- **Watcher had no integration test** — temp-dir write → refresh, skipped-dir → no refresh, context cancel → clean exit; caught both the data race above and the ignore-filter footgun
+- **Dead test setup in `TestRawFileServing`** — unused `RawFile`/`URLPath` writes (`gopls unusedwrite`) replaced by a real raw-file round-trip through the handler
+- **Duplicated nested-repo fixture in `filesystem_test.go`** — extracted `newNestedDocsRepo` helper
+- **Deprecated `exhaustruct` migrated to `exhaustruct_v5`** in `.golangci.yml`
+- **Dead `nixos.wiki` link (403)** in CONTRIBUTING.md replaced with the official Nix manual
+- **Missing `platforms` attribute** added to the flake package meta
 - Flaky `TestRateLimiter_Concurrent` — exact-count assertions now use the `newBurstOnlyLimiter` helper (1-hour window, negligible refill); sibling tests hardened the same way
 - `TestRefreshRateLimit` no-op assertion — now asserts exactly 10× `200` + 5× `429` across 15 sequential requests
 - Pre-existing build break from `httputil` v0.6.0 importing `encoding/json/v2` (resolved by the json/v2 adoption)
@@ -59,8 +89,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Security
 
+- **`firebase-tools` removed from `website/` devDependencies** — a 2026-07-13 debugging artifact that dragged in 6 moderate advisory paths (`stream-json`, `csv-parse`, `uuid`, …); the regenerated lockfile has zero known vulnerabilities, and `pnpm audit` now runs as a CI gate on `website/**` changes
+- **License-check step skipped with rationale** — go-licenses aborts on json/v2 std packages (upstream google/go-licenses#128); documented in `.buildflow.yml`
 - Pinned `anchore/sbom-action/download-syft` to a full commit SHA in `release.yml`
-- Skipped root-level `pnpm audit` in BuildFlow (wrong directory — see AGENTS.md gotcha #15); audit `website/` manually via `cd website && pnpm audit`
+- Skipped root-level `pnpm audit` in BuildFlow (wrong directory — see AGENTS.md gotcha #15); `pnpm audit` now runs in the website CI workflow
 
 ### Removed
 

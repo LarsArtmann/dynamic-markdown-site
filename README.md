@@ -8,6 +8,8 @@ Point it at a folder of `.md` files (or an S3/GCS bucket) and get a fully functi
 
 > **Live docs:** [dynamicmarkdown.lars.software](https://dynamicmarkdown.lars.software) — full documentation site for this project (Astro + Starlight, source in [`website/`](website/)).
 
+![Dynamic Markdown Site — rendered site preview](https://dynamicmarkdown.lars.software/og/home.png)
+
 ## Highlights
 
 - **Zero config** — drop markdown files in a directory, run the binary

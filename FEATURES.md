@@ -194,6 +194,7 @@ Compiled with `CGO_ENABLED=0`, `-tags netgo`, and static linking — zero runtim
 | Storage URL     | `-storage-url` | `DYNAMIC_MARKDOWN_STORAGE_URL` |         |
 | Log level       | `-log-level`   | `DYNAMIC_MARKDOWN_LOG_LEVEL`   | `info`  |
 | Caching         | `-cache`       | `DYNAMIC_MARKDOWN_CACHE`       | `true`  |
+| Cache size      | `-cache-size`  | `DYNAMIC_MARKDOWN_CACHE_SIZE`  | `10000` |
 | Dev mode        | `-dev`         | `DYNAMIC_MARKDOWN_DEV`         | `false` |
 | Request timeout | `-timeout`     | `DYNAMIC_MARKDOWN_TIMEOUT`     | `30s`   |
 | Site name       |                | `DYNAMIC_MARKDOWN_SITE_NAME`   | `Site`  |
