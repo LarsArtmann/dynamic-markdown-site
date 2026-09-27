@@ -171,19 +171,19 @@ graph LR
 
 ## API
 
-| Endpoint           | Method   | Description                                        |
-| ------------------ | -------- | -------------------------------------------------- |
-| `/`                | GET      | Root directory listing                             |
-| `/*path`           | GET      | Markdown file or directory listing                 |
-| `/health`          | GET      | Health check with dependency status (JSON)         |
-| `/refresh`         | GET/POST | Refresh content from source (rate limited: 10/min) |
+| Endpoint           | Method   | Description                                                             |
+| ------------------ | -------- | ----------------------------------------------------------------------- |
+| `/`                | GET      | Root directory listing                                                  |
+| `/*path`           | GET      | Markdown file or directory listing                                      |
+| `/health`          | GET      | Health check with dependency status (JSON)                              |
+| `/refresh`         | GET/POST | Refresh content from source (rate limited: 10/min)                      |
 | `/search`          | GET      | Full-text search (`?q=query`, `page`, `pageSize`; rate limited: 30/min) |
-| `/sitemap.xml`     | GET      | XML sitemap for search engines                     |
-| `/robots.txt`      | GET      | Robots file for crawlers                           |
-| `/metrics`         | GET      | Prometheus-format metrics                          |
-| `/cache/stats`     | GET      | Cache hit/miss statistics (JSON)                   |
-| `/static/*path`    | GET      | Static assets (CSS, favicon)                       |
-| `/api/live-reload` | GET      | SSE endpoint for live reload (dev mode only)       |
+| `/sitemap.xml`     | GET      | XML sitemap for search engines                                          |
+| `/robots.txt`      | GET      | Robots file for crawlers                                                |
+| `/metrics`         | GET      | Prometheus-format metrics                                               |
+| `/cache/stats`     | GET      | Cache hit/miss statistics (JSON)                                        |
+| `/static/*path`    | GET      | Static assets (CSS, favicon)                                            |
+| `/api/live-reload` | GET      | SSE endpoint for live reload (dev mode only)                            |
 
 ## Docker
 

@@ -103,7 +103,7 @@ Nothing — the scope was small and completed.
    ~~violation).~~
 2. ~~Harden `TestRateLimiter_Allow` against refill flakiness.~~ done at `7959ad4`
 3. ~~Harden `TestRateLimiter_DifferentIPs` against refill flakiness.~~ done at `7959ad4`
-4. ~~Update `AGENTS.md` gotcha #10 with the exact-count-vs-refill guidance.~~ done at `7959ad4`, ` 1d4ae5a`
+4. ~~Update `AGENTS.md` gotcha #10 with the exact-count-vs-refill guidance.~~ done at `7959ad4`, `1d4ae5a`
 5. ~~Run `golangci-lint run ./internal/server/...` on the changed file.~~ done — golangci-lint run on changed files, zero findings (2026-07-27 12:17 session)
 6. ~~Commit the fix once cleaned up.~~ done at `7959ad4`
 
@@ -113,11 +113,11 @@ time-based tests. 10. Add a regression guard: a `testing.Short()` skip or a stre
 (`-count=100`) in CI for the concurrent test to catch future drift. 11. Document the token-bucket refill rate formula in the `rateLimiter` doc
 comment (one line) so future readers don't mis-derive the refill speed. 12. Review whether `burst = maxRequests` is the intended semantics (burst equals
 the per-window cap) vs. a smaller burst + steady refill.
-   _Resolutions (2026-09-27 docs-health pass): 7 done — swept in the 2026-07-27 16:41 session; 8 open (TODO_LIST "test that intentionally exercises token refill"); 9 **Won't implement — decided 2026-07-27: keep `newBurstOnlyLimiter`; `x/time/rate` has no clock seam (YAGNI).**; 10 open (TODO_LIST "`-count` repetition guard"); 11 open (no formula doc comment on `rateLimiter` yet; tracked via TODO_LIST burst-semantics item); 12 open (TODO_LIST burst-semantics decision / ROADMAP Open Questions)._
+_Resolutions (2026-09-27 docs-health pass): 7 done — swept in the 2026-07-27 16:41 session; 8 open (TODO_LIST "test that intentionally exercises token refill"); 9 **Won't implement — decided 2026-07-27: keep `newBurstOnlyLimiter`; `x/time/rate` has no clock seam (YAGNI).**; 10 open (TODO_LIST "`-count` repetition guard"); 11 open (no formula doc comment on `rateLimiter` yet; tracked via TODO_LIST burst-semantics item); 12 open (TODO_LIST burst-semantics decision / ROADMAP Open Questions)._
 
 **General test-suite health (noticed, not investigated):** 13. The `internal/container` package takes ~7.9s under race — investigate
 whether DI container tests can be sped up. 14. Add a CI step that runs flaky-prone tests with `-count` repetition. 15. Add a project-wide lint gate that fails CI on `golangci-lint` findings.
-   _Resolutions (2026-09-27 docs-health pass): 13 open; 14 open (TODO_LIST); 15 done — CI `test.yml` runs golangci-lint (v2.12.2 pinned)._
+_Resolutions (2026-09-27 docs-health pass): 13 open; 14 open (TODO_LIST); 15 done — CI `test.yml` runs golangci-lint (v2.12.2 pinned)._
 
 _Scope note:_ Per session instructions, items beyond #6 were not researched —
 they are observations surfaced during this fix, not audited claims.

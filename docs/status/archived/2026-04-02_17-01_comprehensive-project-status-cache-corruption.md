@@ -190,7 +190,7 @@ A reliable command or approach to fully nuke and recreate the Go build cache wit
 ## Current Blockers
 
 | Blocker                | Severity     | Impact                     |
-| --- | --- | --- |
+| ---------------------- | ------------ | -------------------------- |
 | Build cache corruption | **CRITICAL** | Blocks all Go operations   |
 | Cannot run tests       | **HIGH**     | Cannot verify fixes        |
 | Cannot run lint        | **MEDIUM**   | Cannot verify code quality |

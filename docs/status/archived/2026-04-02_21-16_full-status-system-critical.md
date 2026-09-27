@@ -9,7 +9,7 @@
 ## System State at Time of Report
 
 | Metric               | Value                                              | Status                                    |
-| --- | --- | --- |
+| -------------------- | -------------------------------------------------- | ----------------------------------------- |
 | System load          | **337/335/332** (1/5/15 min)                       | 🔴 CRITICAL — ~50x overcommit on ~8 cores |
 | Disk usage           | **96% (218G/229G)**                                | 🔴 CRITICAL — 12GB free                   |
 | Memory pressure      | High — 3,782 free pages (58MB) of 16384-byte pages | 🔴 CRITICAL                               |
@@ -195,48 +195,48 @@
 
 ### Critical (Fix Now)
 
-| # | Area   | Issue                                                          | Impact             | Effort |
-| --- | --- | --- | --- | --- |
-| ~~1~~ | ~~System~~ done — environment resolved; cache/load issues gone with the 2026-04 macOS setup | ~~Reboot to fix cache corruption and reduce load~~ | ~~Everything blocked~~ | ~~2 min~~ |
-| ~~2~~ | ~~Disk~~ done — environment resolved; disk healthy | ~~Free up 50GB+ — clean Go cache, Docker images, build artifacts~~ | ~~System stability~~ | ~~10 min~~ |
-| ~~3~~ | ~~Push~~ done — pushed; repo synced with origin | ~~3 unpushed commits risk data loss~~ | ~~Data safety~~ | ~~1 min~~ |
+| #     | Area                                                                                        | Issue                                                              | Impact                 | Effort     |
+| ----- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------- | ---------- |
+| ~~1~~ | ~~System~~ done — environment resolved; cache/load issues gone with the 2026-04 macOS setup | ~~Reboot to fix cache corruption and reduce load~~                 | ~~Everything blocked~~ | ~~2 min~~  |
+| ~~2~~ | ~~Disk~~ done — environment resolved; disk healthy                                          | ~~Free up 50GB+ — clean Go cache, Docker images, build artifacts~~ | ~~System stability~~   | ~~10 min~~ |
+| ~~3~~ | ~~Push~~ done — pushed; repo synced with origin                                             | ~~3 unpushed commits risk data loss~~                              | ~~Data safety~~        | ~~1 min~~  |
 
 ### High Priority (Fix This Week)
 
-| # | Area       | Issue                                   | Impact                           | Effort |
-| --- | --- | --- | --- | --- |
-| ~~4~~ | ~~Go version~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.** | ~~Upgrade local to 1.26.1~~ | ~~Eliminates ~50 warnings~~ | ~~5 min~~ |
-| ~~5~~ | ~~go.work~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.** | ~~Add project to `~/projects/go.work`~~ | ~~Removes `GOWORK=off` requirement~~ | ~~2 min~~ |
-| ~~6~~ | ~~Deps~~ done — gocloud.dev retained; blob storage is a shipped feature | ~~Evaluate removing `gocloud.dev`~~ | ~~200MB+ build time reduction~~ | ~~Medium~~ |
-| ~~7~~ | ~~Tests~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor | ~~Add container package tests (0% → 80%+)~~ | ~~Test coverage~~ | ~~Low~~ |
-| ~~8~~ | ~~Watcher~~ done — go-filewatcher 500ms debounce (35658b2) | ~~Implement actual debouncing~~ | ~~Prevents refresh storms~~ | ~~Low~~ |
+| #     | Area                                                                                         | Issue                                       | Impact                               | Effort     |
+| ----- | -------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------ | ---------- |
+| ~~4~~ | ~~Go version~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.** | ~~Upgrade local to 1.26.1~~                 | ~~Eliminates ~50 warnings~~          | ~~5 min~~  |
+| ~~5~~ | ~~go.work~~ **Won't implement — obsolete: environment issue from the 2026-04 macOS setup.**  | ~~Add project to `~/projects/go.work`~~     | ~~Removes `GOWORK=off` requirement~~ | ~~2 min~~  |
+| ~~6~~ | ~~Deps~~ done — gocloud.dev retained; blob storage is a shipped feature                      | ~~Evaluate removing `gocloud.dev`~~         | ~~200MB+ build time reduction~~      | ~~Medium~~ |
+| ~~7~~ | ~~Tests~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor               | ~~Add container package tests (0% → 80%+)~~ | ~~Test coverage~~                    | ~~Low~~    |
+| ~~8~~ | ~~Watcher~~ done — go-filewatcher 500ms debounce (35658b2)                                   | ~~Implement actual debouncing~~             | ~~Prevents refresh storms~~          | ~~Low~~    |
 
 ### Medium Priority (Fix This Month)
 
-| #  | Area    | Issue                                                  | Impact                         | Effort  |
-| --- | --- | --- | --- | --- |
-| ~~9~~  | ~~Domain~~ done — setters removed; immutable render pipeline | ~~Remove `SetChildren()` or make private~~ | ~~Immutability contract~~ | ~~Trivial~~ |
-| ~~10~~ | ~~Domain~~ done — sorted rendering via node ordering; tests green | ~~Export and test `shouldComeAfter`~~ | ~~Sort correctness~~ | ~~Low~~ |
-| ~~11~~ | ~~Content~~ done — filter logic split by concern | ~~Split `filterEmptyDirectories` into query+command~~ | ~~Clarity~~ | ~~Low~~ |
-| ~~12~~ | ~~Server~~ done — errors.go returns explicit codes per case | ~~Apply staticcheck tagged switch in errors.go~~ | ~~Lint compliance~~ | ~~Trivial~~ |
-| ~~13~~ | ~~CI~~ done — test.yml runs the full suite on every push | ~~Add test step to GitHub Actions~~ | ~~Catch regressions before merge~~ | ~~Low~~ |
-| ~~14~~ | ~~DevEx~~ **Won't implement — not pursued; templ generate + CI drift check suffice.** | ~~Add `air` or similar for hot-reload during development~~ | ~~Dev velocity~~ | ~~Low~~ |
-| ~~15~~ | ~~Perf~~ **Won't implement — not pursued; O(1) map lookup needs no benchmark.** | ~~Add benchmarks for ContentTree.Find~~ | ~~Verify O(1) claim~~ | ~~Low~~ |
+| #      | Area                                                                                  | Issue                                                      | Impact                             | Effort      |
+| ------ | ------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------- | ----------- |
+| ~~9~~  | ~~Domain~~ done — setters removed; immutable render pipeline                          | ~~Remove `SetChildren()` or make private~~                 | ~~Immutability contract~~          | ~~Trivial~~ |
+| ~~10~~ | ~~Domain~~ done — sorted rendering via node ordering; tests green                     | ~~Export and test `shouldComeAfter`~~                      | ~~Sort correctness~~               | ~~Low~~     |
+| ~~11~~ | ~~Content~~ done — filter logic split by concern                                      | ~~Split `filterEmptyDirectories` into query+command~~      | ~~Clarity~~                        | ~~Low~~     |
+| ~~12~~ | ~~Server~~ done — errors.go returns explicit codes per case                           | ~~Apply staticcheck tagged switch in errors.go~~           | ~~Lint compliance~~                | ~~Trivial~~ |
+| ~~13~~ | ~~CI~~ done — test.yml runs the full suite on every push                              | ~~Add test step to GitHub Actions~~                        | ~~Catch regressions before merge~~ | ~~Low~~     |
+| ~~14~~ | ~~DevEx~~ **Won't implement — not pursued; templ generate + CI drift check suffice.** | ~~Add `air` or similar for hot-reload during development~~ | ~~Dev velocity~~                   | ~~Low~~     |
+| ~~15~~ | ~~Perf~~ **Won't implement — not pursued; O(1) map lookup needs no benchmark.**       | ~~Add benchmarks for ContentTree.Find~~                    | ~~Verify O(1) claim~~              | ~~Low~~     |
 
 ### Low Priority (Nice to Have)
 
-| #  | Area     | Issue                                      |
-| --- | --- | --- |
-| ~~16~~ | ~~Features~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented) | ~~ETag/If-None-Match HTTP caching~~ |
-| ~~17~~ | ~~Features~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~RSS/Atom feed generation~~ |
-| ~~18~~ | ~~Features~~ done — sitemap.xml shipped (4c21153) | ~~sitemap.xml for SEO~~ |
-| ~~19~~ | ~~Features~~ done — OpenGraph meta tags shipped | ~~OpenGraph meta tags~~ |
-| ~~20~~ | ~~Features~~ done — TOC sidebar shipped | ~~TOC sidebar (data exists, template needed)~~ |
-| ~~21~~ | ~~Features~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~Dark mode toggle~~ |
-| ~~22~~ | ~~Features~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~Pagination for large directories~~ |
-| ~~23~~ | ~~Infra~~ done (docs-health pass canonical entry lives in ROADMAP.md (Deployment); not implemented) | ~~TLS/HTTPS support~~ |
-| ~~24~~ | ~~Infra~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Observability).** | ~~Prometheus metrics~~ |
-| ~~25~~ | ~~Quality~~ done — .githooks/pre-commit + pre-push wired | ~~Pre-commit hooks for test+lint~~ |
+| #      | Area                                                                                                         | Issue                                          |
+| ------ | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| ~~16~~ | ~~Features~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented) | ~~ETag/If-None-Match HTTP caching~~            |
+| ~~17~~ | ~~Features~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**                  | ~~RSS/Atom feed generation~~                   |
+| ~~18~~ | ~~Features~~ done — sitemap.xml shipped (4c21153)                                                            | ~~sitemap.xml for SEO~~                        |
+| ~~19~~ | ~~Features~~ done — OpenGraph meta tags shipped                                                              | ~~OpenGraph meta tags~~                        |
+| ~~20~~ | ~~Features~~ done — TOC sidebar shipped                                                                      | ~~TOC sidebar (data exists, template needed)~~ |
+| ~~21~~ | ~~Features~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**                             | ~~Dark mode toggle~~                           |
+| ~~22~~ | ~~Features~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**                             | ~~Pagination for large directories~~           |
+| ~~23~~ | ~~Infra~~ done (docs-health pass canonical entry lives in ROADMAP.md (Deployment); not implemented)          | ~~TLS/HTTPS support~~                          |
+| ~~24~~ | ~~Infra~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Observability).**                        | ~~Prometheus metrics~~                         |
+| ~~25~~ | ~~Quality~~ done — .githooks/pre-commit + pre-push wired                                                     | ~~Pre-commit hooks for test+lint~~             |
 
 ---
 
@@ -291,7 +291,7 @@
 The machine has been at 300+ load average across all three sessions today. This is ~40x the number of CPU cores. The top processes are:
 
 | Process         | CPU         | Memory | Notes                                                   |
-| --- | --- | --- | --- |
+| --------------- | ----------- | ------ | ------------------------------------------------------- |
 | iTerm2          | 126%        | 693MB  | Likely rendering massive scrollback from this session   |
 | WindowServer    | 53%         | 140MB  | macOS display server — high load from all the rendering |
 | Go compile (×6) | ~100% total | ~800MB | Full recompilation from cache corruption                |

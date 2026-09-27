@@ -18,7 +18,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Core Features (100% Complete)
 
 | Feature                          | Status | Notes                                 |
-| --- | --- | --- |
+| -------------------------------- | ------ | ------------------------------------- |
 | Markdown rendering with Goldmark | ✅     | Full GFM + extensions                 |
 | Syntax highlighting (Chroma)     | ✅     | 200+ languages                        |
 | D2 diagram support               | ✅     | Server-side SVG rendering             |
@@ -44,7 +44,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Infrastructure (100% Complete)
 
 | Component                | Status | Notes                         |
-| --- | --- | --- |
+| ------------------------ | ------ | ----------------------------- |
 | Docker multi-stage build | ✅     | Distroless nonroot runtime    |
 | GitHub Actions CI/CD     | ✅     | Test, lint, build, smoke test |
 | Multi-arch Docker images | ✅     | linux/amd64 + linux/arm64     |
@@ -55,7 +55,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Code Quality (100% Complete)
 
 | Metric            | Value             | Status |
-| --- | --- | --- |
+| ----------------- | ----------------- | ------ |
 | Test Coverage     | ~80% avg          | ✅     |
 | Linter Compliance | 0 critical issues | ✅     |
 | Parallel Tests    | 100+ functions    | ✅     |
@@ -69,7 +69,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Test Coverage Gaps
 
 | Package              | Coverage      | Target | Gap           |
-| --- | --- | --- | --- |
+| -------------------- | ------------- | ------ | ------------- |
 | `internal/container` | 0.0%          | 75%    | 🔴 Critical   |
 | `internal/content`   | 72.6%         | 80%    | 🟡 Minor      |
 | `internal/domain`    | 75.8%         | 80%    | 🟢 Close      |
@@ -78,7 +78,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Linter Warnings (Non-Critical)
 
 | Issue                        | Count | Severity | Location                                |
-| --- | --- | --- | --- |
+| ---------------------------- | ----- | -------- | --------------------------------------- |
 | `cyclop` complexity 11       | 1     | Low      | `helpers.go:52`                         |
 | `errcheck` unchecked errors  | 2     | Low      | `admonition_extension.go:274-275`       |
 | `exhaustruct` missing fields | 2     | Low      | `admonition.go`, `sitemap.go`           |
@@ -88,7 +88,7 @@ Dynamic Markdown Site is a **production-ready, feature-complete** Go web server 
 ### Test File Sizes (Need Splitting)
 
 | File               | Lines | Target | Excess  |
-| --- | --- | --- | --- |
+| ------------------ | ----- | ------ | ------- |
 | `handlers_test.go` | 914   | ~400   | +514 🔴 |
 | `search_test.go`   | 685   | ~400   | +285 🟡 |
 | `markdown_test.go` | 611   | ~400   | +211 🟡 |
@@ -198,43 +198,43 @@ The codebase is in excellent shape. No critical issues identified.
 
 ### 🔴 High Priority (Do First)
 
-| #  | Task                                    | Impact   | Effort | Package              |
-| --- | --- | --- | --- | --- |
-| ~~1~~  | ~~Add container package tests~~ done — container_test.go rewritten 2026-09 | ~~Critical~~ | ~~Medium~~ | ~~`internal/container`~~ |
-| ~~2~~  | ~~Address GitHub security vulnerabilities~~ done — govulncheck clean; dependabot configured | ~~High~~ | ~~Low~~ | ~~Dependencies~~ |
-| ~~3~~  | ~~Split `handlers_test.go` (914 lines)~~ done — split into 9 files | ~~High~~ | ~~Medium~~ | ~~`internal/server`~~ |
-| ~~4~~  | ~~Split `search_test.go` (685 lines)~~ done — split into 3 files | ~~High~~ | ~~Medium~~ | ~~`internal/content`~~ |
-| ~~5~~  | ~~Split `markdown_test.go` (611 lines)~~ done — split into 4 files | ~~Medium~~ | ~~Medium~~ | ~~`internal/renderer`~~ |
-| ~~6~~  | ~~Fix Go 1.26.1 environment mismatch~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~Medium~~ | ~~Low~~ | ~~CI/CD~~ |
-| ~~7~~  | ~~Add integration test suite~~ done — shutdown_integration_test.go + per-endpoint tests | ~~High~~ | ~~High~~ | ~~`internal/test`~~ |
-| ~~8~~  | ~~Implement request timing middleware~~ done — responsetime.go sets X-Response-Time | ~~Medium~~ | ~~Low~~ | ~~`internal/server`~~ |
-| ~~9~~  | ~~Add Prometheus metrics endpoint~~ done — metrics.go serves /metrics | ~~Medium~~ | ~~Medium~~ | ~~`internal/server`~~ |
-| ~~10~~ | ~~Clean up remaining 9 linter warnings~~ done — golangci-lint 0 issues since 2026-09-13 | ~~Low~~ | ~~Low~~ | ~~Various~~ |
+| #      | Task                                                                                                         | Impact       | Effort     | Package                  |
+| ------ | ------------------------------------------------------------------------------------------------------------ | ------------ | ---------- | ------------------------ |
+| ~~1~~  | ~~Add container package tests~~ done — container_test.go rewritten 2026-09                                   | ~~Critical~~ | ~~Medium~~ | ~~`internal/container`~~ |
+| ~~2~~  | ~~Address GitHub security vulnerabilities~~ done — govulncheck clean; dependabot configured                  | ~~High~~     | ~~Low~~    | ~~Dependencies~~         |
+| ~~3~~  | ~~Split `handlers_test.go` (914 lines)~~ done — split into 9 files                                           | ~~High~~     | ~~Medium~~ | ~~`internal/server`~~    |
+| ~~4~~  | ~~Split `search_test.go` (685 lines)~~ done — split into 3 files                                             | ~~High~~     | ~~Medium~~ | ~~`internal/content`~~   |
+| ~~5~~  | ~~Split `markdown_test.go` (611 lines)~~ done — split into 4 files                                           | ~~Medium~~   | ~~Medium~~ | ~~`internal/renderer`~~  |
+| ~~6~~  | ~~Fix Go 1.26.1 environment mismatch~~ **Won't implement — environment issue from the 2026-04 macOS setup.** | ~~Medium~~   | ~~Low~~    | ~~CI/CD~~                |
+| ~~7~~  | ~~Add integration test suite~~ done — shutdown_integration_test.go + per-endpoint tests                      | ~~High~~     | ~~High~~   | ~~`internal/test`~~      |
+| ~~8~~  | ~~Implement request timing middleware~~ done — responsetime.go sets X-Response-Time                          | ~~Medium~~   | ~~Low~~    | ~~`internal/server`~~    |
+| ~~9~~  | ~~Add Prometheus metrics endpoint~~ done — metrics.go serves /metrics                                        | ~~Medium~~   | ~~Medium~~ | ~~`internal/server`~~    |
+| ~~10~~ | ~~Clean up remaining 9 linter warnings~~ done — golangci-lint 0 issues since 2026-09-13                      | ~~Low~~      | ~~Low~~    | ~~Various~~              |
 
 ### 🟡 Medium Priority (Do Soon)
 
-| #  | Task                        | Impact | Effort | Package                       |
-| --- | --- | --- | --- | --- |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Rendering & Content).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
-| ~~16~~ | ~~Cache stats dashboard~~ done — GET /cache/stats ships hits/misses/evictions/ratio | ~~Low~~ | ~~Medium~~ | ~~`internal/server` + templates~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).** | ~~—~~ | ~~—~~ |
+| #                                                                                            | Task                                                                                   | Impact  | Effort     | Package                           |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------- | ---------- | --------------------------------- |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**               | ~~—~~   | ~~—~~      |                                   |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**               | ~~—~~   | ~~—~~      |                                   |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Rendering & Content).** | ~~—~~   | ~~—~~      |                                   |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).**  | ~~—~~   | ~~—~~      |                                   |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**               | ~~—~~   | ~~—~~      |                                   |
+| ~~16~~                                                                                       | ~~Cache stats dashboard~~ done — GET /cache/stats ships hits/misses/evictions/ratio    | ~~Low~~ | ~~Medium~~ | ~~`internal/server` + templates~~ |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**    | ~~—~~   | ~~—~~      |                                   |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**               | ~~—~~   | ~~—~~      |                                   |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**               | ~~—~~   | ~~—~~      |                                   |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Search & Discovery).**  | ~~—~~   | ~~—~~      |                                   |
 
 ### 🟢 Low Priority (Do Later)
 
-| #  | Task                        | Impact | Effort | Package               |
-| --- | --- | --- | --- | --- |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Admin & API).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).** | ~~—~~ | ~~—~~ |
-| ~~`funlen` too long~~ | ~~1~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Internationalization).** | ~~Low~~ | ~~`filesystem_test.go:513`~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Deployment).** | ~~—~~ | ~~—~~ |
+| #                                                                                            | Task                                                                                     | Impact  | Effort                       | Package |
+| -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------- | ---------------------------- | ------- |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Admin & API).**           | ~~—~~   | ~~—~~                        |         |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Architecture).**          | ~~—~~   | ~~—~~                        |         |
+| ~~`funlen` too long~~                                                                        | ~~1~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Internationalization).** | ~~Low~~ | ~~`filesystem_test.go:513`~~ |         |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**      | ~~—~~   | ~~—~~                        |         |
+| ~~NOT-DO/DUPLICATE — Kubernetes manifests canonical entry lives in ROADMAP.md (Deployment)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Deployment).**            | ~~—~~   | ~~—~~                        |         |
 
 ---
 
@@ -263,7 +263,7 @@ The codebase is in excellent shape. No critical issues identified.
 ## Metrics Snapshot
 
 | Metric              | Value                            | Trend        |
-| --- | --- | --- |
+| ------------------- | -------------------------------- | ------------ |
 | Total Lines of Code | ~8,500                           | Stable       |
 | Test Functions      | 100+                             | ⬆️ Growing    |
 | Test Coverage       | 80.3% (server), 84.3% (renderer) | ⬆️ Improving  |

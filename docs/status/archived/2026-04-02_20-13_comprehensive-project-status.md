@@ -71,7 +71,7 @@ The project is **functionally complete and production-capable**. All core featur
 ### Test Coverage (from latest run)
 
 | Package              | Coverage                                                 |
-| --- | --- |
+| -------------------- | -------------------------------------------------------- |
 | `internal/cache`     | **100.0%**                                               |
 | `internal/config`    | **90.5%**                                                |
 | `internal/renderer`  | **84.7%**                                                |
@@ -88,16 +88,16 @@ The project is **functionally complete and production-capable**. All core featur
 
 The following were planned but only the CI fix was completed:
 
-| # | Task                                                   | Status         |
-| --- | --- | --- |
-| ~~1~~ | ~~Fix CI: lowercase IMAGE_NAME + digest scan~~ done at `7701c90` | ~~✅ Done~~ |
-| ~~2~~ | ~~Export content helpers (ShouldSkipDir, IsMarkdownFile)~~ done at `0192273` | ~~❌ Not started~~ |
-| ~~3~~ | ~~Deduplicate `getContentType` (server vs content pkg)~~ done at `0192273` | ~~❌ Not started~~ |
-| ~~4~~ | ~~Deduplicate `skipDirs` (watcher vs content pkg)~~ done at `0192273` | ~~❌ Not started~~ |
-| ~~5~~ | ~~Optimize ContentTree with path map for O(1) lookups~~ done at `0192273` | ~~❌ Not started~~ |
-| ~~6~~ | ~~Add compile-time interface checks where missing~~ done at `0192273` | ~~❌ Not started~~ |
+| #     | Task                                                                                     | Status             |
+| ----- | ---------------------------------------------------------------------------------------- | ------------------ |
+| ~~1~~ | ~~Fix CI: lowercase IMAGE_NAME + digest scan~~ done at `7701c90`                         | ~~✅ Done~~        |
+| ~~2~~ | ~~Export content helpers (ShouldSkipDir, IsMarkdownFile)~~ done at `0192273`             | ~~❌ Not started~~ |
+| ~~3~~ | ~~Deduplicate `getContentType` (server vs content pkg)~~ done at `0192273`               | ~~❌ Not started~~ |
+| ~~4~~ | ~~Deduplicate `skipDirs` (watcher vs content pkg)~~ done at `0192273`                    | ~~❌ Not started~~ |
+| ~~5~~ | ~~Optimize ContentTree with path map for O(1) lookups~~ done at `0192273`                | ~~❌ Not started~~ |
+| ~~6~~ | ~~Add compile-time interface checks where missing~~ done at `0192273`                    | ~~❌ Not started~~ |
 | ~~7~~ | ~~Run full test suite + lint verification~~ done — build + test + lint all green 2026-09 | ~~❌ Not started~~ |
-| ~~8~~ | ~~Push all changes~~ done — pushed; repo synced with origin | ~~❌ Not started~~ |
+| ~~8~~ | ~~Push all changes~~ done — pushed; repo synced with origin                              | ~~❌ Not started~~ |
 
 ---
 
@@ -207,33 +207,33 @@ Causes ~50 "compile: version does not match" warnings on every `go test` run. Te
 
 ## F) TOP 25 THINGS TO DO NEXT (Sorted by Impact × Ease)
 
-| #  | Task                                                                             | Impact      | Effort | Type          |
-| --- | --- | --- | --- | --- |
-| ~~1~~  | ~~**Push the 4 unpushed commits** (CI fix is among them)~~ done — pushed; repo synced with origin | ~~🔴 Critical~~ | ~~1 min~~ | ~~Ops~~ |
-| ~~2~~  | ~~**Upgrade local Go to 1.26.1** (fixes noise, speeds builds)~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.** | ~~🔴 High~~ | ~~5 min~~ | ~~Env~~ |
-| ~~3~~  | ~~**Export content helpers** (`ShouldSkipDir`, `IsMarkdownFile`, `GetContentType`)~~ done at `0192273` | ~~🟡 Medium~~ | ~~15 min~~ | ~~Refactor~~ |
-| ~~4~~  | ~~**Deduplicate `getContentType`** in `server/static.go`~~ done at `0192273` | ~~🟡 Medium~~ | ~~10 min~~ | ~~Refactor~~ |
-| ~~5~~  | ~~**Deduplicate `skipDirs`** in `cmd/watcher.go`~~ done at `0192273` | ~~🟡 Medium~~ | ~~10 min~~ | ~~Refactor~~ |
-| ~~6~~  | ~~**Optimize ContentTree** with `map[URLPath]ContentNode` for O(1) `Find()`~~ done at `0192273` | ~~🟡 Medium~~ | ~~30 min~~ | ~~Perf~~ |
-| ~~7~~  | ~~**Add compile-time interface checks** for BlobRepository, InMemoryRepository~~ done at `0192273` | ~~🟢 Low~~ | ~~5 min~~ | ~~Safety~~ |
-| ~~8~~  | ~~**Remove dead `treeStats.addError`** method~~ done — stale TODO; no such method exists | ~~🟢 Low~~ | ~~2 min~~ | ~~Cleanup~~ |
-| ~~9~~  | ~~**Apply staticcheck tagged switch** suggestion in `errors.go`~~ done — errors.go returns explicit codes per case; lint gates green | ~~🟢 Low~~ | ~~5 min~~ | ~~Cleanup~~ |
-| ~~10~~ | ~~**Wire git pre-push hook** to `just pre-push`~~ done — .githooks/pre-push (test + lint) | ~~🟡 Medium~~ | ~~5 min~~ | ~~DevEx~~ |
-| ~~11~~ | ~~**Add sample markdown content** to `content/` for demo~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).** | ~~🟡 Medium~~ | ~~15 min~~ | ~~Content~~ |
-| ~~12~~ | ~~**Add integration tests** for full HTTP pipeline~~ done — shutdown_integration_test.go + per-endpoint tests | ~~🔴 High~~ | ~~2 hrs~~ | ~~Testing~~ |
-| ~~13~~ | ~~**Increase container test coverage** from 0%~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor | ~~🟡 Medium~~ | ~~30 min~~ | ~~Testing~~ |
-| ~~14~~ | ~~**Split large test files** (search, handlers, markdown)~~ done — all three oversized files split | ~~🟢 Low~~ | ~~30 min~~ | ~~Hygiene~~ |
-| ~~15~~ | ~~**CI: pin golangci-lint version**~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned | ~~🟢 Low~~ | ~~5 min~~ | ~~CI~~ |
-| ~~16~~ | ~~**CI: add Go module caching**~~ done — setup-go cache: true | ~~🟡 Medium~~ | ~~15 min~~ | ~~CI~~ |
-| ~~17~~ | ~~**CI: add `templ generate` diff check**~~ done — test.yml templ drift check | ~~🟡 Medium~~ | ~~10 min~~ | ~~CI~~ |
-| ~~18~~ | ~~**Add gzip/brotli compression** middleware~~ done — httputil.Compression middleware | ~~🟡 Medium~~ | ~~30 min~~ | ~~Perf~~ |
-| ~~19~~ | ~~**Add ETag/If-None-Match** support~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented) | ~~🟡 Medium~~ | ~~30 min~~ | ~~Perf~~ |
-| ~~20~~ | ~~**Document architecture decisions** (ADR)~~ done — docs/adr/ holds 5 ADRs | ~~🟡 Medium~~ | ~~1 hr~~ | ~~Docs~~ |
-| ~~21~~ | ~~**Add Prometheus metrics endpoint**~~ done — internal/server/metrics.go serves /metrics | ~~🟡 Medium~~ | ~~1 hr~~ | ~~Observability~~ |
-| ~~22~~ | ~~**RSS/Atom feed generation**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~🟡 Medium~~ | ~~1 hr~~ | ~~Feature~~ |
-| ~~23~~ | ~~**Dark mode CSS + theme toggle**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~🟡 Medium~~ | ~~1 hr~~ | ~~UX~~ |
-| ~~24~~ | ~~**Code copy button** on code blocks~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~🟢 Low~~ | ~~30 min~~ | ~~UX~~ |
-| ~~25~~ | ~~**Separate CI workflows** (`test.yml` fast + `docker.yml` build)~~ done — test.yml + docker.yml + release.yml | ~~🟡 Medium~~ | ~~30 min~~ | ~~CI~~ |
+| #      | Task                                                                                                                                          | Impact          | Effort     | Type              |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------- | ----------------- |
+| ~~1~~  | ~~**Push the 4 unpushed commits** (CI fix is among them)~~ done — pushed; repo synced with origin                                             | ~~🔴 Critical~~ | ~~1 min~~  | ~~Ops~~           |
+| ~~2~~  | ~~**Upgrade local Go to 1.26.1** (fixes noise, speeds builds)~~ **Won't implement — obsolete: toolchain managed via GOTOOLCHAIN=auto + Nix.** | ~~🔴 High~~     | ~~5 min~~  | ~~Env~~           |
+| ~~3~~  | ~~**Export content helpers** (`ShouldSkipDir`, `IsMarkdownFile`, `GetContentType`)~~ done at `0192273`                                        | ~~🟡 Medium~~   | ~~15 min~~ | ~~Refactor~~      |
+| ~~4~~  | ~~**Deduplicate `getContentType`** in `server/static.go`~~ done at `0192273`                                                                  | ~~🟡 Medium~~   | ~~10 min~~ | ~~Refactor~~      |
+| ~~5~~  | ~~**Deduplicate `skipDirs`** in `cmd/watcher.go`~~ done at `0192273`                                                                          | ~~🟡 Medium~~   | ~~10 min~~ | ~~Refactor~~      |
+| ~~6~~  | ~~**Optimize ContentTree** with `map[URLPath]ContentNode` for O(1) `Find()`~~ done at `0192273`                                               | ~~🟡 Medium~~   | ~~30 min~~ | ~~Perf~~          |
+| ~~7~~  | ~~**Add compile-time interface checks** for BlobRepository, InMemoryRepository~~ done at `0192273`                                            | ~~🟢 Low~~      | ~~5 min~~  | ~~Safety~~        |
+| ~~8~~  | ~~**Remove dead `treeStats.addError`** method~~ done — stale TODO; no such method exists                                                      | ~~🟢 Low~~      | ~~2 min~~  | ~~Cleanup~~       |
+| ~~9~~  | ~~**Apply staticcheck tagged switch** suggestion in `errors.go`~~ done — errors.go returns explicit codes per case; lint gates green          | ~~🟢 Low~~      | ~~5 min~~  | ~~Cleanup~~       |
+| ~~10~~ | ~~**Wire git pre-push hook** to `just pre-push`~~ done — .githooks/pre-push (test + lint)                                                     | ~~🟡 Medium~~   | ~~5 min~~  | ~~DevEx~~         |
+| ~~11~~ | ~~**Add sample markdown content** to `content/` for demo~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).**              | ~~🟡 Medium~~   | ~~15 min~~ | ~~Content~~       |
+| ~~12~~ | ~~**Add integration tests** for full HTTP pipeline~~ done — shutdown_integration_test.go + per-endpoint tests                                 | ~~🔴 High~~     | ~~2 hrs~~  | ~~Testing~~       |
+| ~~13~~ | ~~**Increase container test coverage** from 0%~~ done — container_test.go rewritten in the 2026-09 do.Invoke refactor                         | ~~🟡 Medium~~   | ~~30 min~~ | ~~Testing~~       |
+| ~~14~~ | ~~**Split large test files** (search, handlers, markdown)~~ done — all three oversized files split                                            | ~~🟢 Low~~      | ~~30 min~~ | ~~Hygiene~~       |
+| ~~15~~ | ~~**CI: pin golangci-lint version**~~ done — GOLANGCI_LINT_VERSION v2.12.2 pinned                                                             | ~~🟢 Low~~      | ~~5 min~~  | ~~CI~~            |
+| ~~16~~ | ~~**CI: add Go module caching**~~ done — setup-go cache: true                                                                                 | ~~🟡 Medium~~   | ~~15 min~~ | ~~CI~~            |
+| ~~17~~ | ~~**CI: add `templ generate` diff check**~~ done — test.yml templ drift check                                                                 | ~~🟡 Medium~~   | ~~10 min~~ | ~~CI~~            |
+| ~~18~~ | ~~**Add gzip/brotli compression** middleware~~ done — httputil.Compression middleware                                                         | ~~🟡 Medium~~   | ~~30 min~~ | ~~Perf~~          |
+| ~~19~~ | ~~**Add ETag/If-None-Match** support~~ done (docs-health pass canonical entry lives in ROADMAP.md (Content Delivery); not implemented)        | ~~🟡 Medium~~   | ~~30 min~~ | ~~Perf~~          |
+| ~~20~~ | ~~**Document architecture decisions** (ADR)~~ done — docs/adr/ holds 5 ADRs                                                                   | ~~🟡 Medium~~   | ~~1 hr~~   | ~~Docs~~          |
+| ~~21~~ | ~~**Add Prometheus metrics endpoint**~~ done — internal/server/metrics.go serves /metrics                                                     | ~~🟡 Medium~~   | ~~1 hr~~   | ~~Observability~~ |
+| ~~22~~ | ~~**RSS/Atom feed generation**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**                               | ~~🟡 Medium~~   | ~~1 hr~~   | ~~Feature~~       |
+| ~~23~~ | ~~**Dark mode CSS + theme toggle**~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**                                      | ~~🟡 Medium~~   | ~~1 hr~~   | ~~UX~~            |
+| ~~24~~ | ~~**Code copy button** on code blocks~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**                                   | ~~🟢 Low~~      | ~~30 min~~ | ~~UX~~            |
+| ~~25~~ | ~~**Separate CI workflows** (`test.yml` fast + `docker.yml` build)~~ done — test.yml + docker.yml + release.yml                               | ~~🟡 Medium~~   | ~~30 min~~ | ~~CI~~            |
 
 ---
 
@@ -261,7 +261,7 @@ This is blocking the `just test` command from working without `GOWORK=off` and i
 ## Session Timeline
 
 | Time   | What happened                                                                      |
-| --- | --- |
+| ------ | ---------------------------------------------------------------------------------- |
 | ~18:30 | Investigated CI failures via `gh run list` + `gh run view --log-failed`            |
 | ~18:35 | First CI fix: hardcoded lowercase image name (commit `227f551`)                    |
 | ~18:45 | Full codebase research (41 files read)                                             |

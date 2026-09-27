@@ -205,19 +205,19 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 
 ## HTTP API
 
-| Endpoint           | Method   | Description                                   |
-| ------------------ | -------- | --------------------------------------------- |
-| `/`                | GET      | Root directory listing                        |
-| `/*path`           | GET      | Markdown file or subdirectory listing         |
-| `/health`          | GET      | Health check — returns `{"status":"healthy"}` |
-| `/refresh`         | GET/POST | Reload content from source (rate limited)     |
+| Endpoint           | Method   | Description                                             |
+| ------------------ | -------- | ------------------------------------------------------- |
+| `/`                | GET      | Root directory listing                                  |
+| `/*path`           | GET      | Markdown file or subdirectory listing                   |
+| `/health`          | GET      | Health check — returns `{"status":"healthy"}`           |
+| `/refresh`         | GET/POST | Reload content from source (rate limited)               |
 | `/search`          | GET      | Full-text search — `?q=query` (paginated, rate limited) |
-| `/static/*`        | GET      | Embedded static assets (CSS, favicon)         |
-| `/sitemap.xml`     | GET      | XML sitemap for search engine crawlers        |
-| `/robots.txt`      | GET      | robots.txt with sitemap reference             |
-| `/metrics`         | GET      | Prometheus-format metrics                     |
-| `/cache/stats`     | GET      | Cache hit/miss/eviction statistics (JSON)     |
-| `/api/live-reload` | GET      | SSE stream for live reload (dev mode)         |
+| `/static/*`        | GET      | Embedded static assets (CSS, favicon)                   |
+| `/sitemap.xml`     | GET      | XML sitemap for search engine crawlers                  |
+| `/robots.txt`      | GET      | robots.txt with sitemap reference                       |
+| `/metrics`         | GET      | Prometheus-format metrics                               |
+| `/cache/stats`     | GET      | Cache hit/miss/eviction statistics (JSON)               |
+| `/api/live-reload` | GET      | SSE stream for live reload (dev mode)                   |
 
 ---
 

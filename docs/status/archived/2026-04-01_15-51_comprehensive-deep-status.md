@@ -12,7 +12,7 @@
 The 12-item execution plan from the deep-reflection session is **fully complete**. All code changes are committed and build/test cleanly locally. However, **CI is RED** — the latest push (commit `88e3367`) has **26 lint errors** and a security scan failure. This is the single most urgent issue blocking the project.
 
 | Metric       | Status                                                |
-| --- | --- |
+| ------------ | ----------------------------------------------------- |
 | Build        | ✅ `go build ./...` passes                            |
 | Tests        | ✅ All 9 packages pass, 0 failures                    |
 | Vet          | ✅ `go vet ./...` clean                               |
@@ -28,7 +28,7 @@ The 12-item execution plan from the deep-reflection session is **fully complete*
 ### 12-Item Execution Plan (100% Complete)
 
 | #  | Commit    | What                                                                        |
-| --- | --- | --- |
+| -- | --------- | --------------------------------------------------------------------------- |
 | 1  | planning  | Reflected on mistakes, created prioritized execution plan                   |
 | 2  | `400f046` | Reverted unsafe `.md` fallback hack (type assertion + shadowing)            |
 | 3  | `0148795` | Root cause fix: `FileSystemRepository` strips `.md` from URL paths          |
@@ -117,7 +117,7 @@ The latest CI run (`23851819894`) **failed** with 26 lint errors. Build and test
 **Breakdown by linter:**
 
 | Linter             | Count | Files                                                                                        |
-| --- | --- | --- |
+| ------------------ | ----- | -------------------------------------------------------------------------------------------- |
 | `noctx`            | 7     | `sitemap_test.go` — `NewRequest` instead of `NewRequestWithContext`                          |
 | `golines`          | 4     | `admonition_extension.go`, `admonition_extension_test.go`, `diagram_extension.go`, `file.go` |
 | `revive`           | 4     | `admonition_extension.go` — missing comments on exports, unused param                        |
@@ -171,43 +171,43 @@ Ordered by impact-to-effort ratio. Fix CI first, then improve quality, then add 
 
 ### Tier 1: Fix CI (CRITICAL — do today)
 
-| # | Task                                                                                                | Effort | Impact              |
-| --- | --- | --- | --- |
-| ~~1~~ | ~~Fix 26 CI lint errors (noctx, golines, revive, errcheck, exhaustruct, goconst, funlen, testifylint)~~ done — golangci-lint 0 issues since 2026-09-13 | ~~15 min~~ | ~~Unblocks CI~~ |
-| ~~2~~ | ~~Add golangci-lint exclusion rules for intentional globals (`hasMermaidKey`, `alertTitles`)~~ done — intentional globals carry nolint with rationale | ~~5 min~~ | ~~Clean lint~~ |
-| ~~3~~ | ~~Add `golines` to CI pipeline or pre-push hook to prevent formatting drift~~ done — golangci-lint enforces golines; pre-commit hook added | ~~10 min~~ | ~~Prevents recurrence~~ |
-| ~~4~~ | ~~Fix Dependabot critical alert (`google.golang.org/grpc` auth bypass)~~ done — google.golang.org/grpc at v1.83.2 in go.mod | ~~10 min~~ | ~~Security~~ |
-| ~~5~~ | ~~Fix Trivy security scan failure in CI~~ done — docker.yml runs the Trivy scan | ~~10 min~~ | ~~Clean CI~~ |
+| #     | Task                                                                                                                                                   | Effort     | Impact                  |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ----------------------- |
+| ~~1~~ | ~~Fix 26 CI lint errors (noctx, golines, revive, errcheck, exhaustruct, goconst, funlen, testifylint)~~ done — golangci-lint 0 issues since 2026-09-13 | ~~15 min~~ | ~~Unblocks CI~~         |
+| ~~2~~ | ~~Add golangci-lint exclusion rules for intentional globals (`hasMermaidKey`, `alertTitles`)~~ done — intentional globals carry nolint with rationale  | ~~5 min~~  | ~~Clean lint~~          |
+| ~~3~~ | ~~Add `golines` to CI pipeline or pre-push hook to prevent formatting drift~~ done — golangci-lint enforces golines; pre-commit hook added             | ~~10 min~~ | ~~Prevents recurrence~~ |
+| ~~4~~ | ~~Fix Dependabot critical alert (`google.golang.org/grpc` auth bypass)~~ done — google.golang.org/grpc at v1.83.2 in go.mod                            | ~~10 min~~ | ~~Security~~            |
+| ~~5~~ | ~~Fix Trivy security scan failure in CI~~ done — docker.yml runs the Trivy scan                                                                        | ~~10 min~~ | ~~Clean CI~~            |
 
 ### Tier 2: Quality (do this week)
 
-| #  | Task                                                          | Effort | Impact              |
-| --- | --- | --- | --- |
-| ~~6~~  | ~~Add integration tests for HTTP → markdown → HTML pipeline~~ done — shutdown_integration_test.go + per-endpoint tests | ~~2h~~ | ~~Confidence~~ |
-| ~~7~~  | ~~Add graceful shutdown tests~~ done — shutdown_integration_test.go covers drain | ~~30 min~~ | ~~Coverage~~ |
-| ~~8~~  | ~~Add rate limiter tests~~ done — ratelimit_test.go + refresh_test.go | ~~30 min~~ | ~~Coverage~~ |
-| ~~9~~  | ~~Split `handlers_test.go` (914 lines) into focused files~~ done — split into 9 files | ~~30 min~~ | ~~Maintainability~~ |
-| ~~10~~ | ~~Split `search_test.go` (685 lines) into focused files~~ done — split into 3 files | ~~30 min~~ | ~~Maintainability~~ |
-| ~~11~~ | ~~Increase container package test coverage (currently 0%)~~ done — container_test.go rewritten 2026-09 | ~~1h~~ | ~~Coverage~~ |
-| ~~12~~ | ~~Extract `getContentType` branches to reduce complexity 11→<10~~ done — getContentType refactored to map lookup | ~~15 min~~ | ~~Lint clean~~ |
-| ~~13~~ | ~~Add `just lint` command to justfile (matching CI config)~~ **Won't implement — justfile removed; automation via flake.nix + .githooks.** | ~~10 min~~ | ~~Developer UX~~ |
-| ~~14~~ | ~~Add git pre-push hook calling `just pre-push`~~ done — .githooks/pre-push (test + lint) | ~~10 min~~ | ~~Prevent CI breakage~~ |
+| #      | Task                                                                                                                                       | Effort     | Impact                  |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ----------------------- |
+| ~~6~~  | ~~Add integration tests for HTTP → markdown → HTML pipeline~~ done — shutdown_integration_test.go + per-endpoint tests                     | ~~2h~~     | ~~Confidence~~          |
+| ~~7~~  | ~~Add graceful shutdown tests~~ done — shutdown_integration_test.go covers drain                                                           | ~~30 min~~ | ~~Coverage~~            |
+| ~~8~~  | ~~Add rate limiter tests~~ done — ratelimit_test.go + refresh_test.go                                                                      | ~~30 min~~ | ~~Coverage~~            |
+| ~~9~~  | ~~Split `handlers_test.go` (914 lines) into focused files~~ done — split into 9 files                                                      | ~~30 min~~ | ~~Maintainability~~     |
+| ~~10~~ | ~~Split `search_test.go` (685 lines) into focused files~~ done — split into 3 files                                                        | ~~30 min~~ | ~~Maintainability~~     |
+| ~~11~~ | ~~Increase container package test coverage (currently 0%)~~ done — container_test.go rewritten 2026-09                                     | ~~1h~~     | ~~Coverage~~            |
+| ~~12~~ | ~~Extract `getContentType` branches to reduce complexity 11→<10~~ done — getContentType refactored to map lookup                           | ~~15 min~~ | ~~Lint clean~~          |
+| ~~13~~ | ~~Add `just lint` command to justfile (matching CI config)~~ **Won't implement — justfile removed; automation via flake.nix + .githooks.** | ~~10 min~~ | ~~Developer UX~~        |
+| ~~14~~ | ~~Add git pre-push hook calling `just pre-push`~~ done — .githooks/pre-push (test + lint)                                                  | ~~10 min~~ | ~~Prevent CI breakage~~ |
 
 ### Tier 3: Features (do next sprint)
 
-| #  | Task                                                            | Effort | Impact                |
-| --- | --- | --- | --- |
-| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).** | ~~—~~ |
-| ~~18~~ | ~~Gzip/brotli compression middleware~~ done — httputil.Compression middleware | ~~1h~~ | ~~Performance~~ |
-| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery); not implemented.** | ~~—~~ |
-| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).** | ~~—~~ |
-| ~~21~~ | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics | ~~2h~~ | ~~Observability~~ |
-| ~~22~~ | ~~Architecture decision records~~ done — docs/adr/ holds 5 ADRs | ~~1h~~ | ~~Documentation~~ |
-| ~~23~~ | ~~CONTRIBUTING.md~~ done — CONTRIBUTING.md exists | ~~30 min~~ | ~~Open source readiness~~ |
-| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).** | ~~—~~ |
-| ~~25~~ | ~~Separate CI workflows: `test.yml` (fast) + `docker.yml` (build)~~ done — test.yml + docker.yml + release.yml | ~~1h~~ | ~~CI speed~~ |
+| #                                                                                                                    | Task                                                                                                           | Effort     | Impact                    |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------- |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**                                       | ~~—~~      |                           |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**                                       | ~~—~~      |                           |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery).**                            | ~~—~~      |                           |
+| ~~18~~                                                                                                               | ~~Gzip/brotli compression middleware~~ done — httputil.Compression middleware                                  | ~~1h~~     | ~~Performance~~           |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Content Delivery); not implemented.**           | ~~—~~      |                           |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (UI/UX).**                                       | ~~—~~      |                           |
+| ~~21~~                                                                                                               | ~~Prometheus metrics endpoint~~ done — internal/server/metrics.go serves /metrics                              | ~~2h~~     | ~~Observability~~         |
+| ~~22~~                                                                                                               | ~~Architecture decision records~~ done — docs/adr/ holds 5 ADRs                                                | ~~1h~~     | ~~Documentation~~         |
+| ~~23~~                                                                                                               | ~~CONTRIBUTING.md~~ done — CONTRIBUTING.md exists                                                              | ~~30 min~~ | ~~Open source readiness~~ |
+| ~~NOT-DO/DUPLICATE — Sample markdown content in `content/` directory canonical entry lives in ROADMAP.md (Quality)~~ | ~~~~ **NOT-DO/DUPLICATE — canonical entry lives in ROADMAP.md (Quality).**                                     | ~~—~~      |                           |
+| ~~25~~                                                                                                               | ~~Separate CI workflows: `test.yml` (fast) + `docker.yml` (build)~~ done — test.yml + docker.yml + release.yml | ~~1h~~     | ~~CI speed~~              |
 
 ---
 
@@ -289,7 +289,7 @@ sitemap_test.go:244 use assert.InEpsilon instead of direct float compare
 ## Test Coverage by Package
 
 | Package                     | Coverage | Lines of Code |
-| --- | --- | --- |
+| --------------------------- | -------- | ------------- |
 | `internal/cache`            | 100.0%   | ~200          |
 | `internal/config`           | 90.5%    | ~300          |
 | `internal/renderer`         | 84.3%    | ~600          |

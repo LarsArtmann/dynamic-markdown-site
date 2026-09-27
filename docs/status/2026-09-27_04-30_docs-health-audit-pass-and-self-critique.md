@@ -11,17 +11,17 @@
 
 All 28 `2026-0*` status/planning reports were read, verified against code, and annotated with per-item inline verdicts (`done at <hash>` / `done — verified <evidence>` / `**Won't implement**` / `**NOT-DO/DUPLICATE → canonical entry**`). The 17 fully-resolved reports were archived with `git mv` (history preserved) into `docs/status/archived/` and `docs/planning/archived/`; the 12 living reports remain, their unmarked items being the genuinely open work. All six living docs were rebuilt or patched to verified-current state. Every quality gate is green.
 
-| Metric                          | Start                          | Now                                             |
-| ------------------------------- | ------------------------------ | ----------------------------------------------- |
-| Reports with inline annotations | 0 / 28                         | **28 / 28**                                     |
-| Strikethrough verdicts applied  | 0                              | **~400+** (scripted + hand-verified)            |
-| Archived reports                | 0                              | **17** (16 status + 1 planning, via `git mv`)   |
-| TODO_LIST open/code-verified    | 4 open items, ~75% stale       | **20 open items, all code-verified, 0 stale**   |
-| AGENTS.md lines                 | 383 (over the 377 budget)      | **356** (under budget, Project Structure filled)|
-| CHANGELOG [Unreleased]          | missing everything after 07-13 | **current through 2026-09** (json/v2, DI, etc.) |
-| `go build` / `go test -race`    | not run this session           | **pass / 9-of-9 packages pass**                 |
-| `golangci-lint run ./...`       | not run this session           | **0 issues**                                    |
-| check-rows + `~~` gates         | n/a                            | **silent on the full archive set**              |
+| Metric                          | Start                          | Now                                              |
+| ------------------------------- | ------------------------------ | ------------------------------------------------ |
+| Reports with inline annotations | 0 / 28                         | **28 / 28**                                      |
+| Strikethrough verdicts applied  | 0                              | **~400+** (scripted + hand-verified)             |
+| Archived reports                | 0                              | **17** (16 status + 1 planning, via `git mv`)    |
+| TODO_LIST open/code-verified    | 4 open items, ~75% stale       | **20 open items, all code-verified, 0 stale**    |
+| AGENTS.md lines                 | 383 (over the 377 budget)      | **356** (under budget, Project Structure filled) |
+| CHANGELOG [Unreleased]          | missing everything after 07-13 | **current through 2026-09** (json/v2, DI, etc.)  |
+| `go build` / `go test -race`    | not run this session           | **pass / 9-of-9 packages pass**                  |
+| `golangci-lint run ./...`       | not run this session           | **0 issues**                                     |
+| check-rows + `~~` gates         | n/a                            | **silent on the full archive set**               |
 
 Health scores delivered inline at the end of the pass: **Accuracy 9.75/10, Fitness 10/10** (one Low finding: GitHub-side claims unverifiable without API access). Prior baseline: the 2026-07-13 audit claimed 9.25 and self-corrected to ~8.0.
 
@@ -49,7 +49,7 @@ Health scores delivered inline at the end of the pass: **Accuracy 9.75/10, Fitne
 
 ## b) PARTIALLY DONE
 
-1. **HARVEST had coverage gaps.** The recent reports (July 26-27, Sept 13) were harvested thoroughly, but June-era open items were not routed: *add `nix flake check` to `test.yml`*, *decide `proxyVendor` → direct modules*, *audit other tests for ldflags-injection brittleness*. Sept-13 backlog stragglers also went unrouted: markdown-lint MD013 (2704 findings), vulnix channel policy (22 CVEs), gomod-check `go-sourcemap`, go-structure Dockerfile/assets advisories.
+1. **HARVEST had coverage gaps.** The recent reports (July 26-27, Sept 13) were harvested thoroughly, but June-era open items were not routed: _add `nix flake check` to `test.yml`_, _decide `proxyVendor` → direct modules_, _audit other tests for ldflags-injection brittleness_. Sept-13 backlog stragglers also went unrouted: markdown-lint MD013 (2704 findings), vulnix channel policy (22 CVEs), gomod-check `go-sourcemap`, go-structure Dockerfile/assets advisories.
 2. **BuildFlow itself was never run this session.** The Sept-13 `test-coverage` step failure and the findings-gate state are unconfirmed; the new AGENTS.md 356-line count also awaits the actual go-structure-linter gate. `go test`/lint green locally is strong signal, not proof.
 3. **Two report tails were never explicitly read** (`2026-04-02_09-14` lines 400-423; `2026-09-13` lines 200-203). Their numbered items were still annotated (the scripts fail loudly on missing items), but the prose in those tails went unverified.
 4. **The pnpm-audit replacement is documented, not built** — TODO_LIST carries it; nothing wired yet.
@@ -91,7 +91,7 @@ Everything queued in the rebuilt TODO_LIST.md, plus:
 4. **Run the project's own gates inside VERIFY:** `buildflow` (not just go/lint) is the canonical gate for this repo per AGENTS.md; I substituted go build/test/lint because buildflow wasn't in PATH context and I didn't chase it via nix.
 5. **Normalize table delimiters (`| --- |`) before annotating,** not after — the single-dash delimiters caused check-rows false positives that cost a debugging cycle.
 6. **Keep a scratch verdict map** for recurring items (dark mode, RSS, ETag, pprof appear in ~10 reports) so evidence stays per-file instead of bleeding across files — the direct cause of finding d3.
-7. **Harvest-coverage rule for AUDIT mode:** the skill says harvest 1-3 recent reports; the user's instruction was audit-everything. When auditing, sweep *open items* from all reports into the routing table, even though only recent ones get deep reads. The June gaps (b1) came exactly from following the 1-3 rule in an everything-audit context.
+7. **Harvest-coverage rule for AUDIT mode:** the skill says harvest 1-3 recent reports; the user's instruction was audit-everything. When auditing, sweep _open items_ from all reports into the routing table, even though only recent ones get deep reads. The June gaps (b1) came exactly from following the 1-3 rule in an everything-audit context.
 8. **View immediately before every hand edit** after any script write; the daemon and scripts both mutate files, so "recently read" is never stale-proof here.
 9. **Push the check-rows/`~~` gates into a tiny repo script** (`scripts/check-report-annotations.sh`) so future passes get the gate for free instead of reconstructing it.
 
@@ -179,4 +179,4 @@ Everything queued in the rebuilt TODO_LIST.md, plus:
 
 ## Self-Critique Summary
 
-The deliverables are real and verified: 28/28 reports annotated inline, 17 archived with history, six living docs rebuilt against code, every local gate green. The quality bar slipped in the *middle* of the pass, not at the edges: three garbled marker batches, three false-evidence markers, one botched CHANGELOG merge, and two hand-rolled surgery scripts — all self-caught within the session, all corrected, none left in the tree, but each one was a known rule (verify-then-write, don't hand-roll, read the grammar) that I bargained with under time pressure. The process debt to carry forward is small and concrete: harvest the June stragglers, run BuildFlow itself, and make the annotation gates a repo script so the next pass inherits them instead of rebuilding them.
+The deliverables are real and verified: 28/28 reports annotated inline, 17 archived with history, six living docs rebuilt against code, every local gate green. The quality bar slipped in the _middle_ of the pass, not at the edges: three garbled marker batches, three false-evidence markers, one botched CHANGELOG merge, and two hand-rolled surgery scripts — all self-caught within the session, all corrected, none left in the tree, but each one was a known rule (verify-then-write, don't hand-roll, read the grammar) that I bargained with under time pressure. The process debt to carry forward is small and concrete: harvest the June stragglers, run BuildFlow itself, and make the annotation gates a repo script so the next pass inherits them instead of rebuilding them.

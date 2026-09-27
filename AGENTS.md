@@ -334,19 +334,19 @@ Every flag has an env override: `DYNAMIC_MARKDOWN_` + uppercase flag name (`DYNA
 
 ## HTTP API
 
-| Endpoint           | Method   | Description                     |
-| ------------------ | -------- | ------------------------------- |
-| `/`                | GET      | Root directory view             |
-| `/*path`           | GET      | Content (markdown or directory) |
-| `/health`          | GET      | Health check                    |
-| `/refresh`         | GET/POST | Refresh content (rate limited)  |
+| Endpoint           | Method   | Description                                                 |
+| ------------------ | -------- | ----------------------------------------------------------- |
+| `/`                | GET      | Root directory view                                         |
+| `/*path`           | GET      | Content (markdown or directory)                             |
+| `/health`          | GET      | Health check                                                |
+| `/refresh`         | GET/POST | Refresh content (rate limited)                              |
 | `/search`          | GET      | Search content (`?q=query`, paginated, rate limited 30/min) |
-| `/sitemap.xml`     | GET      | XML sitemap                     |
-| `/robots.txt`      | GET      | Robots file                     |
-| `/metrics`         | GET      | Prometheus-format metrics       |
-| `/cache/stats`     | GET      | Cache statistics (JSON)         |
-| `/static/*path`    | GET      | Static assets                   |
-| `/api/live-reload` | GET      | SSE live reload (dev mode)      |
+| `/sitemap.xml`     | GET      | XML sitemap                                                 |
+| `/robots.txt`      | GET      | Robots file                                                 |
+| `/metrics`         | GET      | Prometheus-format metrics                                   |
+| `/cache/stats`     | GET      | Cache statistics (JSON)                                     |
+| `/static/*path`    | GET      | Static assets                                               |
+| `/api/live-reload` | GET      | SSE live reload (dev mode)                                  |
 
 ---
 

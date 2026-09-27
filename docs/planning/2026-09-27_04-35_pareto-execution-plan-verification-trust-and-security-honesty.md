@@ -8,7 +8,7 @@
 
 ## Context — Where the Project Stands
 
-The 2026-09-27 docs-health pass left the documentation layer verified and green: all 28 historical reports annotated, 17 archived, living docs rebuilt, `go build` / `go test -race` 9-of-9 / `golangci-lint` 0 issues. What remains is everything the docs pass *surfaced* rather than *fixed*: the BuildFlow pipeline truth is unconfirmed (Sept-13 `test-coverage` failure never re-diagnosed), 44 PHANTOM_TYPE findings hold the findings gate hostage pending a policy decision, published release metadata lies about the license, the per-IP rate limiter leaks memory, one timing-flaky test erodes CI trust, and the `website/` supply chain (dual lockfiles, `firebase-tools` debug dep, never-run audit) is unverified. Two user decisions gate three work streams (§g of the status report): PHANTOM_TYPE policy, release-tag hygiene, canonical lockfile.
+The 2026-09-27 docs-health pass left the documentation layer verified and green: all 28 historical reports annotated, 17 archived, living docs rebuilt, `go build` / `go test -race` 9-of-9 / `golangci-lint` 0 issues. What remains is everything the docs pass _surfaced_ rather than _fixed_: the BuildFlow pipeline truth is unconfirmed (Sept-13 `test-coverage` failure never re-diagnosed), 44 PHANTOM_TYPE findings hold the findings gate hostage pending a policy decision, published release metadata lies about the license, the per-IP rate limiter leaks memory, one timing-flaky test erodes CI trust, and the `website/` supply chain (dual lockfiles, `firebase-tools` debug dep, never-run audit) is unverified. Two user decisions gate three work streams (§g of the status report): PHANTOM_TYPE policy, release-tag hygiene, canonical lockfile.
 
 **Verschlimmbesserung guards — do NOT touch:** the 17 archived reports and their inline annotations (historical record), the green CI workflows' trigger logic, `GetOrCompute` render path, the json/v2 + GOEXPERIMENT configuration, the `newBurstOnlyLimiter` test helper semantics (only extend, never weaken the deterministic-by-construction property), and the daemon's commit flow (never amend daemon commits; never rebase published history).
 
@@ -16,12 +16,12 @@ The 2026-09-27 docs-health pass left the documentation layer verified and green:
 
 ## Step 1 — Pareto Breakdown
 
-| Tier  | Tasks (comprehensive IDs) | Share of value | Why |
-| ----- | ------------------------- | -------------- | --- |
-| **1%** | T1 (BuildFlow truth gate) | **51%** | Every commit currently ships without the repo's canonical gate verdict. One run + one fix converts "tests pass locally, pipeline presumably red" into "the gate is green and trusted" — which unblocks shipping for everything else. Nothing else compounds like this. |
-| **4%** | T1 + T2 (PHANTOM_TYPE policy) + T3 (license honesty) + T4 (visitors eviction) | **64%** | +13% for: the gate policy decision that defines "green" forever, ending the published license lie (Homebrew/Scoop/Nix metadata), and closing the one known production memory leak. |
-| **20%** | T1-T12 (adds: shutdown flake, pnpm audit, lockfile/firebase-tools, container coverage, refill test, watcher test, /search rate limit, website CI) | **80%** | +16% for security hygiene, CI trust (flaky test), abuse prevention, and supply-chain verification — the things that bite in production, not in reviews. |
-| **Remaining 80%** | T13-T24 (harvest routing, pagination, meta files, tags, lint debt, CI hardening, GitHub presence, docs upkeep, test debt, brotli, nice-to-haves) | **100%** | Completeness: documentation trust, repo hygiene, polish, and the long tail. |
+| Tier              | Tasks (comprehensive IDs)                                                                                                                         | Share of value | Why                                                                                                                                                                                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1%**            | T1 (BuildFlow truth gate)                                                                                                                         | **51%**        | Every commit currently ships without the repo's canonical gate verdict. One run + one fix converts "tests pass locally, pipeline presumably red" into "the gate is green and trusted" — which unblocks shipping for everything else. Nothing else compounds like this. |
+| **4%**            | T1 + T2 (PHANTOM_TYPE policy) + T3 (license honesty) + T4 (visitors eviction)                                                                     | **64%**        | +13% for: the gate policy decision that defines "green" forever, ending the published license lie (Homebrew/Scoop/Nix metadata), and closing the one known production memory leak.                                                                                     |
+| **20%**           | T1-T12 (adds: shutdown flake, pnpm audit, lockfile/firebase-tools, container coverage, refill test, watcher test, /search rate limit, website CI) | **80%**        | +16% for security hygiene, CI trust (flaky test), abuse prevention, and supply-chain verification — the things that bite in production, not in reviews.                                                                                                                |
+| **Remaining 80%** | T13-T24 (harvest routing, pagination, meta files, tags, lint debt, CI hardening, GitHub presence, docs upkeep, test debt, brotli, nice-to-haves)  | **100%**       | Completeness: documentation trust, repo hygiene, polish, and the long tail.                                                                                                                                                                                            |
 
 **Execution order: 1% → 4% → 20% → the rest.**
 
@@ -29,32 +29,32 @@ The 2026-09-27 docs-health pass left the documentation layer verified and green:
 
 ## Step 2 — Comprehensive Plan (30-100 min tasks, ALL TODOs, sorted by value/effort)
 
-| #  | Task                                                                                                    | Impact    | Effort | Customer value                              |
-| -- | ------------------------------------------------------------------------------------------------------- | --------- | ------ | ------------------------------------------- |
-| T1 | Full BuildFlow run → diagnose & fix `test-coverage` step → confirm findings gate + AGENTS.md budget      | 🔴 Critical | 90 min | Trustworthy shipping; unblocks everything   |
-| T2 | PHANTOM_TYPE policy: memo → user decision → execute chosen path → findings gate green                   | 🔴 Critical | 90 min | Defines "green" permanently; 44 findings    |
-| T3 | Fix `.goreleaser.yaml` license (4× MIT → proprietary/unfree) + `goreleaser check` + stray-MIT sweep     | 🟠 High     | 30 min | Published metadata stops lying              |
-| T4 | Rate limiter: `visitors` TTL + sweep goroutine + shutdown wiring + tests (memory leak)                  | 🟠 High     | 90 min | Production memory safety                    |
-| T5 | Stabilize `TestGracefulShutdownStopsInFlightRequests` (reproduce → root-cause → fix → verify 50×)       | 🟠 High     | 60 min | CI trust; no more flaky-first-run failures  |
-| T6 | `cd website && pnpm audit` → triage → fix → wire recurring audit (CI step or flake check)               | 🟠 High     | 45 min | Supply-chain visibility for website deps    |
-| T7 | Lockfile decision → delete stale lock → remove `firebase-tools` → regen → build website                 | 🟠 High     | 45 min | Reproducible website builds; smaller deps   |
-| T8 | `internal/container` do.Invoke error-path tests (accessors + Shutdown report) — 0% → real coverage      | 🟠 High     | 60 min | DI wiring regression safety                 |
-| T9 | Refill-exercising rate-limiter test + burst-semantics doc (after g-answer) + formula comment            | 🟡 Medium   | 45 min | Correctness coverage for time behavior      |
-| T10| Watcher integration test: temp dir → write `.md` → assert refresh; ignore-dirs + ctx-cancel cases       | 🟡 Medium   | 60 min | Dev-mode regression safety                  |
-| T11| Rate limit `/search` (per-IP bucket) + tests + docs tables                                              | 🟡 Medium   | 45 min | Abuse prevention on the open endpoint       |
-| T12| Website CI workflow: pnpm setup + `astro check` + build, path-triggered                                 | 🟡 Medium   | 45 min | Docs-site breakage caught before deploy     |
-| T13| Route missed harvest items (nix flake check CI, proxyVendor, ldflags audit, MD013/vulnix/go-sourcemap)  | 🟡 Medium   | 30 min | Nothing open stays unrecorded               |
-| T14| Search result pagination (page size + query param + template controls + tests)                          | 🟡 Medium   | 60 min | Scales with content growth                  |
-| T15| Repo meta: `SECURITY.md`, `CODEOWNERS`, issue templates                                                 | 🟢 Medium   | 45 min | Community + disclosure infrastructure       |
-| T16| Tag hygiene: execute tag decision (delete duplicate tags or CHANGELOG note)                             | 🟡 Medium   | 30 min | Release history stops confusing readers     |
-| T17| Lint/tooling debt: exhaustruct_v5 migration, 403 nixos.wiki link, flake `platforms` attr, jscpd dedup   | 🟢 Medium   | 60 min | Green gates without stale suppressions      |
-| T18| CI hardening: `-count` guard for concurrent rate-limit test + `nix flake check` step                    | 🟡 Medium   | 45 min | Flake + drift caught at PR time             |
-| T19| GitHub presence: social preview upload + README screenshots/GIF                                          | 🟢 Low      | 45 min | First impressions for new users             |
-| T20| Docs upkeep: `docs/status/README.md` index, archive MIGRATION doc, refresh LIBRARY_INTEGRATIONS, annotation-check script | 🟢 Low | 60 min | Documentation trust stays mechanical        |
-| T21| Test debt: `unusedwrite` cleanup in `content_test.go` + container test speedup (~7.9s under race)       | 🟢 Low      | 45 min | Signal-to-noise in test output              |
-| T22| Verify GitHub-side claims via `gh`: GHCR image, branch protection, release assets                       | 🟢 Low      | 30 min | Health-report Accuracy → 10                 |
-| T23| gzip parity test + brotli evaluation (implement or document-decline)                                    | 🟢 Low      | 60 min | Bandwidth win if adopted; decision recorded |
-| T24| Nice-to-haves: changelog automation eval, cache-size config, version-rename closure, mermaid pin, pnpm-workspace check | 🟢 Low | 60 min | Long-tail polish                            |
+| #   | Task                                                                                                                     | Impact      | Effort | Customer value                              |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | ----------- | ------ | ------------------------------------------- |
+| T1  | Full BuildFlow run → diagnose & fix `test-coverage` step → confirm findings gate + AGENTS.md budget                      | 🔴 Critical | 90 min | Trustworthy shipping; unblocks everything   |
+| T2  | PHANTOM_TYPE policy: memo → user decision → execute chosen path → findings gate green                                    | 🔴 Critical | 90 min | Defines "green" permanently; 44 findings    |
+| T3  | Fix `.goreleaser.yaml` license (4× MIT → proprietary/unfree) + `goreleaser check` + stray-MIT sweep                      | 🟠 High     | 30 min | Published metadata stops lying              |
+| T4  | Rate limiter: `visitors` TTL + sweep goroutine + shutdown wiring + tests (memory leak)                                   | 🟠 High     | 90 min | Production memory safety                    |
+| T5  | Stabilize `TestGracefulShutdownStopsInFlightRequests` (reproduce → root-cause → fix → verify 50×)                        | 🟠 High     | 60 min | CI trust; no more flaky-first-run failures  |
+| T6  | `cd website && pnpm audit` → triage → fix → wire recurring audit (CI step or flake check)                                | 🟠 High     | 45 min | Supply-chain visibility for website deps    |
+| T7  | Lockfile decision → delete stale lock → remove `firebase-tools` → regen → build website                                  | 🟠 High     | 45 min | Reproducible website builds; smaller deps   |
+| T8  | `internal/container` do.Invoke error-path tests (accessors + Shutdown report) — 0% → real coverage                       | 🟠 High     | 60 min | DI wiring regression safety                 |
+| T9  | Refill-exercising rate-limiter test + burst-semantics doc (after g-answer) + formula comment                             | 🟡 Medium   | 45 min | Correctness coverage for time behavior      |
+| T10 | Watcher integration test: temp dir → write `.md` → assert refresh; ignore-dirs + ctx-cancel cases                        | 🟡 Medium   | 60 min | Dev-mode regression safety                  |
+| T11 | Rate limit `/search` (per-IP bucket) + tests + docs tables                                                               | 🟡 Medium   | 45 min | Abuse prevention on the open endpoint       |
+| T12 | Website CI workflow: pnpm setup + `astro check` + build, path-triggered                                                  | 🟡 Medium   | 45 min | Docs-site breakage caught before deploy     |
+| T13 | Route missed harvest items (nix flake check CI, proxyVendor, ldflags audit, MD013/vulnix/go-sourcemap)                   | 🟡 Medium   | 30 min | Nothing open stays unrecorded               |
+| T14 | Search result pagination (page size + query param + template controls + tests)                                           | 🟡 Medium   | 60 min | Scales with content growth                  |
+| T15 | Repo meta: `SECURITY.md`, `CODEOWNERS`, issue templates                                                                  | 🟢 Medium   | 45 min | Community + disclosure infrastructure       |
+| T16 | Tag hygiene: execute tag decision (delete duplicate tags or CHANGELOG note)                                              | 🟡 Medium   | 30 min | Release history stops confusing readers     |
+| T17 | Lint/tooling debt: exhaustruct_v5 migration, 403 nixos.wiki link, flake `platforms` attr, jscpd dedup                    | 🟢 Medium   | 60 min | Green gates without stale suppressions      |
+| T18 | CI hardening: `-count` guard for concurrent rate-limit test + `nix flake check` step                                     | 🟡 Medium   | 45 min | Flake + drift caught at PR time             |
+| T19 | GitHub presence: social preview upload + README screenshots/GIF                                                          | 🟢 Low      | 45 min | First impressions for new users             |
+| T20 | Docs upkeep: `docs/status/README.md` index, archive MIGRATION doc, refresh LIBRARY_INTEGRATIONS, annotation-check script | 🟢 Low      | 60 min | Documentation trust stays mechanical        |
+| T21 | Test debt: `unusedwrite` cleanup in `content_test.go` + container test speedup (~7.9s under race)                        | 🟢 Low      | 45 min | Signal-to-noise in test output              |
+| T22 | Verify GitHub-side claims via `gh`: GHCR image, branch protection, release assets                                        | 🟢 Low      | 30 min | Health-report Accuracy → 10                 |
+| T23 | gzip parity test + brotli evaluation (implement or document-decline)                                                     | 🟢 Low      | 60 min | Bandwidth win if adopted; decision recorded |
+| T24 | Nice-to-haves: changelog automation eval, cache-size config, version-rename closure, mermaid pin, pnpm-workspace check   | 🟢 Low      | 60 min | Long-tail polish                            |
 
 ---
 
