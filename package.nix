@@ -2,16 +2,17 @@
   lib,
   buildGoModule,
   templ,
+  go_1_27,
 }:
 
 let
   pname = "dynamic-markdown-site";
   version = "0.0.0";
 in
-buildGoModule {
+(buildGoModule.override { go = go_1_27; }) {
   inherit pname version;
 
-  vendorHash = "sha256-/bIf2sea5gjbB8GFtl27yePL/BVP4paPr5eeKA4BLVo=";
+  vendorHash = import ./vendorHash.nix;
 
   src = lib.fileset.toSource {
     root = ./.;
@@ -30,7 +31,10 @@ buildGoModule {
     templ generate
   '';
 
-  env.CGO_ENABLED = 0;
+  env = {
+    CGO_ENABLED = 0;
+    GOEXPERIMENT = "jsonv2";
+  };
   doCheck = false;
   tags = [
     "netgo"
