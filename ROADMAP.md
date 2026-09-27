@@ -89,6 +89,8 @@
 
 - **Rate-limiter burst semantics:** is `burst = maxRequests` (full-window burst up front, then trickle) the intended production behavior, or should burst be smaller with steady refill? Affects tests and docs. (Raised 2026-07-27.)
 - **PHANTOM_TYPE findings-gate policy — DECIDED 2026-09-27 (autonomous, under blanket execution approval):** the gate stays at `error+` severity. Current BuildFlow classifies all `branching-flow` PHANTOM_TYPE suggestions as warning/info (66 + 17 across 25 files, triaged 2026-09-27 — mostly string params like `query`, `ip`, `title`, `baseURL`; zero at error level), so the findings gate is green without suppression. Bulk-rebranding 66 params is rejected for now: many are internal plumbing (`errMsg`, `context`, test helpers) where branded types add ceremony without safety. Targeted adoption lives under Architecture below; revisit if the linter promotes findings to error severity.
+- **Changelog automation (git-cliff) — DECLINED 2026-09-27 (autonomous):** releases are rare and the manual Keep-a-Changelog entries are curated, not generated from commit subjects (the auto-commit daemon's `chore:` subjects would pollute generated notes). Revisit only if release cadence grows beyond a few per year.
+- **version → buildinfo package rename — WON'T DO (permanent):** `internal/version` is conventional across GoReleaser/Homebrew/distroless ldflags wiring in this repo and matches the ecosystem convention; renaming buys nothing and breaks muscle memory. Closed 2026-09-27.
 - **proxyVendor → direct dependency:** `gocloud.dev`'s proxy vendor setup vs. promoting to a direct dependency — re-evaluate when the blob-storage abstraction work (Architecture) is picked up. (Harvested 2026-09-27 from June-era reports.)
 
 ## 🚢 Deployment

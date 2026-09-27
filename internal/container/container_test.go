@@ -66,7 +66,7 @@ func newInProcessContainer(t *testing.T) *Container {
 	)
 	t.Cleanup(srv.Shutdown)
 
-	do.ProvideValue(injector, &config.Config{})
+	do.ProvideValue(injector, &config.Config{CacheSize: 10_000})
 	do.ProvideValue(injector, slog.New(slog.DiscardHandler))
 	do.ProvideValue[content.Repository](injector, repo)
 	do.ProvideValue(injector, srv)
@@ -152,9 +152,10 @@ func TestProviders_WireFullGraph(t *testing.T) {
 	t.Cleanup(func() { _ = injector.Shutdown() })
 
 	do.ProvideValue(injector, &config.Config{
-		LogLevel: "debug",
-		DevMode:  true,
-		RootDir:  t.TempDir(),
+		LogLevel:  "debug",
+		DevMode:   true,
+		RootDir:   t.TempDir(),
+		CacheSize: 10_000,
 	})
 	do.Provide(injector, provideLogger)
 	do.Provide(injector, provideCache)

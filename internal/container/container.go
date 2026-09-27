@@ -117,9 +117,13 @@ func provideLogger(i do.Injector) (*slog.Logger, error) {
 	return slog.New(logger), nil
 }
 
-func provideCache(_ do.Injector) (*cache.HTMLCache, error) {
-	// 10,000 entry cache with 1-hour TTL
-	return cache.NewHTMLCache(10_000), nil
+func provideCache(i do.Injector) (*cache.HTMLCache, error) {
+	cfg, err := do.Invoke[*config.Config](i)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve config")
+	}
+
+	return cache.NewHTMLCache(cfg.CacheSize), nil
 }
 
 func provideRenderer(_ do.Injector) (*renderer.GoldmarkRenderer, error) {

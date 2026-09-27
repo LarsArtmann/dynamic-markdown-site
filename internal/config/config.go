@@ -16,10 +16,15 @@ import (
 
 // Sentinel errors for validation failures.
 var (
-	errInvalidPort     = errors.New("invalid port (must be 1-65535)")
-	errInvalidRootDir  = errors.New("root path is not a directory")
-	errInvalidLogLevel = errors.New("invalid log level (must be debug, info, warn, or error)")
+	errInvalidPort      = errors.New("invalid port (must be 1-65535)")
+	errInvalidRootDir   = errors.New("root path is not a directory")
+	errInvalidLogLevel  = errors.New("invalid log level (must be debug, info, warn, or error)")
+	errInvalidCacheSize = errors.New("invalid cache size (must be at least 1)")
 )
+
+// defaultCacheSize is the maximum number of cached HTML pages when
+// -cache-size / DYNAMIC_MARKDOWN_CACHE_SIZE is not set.
+const defaultCacheSize = 10_000
 
 // Log level names used for validation, parsing, and slog conversion.
 const (
@@ -59,7 +64,7 @@ func DefaultConfig() *Config {
 		StorageURL:   "",
 		LogLevel:     logLevelInfo,
 		CacheEnabled: true,
-		CacheSize:    10_000,
+		CacheSize:    defaultCacheSize,
 		DevMode:      false,
 		Timeout:      30 * time.Second,
 		SiteName:     "Site",
@@ -184,7 +189,12 @@ func (c *Config) validate() error {
 		return errors.Wrap(errInvalidPort, fmt.Sprintf("port=%d", c.Port))
 	}
 
-	// Validate cache size
+	// Validate cache size; zero means "unset" (hand-built Configs) and falls
+	// back to the default, while an explicitly negative size is an error.
+	if c.CacheSize == 0 {
+		c.CacheSize = defaultCacheSize
+	}
+
 	if c.CacheSize < 1 {
 		return errors.Wrapf(errInvalidCacheSize, "cache_size=%d", c.CacheSize)
 	}
