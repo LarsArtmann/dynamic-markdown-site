@@ -2,7 +2,9 @@
 //
 // Usage in build:
 //
-//	-X main.version=${VERSION} -X main.commit=${COMMIT} -X main.buildDate=${BUILD_DATE}
+//	-X github.com/larsartmann/dynamic-markdown-site/internal/version.Version=${VERSION}
+//	-X github.com/larsartmann/dynamic-markdown-site/internal/version.Commit=${COMMIT}
+//	-X github.com/larsartmann/dynamic-markdown-site/internal/version.BuildDate=${BUILD_DATE}
 package version
 
 // Version information injected at build time via ldflags.

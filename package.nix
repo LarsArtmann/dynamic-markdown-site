@@ -44,6 +44,9 @@ in
   ldflags = [
     "-s"
     "-w"
+    "-X github.com/larsartmann/dynamic-markdown-site/internal/version.Version=${version}"
+    "-X github.com/larsartmann/dynamic-markdown-site/internal/version.Commit=unknown"
+    "-X github.com/larsartmann/dynamic-markdown-site/internal/version.BuildDate=unknown"
   ];
 
   meta = with lib; {

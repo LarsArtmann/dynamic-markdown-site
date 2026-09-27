@@ -1,0 +1,3 @@
+# Repo style deliberately uses long lines (status-report tables, AGENTS.md
+# gotchas, docs/ prose). Line length is not a gate here.
+MD013: false
