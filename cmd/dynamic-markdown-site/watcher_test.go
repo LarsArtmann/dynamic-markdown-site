@@ -15,6 +15,7 @@ import (
 
 type countingRepository struct {
 	content.Repository
+
 	refreshes atomic.Int64
 }
 
@@ -24,7 +25,24 @@ func (c *countingRepository) Refresh() domain.RefreshResult {
 	return c.Repository.Refresh()
 }
 
-func startWatcher(t *testing.T, root string, repo content.Repository) (cancel context.CancelFunc, done <-chan struct{}) {
+func newWatchRoot(t *testing.T) string {
+	t.Helper()
+
+	root, err := os.MkdirTemp(".", "watcher-test-")
+	if err != nil {
+		t.Fatalf("create watch root: %v", err)
+	}
+
+	t.Cleanup(func() { _ = os.RemoveAll(root) })
+
+	return root
+}
+
+func startWatcher(
+	t *testing.T,
+	root string,
+	repo content.Repository,
+) (cancel context.CancelFunc, done <-chan struct{}) {
 	t.Helper()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -34,6 +52,8 @@ func startWatcher(t *testing.T, root string, repo content.Repository) (cancel co
 		defer close(finished)
 		watchForChanges(ctx, root, repo, nil, slog.New(slog.DiscardHandler))
 	}()
+
+	time.Sleep(500 * time.Millisecond)
 
 	return cancel, finished
 }
@@ -80,7 +100,7 @@ func containsPath(paths []domain.URLPath, want string) bool {
 func TestWatchForChanges_RefreshesOnMarkdownWrite(t *testing.T) {
 	t.Parallel()
 
-	root := t.TempDir()
+	root := newWatchRoot(t)
 
 	fsRepo, err := content.NewFileSystemRepository(root)
 	if err != nil {
@@ -114,7 +134,7 @@ func TestWatchForChanges_RefreshesOnMarkdownWrite(t *testing.T) {
 func TestWatchForChanges_IgnoresSkippedDirs(t *testing.T) {
 	t.Parallel()
 
-	root := t.TempDir()
+	root := newWatchRoot(t)
 
 	fsRepo, err := content.NewFileSystemRepository(root)
 	if err != nil {
@@ -133,11 +153,15 @@ func TestWatchForChanges_IgnoresSkippedDirs(t *testing.T) {
 		t.Fatalf("write ignored markdown: %v", err)
 	}
 
-	waitForRefreshes(t, repo, 1, 5*time.Second)
+	if err := os.WriteFile(filepath.Join(root, "hello.md"), []byte("# Hello\n"), 0o600); err != nil {
+		t.Fatalf("write root markdown: %v", err)
+	}
+
+	first := waitForRefreshes(t, repo, 1, 5*time.Second)
 	time.Sleep(3 * time.Second)
 
-	if got := repo.refreshes.Load(); got != 1 {
-		t.Errorf("ignored-dir write triggered %d unexpected refresh(s) beyond the initial one", got-1)
+	if got := repo.refreshes.Load(); got != first {
+		t.Errorf("ignored-dir write triggered %d unexpected refresh(s) beyond the initial %d", got-first, first)
 	}
 
 	if containsPath(repo.AllPaths(), "/vendor/secret.md") {
@@ -150,7 +174,7 @@ func TestWatchForChanges_IgnoresSkippedDirs(t *testing.T) {
 func TestWatchForChanges_ExitsOnContextCancel(t *testing.T) {
 	t.Parallel()
 
-	root := t.TempDir()
+	root := newWatchRoot(t)
 
 	fsRepo, err := content.NewFileSystemRepository(root)
 	if err != nil {
