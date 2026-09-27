@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Request timing middleware — `X-Response-Time` header on every response (`internal/server/responsetime.go`)
+- Dependabot config with weekly grouped minor/patch updates (Go modules, Actions, pnpm)
+- dprint formatter config for JSON/YAML/Config files
+- Astro + Starlight documentation website in `website/` (hosted at dynamicmarkdown.lars.software)
 - Admonition/Alert blocks — GitHub-style `> [!TYPE]` blockquote syntax with 6 types (NOTE, TIP, IMPORTANT, WARNING, CAUTION, CRITICAL) and themed CSS styling
 - Custom Goldmark AST transformer for parsing alert markers across split text nodes
 - `/sitemap.xml` endpoint for search engine crawlers with priority and changefreq metadata
@@ -19,10 +23,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Comprehensive sitemap tests covering directories, files, HTTPS detection, and priority calculation
 - HEALTHCHECK directive re-added to Dockerfile (uses binary's `healthcheck` subcommand)
 - Compression middleware via `httputil.Compression` for gzip-encoded responses
-- Astro + Starlight documentation website in `website/` (hosted at dynamicmarkdown.lars.software)
 
 ### Changed
 
+- **Migrated server JSON to `encoding/json/v2`** — requires `GOEXPERIMENT=jsonv2` and a `go 1.27+` toolchain (`go.mod` now declares `go 1.27.1`); supersedes the earlier "stable encoding/json only" policy
+- **Dependency injection hardened** — all `do.MustInvoke` call sites replaced with error-returning `do.Invoke`; container accessors now return `(T, error)` (Cache/Renderer/Searcher accessors removed as dead code)
+- **File watching rewritten on `go-filewatcher/v2`** — 181 lines of hand-rolled fsnotify boilerplate replaced with 85 lines; watcher now shuts down cleanly via the SIGINT/SIGTERM context
+- Upgraded to `charm.land/log/v2`, `otter/v2`, `httputil` v1.2.0, `go-filewatcher/v2` v2.3.0
+- Website flake apps switched from npm to pnpm
 - Refactored frontmatter draft parsing to use `yaml.v3` for proper boolean handling
 - Simplified static file embedding pattern using `//go:embed`
 - Refactored `getContentType` from switch statement to map lookup
@@ -30,16 +38,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added godoc comments on exported admonition extension types
 - Silence `fmt.Fprintf` return value warnings in admonition renderer
 - Add linter exclusions for exhaustruct and gochecknoglobals in Goldmark extensions
-- Pinned `go-error-family` to `v0.6.1` (v0.7.0+ adopts `encoding/json/v2` which is not enabled)
 
 ### Fixed
 
+- Flaky `TestRateLimiter_Concurrent` — exact-count assertions now use the `newBurstOnlyLimiter` helper (1-hour window, negligible refill); sibling tests hardened the same way
+- `TestRefreshRateLimit` no-op assertion — now asserts exactly 10× `200` + 5× `429` across 15 sequential requests
+- Pre-existing build break from `httputil` v0.6.0 importing `encoding/json/v2` (resolved by the json/v2 adoption)
+- `TestHealthEndpoint` brittleness under ldflags injection — reads `version.Version`/`version.Commit` at runtime instead of hardcoding `dev`/`unknown`
+- `nix-build` `vendorHash` ↔ `go.sum` drift (multiple fixes; latest `b4d12bb`)
+- golangci-lint findings: `makezero` in Levenshtein DP, `unparam` in sitemap test helper, misplaced `SkipDirs` nolint directive
+- Website: HTML cache rule now matches cleanUrls pages (`f55589a`)
 - Fixed panic on double `Stop()` call in rate limiter
 - Fixed `hasMermaid` not propagating through `NewRenderedFile` constructor
 - Removed dead regex-based diagram detection code
 - Stripped `.md` extension from URL paths for clean URLs
-- Reverted accidental `encoding/json/v2` migration that broke compilation (`GOEXPERIMENT=jsonv2` not enabled)
+- Reverted accidental `encoding/json/v2` migration that broke compilation (`GOEXPERIMENT=jsonv2` not enabled; superseded by the json/v2 adoption above)
 - Fixed metrics endpoint test by setting `Accept-Encoding: identity` to bypass compression middleware
+
+### Security
+
+- Pinned `anchore/sbom-action/download-syft` to a full commit SHA in `release.yml`
+- Skipped root-level `pnpm audit` in BuildFlow (wrong directory — see AGENTS.md gotcha #15); audit `website/` manually via `cd website && pnpm audit`
 
 ### Removed
 

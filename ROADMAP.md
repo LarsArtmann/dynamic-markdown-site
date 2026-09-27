@@ -1,7 +1,7 @@
 # Roadmap
 
-**Generated:** 2026-04-05 | **Last Updated:** 2026-07-13
-**Purpose:** Aspirational items without timeline
+**Generated:** 2026-04-05 | **Last Updated:** 2026-09-27 (docs-health AUDIT pass)
+**Purpose:** Aspirational items without timeline, plus open design questions
 
 > Items here are goals and ideas. No commitment on delivery dates.
 
@@ -28,7 +28,6 @@
 
 - [ ] Implement content draft preview
 - [ ] Add image optimization
-- [ ] Implement graceful degradation for D2 rendering failures — _partially done; full fallback chain could be deeper_
 - [ ] Add diagram export (PNG/SVG download buttons)
 - [ ] Add diagram zoom for large diagrams
 - [ ] Implement content versioning (git-based history)
@@ -49,6 +48,7 @@
 - [ ] Add RSS/Atom feed generation
 - [ ] Implement WebSocket live reload
 - [ ] Add gzip/brotli compression
+
 - [ ] Add ETag/If-None-Match support
 
 ### Observability
@@ -73,10 +73,21 @@
 - [ ] Design plugin system for custom markdown extensions
 - [ ] Split Repository interface (Reader/Refresher)
 - [ ] Structured error types (Is/As/Unwrap)
+- [ ] Review `gocloud.dev` dependency weight (large transitive tree for blob storage; evaluate modularization or interface + plugin pattern)
 
 ### Internationalization
 
 - [ ] Implement internationalization (multi-language support)
+
+### Platform
+
+- [ ] gRPC/CLI API for programmatic search and content access
+- [ ] Consider `nix flake check --all-systems` in CI (aarch64-darwin/aarch64-linux/x86_64-darwin currently omitted)
+
+## ❓ Open Questions
+
+- **Rate-limiter burst semantics:** is `burst = maxRequests` (full-window burst up front, then trickle) the intended production behavior, or should burst be smaller with steady refill? Affects tests and docs. (Raised 2026-07-27.)
+- **PHANTOM_TYPE findings-gate policy:** should the BuildFlow `branching-flow` gate hard-require phantom types for all string parameters (44 findings), or be advisory with targeted domain types? See `docs/status/2026-09-13_14-52` §g1.
 
 ## 🚢 Deployment
 
