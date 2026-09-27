@@ -124,7 +124,7 @@ func TestWatchForChanges_RefreshesOnMarkdownWrite(t *testing.T) {
 		time.Sleep(50 * time.Millisecond)
 	}
 
-	if !containsPath(repo.AllPaths(), "/hello.md") {
+	if !containsPath(repo.AllPaths(), "/hello") {
 		t.Error("watcher did not refresh the repository with the new markdown file")
 	}
 
@@ -164,7 +164,7 @@ func TestWatchForChanges_IgnoresSkippedDirs(t *testing.T) {
 		t.Errorf("ignored-dir write triggered %d unexpected refresh(s) beyond the initial %d", got-first, first)
 	}
 
-	if containsPath(repo.AllPaths(), "/vendor/secret.md") {
+	if containsPath(repo.AllPaths(), "/vendor/secret") {
 		t.Error("content inside a skipped directory must not appear in the repository")
 	}
 

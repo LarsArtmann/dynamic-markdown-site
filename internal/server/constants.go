@@ -35,3 +35,6 @@ const (
 	headerForwardedProto = "X-Forwarded-Proto"
 	headerContentType    = "Content-Type"
 )
+
+// searchRateLimit is the per-IP request budget for /search per minute.
+const searchRateLimit = 30

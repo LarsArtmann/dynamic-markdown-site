@@ -122,6 +122,7 @@ func (s *Server) renderSearch(
 	r *http.Request,
 	query string,
 	results []content.SearchResult,
+	pagination domain.SearchPagination,
 ) {
 	crumbs := domain.BuildBreadcrumbs(domain.MustURLPath("/search"))
 
@@ -135,9 +136,10 @@ func (s *Server) renderSearch(
 	}
 
 	searchProps := templates.SearchViewProps{
-		Layout:  props,
-		Query:   query,
-		Results: results,
+		Layout:     props,
+		Query:      query,
+		Results:    results,
+		Pagination: pagination,
 	}
 
 	component := templates.SearchView(searchProps)

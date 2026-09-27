@@ -17,16 +17,17 @@ import (
 )
 
 type Server struct {
-	repo        content.Repository
-	searcher    content.Searchable
-	renderer    domain.Renderer
-	logger      *slog.Logger
-	rateLimiter *rateLimiter
-	cache       *cache.HTMLCache
-	liveReload  *LiveReload
-	devMode     bool
-	siteName    string
-	startedAt   time.Time
+	repo               content.Repository
+	searcher           content.Searchable
+	renderer           domain.Renderer
+	logger             *slog.Logger
+	rateLimiter        *rateLimiter
+	searchRateLimiter  *rateLimiter
+	cache              *cache.HTMLCache
+	liveReload         *LiveReload
+	devMode            bool
+	siteName           string
+	startedAt          time.Time
 }
 
 func NewServer(
@@ -39,19 +40,20 @@ func NewServer(
 	siteName string,
 ) *Server {
 	rl := newRateLimiter(10, time.Minute)
-	lr := NewLiveReload(log)
+	srl := newRateLimiter(searchRateLimit, time.Minute)
 
 	return &Server{
-		repo:        repo,
-		searcher:    searcher,
-		renderer:    renderer,
-		logger:      log,
-		rateLimiter: rl,
-		cache:       htmlCache,
-		liveReload:  lr,
-		devMode:     devMode,
-		siteName:    siteName,
-		startedAt:   time.Now(),
+		repo:               repo,
+		searcher:           searcher,
+		renderer:           renderer,
+		logger:             log,
+		rateLimiter:        rl,
+		searchRateLimiter:  srl,
+		cache:              htmlCache,
+		liveReload:         lr,
+		devMode:            devMode,
+		siteName:           siteName,
+		startedAt:          time.Now(),
 	}
 }
 
@@ -88,6 +90,7 @@ func (s *Server) Handler() http.Handler {
 
 func (s *Server) Shutdown() {
 	s.rateLimiter.Stop()
+	s.searchRateLimiter.Stop()
 	s.cache.Close()
 }
 
@@ -225,10 +228,23 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleSearch(w http.ResponseWriter, r *http.Request) {
+	ip := clientIP(r)
+	if !s.searchRateLimiter.checkRateLimit(ip) {
+		s.logger.Warn("rate limit exceeded for search endpoint", "client_ip", ip)
+		writeJSON(w, http.StatusTooManyRequests, map[string]any{
+			jsonKeyStatus:    jsonStatusError,
+			jsonKeyMessage:   "rate limit exceeded: too many search requests",
+			jsonKeyLimit:     fmt.Sprintf("%d requests per minute per IP", searchRateLimit),
+			jsonKeyTimestamp: time.Now().UTC(),
+		})
+
+		return
+	}
+
 	query := strings.TrimSpace(r.URL.Query().Get("q"))
 
 	if query == "" {
-		s.renderSearch(w, r, query, nil)
+		s.renderSearch(w, r, query, nil, domain.NewSearchPagination(0, "", ""))
 
 		return
 	}
@@ -241,7 +257,13 @@ func (s *Server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.renderSearch(w, r, query, results)
+	pagination := domain.NewSearchPagination(
+		len(results),
+		r.URL.Query().Get("page"),
+		r.URL.Query().Get("pageSize"),
+	)
+
+	s.renderSearch(w, r, query, results[pagination.Offset():pagination.End()], pagination)
 }
 
 func (s *Server) handleContentByPath(w http.ResponseWriter, r *http.Request, filepath string) {
