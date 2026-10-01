@@ -5,7 +5,7 @@
 set -euo pipefail
 
 echo "==> Running tests..."
-go test ./... -race -cover
+env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go test ./... -race -cover
 
 echo "==> Running linter..."
 if command -v golangci-lint >/dev/null 2>&1; then
