@@ -372,4 +372,8 @@ Build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:
 
 `master` protection (enabled 2026-09-27) requires the `Unit + integration tests` check with `enforce_admins: false` — the owner-owned auto-commit daemon pushes straight to master as admin and bypasses; do NOT "fix" the apparently-missing enforcement. The Docker `security-scan` job hard-fails on CRITICAL/HIGH with `ignore-unfixed: true`: unfixable advisories (e.g. GO-2026-5932 x/crypto/openpgp — package not linked into the binary) cannot red the gate; Dependabot alerts remain the module-level signal. otel sits on `v1.47.0-rc.1` by documented decision (ROADMAP) — re-pin to stable when the fixes ship stable.
 
+### 20. Ambient Go Trails go.mod; Unset GOTOOLCHAIN for Go Commands
+
+The user-level Go (home-manager) can lag `go.mod`'s floor while the shell exports `GOTOOLCHAIN=local`, which blocks toolchain auto-download — bare `go` fails with "go.mod requires go >= 1.27.1" (blocked a `git town sync` push at the pre-push hook, 2026-10-01). Run Go commands as `env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go ...` (gotcha 12 pattern; golangci-lint is built with go1.27.1 and unaffected) or inside `nix develop`; `.githooks/pre-push` does this itself since 2026-10-01 so pushes work from any shell.
+
 ---
