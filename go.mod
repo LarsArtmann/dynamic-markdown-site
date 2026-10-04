@@ -8,7 +8,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/cockroachdb/errors v1.14.0
 	github.com/larsartmann/go-filewatcher/v2 v2.3.0
-	github.com/larsartmann/httputil v1.4.1
+	github.com/larsartmann/httputil v1.4.0
 	github.com/maypok86/otter/v2 v2.3.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/samber/lo v1.53.0
@@ -91,7 +91,7 @@ require (
 	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/google/pprof v0.0.0-20261003200830-ebaad5f31b4d // indirect
+	github.com/google/pprof v0.0.0-20261002000307-77d3b59017a0 // indirect
 	github.com/google/s2a-go v0.1.11 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/google/wire v0.7.0 // indirect
