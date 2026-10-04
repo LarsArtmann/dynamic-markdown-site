@@ -186,6 +186,8 @@ github.com/google/martian/v3 v3.3.3 h1:DIhPTQrbPkgs2yJYdXU/eNACCG5DVQjySNRNlflZ9
 github.com/google/martian/v3 v3.3.3/go.mod h1:iEPrYcgCF7jA9OtScMFQyAlZZ4YXTKEtJ1E6RWzmBA0=
 github.com/google/pprof v0.0.0-20261002000307-77d3b59017a0 h1:4CBFbi9eeXVSb4LOivt4BiFE+t38dqUQEEHVJiUrPlk=
 github.com/google/pprof v0.0.0-20261002000307-77d3b59017a0/go.mod h1:jl5iWTm0/hd5PjEYEOuwAJ57L/CibdZfrqZ5XA5GrCk=
+github.com/google/pprof v0.0.0-20261003200830-ebaad5f31b4d h1:kZK3FQM86gr3cgJHMP7rPn8A3Z75mt+ZaVBoqMlpPF0=
+github.com/google/pprof v0.0.0-20261003200830-ebaad5f31b4d/go.mod h1:jl5iWTm0/hd5PjEYEOuwAJ57L/CibdZfrqZ5XA5GrCk=
 github.com/google/s2a-go v0.1.11 h1:7v1V1TraNGP63WptsAkNqr2w8jgm4vM6A6qx6Lsw9iM=
 github.com/google/s2a-go v0.1.11/go.mod h1:pz4tyvwXvJLLbyrkh6FW1eS2zPUXMaTmyNhYtyP2tNw=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
@@ -216,6 +218,8 @@ github.com/larsartmann/go-filewatcher/v2 v2.3.0 h1:9I7fLdVxeQOyvCbHvE9GNlV5DlW0E
 github.com/larsartmann/go-filewatcher/v2 v2.3.0/go.mod h1:IA0MVUVIbqAPrFHMvGRKKbqwW8gcBlImdMCl9MRZqlk=
 github.com/larsartmann/httputil v1.4.0 h1:LyQl8PQFgIQU70LJ91A9rDBlx/xssMra+HbvKcRng3w=
 github.com/larsartmann/httputil v1.4.0/go.mod h1:wjSciE4apTkXRTrbmqiQ+UegdlslOsMJP317+0IdKA4=
+github.com/larsartmann/httputil v1.4.1 h1:sTHWwKY4eNmJzRkEmVU4Gi5on7klDqwBMCeEUq8pfsQ=
+github.com/larsartmann/httputil v1.4.1/go.mod h1:6SUXrarIpc/qJ9paJfcV4tPrO8bI3ZtzOYwIxKwnLoE=
 github.com/larsartmann/httputil/server_timing v1.0.1 h1:9T2YwZfrj71F1NFblFwIDsJZ7rnLU8K1BYlxBmrwfn8=
 github.com/larsartmann/httputil/server_timing v1.0.1/go.mod h1:QumWlp/L8NhkwNXZkN/IeLjtE5Y97axZ9LCK9NzSVck=
 github.com/lucasb-eyer/go-colorful v1.4.1 h1:1EO+WB73+EH8EVbzlrG3KLAfEypQWVHIBqlTf+2hNss=
