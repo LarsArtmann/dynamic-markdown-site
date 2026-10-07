@@ -22,4 +22,3 @@ auto_fix: true
 # the experiment.
 skip_steps:
   - pnpm-audit
-  - license-check
