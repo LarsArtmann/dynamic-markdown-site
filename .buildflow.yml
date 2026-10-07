@@ -9,11 +9,9 @@ exclude:
 
 auto_fix: true
 
-# pnpm-audit always fails here: buildflow runs `pnpm audit` at the repo root,
-# but the only JS/TS project lives in website/ (Astro + Starlight) with its own
-# pnpm-lock.yaml, and the provider ignores per-directory config (tool_paths).
-# Excluded per buildflow's own recommendation; audit website deps directly via
-# `cd website && pnpm audit` until buildflow supports subdirectory projects.
+# pnpm-audit UNSKIPPED 2026-10-07: the audit now runs in the lockfile's
+# directory (lockfileDir, issue #19's fix), so the Astro project in
+# website/ audits against its own pnpm-lock.yaml — no tool_paths needed.
 #
 # license-check (go-licenses) cannot run against this repo: GOEXPERIMENT=jsonv2
 # (encoding/json/v2 imports) plus the downloaded go 1.27 toolchain make
@@ -21,4 +19,3 @@ auto_fix: true
 # packages (upstream google/go-licenses#128). Re-enable when upstream supports
 # the experiment.
 skip_steps:
-  - pnpm-audit
