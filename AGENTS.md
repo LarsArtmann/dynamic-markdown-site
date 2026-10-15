@@ -374,6 +374,6 @@ Build-script approvals live in `website/pnpm-workspace.yaml` under `allowBuilds:
 
 ### 20. Ambient Go Trails go.mod; Unset GOTOOLCHAIN for Go Commands
 
-The user-level Go (home-manager) can lag `go.mod`'s floor while the shell exports `GOTOOLCHAIN=local`, which blocks toolchain auto-download — bare `go` fails with "go.mod requires go >= 1.27.1" (blocked a `git town sync` push at the pre-push hook, 2026-10-01). Run Go commands as `env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go ...` (gotcha 12 pattern; golangci-lint is built with go1.27.1 and unaffected) or inside `nix develop`; `.githooks/pre-push` does this itself since 2026-10-01 so pushes work from any shell.
+The user-level Go (home-manager) can lag `go.mod`'s floor while the shell exports `GOTOOLCHAIN=local`, which blocks toolchain auto-download — bare `go` fails with "go.mod requires go >= 1.27.1" (blocked a `git town sync` push at the pre-push hook, 2026-10-01). Run Go commands as `env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go ...` (gotcha 12 pattern; golangci-lint is built with go1.27.1 and unaffected) or inside `nix develop`. The `.githooks/pre-push` hook was removed (2026-10-15); only `pre-commit` remains in `.githooks/`.
 
 ---
