@@ -140,7 +140,7 @@ func logStartupInfo(svc *services) {
 func setupHTTPServer(svc *services) *http.Server {
 	handler := svc.server.Handler()
 
-	return &http.Server{ //nolint:exhaustruct_v5 // http.Server has many optional fields; we set only what we need.
+	return &http.Server{
 		Addr:              fmt.Sprintf(":%d", svc.config.Port),
 		Handler:           handler,
 		ReadTimeout:       svc.config.Timeout,
