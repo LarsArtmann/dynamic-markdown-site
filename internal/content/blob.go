@@ -73,7 +73,7 @@ func (r *BlobRepository) HealthCheck(ctx context.Context) error {
 		return errors.Wrap(err, "health check cancelled")
 	}
 
-	iter := r.bucket.List(ctx, &blob.ListOptions{Delimiter: "/"})
+	iter := r.bucket.List(&blob.ListOptions{Delimiter: "/"})
 
 	if _, err := iter.Next(ctx); err != nil && !errors.Is(err, io.EOF) {
 		return errors.Wrap(err, "content bucket unreachable")
