@@ -30,6 +30,7 @@ func TestGracefulShutdownStopsInFlightRequests(t *testing.T) {
 		logger,
 		htmlCache,
 		renderer.NewGoldmarkRenderer(),
+		nil,
 		false,
 		"Site",
 	)

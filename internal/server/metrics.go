@@ -50,5 +50,10 @@ func (s *Server) handleMetrics(w http.ResponseWriter, _ *http.Request) {
 	fmt.Fprintf(&b, "dynamic_markdown_site_uptime_seconds %s\n",
 		strconv.FormatFloat(time.Since(s.startedAt).Seconds(), 'f', 3, 64))
 
+	// Health probe gauges from the go-health evaluation hook (ADR-0006).
+	if s.healthMetrics != nil {
+		b.WriteString(s.healthMetrics.Exposition())
+	}
+
 	_, _ = w.Write([]byte(b.String())) //nolint:erraudit // client disconnect mid-write is unrecoverable
 }

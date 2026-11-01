@@ -23,6 +23,7 @@ type Server struct {
 	searchRateLimiter *rateLimiter
 	cache             *cache.HTMLCache
 	liveReload        *LiveReload
+	healthMetrics     *HealthMetrics
 	devMode           bool
 	siteName          string
 	startedAt         time.Time
@@ -34,6 +35,7 @@ func NewServer(
 	log *slog.Logger,
 	htmlCache *cache.HTMLCache,
 	renderer domain.Renderer,
+	healthMetrics *HealthMetrics,
 	devMode bool,
 	siteName string,
 ) *Server {
@@ -50,6 +52,7 @@ func NewServer(
 		searchRateLimiter: srl,
 		cache:             htmlCache,
 		liveReload:        lr,
+		healthMetrics:     healthMetrics,
 		devMode:           devMode,
 		siteName:          siteName,
 		startedAt:         time.Now(),

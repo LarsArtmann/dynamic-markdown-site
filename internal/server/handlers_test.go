@@ -104,7 +104,7 @@ func newTestServerWithCacheAndDevMode(
 	searcher := content.NewSearcher(repo)
 	rndr := renderer.NewGoldmarkRenderer()
 
-	srv := NewServer(repo, searcher, logger, htmlCache, rndr, devMode, "Site")
+	srv := NewServer(repo, searcher, logger, htmlCache, rndr, nil, devMode, "Site")
 	t.Cleanup(srv.Shutdown)
 
 	return srv
