@@ -5,12 +5,12 @@
 > for the implementation record, verification matrix, and post-fix scorecard. The text below is
 > the untouched point-in-time baseline.
 
-| | |
-| --- | --- |
-| Date | 2026-11-01 01:07 |
-| Scope | DI container (`internal/container`), lifecycle wiring (`cmd/dynamic-markdown-site`), health checks (`internal/server`), shutdown behavior, samber/do v2.1.0 API utilization |
-| Method | Full read of container/main/healthcheck/watcher/server/cache/blob sources; grep sweeps for every `do.*` API; verified dispatch behavior against samber/do v2.1.0 source (`service_eager.go`, `scope.go`) and pkg.go.dev; build + `go test -race` on container/server/cmd packages |
-| Verdict | **DI fundamentals: superb. Health-check integration: not wired. Self-healing: broken by one hardcoded 200.** |
+|         |                                                                                                                                                                                                                                                                                   |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date    | 2026-11-01 01:07                                                                                                                                                                                                                                                                  |
+| Scope   | DI container (`internal/container`), lifecycle wiring (`cmd/dynamic-markdown-site`), health checks (`internal/server`), shutdown behavior, samber/do v2.1.0 API utilization                                                                                                       |
+| Method  | Full read of container/main/healthcheck/watcher/server/cache/blob sources; grep sweeps for every `do.*` API; verified dispatch behavior against samber/do v2.1.0 source (`service_eager.go`, `scope.go`) and pkg.go.dev; build + `go test -race` on container/server/cmd packages |
+| Verdict | **DI fundamentals: superb. Health-check integration: not wired. Self-healing: broken by one hardcoded 200.**                                                                                                                                                                      |
 
 ---
 
@@ -25,12 +25,12 @@
 
 **Question 2: Do we have a PROPER service-oriented, composable, resilient, and self-healing architecture?**
 
-| Property | Grade | One-line justification |
-| --- | --- | --- |
-| Service-oriented | **A** | Single composition root, constructor injection everywhere, interface consumers (`content.Repository`, `domain.Renderer`, `content.Searchable`), zero service-locator smell |
-| Composable | **A−** | Graph is flat but clean; provider functions are pure and independently testable; `do.Package`/scopes unused but not needed at this size |
-| Resilient (shutdown) | **B−** | Graceful drain works and is tested; two resource-lifecycle leaks (blob bucket never closed, cache not container-owned) and a fragile double-shutdown |
-| Self-healing | **C−** | Restart-on-failure contract is defeated by the always-200 `/health`; DI health sweep dormant |
+| Property             | Grade  | One-line justification                                                                                                                                                     |
+| -------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Service-oriented     | **A**  | Single composition root, constructor injection everywhere, interface consumers (`content.Repository`, `domain.Renderer`, `content.Searchable`), zero service-locator smell |
+| Composable           | **A−** | Graph is flat but clean; provider functions are pure and independently testable; `do.Package`/scopes unused but not needed at this size                                    |
+| Resilient (shutdown) | **B−** | Graceful drain works and is tested; two resource-lifecycle leaks (blob bucket never closed, cache not container-owned) and a fragile double-shutdown                       |
+| Self-healing         | **C−** | Restart-on-failure contract is defeated by the always-200 `/health`; DI health sweep dormant                                                                               |
 
 Overall: **strong skeleton, weak nerve system.** The wiring to be superb already exists — three small, surgical changes (§7) close every gap.
 
@@ -42,15 +42,15 @@ Overall: **strong skeleton, weak nerve system.** The wiring to be superb already
 
 `internal/container/container.go` — one `do.New()` (line 29), private injector, typed error-returning accessors:
 
-| Service | Registration | Lifetime | Materialized at boot? |
-| --- | --- | --- | --- |
-| `*config.Config` | `do.Provide` (container.go:32) | lazy singleton | yes (everything depends on it) |
-| `*slog.Logger` | `do.Provide` (container.go:33) | lazy singleton | yes |
-| `*cache.HTMLCache` | `do.Provide` (container.go:34) | lazy singleton | yes (server needs it) |
-| `*renderer.GoldmarkRenderer` | `do.Provide` (container.go:35) | lazy singleton | yes |
-| `content.Repository` (interface) | `do.Provide` (container.go:36) | lazy singleton | yes |
-| `*content.Searcher` | `do.Provide` (container.go:37) | lazy singleton | yes |
-| `*server.Server` | `provideServer()` + `do.ProvideValue` (container.go:42-46) | **eager** value | **yes — deliberately** |
+| Service                          | Registration                                               | Lifetime        | Materialized at boot?          |
+| -------------------------------- | ---------------------------------------------------------- | --------------- | ------------------------------ |
+| `*config.Config`                 | `do.Provide` (container.go:32)                             | lazy singleton  | yes (everything depends on it) |
+| `*slog.Logger`                   | `do.Provide` (container.go:33)                             | lazy singleton  | yes                            |
+| `*cache.HTMLCache`               | `do.Provide` (container.go:34)                             | lazy singleton  | yes (server needs it)          |
+| `*renderer.GoldmarkRenderer`     | `do.Provide` (container.go:35)                             | lazy singleton  | yes                            |
+| `content.Repository` (interface) | `do.Provide` (container.go:36)                             | lazy singleton  | yes                            |
+| `*content.Searcher`              | `do.Provide` (container.go:37)                             | lazy singleton  | yes                            |
+| `*server.Server`                 | `provideServer()` + `do.ProvideValue` (container.go:42-46) | **eager** value | **yes — deliberately**         |
 
 The eager server construction (container.go:39-46) is a **documented, correct** boot-criticality decision: main starts listening immediately, and the health sweep must see a constructed service from boot rather than reporting green for a never-resolved service. It also makes startup fail-fast — a bad `-storage-url` surfaces at boot (10s blob timeout, container.go:171), not at first request.
 
@@ -58,25 +58,25 @@ The eager server construction (container.go:39-46) is a **documented, correct** 
 
 ### 2.2 Lifecycle ownership map (as implemented)
 
-| Resource | Who closes it | samber/do-aware? | Verified |
-| --- | --- | --- | --- |
-| `http.Server` (listener, in-flight reqs) | `main.gracefulShutdown` → `httpServer.Shutdown` (main.go:180) | n/a (not in container) | shutdown_integration_test.go:100 |
-| `*server.Server` (rate limiters + cache) | `main.shutdownServices` manually (main.go:193) **and** `injector.Shutdown()` via `do.Shutdowner` dispatch | yes (matches `Shutdowner`) | service_eager.go:133-139 dispatches `Shutdown()` for eager services |
-| `*cache.HTMLCache` (otter goroutines) | only transitively via `Server.Shutdown()` (handlers.go:95) | **no** (`Close()` ≠ `Shutdown()`) | otter `StopAllGoroutines` is `sync.Once`-guarded (cache_impl.go:1712) |
-| `*BlobRepository` (gocloud bucket) | **nobody in production code** — `Close()` at blob.go:286-287 is test-only | **no** (`Close() error` matches no Shutdowner interface) | grep: only tests call it |
-| rate limiter sweep goroutines | `Server.Shutdown()` → `rateLimiter.Stop()` (handlers.go:93-94) | transitively | `Stop()` is `sync.Once`-guarded (ratelimit.go:111-114) |
-| file watcher | `watchForChanges` defer `watcher.Close()` (watcher.go:40-44), ctx-cancelled | no (deliberately outside container, dev-only) | |
-| `LiveReload` SSE clients | request-context cancellation only (livereload.go:96-103) | no (state-holding service unknown to container) | |
+| Resource                                 | Who closes it                                                                                             | samber/do-aware?                                         | Verified                                                              |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
+| `http.Server` (listener, in-flight reqs) | `main.gracefulShutdown` → `httpServer.Shutdown` (main.go:180)                                             | n/a (not in container)                                   | shutdown_integration_test.go:100                                      |
+| `*server.Server` (rate limiters + cache) | `main.shutdownServices` manually (main.go:193) **and** `injector.Shutdown()` via `do.Shutdowner` dispatch | yes (matches `Shutdowner`)                               | service_eager.go:133-139 dispatches `Shutdown()` for eager services   |
+| `*cache.HTMLCache` (otter goroutines)    | only transitively via `Server.Shutdown()` (handlers.go:95)                                                | **no** (`Close()` ≠ `Shutdown()`)                        | otter `StopAllGoroutines` is `sync.Once`-guarded (cache_impl.go:1712) |
+| `*BlobRepository` (gocloud bucket)       | **nobody in production code** — `Close()` at blob.go:286-287 is test-only                                 | **no** (`Close() error` matches no Shutdowner interface) | grep: only tests call it                                              |
+| rate limiter sweep goroutines            | `Server.Shutdown()` → `rateLimiter.Stop()` (handlers.go:93-94)                                            | transitively                                             | `Stop()` is `sync.Once`-guarded (ratelimit.go:111-114)                |
+| file watcher                             | `watchForChanges` defer `watcher.Close()` (watcher.go:40-44), ctx-cancelled                               | no (deliberately outside container, dev-only)            |                                                                       |
+| `LiveReload` SSE clients                 | request-context cancellation only (livereload.go:96-103)                                                  | no (state-holding service unknown to container)          |                                                                       |
 
 ### 2.3 Health-check layers (as implemented)
 
-| Layer | Exists | Truthful | Wired to DI |
-| --- | --- | --- | --- |
-| In-process DI sweep (`injector.HealthCheck*`) | ❌ never invoked | — | would work today (Server matches `HealthcheckerWithContext`) |
-| `Server.HealthCheck(ctx)` method | ✅ (handlers.go:101-111) | ✅ checks ctx + repo | ⚠️ used only by its own unit tests |
-| `/health` endpoint | ✅ (handlers.go:121-138) | ❌ **always 200/healthy** | ❌ hand-rolled, ignores `HealthCheck()` |
-| `healthcheck` subcommand (ADR-0005) | ✅ (healthcheck.go:33-71) | trusts `/health`'s 200 | inherits the lie |
-| `/metrics` | ✅ cache + uptime only | n/a | no health metrics (metrics.go) |
+| Layer                                         | Exists                    | Truthful                  | Wired to DI                                                  |
+| --------------------------------------------- | ------------------------- | ------------------------- | ------------------------------------------------------------ |
+| In-process DI sweep (`injector.HealthCheck*`) | ❌ never invoked          | —                         | would work today (Server matches `HealthcheckerWithContext`) |
+| `Server.HealthCheck(ctx)` method              | ✅ (handlers.go:101-111)  | ✅ checks ctx + repo      | ⚠️ used only by its own unit tests                            |
+| `/health` endpoint                            | ✅ (handlers.go:121-138)  | ❌ **always 200/healthy** | ❌ hand-rolled, ignores `HealthCheck()`                      |
+| `healthcheck` subcommand (ADR-0005)           | ✅ (healthcheck.go:33-71) | trusts `/health`'s 200    | inherits the lie                                             |
+| `/metrics`                                    | ✅ cache + uptime only    | n/a                       | no health metrics (metrics.go)                               |
 
 ---
 
@@ -84,23 +84,23 @@ The eager server construction (container.go:39-46) is a **documented, correct** 
 
 Grep sweep over all `do.*` API usage (only two files import samber/do: `internal/container/container.go`, `container_test.go`).
 
-| ID | Rule | Verdict | Evidence |
-| --- | --- | --- | --- |
-| DO-1 | No `Must*` in runtime paths | ✅ **Clean** | Zero occurrences of `MustInvoke`/`MustInvokeAs`/`MustShutdown` in the repo. Accessors use `do.Invoke` + `errors.Wrap` (container.go:52-69). |
-| DO-2 | Every `do.New()` has a matching `Shutdown()` | ✅ **Clean** | Single `do.New()` (container.go:29); `Container.Shutdown()` (container.go:72-74) called on both the error path (main.go:71) and the graceful path (main.go:185); tests clean up via `t.Cleanup` (container_test.go:47). ⚠️ Caveat: the container *reports* shutdown but cannot *own* two of its resources — see §4 HIGH-2 / MED-2. |
-| DO-3 | No `do.Override*` outside tests | ✅ **Clean** | Zero `Override*` calls anywhere; tests compose fresh containers with `ProvideValue` instead (container_test.go:64-67) — the more honest pattern. |
-| DO-4 | No global injector | ✅ **Clean** | Injector is a private struct field; no package-level `do.Injector`/`RootScope` variables; no `do.DefaultRootScope` usage. |
-| DO-5 | No `do.Invoke` inside loops | ✅ **Clean** | All invocations are hoisted provider-body/accessor calls. |
-| DO-6 | `Shutdown()` is self-contained | ✅ **Clean** | `Server.Shutdown()` touches only its own fields (handlers.go:92-96); no injector access inside any service; no cross-service shutdown calls. |
+| ID   | Rule                                         | Verdict      | Evidence                                                                                                                                                                                                                                                                                                                          |
+| ---- | -------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DO-1 | No `Must*` in runtime paths                  | ✅ **Clean** | Zero occurrences of `MustInvoke`/`MustInvokeAs`/`MustShutdown` in the repo. Accessors use `do.Invoke` + `errors.Wrap` (container.go:52-69).                                                                                                                                                                                       |
+| DO-2 | Every `do.New()` has a matching `Shutdown()` | ✅ **Clean** | Single `do.New()` (container.go:29); `Container.Shutdown()` (container.go:72-74) called on both the error path (main.go:71) and the graceful path (main.go:185); tests clean up via `t.Cleanup` (container_test.go:47). ⚠️ Caveat: the container _reports_ shutdown but cannot _own_ two of its resources — see §4 HIGH-2 / MED-2. |
+| DO-3 | No `do.Override*` outside tests              | ✅ **Clean** | Zero `Override*` calls anywhere; tests compose fresh containers with `ProvideValue` instead (container_test.go:64-67) — the more honest pattern.                                                                                                                                                                                  |
+| DO-4 | No global injector                           | ✅ **Clean** | Injector is a private struct field; no package-level `do.Injector`/`RootScope` variables; no `do.DefaultRootScope` usage.                                                                                                                                                                                                         |
+| DO-5 | No `do.Invoke` inside loops                  | ✅ **Clean** | All invocations are hoisted provider-body/accessor calls.                                                                                                                                                                                                                                                                         |
+| DO-6 | `Shutdown()` is self-contained               | ✅ **Clean** | `Server.Shutdown()` touches only its own fields (handlers.go:92-96); no injector access inside any service; no cross-service shutdown calls.                                                                                                                                                                                      |
 
 Structural smells:
 
-| Smell | Verdict |
-| --- | --- |
-| Service-locator (injector passed deep) | ✅ absent — `do.Injector` appears only in provider signatures |
-| Injector stored inside a service | ✅ absent |
-| Compile-time interface guards | ✅ `var _ Repository = (*BlobRepository)(nil)` (blob.go:25); ⚠️ no `var _ do.Shutdowner = …` / `var _ do.HealthcheckerWithContext = …` guards on Server/HTMLCache/BlobRepository — the lifecycle contracts are implicit and untested |
-| Error propagation quality | ✅ every provider wraps with context; sentinel `errBlobTimeout` defined at package level (container.go:20) |
+| Smell                                  | Verdict                                                                                                                                                                                                                             |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Service-locator (injector passed deep) | ✅ absent — `do.Injector` appears only in provider signatures                                                                                                                                                                       |
+| Injector stored inside a service       | ✅ absent                                                                                                                                                                                                                           |
+| Compile-time interface guards          | ✅ `var _ Repository = (*BlobRepository)(nil)` (blob.go:25); ⚠️ no `var _ do.Shutdowner = …` / `var _ do.HealthcheckerWithContext = …` guards on Server/HTMLCache/BlobRepository — the lifecycle contracts are implicit and untested |
+| Error propagation quality              | ✅ every provider wraps with context; sentinel `errBlobTimeout` defined at package level (container.go:20)                                                                                                                          |
 
 **Score: 6/6 anti-pattern rules clean, 0 findings.** This is rare and worth saying plainly: the DI discipline in this repo is textbook.
 
@@ -216,28 +216,28 @@ Estimated total diff for 1-4: well under 100 lines including tests; no interface
 
 ## 8. Verification Performed
 
-| Check | Result |
-| --- | --- |
-| `env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go build ./...` | ✅ BUILD_OK |
-| `go test ./internal/container/... ./internal/server/... ./cmd/... -race -count=1` | ✅ ok (2.274s / 1.233s / 6.667s) |
-| Grep: `MustInvoke|do.Override|do.DefaultRootScope` | ✅ zero production hits |
-| Grep: `injector.HealthCheck` callers | ✅ zero — sweep dormant (MED-1 confirmed) |
-| Grep: `BlobRepository.Close` callers | ✅ zero production hits (HIGH-2 confirmed) |
-| samber/do v2.1.0 eager-shutdown dispatch (service_eager.go:114-139) | ✅ verified: only `Shutdown*` method names trigger |
-| samber/do v2.1.0 `Scope.HealthCheckWithContext` (scope.go:289-310) | ✅ verified: sweeps all `Healthchecker*` services |
-| otter v2.3.0 `StopAllGoroutines` (cache_impl.go:1712) | ✅ `sync.Once` — double-shutdown safe today (MED-3 caveat) |
+| Check                                                                             | Result                                                     |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go build ./...`                           | ✅ BUILD_OK                                                |
+| `go test ./internal/container/... ./internal/server/... ./cmd/... -race -count=1` | ✅ ok (2.274s / 1.233s / 6.667s)                           |
+| Grep: `MustInvoke                                                                 | do.Override                                                |
+| Grep: `injector.HealthCheck` callers                                              | ✅ zero — sweep dormant (MED-1 confirmed)                  |
+| Grep: `BlobRepository.Close` callers                                              | ✅ zero production hits (HIGH-2 confirmed)                 |
+| samber/do v2.1.0 eager-shutdown dispatch (service_eager.go:114-139)               | ✅ verified: only `Shutdown*` method names trigger         |
+| samber/do v2.1.0 `Scope.HealthCheckWithContext` (scope.go:289-310)                | ✅ verified: sweeps all `Healthchecker*` services          |
+| otter v2.3.0 `StopAllGoroutines` (cache_impl.go:1712)                             | ✅ `sync.Once` — double-shutdown safe today (MED-3 caveat) |
 
 ## 9. Scorecard
 
-| Dimension | Grade | Weight of evidence |
-| --- | --- | --- |
-| Composition root & wiring purity | **A** | §3: 6/6 DO rules clean |
-| Composability & service boundaries | **A−** | §5.5: interface-first consumers; flat but honest graph |
-| Resilience (drain, fail-fast, timeouts) | **B+** | §5.1-5.2; minus double-shutdown fragility |
-| Lifecycle completeness | **C+** | §4 HIGH-2, MED-2, MED-3: 2 of 4 resource-holders invisible to the container |
-| Health-check integration | **D** | §4 HIGH-1, MED-1: plumbing exists, endpoint bypasses it |
-| Self-healing (orchestrator contract) | **C−** | §4 HIGH-1: always-200 defeats ADR-0005's own intent |
-| **Overall** | **B** | Excellent DI skeleton; the health nerve system needs ~100 lines to become superb |
+| Dimension                               | Grade  | Weight of evidence                                                               |
+| --------------------------------------- | ------ | -------------------------------------------------------------------------------- |
+| Composition root & wiring purity        | **A**  | §3: 6/6 DO rules clean                                                           |
+| Composability & service boundaries      | **A−** | §5.5: interface-first consumers; flat but honest graph                           |
+| Resilience (drain, fail-fast, timeouts) | **B+** | §5.1-5.2; minus double-shutdown fragility                                        |
+| Lifecycle completeness                  | **C+** | §4 HIGH-2, MED-2, MED-3: 2 of 4 resource-holders invisible to the container      |
+| Health-check integration                | **D**  | §4 HIGH-1, MED-1: plumbing exists, endpoint bypasses it                          |
+| Self-healing (orchestrator contract)    | **C−** | §4 HIGH-1: always-200 defeats ADR-0005's own intent                              |
+| **Overall**                             | **B**  | Excellent DI skeleton; the health nerve system needs ~100 lines to become superb |
 
 ## 10. Open Work
 

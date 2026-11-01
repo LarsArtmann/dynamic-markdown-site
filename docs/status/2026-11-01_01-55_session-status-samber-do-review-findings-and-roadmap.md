@@ -1,12 +1,12 @@
 # Session Status: samber/do + Health-Check Review — Findings, Honesty, Roadmap
 
-| | |
-| --- | --- |
-| Date | 2026-11-01 01:55 |
-| Session scope | Deep review of samber/do v2 usage + health-check architecture; zero production code changed |
-| Deliverables | `docs/status/2026-11-01_01-07_samber-do-di-and-healthcheck-architecture-review.md` + index row in `docs/status/README.md` |
-| Verification | `go build ./...` BUILD_OK; `go test` container/server/cmd with `-race` all ok |
-| Status | Review complete. All found defects **open** — nothing fixed yet. |
+|                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | 2026-11-01 01:55                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Session scope  | Deep review of samber/do v2 usage + health-check architecture; zero production code changed                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Deliverables   | `docs/status/2026-11-01_01-07_samber-do-di-and-healthcheck-architecture-review.md` + index row in `docs/status/README.md`                                                                                                                                                                                                                                                                                                                                                                         |
+| Verification   | `go build ./...` BUILD_OK; `go test` container/server/cmd with `-race` all ok                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Status         | Review complete. All found defects **open** — nothing fixed yet.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ⚠️ Update 01:58 | Written at 01:55; at 01:56 a follow-up session **executed the fixes** (truthful `/health` 503, `Shutdown()` on blob/cache, compile-time guards, live sweep, single shutdown owner, SSE stall + dev-gating) and reported green gates: see [01:56 report](./2026-11-01_01-56_session-status-samber-do-healthcheck-fixes.md). Sections (c)/(d) items 1-5 and (f) Tier 1 items 1-7 are thereby done; the (g) questions below are superseded accordingly. Kept verbatim as the point-in-time snapshot. |
 
 ---
@@ -37,25 +37,25 @@
 
 ## a) FULLY DONE
 
-| Item | Evidence |
-| --- | --- |
+| Item                                                                                       | Evidence                                                                                                                          |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
 | Deep review of samber/do v2 + health-check architecture delivered as detailed `.md` report | `docs/status/2026-11-01_01-07_samber-do-di-and-healthcheck-architecture-review.md` (10 sections, scorecard, fix prescriptions §7) |
-| Report registered in the living-reports index per convention | `docs/status/README.md` top row added |
-| DO-1 → DO-6 anti-pattern sweep: **6/6 clean** | grep: zero `MustInvoke`/`Override`/global injector/single `do.New()` at container.go:29 |
-| samber/do v2.1.0 behavior claims verified against library source, not docs | `service_eager.go:114-139` (shutdown dispatch: only `Shutdown*` names), `scope.go:289-310` (HealthCheck sweep) |
-| otter v2.3.0 `StopAllGoroutines` idempotency verified in source | `cache_impl.go:1712` (`sync.Once`) — double-shutdown safe today |
-| Build + race tests on audited packages green | BUILD_OK; container 2.274s / server 1.233s / cmd 6.667s, all `ok` |
-| Findings catalogued with file:line evidence, severity, and concrete fixes | 2 HIGH, 3 MED, 5 LOW; fix sketches in review §7 (est. <100 lines total) |
+| Report registered in the living-reports index per convention                               | `docs/status/README.md` top row added                                                                                             |
+| DO-1 → DO-6 anti-pattern sweep: **6/6 clean**                                              | grep: zero `MustInvoke`/`Override`/global injector/single `do.New()` at container.go:29                                           |
+| samber/do v2.1.0 behavior claims verified against library source, not docs                 | `service_eager.go:114-139` (shutdown dispatch: only `Shutdown*` names), `scope.go:289-310` (HealthCheck sweep)                    |
+| otter v2.3.0 `StopAllGoroutines` idempotency verified in source                            | `cache_impl.go:1712` (`sync.Once`) — double-shutdown safe today                                                                   |
+| Build + race tests on audited packages green                                               | BUILD_OK; container 2.274s / server 1.233s / cmd 6.667s, all `ok`                                                                 |
+| Findings catalogued with file:line evidence, severity, and concrete fixes                  | 2 HIGH, 3 MED, 5 LOW; fix sketches in review §7 (est. <100 lines total)                                                           |
 
 ## b) PARTIALLY DONE
 
-| Item | Works now | Open | Effort to finish |
-| --- | --- | --- | --- |
-| Defect remediation | Fully diagnosed: root causes, exact edits, guard list (review §7.1-7.4) | Zero lines implemented; no tests added | S-M batch (<2h) |
-| Health-check truth chain | `Server.HealthCheck(ctx)` exists and is correct; subcommand + `/health` plumbing exist | Endpoint ignores the method; sweep never invoked; aggregate hardcoded healthy | S (wire) + M (typed payload) |
-| Container lifecycle ownership | Server teardown flows through `injector.Shutdown()` (DAG-aware) | Blob bucket + cache invisible to the container (`Close()` ≠ `Shutdown*`) | S each |
-| Shutdown-order guarantee | Manual `Server.Shutdown()` + injector wave both idempotent-safe today | Single-owner sequence not established; runtime test missing | S + M (test) |
-| Report → backlog pipeline | Findings written with stable structure | Not harvested into `TODO_LIST.md`/`ROADMAP.md` | S |
+| Item                          | Works now                                                                              | Open                                                                          | Effort to finish             |
+| ----------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------- |
+| Defect remediation            | Fully diagnosed: root causes, exact edits, guard list (review §7.1-7.4)                | Zero lines implemented; no tests added                                        | S-M batch (<2h)              |
+| Health-check truth chain      | `Server.HealthCheck(ctx)` exists and is correct; subcommand + `/health` plumbing exist | Endpoint ignores the method; sweep never invoked; aggregate hardcoded healthy | S (wire) + M (typed payload) |
+| Container lifecycle ownership | Server teardown flows through `injector.Shutdown()` (DAG-aware)                        | Blob bucket + cache invisible to the container (`Close()` ≠ `Shutdown*`)      | S each                       |
+| Shutdown-order guarantee      | Manual `Server.Shutdown()` + injector wave both idempotent-safe today                  | Single-owner sequence not established; runtime test missing                   | S + M (test)                 |
+| Report → backlog pipeline     | Findings written with stable structure                                                 | Not harvested into `TODO_LIST.md`/`ROADMAP.md`                                | S                            |
 
 ## c) NOT STARTED
 
@@ -97,63 +97,63 @@ Tier 1 = actionable now (harvest to TODO_LIST); Tier 2 = roadmap fuel. Impact / 
 
 **Tier 1 — actionable now**
 
-| # | Task | Impact | Effort | Category |
-| --- | --- | --- | --- | --- |
-| 1 | Make `/health` derive overall status from `Server.HealthCheck(r.Context())`; 503 + `unhealthy` on failure | Critical | S | Bug |
-| 2 | Add `BlobRepository.Shutdown() error` (delegate to `Close()`) so the injector DAG closes the bucket | Critical | S | Bug |
-| 3 | Add `HTMLCache.Shutdown()` (delegate to `Close()`) for container-owned teardown | High | S | Quality |
-| 4 | Add `Container.HealthCheck(ctx)` delegating to `injector.HealthCheckWithContext` | High | S | Feature |
-| 5 | Delete manual `svc.server.Shutdown()` in `shutdownServices` (main.go:193); injector owns it | Medium | S | Cleanup |
-| 6 | Compile-time guards: `var _ do.ShutdownerWithError = (*BlobRepository)(nil)`, `do.Shutdowner` on cache, `do.HealthcheckerWithContext` on server | High | S | Quality |
-| 7 | Failure-path test: healthcheck subcommand exits non-zero on non-200 (currently zero coverage) | High | S | Bug |
-| 8 | Unit test: `/health` returns 503 when `repo.Root()` fails (with failing-repo fixture) | High | S | Bug |
-| 9 | Fix blob-provider timeout leak: close the abandoned repo if the racing goroutine succeeds | Medium | M | Bug |
-| 10 | Rename `err` → `report` in `assertNoShutdownError` (container_test.go:37) — stop type-lying | Low | S | Cleanup |
-| 11 | Update stale doc comment handlers.go:98-100 once the sweep is wired | Low | S | Documentation |
-| 12 | Integration test: after `injector.Shutdown()`, blob bucket is closed (assert via wrapper repo) | Medium | M | Quality |
-| 13 | Integration test: after `injector.Shutdown()`, otter goroutines stopped (`StopAllGoroutines` idempotency covered) | Medium | M | Quality |
-| 14 | ADR-0006: who owns health truth (DI sweep vs endpoint vs orchestrator), incl. 503 semantics | High | M | Documentation |
-| 15 | Harvest this report's findings into `TODO_LIST.md` / `ROADMAP.md` | Medium | S | Documentation |
+| #  | Task                                                                                                                                            | Impact   | Effort | Category      |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
+| 1  | Make `/health` derive overall status from `Server.HealthCheck(r.Context())`; 503 + `unhealthy` on failure                                       | Critical | S      | Bug           |
+| 2  | Add `BlobRepository.Shutdown() error` (delegate to `Close()`) so the injector DAG closes the bucket                                             | Critical | S      | Bug           |
+| 3  | Add `HTMLCache.Shutdown()` (delegate to `Close()`) for container-owned teardown                                                                 | High     | S      | Quality       |
+| 4  | Add `Container.HealthCheck(ctx)` delegating to `injector.HealthCheckWithContext`                                                                | High     | S      | Feature       |
+| 5  | Delete manual `svc.server.Shutdown()` in `shutdownServices` (main.go:193); injector owns it                                                     | Medium   | S      | Cleanup       |
+| 6  | Compile-time guards: `var _ do.ShutdownerWithError = (*BlobRepository)(nil)`, `do.Shutdowner` on cache, `do.HealthcheckerWithContext` on server | High     | S      | Quality       |
+| 7  | Failure-path test: healthcheck subcommand exits non-zero on non-200 (currently zero coverage)                                                   | High     | S      | Bug           |
+| 8  | Unit test: `/health` returns 503 when `repo.Root()` fails (with failing-repo fixture)                                                           | High     | S      | Bug           |
+| 9  | Fix blob-provider timeout leak: close the abandoned repo if the racing goroutine succeeds                                                       | Medium   | M      | Bug           |
+| 10 | Rename `err` → `report` in `assertNoShutdownError` (container_test.go:37) — stop type-lying                                                     | Low      | S      | Cleanup       |
+| 11 | Update stale doc comment handlers.go:98-100 once the sweep is wired                                                                             | Low      | S      | Documentation |
+| 12 | Integration test: after `injector.Shutdown()`, blob bucket is closed (assert via wrapper repo)                                                  | Medium   | M      | Quality       |
+| 13 | Integration test: after `injector.Shutdown()`, otter goroutines stopped (`StopAllGoroutines` idempotency covered)                               | Medium   | M      | Quality       |
+| 14 | ADR-0006: who owns health truth (DI sweep vs endpoint vs orchestrator), incl. 503 semantics                                                     | High     | M      | Documentation |
+| 15 | Harvest this report's findings into `TODO_LIST.md` / `ROADMAP.md`                                                                               | Medium   | S      | Documentation |
 
 **Tier 2 — roadmap fuel**
 
-| # | Task | Impact | Effort | Category |
-| --- | --- | --- | --- | --- |
-| 16 | Typed health payload: status enum + typed dependency structs (make "degraded" representable) | High | M | Feature |
-| 17 | Surface renderer (D2) degradation as `degraded` in `/health` instead of silence | Medium | M | Feature |
-| 18 | `do.InjectorOpts{HealthCheckGlobalTimeout}` to bound sweeps | Medium | S | Quality |
-| 19 | `/metrics`: `repository_health` gauge + last-sweep-timestamp | Medium | M | Feature |
-| 20 | Bounded `ShutdownWithContext` aligned with the 30s drain window | Medium | M | Quality |
-| 21 | Per-service `ShutdownReport` errors logged structured on shutdown | Low | S | Quality |
-| 22 | Confirm + document FileSystemRepository needs no closer (interface note) | Low | S | Documentation |
-| 23 | Golden-file test for `/health` JSON contract | Low | S | Quality |
-| 24 | Retry/backoff around `repo.Root()` in the sweep for transient blob errors | Medium | M | Feature |
-| 25 | Liveness/readiness split (`/healthz` vs `/readyz`) if orchestrator supports it | Medium | M | Feature |
-| 26 | Assess `/health` info disclosure (version/commit on public deploys) | Low | S | Security |
-| 27 | Benchmark `HealthCheck` (`repo.Root()` cost under blob storage) | Low | S | Quality |
-| 28 | `LiveReload.Shutdown()` for completeness if it ever leaves dev mode | Low | S | Quality |
-| 29 | Extract blob-open-with-timeout into a testable function (container.go:150-173) | Low | S | Cleanup |
-| 30 | Include scheme + elapsed in `errBlobTimeout` message | Low | S | Quality |
-| 31 | Wire `samber-do-auditlog` hooks for registration/invocation/shutdown observability | Medium | M | Feature |
-| 32 | Group providers into `do.Package` (config/logger vs core services) | Low | L | Cleanup |
-| 33 | Dev-mode watcher as a child scope of the injector (graph completeness) | Low | L | Cleanup |
-| 34 | Dev-only debug endpoint exposing `do.ExplainInjector` graph | Low | M | Feature |
-| 35 | `do.HealthCheck[T]`-based per-service probe surface in debug endpoint | Low | L | Feature |
-| 36 | Update FEATURES.md `/health` semantics after fix lands | Low | S | Documentation |
-| 37 | Update website docs API table for `/health` status codes | Low | S | Documentation |
-| 38 | Verify Dockerfile `HEALTHCHECK --start-period=10s` vs blob 10s open timeout | Medium | S | Bug |
-| 39 | E2E test: SIGTERM → drain → injector shutdown ordering in `main.run` | Medium | M | Quality |
-| 40 | Circuit-breaker idea: serve stale cache while repository unreachable (in-process self-healing) | Medium | L | Feature |
-| 41 | Custom lint rule: forbid hardcoded `jsonStatusHealthy` aggregates in handlers (doanalyzerv2-style) | Low | L | Quality |
-| 42 | Unify `jsonStatus*`/`jsonKey*` string constants into a typed vocabulary | Low | M | Cleanup |
-| 43 | Document (gotcha) the lifecycle ownership map in AGENTS.md | Medium | S | Documentation |
-| 44 | Add `var _ do.Shutdowner = (*rateLimiter)(nil)`-style internal guards where owner is Server | Low | S | Quality |
-| 45 | Sweep coverage: assert `injector.HealthCheck` finds exactly Server (and future healthcheckers) | Medium | S | Quality |
-| 46 | Container accessor for `HealthReport` logging on startup (log sweep result once at boot) | Low | S | Feature |
-| 47 | Startup probe: run one sweep before ListenAndServe; abort boot on unhealthy deps | Medium | M | Feature |
-| 48 | Consider `do.ProvideTransient` + scope for per-request tracing in accesslog | Low | L | Cleanup |
-| 49 | Evaluate otter v2.4.0 bump (module cache shows v2.4.0 available) | Low | M | Cleanup |
-| 50 | Post-fix: re-run this review's scorecard; expect Health D→A, Self-healing C−→A | Medium | M | Documentation |
+| #  | Task                                                                                               | Impact | Effort | Category      |
+| -- | -------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 16 | Typed health payload: status enum + typed dependency structs (make "degraded" representable)       | High   | M      | Feature       |
+| 17 | Surface renderer (D2) degradation as `degraded` in `/health` instead of silence                    | Medium | M      | Feature       |
+| 18 | `do.InjectorOpts{HealthCheckGlobalTimeout}` to bound sweeps                                        | Medium | S      | Quality       |
+| 19 | `/metrics`: `repository_health` gauge + last-sweep-timestamp                                       | Medium | M      | Feature       |
+| 20 | Bounded `ShutdownWithContext` aligned with the 30s drain window                                    | Medium | M      | Quality       |
+| 21 | Per-service `ShutdownReport` errors logged structured on shutdown                                  | Low    | S      | Quality       |
+| 22 | Confirm + document FileSystemRepository needs no closer (interface note)                           | Low    | S      | Documentation |
+| 23 | Golden-file test for `/health` JSON contract                                                       | Low    | S      | Quality       |
+| 24 | Retry/backoff around `repo.Root()` in the sweep for transient blob errors                          | Medium | M      | Feature       |
+| 25 | Liveness/readiness split (`/healthz` vs `/readyz`) if orchestrator supports it                     | Medium | M      | Feature       |
+| 26 | Assess `/health` info disclosure (version/commit on public deploys)                                | Low    | S      | Security      |
+| 27 | Benchmark `HealthCheck` (`repo.Root()` cost under blob storage)                                    | Low    | S      | Quality       |
+| 28 | `LiveReload.Shutdown()` for completeness if it ever leaves dev mode                                | Low    | S      | Quality       |
+| 29 | Extract blob-open-with-timeout into a testable function (container.go:150-173)                     | Low    | S      | Cleanup       |
+| 30 | Include scheme + elapsed in `errBlobTimeout` message                                               | Low    | S      | Quality       |
+| 31 | Wire `samber-do-auditlog` hooks for registration/invocation/shutdown observability                 | Medium | M      | Feature       |
+| 32 | Group providers into `do.Package` (config/logger vs core services)                                 | Low    | L      | Cleanup       |
+| 33 | Dev-mode watcher as a child scope of the injector (graph completeness)                             | Low    | L      | Cleanup       |
+| 34 | Dev-only debug endpoint exposing `do.ExplainInjector` graph                                        | Low    | M      | Feature       |
+| 35 | `do.HealthCheck[T]`-based per-service probe surface in debug endpoint                              | Low    | L      | Feature       |
+| 36 | Update FEATURES.md `/health` semantics after fix lands                                             | Low    | S      | Documentation |
+| 37 | Update website docs API table for `/health` status codes                                           | Low    | S      | Documentation |
+| 38 | Verify Dockerfile `HEALTHCHECK --start-period=10s` vs blob 10s open timeout                        | Medium | S      | Bug           |
+| 39 | E2E test: SIGTERM → drain → injector shutdown ordering in `main.run`                               | Medium | M      | Quality       |
+| 40 | Circuit-breaker idea: serve stale cache while repository unreachable (in-process self-healing)     | Medium | L      | Feature       |
+| 41 | Custom lint rule: forbid hardcoded `jsonStatusHealthy` aggregates in handlers (doanalyzerv2-style) | Low    | L      | Quality       |
+| 42 | Unify `jsonStatus*`/`jsonKey*` string constants into a typed vocabulary                            | Low    | M      | Cleanup       |
+| 43 | Document (gotcha) the lifecycle ownership map in AGENTS.md                                         | Medium | S      | Documentation |
+| 44 | Add `var _ do.Shutdowner = (*rateLimiter)(nil)`-style internal guards where owner is Server        | Low    | S      | Quality       |
+| 45 | Sweep coverage: assert `injector.HealthCheck` finds exactly Server (and future healthcheckers)     | Medium | S      | Quality       |
+| 46 | Container accessor for `HealthReport` logging on startup (log sweep result once at boot)           | Low    | S      | Feature       |
+| 47 | Startup probe: run one sweep before ListenAndServe; abort boot on unhealthy deps                   | Medium | M      | Feature       |
+| 48 | Consider `do.ProvideTransient` + scope for per-request tracing in accesslog                        | Low    | L      | Cleanup       |
+| 49 | Evaluate otter v2.4.0 bump (module cache shows v2.4.0 available)                                   | Low    | M      | Cleanup       |
+| 50 | Post-fix: re-run this review's scorecard; expect Health D→A, Self-healing C−→A                     | Medium | M      | Documentation |
 
 ## g) Questions I cannot figure out myself
 
@@ -163,4 +163,4 @@ Tier 1 = actionable now (harvest to TODO_LIST); Tier 2 = roadmap fuel. Impact / 
 
 ---
 
-*Point-in-time snapshot. Findings reference: `2026-11-01_01-07_samber-do-di-and-healthcheck-architecture-review.md`. Section (f) is HARVEST input — route Tier 1 to `TODO_LIST.md`, Tier 2 to `ROADMAP.md`.*
+_Point-in-time snapshot. Findings reference: `2026-11-01_01-07_samber-do-di-and-healthcheck-architecture-review.md`. Section (f) is HARVEST input — route Tier 1 to `TODO_LIST.md`, Tier 2 to `ROADMAP.md`._

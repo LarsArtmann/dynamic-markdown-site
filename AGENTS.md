@@ -273,7 +273,7 @@ Files/directories starting with `.` are ignored by the filesystem repository.
 
 ### 7. Graceful Shutdown
 
-The server handles SIGINT/SIGTERM and waits up to 30 seconds for in-flight requests. `main.gracefulShutdown` closes the live-reload hub *before* `http.Server.Shutdown` (an SSE stream never goes idle, so it would hold the drain until the deadline); `container.Shutdown()` then dispatches shutdown through samber/do lifecycle interfaces — `Server.Shutdown()` (rate limiters, live reload, cache), `HTMLCache.Shutdown()`, `BlobRepository.Shutdown()` (bucket). Do not add manual per-service shutdown calls in main; the injector is the single owner.
+The server handles SIGINT/SIGTERM and waits up to 30 seconds for in-flight requests. `main.gracefulShutdown` closes the live-reload hub _before_ `http.Server.Shutdown` (an SSE stream never goes idle, so it would hold the drain until the deadline); `container.Shutdown()` then dispatches shutdown through samber/do lifecycle interfaces — `Server.Shutdown()` (rate limiters, live reload, cache), `HTMLCache.Shutdown()`, `BlobRepository.Shutdown()` (bucket). Do not add manual per-service shutdown calls in main; the injector is the single owner.
 
 ### 8. Templ Version Mismatch
 
@@ -378,6 +378,6 @@ The user-level Go (home-manager) can lag `go.mod`'s floor while the shell export
 
 ### 21. DI Health Sweep & Lifecycle Contracts (2026-11-01)
 
-`Container.HealthCheck(ctx)` delegates to `injector.HealthCheckWithContext`, which returns **one entry per invoked service** — `nil` for passing checks *and* for services without a samber/do `Healthchecker*` interface (the v2.1.0 godoc's "services that implement the Healthchecker interface" phrasing is misleading; verified in `scope.go`). Treat "any non-nil value = unhealthy, all nil = healthy". `/health` is truthful: 503 + `unhealthy` when `Server.HealthCheck` fails — the `healthcheck` subcommand and Docker restart contract depend on that 503; never hardcode the status again. Lifecycle methods are dispatched by name only (`Shutdown`, `ShutdownWithContext`, ...; `Close` matches nothing), and the compile-time guards asserting them live in `internal/container/container.go` — keep internal packages free of samber/do imports. `/api/live-reload` is registered only in dev mode, and `LiveReload.Close()` releases SSE handlers so they cannot hold the drain.
+`Container.HealthCheck(ctx)` delegates to `injector.HealthCheckWithContext`, which returns **one entry per invoked service** — `nil` for passing checks _and_ for services without a samber/do `Healthchecker*` interface (the v2.1.0 godoc's "services that implement the Healthchecker interface" phrasing is misleading; verified in `scope.go`). Treat "any non-nil value = unhealthy, all nil = healthy". `/health` is truthful: 503 + `unhealthy` when `Server.HealthCheck` fails — the `healthcheck` subcommand and Docker restart contract depend on that 503; never hardcode the status again. Lifecycle methods are dispatched by name only (`Shutdown`, `ShutdownWithContext`, ...; `Close` matches nothing), and the compile-time guards asserting them live in `internal/container/container.go` — keep internal packages free of samber/do imports. `/api/live-reload` is registered only in dev mode, and `LiveReload.Close()` releases SSE handlers so they cannot hold the drain.
 
 ---
