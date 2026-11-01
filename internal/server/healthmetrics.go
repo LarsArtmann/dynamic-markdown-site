@@ -17,16 +17,62 @@ import (
 // scrapes, health_ prefix convention).
 type HealthMetrics struct {
 	latest atomic.Value // string
+
+	// checked is the set of do service names whose types implement a real
+	// health check (do.HealthcheckerWithContext). When non-nil, Observe
+	// renders only these services: go-health's injector sweep reports a
+	// synthetic "pass" for every invoked service that lacks a check, and
+	// exposing those as health_check{service=...} 1 would claim verdicts
+	// that were never evaluated. Nil (NewHealthMetrics) renders every
+	// sweep entry, which is correct for NewChecks-shaped probes whose
+	// entries are all real.
+	checked map[string]struct{}
 }
 
-// NewHealthMetrics creates an empty exposition holder.
+// NewHealthMetrics creates an exposition holder that renders every probe
+// response entry as-is. Use NewHealthMetricsWithChecks for injector-sweep
+// probes whose response includes services without real checks.
 func NewHealthMetrics() *HealthMetrics {
 	return &HealthMetrics{latest: atomic.Value{}}
 }
 
+// NewHealthMetricsWithChecks creates an exposition holder scoped to the
+// named services — the ones whose types implement a real health check.
+func NewHealthMetricsWithChecks(services []string) *HealthMetrics {
+	checked := make(map[string]struct{}, len(services))
+	for _, name := range services {
+		checked[name] = struct{}{}
+	}
+
+	return &HealthMetrics{latest: atomic.Value{}, checked: checked}
+}
+
 // Observe renders the classified response and publishes it atomically.
+// Responses from injector-sweep probes carry synthetic pass entries for
+// services without real checks; a checked-scoped holder drops those.
 func (h *HealthMetrics) Observe(resp health.Response) {
-	h.latest.Store(renderHealthExposition(resp))
+	h.latest.Store(renderHealthExposition(h.filterChecks(resp)))
+}
+
+// filterChecks returns resp unchanged unless the holder is scoped to real
+// checks, in which case synthetic sweep entries are dropped from Checks.
+// The roll-up status is kept: go-health classifies it from the real checks'
+// verdicts, so synthetic entries do not influence it.
+func (h *HealthMetrics) filterChecks(resp health.Response) health.Response {
+	if h.checked == nil {
+		return resp
+	}
+
+	filtered := resp
+	filtered.Checks = make(map[string]health.Check, len(h.checked))
+
+	for name, check := range resp.Checks {
+		if _, real := h.checked[name]; real {
+			filtered.Checks[name] = check
+		}
+	}
+
+	return filtered
 }
 
 // Exposition returns the latest probe metrics, or "" before the first sweep.

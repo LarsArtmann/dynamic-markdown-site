@@ -128,6 +128,11 @@ func BenchmarkServerNotFound(b *testing.B) {
 	runBenchmarkRequest(b, handler, "/nonexistent-file")
 }
 
+// BenchmarkServerHealthCheck measures GET /health — the readiness alias
+// served from the probe's cached sweep verdict (production probes refresh on
+// -probe-interval, default 15s). Per-request cost is cache read + JSON
+// serialization: health checks run on the sweep, never per request, so this
+// benchmark reflects the steady-state orchestrator-probe path.
 func BenchmarkServerHealthCheck(b *testing.B) {
 	handler := newBenchmarkHandler(b)
 	runBenchmarkRequest(b, handler, "/health")

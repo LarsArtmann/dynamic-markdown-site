@@ -24,7 +24,22 @@ type LiveReload struct {
 	clients   map[chan LiveReloadEvent]struct{}
 	closed    chan struct{}
 	closeOnce sync.Once
+
+	// heartbeat is the SSE comment cadence keeping proxies and browsers from
+	// reaping idle dev streams (default 15s; shortened in tests). Comments
+	// (`: heartbeat`) carry no event, so clients do not reload on them.
+	heartbeat time.Duration
+
+	// clientCap bounds concurrent SSE streams per dev server: a forgotten
+	// browser tab farm would otherwise pin goroutines and file descriptors
+	// forever (default 64; lowered in tests).
+	clientCap int
 }
+
+const (
+	defaultHeartbeatInterval = 15 * time.Second
+	defaultLiveReloadClients = 64
+)
 
 func NewLiveReload(logger *slog.Logger) *LiveReload {
 	return &LiveReload{
@@ -33,6 +48,8 @@ func NewLiveReload(logger *slog.Logger) *LiveReload {
 		clients:   make(map[chan LiveReloadEvent]struct{}),
 		closed:    make(chan struct{}),
 		closeOnce: sync.Once{},
+		heartbeat: defaultHeartbeatInterval,
+		clientCap: defaultLiveReloadClients,
 	}
 }
 
@@ -74,7 +91,38 @@ func (lr *LiveReload) Notify(path string) {
 	}
 }
 
+// admitClient reserves a client slot under the cap, returning false when the
+// dev server already serves its maximum of concurrent SSE streams. The slot
+// is released by the handler's deferred client cleanup.
+func (lr *LiveReload) admitClient() bool {
+	lr.mu.Lock()
+	defer lr.mu.Unlock()
+
+	if len(lr.clients) >= lr.clientCap {
+		return false
+	}
+
+	return true
+}
+
 func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
+	liveness := lr.admitClient()
+	if !liveness {
+		lr.logger.Warn(
+			"live reload client rejected: cap reached",
+			"client_ip", clientIP(r),
+			"cap", lr.clientCap,
+		)
+
+		http.Error(
+			w,
+			fmt.Sprintf("live reload client limit reached (%d); close other tabs and reload", lr.clientCap),
+			http.StatusServiceUnavailable,
+		)
+
+		return
+	}
+
 	clientChan := make(chan LiveReloadEvent, 100)
 	defer close(clientChan)
 
@@ -119,6 +167,11 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
+	// The ticker lives on the handler loop: heartbeats and reload events are
+	// written by the same goroutine, so frames never interleave.
+	heartbeat := time.NewTicker(lr.heartbeat)
+	defer heartbeat.Stop()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -129,6 +182,16 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 			lr.logger.Debug("live reload closed, disconnecting client")
 
 			return
+		case <-heartbeat.C:
+			// SSE comment frame: invisible to event listeners, resets idle
+			// timers in browsers and intermediate proxies.
+			if _, err := fmt.Fprint(w, ": heartbeat\n\n"); err != nil {
+				lr.logger.Debug("failed to send live reload heartbeat", "error", err)
+
+				return
+			}
+
+			flusher.Flush()
 		case event, ok := <-clientChan:
 			if !ok {
 				return

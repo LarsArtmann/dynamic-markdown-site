@@ -56,7 +56,14 @@ func New() (*Container, error) {
 	injector := do.New()
 
 	// Register providers - order doesn't matter, dependencies are resolved automatically
-	healthMetrics := server.NewHealthMetrics()
+	// The checked set mirrors the compile-time guards below: exactly these
+	// types implement do.HealthcheckerWithContext. Metrics expose only real
+	// checks — the injector sweep synthesizes "pass" entries for every other
+	// service, and rendering those would claim unevaluated verdicts.
+	healthMetrics := server.NewHealthMetricsWithChecks([]string{
+		health.DoServiceName[content.Repository](),
+		health.DoServiceName[*renderer.GoldmarkRenderer](),
+	})
 	do.ProvideValue(injector, healthMetrics)
 
 	do.Provide(injector, provideConfig)

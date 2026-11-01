@@ -68,3 +68,50 @@ func TestMetricsExposeProbeVerdict(t *testing.T) {
 		}
 	}
 }
+
+// TestMetricsDropSyntheticSweepEntries pins the F53 honesty fix: go-health's
+// injector sweep synthesizes a pass entry for every invoked service that has
+// no Healthchecker (cache, server, searcher, config, logger). A
+// checked-scoped holder renders only the services with real checks, so
+// health_check gauges never claim unevaluated verdicts.
+func TestMetricsDropSyntheticSweepEntries(t *testing.T) {
+	t.Parallel()
+
+	realRepository := health.DoServiceName[content.Repository]()
+	realRenderer := health.DoServiceName[*renderer.GoldmarkRenderer]()
+
+	healthMetrics := NewHealthMetricsWithChecks([]string{realRepository, realRenderer})
+
+	sweepResponse := health.Response{
+		Status: health.StatusPass,
+		Checks: map[string]health.Check{
+			realRepository: {Status: health.StatusPass},
+			realRenderer:   {Status: health.StatusWarn},
+			"*cache.HTMLCache":  {Status: health.StatusPass},
+			"*server.Server":    {Status: health.StatusPass},
+			"*content.Searcher": {Status: health.StatusPass},
+		},
+	}
+
+	healthMetrics.Observe(sweepResponse)
+
+	exposition := healthMetrics.Exposition()
+
+	if !strings.Contains(exposition, `health_check{service="`+realRepository+`"} 1`) {
+		t.Errorf("exposition missing the real repository check:\n%s", exposition)
+	}
+
+	if !strings.Contains(exposition, `health_check{service="`+realRenderer+`"} 1`) {
+		t.Errorf("exposition missing the renderer check (warn degrades to up):\n%s", exposition)
+	}
+
+	for _, synthetic := range []string{"*cache.HTMLCache", "*server.Server", "*content.Searcher"} {
+		if strings.Contains(exposition, synthetic) {
+			t.Errorf("exposition renders synthetic sweep entry %q as a health check", synthetic)
+		}
+	}
+
+	if !strings.Contains(exposition, "health_up 1") {
+		t.Errorf("exposition lost the health_up roll-up:\n%s", exposition)
+	}
+}
