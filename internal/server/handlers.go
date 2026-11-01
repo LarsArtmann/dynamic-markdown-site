@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,7 +11,6 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
-	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 	httputil "github.com/larsartmann/httputil"
 )
 
@@ -62,7 +60,6 @@ func NewServer(
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /health", s.handleHealth)
 	mux.HandleFunc("GET /robots.txt", s.handleRobotsTxt)
 	mux.HandleFunc("GET /sitemap.xml", s.handleSitemapXML)
 	mux.HandleFunc("GET /refresh", s.handleRefresh)
@@ -98,87 +95,12 @@ func (s *Server) Shutdown() {
 	s.cache.Close()
 }
 
-// HealthCheck verifies the content repository is reachable, the server's only
-// dependency that can fail. It is the single health probe: the /health
-// endpoint serves its verdict and the DI container's health sweep invokes it
-// through samber/do's HealthcheckerWithContext interface.
-func (s *Server) HealthCheck(ctx context.Context) error {
-	if err := ctx.Err(); err != nil {
-		return fmt.Errorf("health check cancelled: %w", err)
-	}
-
-	if _, err := s.repo.Root(); err != nil {
-		return fmt.Errorf("content repository unreachable: %w", err)
-	}
-
-	return nil
-}
-
 func (s *Server) LiveReload() *LiveReload {
 	return s.liveReload
 }
 
 func (s *Server) handleContentOr404(w http.ResponseWriter, r *http.Request) {
 	s.handleContentByPath(w, r, r.URL.Path)
-}
-
-func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
-	now := time.Now().UTC()
-
-	healthErr := s.HealthCheck(r.Context())
-
-	status, code := jsonStatusHealthy, http.StatusOK
-	if healthErr != nil {
-		status, code = jsonStatusUnhealthy, http.StatusServiceUnavailable
-	}
-
-	payload := map[string]any{
-		jsonKeyStatus:    status,
-		jsonKeyVersion:   version.Version,
-		jsonKeyCommit:    version.Commit,
-		jsonKeyBuildDate: version.BuildDate,
-		jsonKeyTimestamp: now,
-		"uptime":         now.Sub(s.startedAt).String(),
-		"dependencies": map[string]any{
-			"repository": s.repositoryHealth(healthErr),
-			"cache":      s.checkCache(),
-		},
-	}
-
-	if healthErr != nil {
-		payload[jsonKeyError] = healthErr.Error()
-	}
-
-	writeJSON(w, code, payload)
-}
-
-// repositoryHealth derives the repository dependency report from the health
-// probe so /health performs exactly one repository check per request.
-func (s *Server) repositoryHealth(healthErr error) map[string]any {
-	if healthErr != nil {
-		return map[string]any{
-			jsonKeyStatus: jsonStatusError,
-			"error":       healthErr.Error(),
-		}
-	}
-
-	return map[string]any{
-		jsonKeyStatus: jsonStatusHealthy,
-		"modified":    s.repo.LastModified().UTC(),
-	}
-}
-
-// checkCache reports current cache utilization.
-func (s *Server) checkCache() map[string]any {
-	stats := s.cache.Stats()
-
-	return map[string]any{
-		jsonKeyStatus: jsonStatusHealthy,
-		"size":        s.cache.EstimatedSize(),
-		"hits":        stats.Hits,
-		"misses":      stats.Misses,
-		"hitRate":     stats.HitRatio(),
-	}
 }
 
 func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {

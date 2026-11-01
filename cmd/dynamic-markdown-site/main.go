@@ -138,7 +138,7 @@ func logStartupInfo(svc *services) {
 }
 
 func setupHTTPServer(svc *services) *http.Server {
-	handler := svc.server.Handler()
+	handler := server.WithHealthProbes(svc.server.Handler(), svc.container.Probe())
 
 	return &http.Server{
 		Addr:              fmt.Sprintf(":%d", svc.config.Port),

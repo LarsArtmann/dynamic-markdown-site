@@ -68,7 +68,7 @@ func (r *BlobRepository) Root() (*domain.DirectoryNode, error) {
 // probe both pick it up as the repository's own check.
 func (r *BlobRepository) HealthCheck(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
-		return err
+		return errors.Wrap(err, "health check cancelled")
 	}
 
 	if _, err := r.Root(); err != nil {
