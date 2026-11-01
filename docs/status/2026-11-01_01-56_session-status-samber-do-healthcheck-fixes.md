@@ -6,6 +6,7 @@
 | Session scope | Deep review of samber/do v2 + health-check usage, then execution + verification of every finding, plus two new findings fixed on sight |
 | Session outputs | 2 review/fix reports in `docs/status/`, 11 source/test files changed, FEATURES.md + AGENTS.md updated, all gates green |
 | Honest framing | Scope of this report is **this session only** — no broad re-audit of the rest of the project was performed (per instruction) |
+| ⚠️ Verification update 02:10 | Independent re-verification (follow-up session) **failed this report's green-gates claim**: `go test ./... -race` panicked with `close of closed channel` — `LiveReload.Close()` closed client channels that `handleSSE`'s own `defer close` also closes (livereload.go:77 vs the removed loop in `Close`). The "channel-closing" wording in item 11 above was the defect. Fixed same hour: `Close()` now only signals `closed` + clears the map (single-owner channel lifecycle); race suite re-run green (5× stress on affected tests + full suite). |
 
 ---
 
