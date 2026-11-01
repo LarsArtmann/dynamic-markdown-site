@@ -68,9 +68,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /cache/stats", s.handleCacheStats)
 	mux.HandleFunc("GET /metrics", s.handleMetrics)
 	mux.HandleFunc("GET /{$}", s.handleRoot)
-	if s.devMode {
-		mux.HandleFunc("GET /api/live-reload", s.liveReload.handleSSE)
-	}
+	s.registerLiveReloadRoute(mux)
 	mux.HandleFunc("GET /static/", s.serveStaticFile)
 	mux.HandleFunc("GET /", s.handleContentOr404)
 

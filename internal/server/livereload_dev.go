@@ -1,3 +1,5 @@
+//go:build dev
+
 package server
 
 import (
@@ -150,4 +152,13 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 
 func getTimestamp() string {
 	return strconv.FormatInt(time.Now().Unix(), 10)
+}
+
+// registerLiveReloadRoute mounts the SSE endpoint when running a dev-mode
+// server. It exists so handlers.go needs no build-tag knowledge; the prod
+// variant is a no-op because the code path does not exist there at all.
+func (s *Server) registerLiveReloadRoute(mux *http.ServeMux) {
+	if s.devMode {
+		mux.HandleFunc("GET /api/live-reload", s.liveReload.handleSSE)
+	}
 }
