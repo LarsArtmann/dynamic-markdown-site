@@ -7,6 +7,7 @@
 | Deliverables | `docs/status/2026-11-01_01-07_samber-do-di-and-healthcheck-architecture-review.md` + index row in `docs/status/README.md` |
 | Verification | `go build ./...` BUILD_OK; `go test` container/server/cmd with `-race` all ok |
 | Status | Review complete. All found defects **open** — nothing fixed yet. |
+| ⚠️ Update 01:58 | Written at 01:55; at 01:56 a follow-up session **executed the fixes** (truthful `/health` 503, `Shutdown()` on blob/cache, compile-time guards, live sweep, single shutdown owner, SSE stall + dev-gating) and reported green gates: see [01:56 report](./2026-11-01_01-56_session-status-samber-do-healthcheck-fixes.md). Sections (c)/(d) items 1-5 and (f) Tier 1 items 1-7 are thereby done; the (g) questions below are superseded accordingly. Kept verbatim as the point-in-time snapshot. |
 
 ---
 
