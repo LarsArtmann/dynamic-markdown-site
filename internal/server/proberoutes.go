@@ -25,6 +25,7 @@ func WithHealthProbes(next http.Handler, probe *health.Probe) http.Handler {
 
 	mux.HandleFunc("GET /health", probe.ReadinessHandler())
 	probe.RegisterRoutes(mux, health.DefaultRoutes())
+	mountHealthDashboard(mux, probe)
 	mux.Handle("/", next)
 
 	return mux

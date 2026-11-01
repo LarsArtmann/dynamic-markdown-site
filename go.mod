@@ -9,6 +9,7 @@ require (
 	github.com/cockroachdb/errors v1.14.0
 	github.com/larsartmann/go-filewatcher/v2 v2.3.0
 	github.com/larsartmann/go-health v0.8.1
+	github.com/larsartmann/go-health-dashboard v0.10.2
 	github.com/larsartmann/httputil v1.4.0
 	github.com/maypok86/otter/v2 v2.3.0
 	github.com/samber/do/v2 v2.1.0
@@ -108,7 +109,6 @@ require (
 	github.com/larsartmann/go-error-family v0.12.0 // indirect
 	github.com/larsartmann/go-etag/entitytag v0.6.1 // indirect
 	github.com/larsartmann/go-etag/server v0.6.1 // indirect
-	github.com/larsartmann/go-health-dashboard v0.10.2 // indirect
 	github.com/larsartmann/go-sse v0.6.2 // indirect
 	github.com/larsartmann/templ-components v1.19.4 // indirect
 	github.com/larsartmann/templ-components/datastar v1.19.4 // indirect
