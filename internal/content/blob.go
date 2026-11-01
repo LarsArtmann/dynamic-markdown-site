@@ -63,16 +63,20 @@ func (r *BlobRepository) Root() (*domain.DirectoryNode, error) {
 	return rootFromTree(&r.tree, &r.mu)
 }
 
-// HealthCheck verifies the content tree is reachable. It satisfies samber/do's
-// HealthcheckerWithContext interface, so the DI health sweep and the go-health
-// probe both pick it up as the repository's own check.
+// HealthCheck verifies the blob bucket still answers requests. It lists one
+// entry (bounded) rather than reading the cached tree: a probe that cannot
+// fail after boot is a liveness check, not a readiness check. Satisfies
+// samber/do's HealthcheckerWithContext interface, so the DI sweep and the
+// go-health probe share this verdict.
 func (r *BlobRepository) HealthCheck(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return errors.Wrap(err, "health check cancelled")
 	}
 
-	if _, err := r.Root(); err != nil {
-		return errors.Wrap(err, "content repository unreachable")
+	iter := r.bucket.List(ctx, &blob.ListOptions{Delimiter: "/"})
+
+	if _, err := iter.Next(ctx); err != nil && !errors.Is(err, io.EOF) {
+		return errors.Wrap(err, "content bucket unreachable")
 	}
 
 	return nil

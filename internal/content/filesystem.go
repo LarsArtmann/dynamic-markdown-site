@@ -61,16 +61,18 @@ func (r *FileSystemRepository) Root() (*domain.DirectoryNode, error) {
 	return rootFromTree(&r.tree, &r.mu)
 }
 
-// HealthCheck verifies the content tree is reachable. It satisfies samber/do's
-// HealthcheckerWithContext interface, so the DI health sweep and the go-health
-// probe both pick it up as the repository's own check.
+// HealthCheck verifies the content root is still readable on disk. It
+// deliberately touches the filesystem (one top-level readdir) instead of the
+// cached tree: a probe that cannot fail after boot is a liveness check, not a
+// readiness check. Satisfies samber/do's HealthcheckerWithContext interface,
+// so the DI sweep and the go-health probe share this verdict.
 func (r *FileSystemRepository) HealthCheck(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return errors.Wrap(err, "health check cancelled")
 	}
 
-	if _, err := r.Root(); err != nil {
-		return errors.Wrap(err, "content repository unreachable")
+	if _, err := os.ReadDir(r.rootDir); err != nil {
+		return errors.Wrapf(err, "content root unreadable: %s", r.rootDir)
 	}
 
 	return nil

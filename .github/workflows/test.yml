@@ -93,6 +93,48 @@ jobs:
       - name: Repetition guard for concurrent rate-limiter test
         run: go test ./internal/server/ -run TestRateLimiter_Concurrent -race -count=10
 
+      - name: Dev build tag suite (live reload is dev-only — gotcha 22)
+        run: go test -tags dev ./internal/server/ -race -count=1
+
+      - name: Probe e2e — readyz flips to 503 and healthcheck exits 1 when the repository dies
+        run: |
+          set -euo pipefail
+
+          go build -o /tmp/dms ./cmd/dynamic-markdown-site
+
+          root="$(mktemp -d)"
+          port=18099
+          /tmp/dms -port "$port" -root "$root" -timeout 5s &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          code=""
+          for _ in $(seq 1 50); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:$port/readyz" || true)
+            [ "$code" = "200" ] && break
+            sleep 0.2
+          done
+          [ "$code" = "200" ] || { echo "readyz = $code, want 200 for a healthy boot"; exit 1; }
+
+          # Kill the repository underneath the running server: readiness must
+          # notice (probe refresh ≤ 15s) while liveness stays green.
+          chmod 000 "$root"
+
+          code=""
+          for _ in $(seq 1 150); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:$port/readyz" || true)
+            [ "$code" = "503" ] && break
+            sleep 0.2
+          done
+          [ "$code" = "503" ] || { echo "readyz = $code, want 503 after the repository died"; exit 1; }
+
+          liveness=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:$port/healthz")
+          [ "$liveness" = "200" ] || { echo "healthz = $liveness, want 200 (liveness never checks dependencies)"; exit 1; }
+
+          if /tmp/dms healthcheck --addr "127.0.0.1:$port" --timeout 5; then
+            echo "healthcheck subcommand exited 0 for a 503 verdict"; exit 1
+          fi
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
