@@ -50,6 +50,9 @@ func New() (*Container, error) {
 	injector := do.New()
 
 	// Register providers - order doesn't matter, dependencies are resolved automatically
+	healthMetrics := server.NewHealthMetrics()
+	do.ProvideValue(injector, healthMetrics)
+
 	do.Provide(injector, provideConfig)
 	do.Provide(injector, provideLogger)
 	do.Provide(injector, provideCache)
@@ -75,6 +78,7 @@ func New() (*Container, error) {
 		health.WithCriticalService[content.Repository](),
 		health.WithVersion(version.Version),
 		health.WithRefreshInterval(probeRefreshInterval),
+		health.WithEvaluationHook(healthMetrics.Observe),
 	)
 
 	// Start runs the first sweep synchronously and fails fast when a critical
@@ -280,7 +284,7 @@ func provideServer(i do.Injector) (*server.Server, error) {
 		return nil, errors.Wrap(err, "failed to resolve cache")
 	}
 
-	rndr, err := do.Invoke[*renderer.GoldmarkRenderer](i)
+	renderer, err := do.Invoke[*renderer.GoldmarkRenderer](i)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to resolve renderer")
 	}
@@ -290,5 +294,9 @@ func provideServer(i do.Injector) (*server.Server, error) {
 		return nil, errors.Wrap(err, "failed to resolve config")
 	}
 
-	return server.NewServer(repo, searcher, logger, htmlCache, rndr, cfg.DevMode, cfg.SiteName), nil
+	// Optional service: containers built without health metrics still serve,
+	// with /metrics omitting the health section.
+	healthMetrics, _ := do.Invoke[*server.HealthMetrics](i)
+
+	return server.NewServer(repo, searcher, logger, htmlCache, renderer, healthMetrics, cfg.DevMode, cfg.SiteName), nil
 }

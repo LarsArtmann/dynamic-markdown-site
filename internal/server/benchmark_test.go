@@ -43,7 +43,7 @@ func newBenchmarkHandler(b *testing.B) http.Handler {
 	searcher := content.NewSearcher(repo)
 	srv := NewServer(
 		repo, searcher, logger, htmlCache,
-		renderer.NewGoldmarkRenderer(), false, "Site",
+		renderer.NewGoldmarkRenderer(), nil, false, "Site",
 	)
 
 	return WithHealthProbes(srv.Handler(), newHealthyTestProbe(b, repo))
