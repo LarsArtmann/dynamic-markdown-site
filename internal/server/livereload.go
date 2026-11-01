@@ -37,6 +37,10 @@ func NewLiveReload(logger *slog.Logger) *LiveReload {
 // Close disconnects every SSE client and makes handlers exit immediately, so
 // an open live-reload stream cannot hold http.Server.Shutdown until its
 // deadline. It is idempotent and safe to call concurrently with Notify.
+//
+// Handlers exit through the closed signal while each handler's own
+// `defer close(clientChan)` remains the only closer of its channel — closing
+// them here double-closes any whose handler is still running.
 func (lr *LiveReload) Close() {
 	lr.closeOnce.Do(func() {
 		close(lr.closed)
@@ -44,10 +48,6 @@ func (lr *LiveReload) Close() {
 
 	lr.mu.Lock()
 	defer lr.mu.Unlock()
-
-	for client := range lr.clients {
-		close(client)
-	}
 
 	lr.clients = make(map[chan LiveReloadEvent]struct{})
 }
