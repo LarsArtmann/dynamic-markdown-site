@@ -7,13 +7,28 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/cockroachdb/errors"
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/config"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
+	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
 	"github.com/samber/do/v2"
 )
+
+// errRepositoryUnreachable backs the failingHealthRepository test double.
+var errRepositoryUnreachable = errors.New("repository unreachable")
+
+// failingHealthRepository fails only Root, the one probe the server's health
+// check performs; everything else is inherited from the embedded interface.
+type failingHealthRepository struct {
+	content.Repository
+}
+
+func (f *failingHealthRepository) Root() (*domain.DirectoryNode, error) {
+	return nil, errRepositoryUnreachable
+}
 
 // runInSubprocess runs the current test in a subprocess to isolate flag.Parse() calls.
 // This is necessary because container.New() ultimately calls config.Load() which uses
@@ -43,13 +58,18 @@ func assertNoShutdownError(t *testing.T, c *Container) {
 func newInProcessContainer(t *testing.T) *Container {
 	t.Helper()
 
+	return newInProcessContainerWithRepo(t, content.NewInMemoryRepository())
+}
+
+func newInProcessContainerWithRepo(t *testing.T, repo content.Repository) *Container {
+	t.Helper()
+
 	injector := do.New()
 	t.Cleanup(func() { _ = injector.Shutdown() })
 
 	htmlCache := cache.NewHTMLCache(10)
 	t.Cleanup(htmlCache.Close)
 
-	repo := content.NewInMemoryRepository()
 	srv := server.NewServer(
 		repo,
 		content.NewSearcher(repo),
@@ -69,9 +89,35 @@ func newInProcessContainer(t *testing.T) *Container {
 	return &Container{injector: injector}
 }
 
-func TestAccessors_ReturnInjectedValues(t *testing.T) {
+func TestHealthCheck_SweepsInjectedServices(t *testing.T) {
 	t.Parallel()
 
+	c := newInProcessContainer(t)
+
+	if report := c.HealthCheck(context.Background()); len(report) != 0 {
+		t.Errorf("HealthCheck() = %v, want empty map for healthy services", report)
+	}
+}
+
+func TestHealthCheck_ReportsUnhealthyRepository(t *testing.T) {
+	t.Parallel()
+
+	c := newInProcessContainerWithRepo(t, &failingHealthRepository{})
+
+	report := c.HealthCheck(context.Background())
+	if len(report) == 0 {
+		t.Fatal("HealthCheck() = empty map, want an error for the unreachable repository")
+	}
+
+	for service, err := range report {
+		if err == nil {
+			t.Errorf("HealthCheck()[%s] = nil, want error", service)
+		}
+	}
+}
+
+func TestAccessors_ReturnInjectedValues(t *testing.T) {
+	t.Parallel()
 	c := newInProcessContainer(t)
 
 	cfg, err := c.Config()
