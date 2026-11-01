@@ -33,7 +33,7 @@ type HealthMetrics struct {
 // response entry as-is. Use NewHealthMetricsWithChecks for injector-sweep
 // probes whose response includes services without real checks.
 func NewHealthMetrics() *HealthMetrics {
-	return &HealthMetrics{latest: atomic.Value{}}
+	return &HealthMetrics{latest: atomic.Value{}, checked: nil}
 }
 
 // NewHealthMetricsWithChecks creates an exposition holder scoped to the
@@ -67,7 +67,7 @@ func (h *HealthMetrics) filterChecks(resp health.Response) health.Response {
 	filtered.Checks = make(map[string]health.Check, len(h.checked))
 
 	for name, check := range resp.Checks {
-		if _, real := h.checked[name]; real {
+		if _, isReal := h.checked[name]; isReal {
 			filtered.Checks[name] = check
 		}
 	}

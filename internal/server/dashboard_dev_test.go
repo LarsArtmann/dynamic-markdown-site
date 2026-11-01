@@ -74,7 +74,10 @@ func TestMountHealthDashboardNilProbeIsNoOp(t *testing.T) {
 	mountHealthDashboard(mux, nil)
 
 	rec := httptest.NewRecorder()
-	mux.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/debug/health-dashboard", nil))
+	mux.ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/debug/health-dashboard", nil),
+	)
 
 	if rec.Code != http.StatusNotFound {
 		t.Errorf("dashboard status with nil probe = %d, want 404 (nothing mounted)", rec.Code)

@@ -127,6 +127,8 @@ Dev mode (`-dev` flag) enables:
 - **File watching** via [go-filewatcher/v2](https://github.com/larsartmann/go-filewatcher) — monitors all `.md`/`.markdown` files recursively, skips content-excluded directories, and shuts down cleanly via context cancellation
 - **500ms debounce** — batches rapid changes
 - **SSE endpoint** (`/api/live-reload`) — browser receives reload events; compiled into `-tags dev` builds only (absent from production binaries)
+- **Stream hardening** — 15s heartbeat comments keep proxies from reaping idle streams, and a 64-client cap returns an actionable 503 on overflow (dev-build internals, not config)
+- **Health dashboard** — `/debug/health-dashboard` renders the live probe (per-check verdicts, SSE updates) in `-tags dev` builds; release binaries return 404 and link no dashboard code (ADR-0007)
 - **Toast notifications** — connection status in the bottom-right corner
 - **Auto-reconnect** — recovers from dropped connections
 
@@ -218,9 +220,10 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/static/*`        | GET      | Embedded static assets (CSS, favicon)                                                                     |
 | `/sitemap.xml`     | GET      | XML sitemap for search engine crawlers                                                                    |
 | `/robots.txt`      | GET      | robots.txt with sitemap reference                                                                         |
-| `/metrics`         | GET      | Prometheus-format metrics                                                                                 |
+| `/metrics`         | GET      | Prometheus-format metrics (incl. `health_up` + `health_check` gauges for services with real checks)       |
 | `/cache/stats`     | GET      | Cache hit/miss/eviction statistics (JSON)                                                                 |
 | `/api/live-reload` | GET      | SSE stream for live reload (`-tags dev` builds only — compiled out of production)                         |
+| `/debug/health-dashboard` | GET | Health dashboard HTML (`-tags dev` builds only — 404 in production, ADR-0007)                        |
 
 ---
 

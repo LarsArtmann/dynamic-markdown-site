@@ -85,8 +85,8 @@ func TestMetricsDropSyntheticSweepEntries(t *testing.T) {
 	sweepResponse := health.Response{
 		Status: health.StatusPass,
 		Checks: map[string]health.Check{
-			realRepository: {Status: health.StatusPass},
-			realRenderer:   {Status: health.StatusWarn},
+			realRepository:      {Status: health.StatusPass},
+			realRenderer:        {Status: health.StatusWarn},
 			"*cache.HTMLCache":  {Status: health.StatusPass},
 			"*server.Server":    {Status: health.StatusPass},
 			"*content.Searcher": {Status: health.StatusPass},

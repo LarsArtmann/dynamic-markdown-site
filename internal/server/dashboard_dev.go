@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/larsartmann/go-health"
-	"github.com/larsartmann/go-health-dashboard"
+	dashboard "github.com/larsartmann/go-health-dashboard"
 )
 
 // healthDashboardRoutes are the dev-only dashboard paths. They must not
@@ -54,5 +54,7 @@ func mountHealthDashboard(mux *http.ServeMux, probe *health.Probe) {
 
 	dash.RegisterRoutes(mux)
 
-	_ = dash.Start(context.Background()) //nolint:errcheck // Start is fire-and-forget: it returns nil today and the pusher only logs
+	_ = dash.Start(
+		context.Background(),
+	) //nolint:errcheck // Start is fire-and-forget: it returns nil today and the pusher only logs
 }
