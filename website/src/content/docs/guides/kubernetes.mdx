@@ -1,0 +1,89 @@
+---
+title: Kubernetes
+description: Wire liveness, readiness, and startup probes for Dynamic Markdown Site in Kubernetes.
+---
+
+The server exposes the standard Kubernetes three-probe set plus a `/health` readiness alias. The content repository is the only **critical** dependency: its failure flips readiness to `503`, while the process keeps serving traffic (and liveness stays green). Diagram rendering without a D2 binary degrades to `200` + `"status": "warn"` — it never restarts your pod.
+
+## Probe endpoints
+
+| Endpoint   | Meaning                                  | Verdict                                                     |
+| ---------- | ---------------------------------------- | ----------------------------------------------------------- |
+| `/healthz` | Is the process alive?                    | Always `200` while serving (never touches dependencies)      |
+| `/readyz`  | Are critical dependencies reachable?     | `503` only when the content repository fails                 |
+| `/startupz`| Is boot done? Critical services are evaluated per request until the first all-green pass, then the verdict latches green | `503` until first pass, `200` afterwards |
+| `/health`  | Alias of `/readyz` (Docker `HEALTHCHECK`)| Same as `/readyz`                                            |
+
+Readiness responses are cached and refreshed by an internal sweep (`-probe-interval`, default `15s`), so a dependency failure is reflected within one sweep interval, not per request.
+
+## Example manifest
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamic-markdown-site
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: site
+          image: ghcr.io/larsartmann/dynamic-markdown-site:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: content
+              mountPath: /content
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /startupz
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 12 # 60s budget: startupz evaluates the repository per request, covering blob credential discovery (up to 10s)
+      volumes:
+        - name: content
+          persistentVolumeClaim:
+            claimName: content
+```
+
+## Probe wiring rules
+
+- **Liveness → `/healthz` only.** It never checks dependencies, so a dead S3 bucket cannot trigger restart loops. Dependency failures are a readiness concern.
+- **Readiness → `/readyz`.** Pull the pod from Service endpoints when the repository is unreachable; traffic stops, the pod survives.
+- **Startup → `/startupz`.** Gates liveness until boot completes, which matters for blob storage: `s3://`/`gs://` credential discovery can take up to 10 seconds (the server gives it exactly that before failing boot). With `periodSeconds: 5` and `failureThreshold: 12`, Kubernetes waits up to 60 seconds before treating the pod as crash-looping — comfortably above the 10-second construction budget.
+
+## Sizing the startup window
+
+The startup budget must exceed the slowest boot path:
+
+| Storage backend | Boot cost to first green `/startupz`                  |
+| --------------- | ----------------------------------------------------- |
+| Filesystem      | Repository open + first tree build (fast, < 1s)       |
+| Blob (`s3://`, `gs://`, `azblob://`) | Credential discovery (up to 10s) |
+
+If your cluster enforces short startup budgets (some managed platforms cap at 30s), keep `failureThreshold × periodSeconds ≥ 30s` for blob deployments and consider warming credentials at the platform level rather than stretching the budget.
+
+## Docker parity
+
+The Docker image ships a `HEALTHCHECK` using the binary's own `healthcheck` subcommand (distroless has no `curl`):
+
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["/app/dynamic-markdown-site", "healthcheck", "--addr", "localhost:8080"]
+```
+
+`--start-period=10s` mirrors the blob construction timeout: health-check failures during the first 10 seconds do not count against `--retries`. If you override the image's health check for blob deployments on slow credential paths, raise `--start-period` to at least your observed credential-discovery time.
