@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/version"
 	"github.com/larsartmann/go-health"
@@ -49,13 +50,13 @@ func newTestProbe(tb testing.TB, critical []string, checks map[string]health.Che
 	return probe
 }
 
-func repositoryCheck(repo content.Repository) health.CheckFunc {
+func repositoryCheck(repo interface{ HealthCheck(context.Context) error }) health.CheckFunc {
 	return func(ctx context.Context) error {
 		return repo.HealthCheck(ctx)
 	}
 }
 
-func newHealthyTestProbe(tb testing.TB, repo content.Repository) *health.Probe {
+func newHealthyTestProbe(tb testing.TB, repo interface{ HealthCheck(context.Context) error }) *health.Probe {
 	return newTestProbe(tb, []string{"repository"}, map[string]health.CheckFunc{
 		"repository": repositoryCheck(repo),
 	})
@@ -216,12 +217,21 @@ func TestLivenessNeverChecksDependencies(t *testing.T) {
 	}
 }
 
+func newUnhealthyRepositoryServer(t *testing.T) *Server {
+	t.Helper()
+
+	htmlCache := cache.NewHTMLCache(10)
+	t.Cleanup(htmlCache.Close)
+
+	return newTestServerWithCache(t, &FailingRepository{}, htmlCache)
+}
+
 func TestWithHealthProbesNilProbeReturnsNext(t *testing.T) {
 	t.Parallel()
 
-	next := http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
+	next := http.NewServeMux()
 
-	if got := WithHealthProbes(next, nil); got != next {
+	if got := WithHealthProbes(next, nil); got != http.Handler(next) {
 		t.Error("WithHealthProbes with a nil probe must return the wrapped handler unchanged")
 	}
 }
