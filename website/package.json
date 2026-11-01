@@ -2,7 +2,7 @@
   "name": "dynamic-markdown-site-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Website and documentation for Dynamic Markdown Site — a Go server that turns markdown into a navigable website",
+  "description": "Website and documentation for Dynamic Markdown Site \u2014 a Go server that turns markdown into a navigable website",
   "keywords": [
     "astro",
     "documentation",

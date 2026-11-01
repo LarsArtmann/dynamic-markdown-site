@@ -2,3 +2,7 @@ allowBuilds:
   esbuild: true
   protobufjs: true
   re2: true
+overrides:
+  undici: ">=8.12.2"
+  zod: ">=4.6.6"
+  postcss-selector-parser: ">=6.1.5"

@@ -1,11 +1,12 @@
 # TODO List
 
-**Last Updated:** 2026-09-27 (post-Pareto follow-up pass — dependency bumps, Trivy policy, branch protection, upstream filings)
+**Last Updated:** 2026-11-01 (go-health plan execution pass — dashboard spike, blob-drain fix, coverage truth, website overrides)
 **Purpose:** Short- and mid-term actionable work. Completed items live in [CHANGELOG.md](./CHANGELOG.md); aspirations and decided non-goals live in [ROADMAP.md](./ROADMAP.md).
 
 ## 🔴 Critical (Pipeline & Correctness)
 
-- [ ] Revisit GHSA-rj75-hqrm-r3gf once @astrojs/starlight / expressive-code bumps postcss-selector-parser past 6.1.4 (2026-10-07: pnpm-audit unskipped after the lockfileDir fix; semver sweep cleared 11 of 12 advisories, this one is upstream-pinned — warning-severity build-time CPU advisory, gate stays green)
+- [x] Revisit GHSA-rj75-hqrm-r3gf once @astrojs/starlight / expressive-code bumps postcss-selector-parser past 6.1.4
+  - **Resolved 2026-11-01:** `pnpm-workspace.yaml` overrides force `postcss-selector-parser >=6.1.5`, `undici >=8.12.2`, `zod >=4.6.6` (pnpm v11+ reads overrides from `pnpm-workspace.yaml`, NOT `package.json.pnpm` — same ignore-class trap as the `allowBuilds` gotcha). `pnpm audit --prod` now reports **0 vulnerabilities** (was 10: 5 high, 5 moderate); `astro build` green as the compatibility gate. Overrides are pinned minimums, so future parent-range bumps keep the patched floors.
 
 - [x] Confirm the first fully-green CI run lands (Test, Build Docker Image including the Trivy security-scan, Website, Nix flake check)
   - **Confirmed 2026-09-27:** run `36332656665` — build ✓ + security-scan ✓ (Trivy gate green under the new CRITICAL+HIGH + ignore-unfixed policy); sibling run `36332656732` — Nix flake check ✓, Lint ✓, Unit + integration tests ✓; Website ✓ (28 s). Root causes fixed earlier the same day: stale `vendorHash.nix` after the dependency bumps (repaired via `nix-hash-fix`), missing `GOEXPERIMENT=jsonv2` in CI, and the Dockerfile that copied a prebuilt binary no step produced.
@@ -16,9 +17,10 @@
 
 - [x] Enable branch protection on `master`
   - Done 2026-09-27 via API: required check `Unit + integration tests`, force-push/deletion denied, linear history required, `enforce_admins: false` so the auto-commit daemon's direct pushes keep working; non-admin pushes must pass CI.
-- [ ] Add a GitHub social preview image (repo Settings → Social preview; upload `website/public/og/home.png` — the README already embeds it)
+- [ ] Add a GitHub social preview image (repo Settings → Social preview; upload `website/public/og/home.png` — the README already embeds it; file verified present 2026-11-01)
   - No public API for this upload; manual 2-minute step.
-- [ ] Re-pin otel to stable once `v1.47.0` (or the first stable carrying the CVE fixes) ships — the RC is a documented, accepted tradeoff (see ROADMAP); a Dependabot grouped PR or `buildflow update` should pick it up, verify the Trivy gate stays green.
+- [x] Re-pin otel to stable once `v1.47.0` (or the first stable carrying the CVE fixes) ships — the RC is a documented, accepted tradeoff (see ROADMAP); a Dependabot grouped PR or `buildflow update` should pick it up, verify the Trivy gate stays green.
+  - **Done 2026-11-01 (verified):** `go.mod` already resolves `go.opentelemetry.io/otel v1.47.0` stable (plus contrib instrumentation at v0.72.0); the RC pin is gone.
 
 ## 🟡 Medium Priority
 
