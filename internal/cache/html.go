@@ -75,6 +75,13 @@ func (c *HTMLCache) Close() {
 	c.cache.StopAllGoroutines()
 }
 
+// Shutdown releases all cache resources including background goroutines. It
+// exists so the DI container can stop the cache through samber/do's
+// Shutdowner interface during injector shutdown.
+func (c *HTMLCache) Shutdown() {
+	c.Close()
+}
+
 // Stats returns cache statistics.
 func (c *HTMLCache) Stats() Stats {
 	s := c.cache.Stats()

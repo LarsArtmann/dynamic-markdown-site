@@ -19,6 +19,16 @@ import (
 
 var errBlobTimeout = errors.New("blob repository creation timed out after 10 seconds")
 
+// Compile-time lifecycle contracts: samber/do dispatches shutdown and health
+// sweeps only through these interfaces, so a service losing its lifecycle
+// method fails the build here in the composition root instead of leaking
+// resources or reporting green at runtime.
+var (
+	_ do.ShutdownerWithError      = (*content.BlobRepository)(nil)
+	_ do.Shutdowner               = (*cache.HTMLCache)(nil)
+	_ do.HealthcheckerWithContext = (*server.Server)(nil)
+)
+
 // Container holds the DI injector and provides access to services.
 type Container struct {
 	injector do.Injector
@@ -35,15 +45,17 @@ func New() (*Container, error) {
 	do.Provide(injector, provideRenderer)
 	do.Provide(injector, provideRepository)
 	do.Provide(injector, provideSearcher)
+	do.Provide(injector, provideServer)
 
 	// The server is boot-critical: main starts it immediately after wiring.
-	// Construct it here so health sweeps see a constructed service from boot
-	// instead of reporting green for one that was never resolved.
-	srv, err := provideServer(injector)
-	if err != nil {
-		return nil, err
+	// Resolving it here materializes the provider eagerly, keeping the graph's
+	// dependency edges intact (dependency-aware shutdown wave, health sweep
+	// sees a constructed service from boot) while construction still fails fast.
+	if _, err := do.Invoke[*server.Server](injector); err != nil {
+		_ = injector.Shutdown()
+
+		return nil, errors.Wrap(err, "failed to construct server")
 	}
-	do.ProvideValue(injector, srv)
 
 	return &Container{injector: injector}, nil
 }
@@ -66,6 +78,13 @@ func (c *Container) Repository() (content.Repository, error) {
 // Server returns the HTTP server.
 func (c *Container) Server() (*server.Server, error) {
 	return do.Invoke[*server.Server](c.injector)
+}
+
+// HealthCheck probes every service implementing samber/do's Healthchecker
+// interfaces (the server today). The returned map is keyed by service
+// description; an empty map means every probed service is healthy.
+func (c *Container) HealthCheck(ctx context.Context) map[string]error {
+	return c.injector.HealthCheckWithContext(ctx)
 }
 
 // Shutdown gracefully shuts down all services.

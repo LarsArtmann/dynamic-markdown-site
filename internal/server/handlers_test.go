@@ -209,14 +209,14 @@ func newTestHandlerForEndpointTests(t *testing.T) http.Handler {
 func TestHealthEndpoint(t *testing.T) {
 	t.Parallel()
 
-	handler := newFailingTestHandler(t)
+	handler := newTestHandlerFor(t)
 	runHTTPTests(t, handler, sharedHTTPTestCases)
 }
 
 func TestHealthEndpointStructure(t *testing.T) {
 	t.Parallel()
 
-	handler := newFailingTestHandler(t)
+	handler := newTestHandlerFor(t)
 	rec := executeRequest(handler, "/health")
 
 	if rec.Code != http.StatusOK {

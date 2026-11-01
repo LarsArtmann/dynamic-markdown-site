@@ -190,8 +190,6 @@ func gracefulShutdown(svc *services, httpServer *http.Server) error {
 }
 
 func shutdownServices(svc *services) {
-	svc.server.Shutdown()
-
 	report := svc.container.Shutdown()
 	if !report.Succeed {
 		svc.logger.Error("failed to shutdown container", slog.String("error", report.Error()))

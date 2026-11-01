@@ -286,3 +286,10 @@ func (r *BlobRepository) GetRaw(urlPath domain.URLPath) (*RawFile, error) {
 func (r *BlobRepository) Close() error {
 	return errors.Wrap(r.bucket.Close(), "close blob bucket")
 }
+
+// Shutdown closes the underlying blob bucket. It exists so the DI container
+// can release the bucket through samber/do's ShutdownerWithError interface
+// during injector shutdown; Close is the idiomatic name for direct callers.
+func (r *BlobRepository) Shutdown() error {
+	return r.Close()
+}
