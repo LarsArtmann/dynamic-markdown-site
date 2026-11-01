@@ -330,10 +330,11 @@ Full-mode buildflow fails on remaining severity error+ findings (`branching-flow
 | `-dev`         | false   | Dev mode (no cache, file watching)                         |
 | `-cache-size`  | 10000   | Maximum cached HTML pages (invalid if < 1)                 |
 | `-timeout`     | 30s     | Request timeout                                            |
+| `-probe-interval` | 15s  | Health probe refresh interval (cached-readiness staleness bound; invalid if < 0) |
 
 ### Environment Variables
 
-Every flag has an env override: `DYNAMIC_MARKDOWN_` + uppercase flag name (`DYNAMIC_MARKDOWN_PORT`, `DYNAMIC_MARKDOWN_ROOT`, `DYNAMIC_MARKDOWN_STORAGE_URL`, `DYNAMIC_MARKDOWN_LOG_LEVEL`, `DYNAMIC_MARKDOWN_CACHE`, `DYNAMIC_MARKDOWN_CACHE_SIZE`, `DYNAMIC_MARKDOWN_DEV`, `DYNAMIC_MARKDOWN_TIMEOUT`), plus `DYNAMIC_MARKDOWN_SITE_NAME` (env only, no flag).
+Every flag has an env override: `DYNAMIC_MARKDOWN_` + uppercase flag name (`DYNAMIC_MARKDOWN_PORT`, `DYNAMIC_MARKDOWN_ROOT`, `DYNAMIC_MARKDOWN_STORAGE_URL`, `DYNAMIC_MARKDOWN_LOG_LEVEL`, `DYNAMIC_MARKDOWN_CACHE`, `DYNAMIC_MARKDOWN_CACHE_SIZE`, `DYNAMIC_MARKDOWN_DEV`, `DYNAMIC_MARKDOWN_TIMEOUT`, `DYNAMIC_MARKDOWN_PROBE_INTERVAL`), plus `DYNAMIC_MARKDOWN_SITE_NAME` (env only, no flag).
 
 ---
 

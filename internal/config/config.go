@@ -26,6 +26,15 @@ var (
 // -cache-size / DYNAMIC_MARKDOWN_CACHE_SIZE is not set.
 const defaultCacheSize = 10_000
 
+// defaultProbeInterval is the health-probe refresh interval when
+// -probe-interval / DYNAMIC_MARKDOWN_PROBE_INTERVAL is not set. It bounds how
+// stale a readiness verdict can be.
+const defaultProbeInterval = 15 * time.Second
+
+// errInvalidProbeInterval guards against a non-positive probe interval, which
+// would either never refresh the verdict or panic the ticker.
+var errInvalidProbeInterval = errors.New("invalid probe interval (must be greater than 0)")
+
 // Log level names used for validation, parsing, and slog conversion.
 const (
 	logLevelDebug = "debug"
@@ -203,6 +212,16 @@ func (c *Config) validate() error {
 		return errors.Wrapf(errInvalidCacheSize, "cache_size=%d", c.CacheSize)
 	}
 
+	// Validate probe interval; zero means "unset" (hand-built Configs) and
+	// falls back to the default, while a negative interval is an error.
+	if c.ProbeInterval == 0 {
+		c.ProbeInterval = defaultProbeInterval
+	}
+
+	if c.ProbeInterval < 0 {
+		return errors.Wrapf(errInvalidProbeInterval, "probe_interval=%v", c.ProbeInterval)
+	}
+
 	// Validate storage - either StorageURL (blob) or RootDir (filesystem)
 	if c.StorageURL == "" {
 		// Using filesystem storage
@@ -276,6 +295,7 @@ func (c *Config) String() string {
 	fmt.Fprintf(&b, "  Cache:        %v\n", c.CacheEnabled)
 	fmt.Fprintf(&b, "  Dev Mode:     %v\n", c.DevMode)
 	fmt.Fprintf(&b, "  Timeout:      %v\n", c.Timeout)
+	fmt.Fprintf(&b, "  ProbeInterval: %v\n", c.ProbeInterval)
 	fmt.Fprintf(&b, "  Site Name:    %s\n", c.SiteName)
 
 	return b.String()

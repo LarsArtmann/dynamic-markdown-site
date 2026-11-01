@@ -34,9 +34,9 @@ var (
 	_ do.HealthcheckerWithContext = (*renderer.GoldmarkRenderer)(nil)
 )
 
-// probeRefreshInterval bounds how often the go-health probe re-runs the DI
-// health sweep. The readiness handler serves the cached verdict between runs,
-// so orchestrator probes never fan out into the repository.
+// probeRefreshInterval is the fallback health-probe refresh interval when a
+// container is built without config (tests); production reads
+// cfg.ProbeInterval (-probe-interval / DYNAMIC_MARKDOWN_PROBE_INTERVAL).
 const probeRefreshInterval = 15 * time.Second
 
 // Container holds the DI injector and provides access to services.
@@ -71,13 +71,20 @@ func New() (*Container, error) {
 		return nil, errors.Wrap(err, "failed to construct server")
 	}
 
+	// Resolve config (already materialized by the eager server construction)
+	// for the probe interval; fall back for containers built without config.
+	interval := probeRefreshInterval
+	if cfg, err := do.Invoke[*config.Config](injector); err == nil && cfg.ProbeInterval > 0 {
+		interval = cfg.ProbeInterval
+	}
+
 	probe := health.New(injector,
 		// The repository is the only dependency whose failure makes the site
 		// unusable: it alone flips readiness to 503. The renderer's missing-D2
 		// degradation stays non-critical (warn, HTTP 200).
 		health.WithCriticalService[content.Repository](),
 		health.WithVersion(version.Version),
-		health.WithRefreshInterval(probeRefreshInterval),
+		health.WithRefreshInterval(interval),
 		health.WithEvaluationHook(healthMetrics.Observe),
 	)
 
