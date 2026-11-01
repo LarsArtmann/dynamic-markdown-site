@@ -96,8 +96,9 @@ func (s *Server) Shutdown() {
 }
 
 // HealthCheck verifies the content repository is reachable, the server's only
-// dependency that can fail. The same probe is served at runtime via the
-// /health endpoint; no in-process sweep invokes this method today.
+// dependency that can fail. It is the single health probe: the /health
+// endpoint serves its verdict and the DI container's health sweep invokes it
+// through samber/do's HealthcheckerWithContext interface.
 func (s *Server) HealthCheck(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return fmt.Errorf("health check cancelled: %w", err)
@@ -118,32 +119,43 @@ func (s *Server) handleContentOr404(w http.ResponseWriter, r *http.Request) {
 	s.handleContentByPath(w, r, r.URL.Path)
 }
 
-func (s *Server) handleHealth(w http.ResponseWriter, _ *http.Request) {
+func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().UTC()
 
-	dependencies := map[string]any{
-		"repository": s.checkRepository(),
-		"cache":      s.checkCache(),
+	healthErr := s.HealthCheck(r.Context())
+
+	status, code := jsonStatusHealthy, http.StatusOK
+	if healthErr != nil {
+		status, code = jsonStatusUnhealthy, http.StatusServiceUnavailable
 	}
 
-	writeJSON(w, http.StatusOK, map[string]any{
-		jsonKeyStatus:    jsonStatusHealthy,
+	payload := map[string]any{
+		jsonKeyStatus:    status,
 		jsonKeyVersion:   version.Version,
 		jsonKeyCommit:    version.Commit,
 		jsonKeyBuildDate: version.BuildDate,
 		jsonKeyTimestamp: now,
 		"uptime":         now.Sub(s.startedAt).String(),
-		"dependencies":   dependencies,
-	})
+		"dependencies": map[string]any{
+			"repository": s.repositoryHealth(healthErr),
+			"cache":      s.checkCache(),
+		},
+	}
+
+	if healthErr != nil {
+		payload[jsonKeyError] = healthErr.Error()
+	}
+
+	writeJSON(w, code, payload)
 }
 
-// checkRepository reports whether the content repository is reachable.
-func (s *Server) checkRepository() map[string]any {
-	_, err := s.repo.Root()
-	if err != nil {
+// repositoryHealth derives the repository dependency report from the health
+// probe so /health performs exactly one repository check per request.
+func (s *Server) repositoryHealth(healthErr error) map[string]any {
+	if healthErr != nil {
 		return map[string]any{
 			jsonKeyStatus: jsonStatusError,
-			"error":       err.Error(),
+			"error":       healthErr.Error(),
 		}
 	}
 

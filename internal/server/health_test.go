@@ -13,6 +13,7 @@ import (
 
 type healthPayload struct {
 	Status       string         `json:"status"`
+	Error        string         `json:"error"`
 	Version      string         `json:"version"`
 	Commit       string         `json:"commit"`
 	BuildDate    string         `json:"buildDate"`
@@ -92,7 +93,25 @@ func TestHealthEndpointReportsUnhealthyRepository(t *testing.T) {
 
 	srv := newUnhealthyRepositoryServer(t)
 
-	payload := fetchHealth(t, srv)
+	rec := httptest.NewRecorder()
+	newTestHandler(srv).ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil),
+	)
+
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want 503", rec.Code)
+	}
+
+	var payload healthPayload
+	decodeJSON(t, rec, &payload)
+
+	if payload.Status != "unhealthy" {
+		t.Errorf("status = %q, want unhealthy", payload.Status)
+	}
+	if payload.Error == "" {
+		t.Error("expected top-level error detail, got empty")
+	}
 
 	repoHealth, ok := payload.Dependencies["repository"].(map[string]any)
 	if !ok {

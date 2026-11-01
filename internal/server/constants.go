@@ -19,9 +19,10 @@ const (
 
 // Common JSON response values.
 const (
-	jsonStatusSuccess = "success"
-	jsonStatusHealthy = "healthy"
-	jsonStatusError   = "error"
+	jsonStatusSuccess   = "success"
+	jsonStatusHealthy   = "healthy"
+	jsonStatusUnhealthy = "unhealthy"
+	jsonStatusError     = "error"
 )
 
 // URL schemes used when constructing absolute URLs.
