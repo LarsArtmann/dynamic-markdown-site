@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -433,4 +434,143 @@ func TestContainerLifecycle(t *testing.T) {
 
 	assertNoShutdownError(t, container)
 	assertNoShutdownError(t, container)
+}
+
+// dagProvider and dagDependent are minimal do services for pinning shutdown
+// order: the dependent's provider closure invokes the provider, which is what
+// records the dependency edge the shutdown wave follows.
+type dagProvider struct{ stop func() }
+
+type dagDependent struct{ stop func() }
+
+func (d *dagProvider) Shutdown()  { d.stop() }
+func (d *dagDependent) Shutdown() { d.stop() }
+
+// TestShutdown_ShutsDependentsBeforeProviders pins the injector's
+// dependency-aware shutdown wave: a service that consumes another must shut
+// down before its provider, so consumers never touch a torn-down dependency.
+func TestShutdown_ShutsDependentsBeforeProviders(t *testing.T) {
+	t.Parallel()
+
+	injector := do.New()
+	t.Cleanup(func() { _ = injector.Shutdown() })
+
+	var (
+		mu    sync.Mutex
+		order []string
+	)
+
+	do.Provide(injector, func(do.Injector) (*dagProvider, error) {
+		return &dagProvider{stop: func() {
+			mu.Lock()
+			defer mu.Unlock()
+
+			order = append(order, "provider")
+		}}, nil
+	})
+	do.Provide(injector, func(i do.Injector) (*dagDependent, error) {
+		if _, err := do.Invoke[*dagProvider](i); err != nil {
+			return nil, errors.Wrap(err, "resolve provider")
+		}
+
+		return &dagDependent{stop: func() {
+			mu.Lock()
+			defer mu.Unlock()
+
+			order = append(order, "dependent")
+		}}, nil
+	})
+
+	if _, err := do.Invoke[*dagDependent](injector); err != nil {
+		t.Fatalf("materialize dependent: %v", err)
+	}
+
+	report := (&Container{injector: injector}).Shutdown()
+	if !report.Succeed {
+		t.Fatalf("Shutdown() report: %v", report.Error())
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(order) != 2 || order[0] != "dependent" || order[1] != "provider" {
+		t.Errorf("shutdown order = %v, want [dependent provider]", order)
+	}
+}
+
+// TestNew_FailsFastOnUnreachableStorage verifies boot fails with a wrapped,
+// context-rich error when the storage URL cannot produce a repository, and
+// that the partially-built injector is shut down on that path.
+func TestNew_FailsFastOnUnreachableStorage(t *testing.T) {
+	if os.Getenv("GO_TEST_SUBPROCESS") != "1" {
+		t.Setenv("DYNAMIC_MARKDOWN_STORAGE_URL", "unsupported-scheme://nope")
+		runInSubprocess(t)
+
+		return
+	}
+
+	c, err := New()
+	if err == nil {
+		_ = c.Shutdown()
+
+		t.Fatal("New() should fail for an unreachable storage URL")
+	}
+
+	// An unknown scheme fails fast inside gocloud's bucket open (before the
+	// 10s timeout branch); assert the boot error surfaces the storage URL.
+	if !strings.Contains(err.Error(), "unsupported-scheme://nope") {
+		t.Errorf("New() error = %v, want it to carry the storage URL", err)
+	}
+}
+
+// TestProbe_RendererDegradationWarnsButRepositoryFails pins the criticality
+// split: a D2-less renderer degrades the verdict to warn (HTTP 200), while a
+// failing repository is the only condition that produces fail (HTTP 503).
+func TestProbe_RendererDegradationWarnsButRepositoryFails(t *testing.T) {
+	t.Parallel()
+
+	injector := do.New()
+	t.Cleanup(func() { _ = injector.Shutdown() })
+
+	repo := &failingHealthRepository{}
+	htmlCache := cache.NewHTMLCache(10)
+	t.Cleanup(htmlCache.Close)
+
+	degradedRenderer := renderer.NewGoldmarkRenderer() // no D2: degraded, not broken
+	srv := server.NewServer(
+		repo,
+		content.NewSearcher(repo),
+		slog.New(slog.DiscardHandler),
+		htmlCache,
+		degradedRenderer,
+		false,
+		"Test",
+	)
+	t.Cleanup(srv.Shutdown)
+
+	do.ProvideValue(injector, &config.Config{CacheSize: 10_000})
+	do.ProvideValue(injector, slog.New(slog.DiscardHandler))
+	do.ProvideValue[content.Repository](injector, repo)
+	do.ProvideValue(injector, srv)
+	do.ProvideValue(injector, degradedRenderer)
+
+	probe := health.New(injector,
+		health.WithCriticalService[content.Repository](),
+		health.WithRefreshInterval(time.Hour),
+	)
+
+	if err := probe.Start(context.Background()); err != nil {
+		t.Fatalf("probe.Start() error: %v", err)
+	}
+
+	t.Cleanup(probe.Shutdown)
+
+	resp := probe.CachedResponse()
+	if resp.Status != health.StatusFail {
+		t.Errorf("probe status = %q, want fail (critical repository down)", resp.Status)
+	}
+
+	if degradedRenderer.HealthCheck(context.Background()) == nil {
+		t.Error("degraded renderer HealthCheck should fail; it is what produces warn/200 in healthy-repo deployments")
+	}
 }
