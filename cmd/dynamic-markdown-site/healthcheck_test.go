@@ -171,10 +171,14 @@ func TestHealthcheckSubcommandTracksProbeReadiness(t *testing.T) {
 	})
 }
 
+// errStorageUnreachable backs failingHealthRepo; a static sentinel keeps the
+// test free of dynamic errors (err113) and lets the drain path stay greppable.
+var errStorageUnreachable = errors.New("storage unreachable")
+
 // failingHealthRepo fails HealthCheck to simulate dead storage behind a
 // server that still boots and serves traffic.
 type failingHealthRepo struct{}
 
 func (failingHealthRepo) HealthCheck(_ context.Context) error {
-	return errors.New("storage unreachable")
+	return errStorageUnreachable
 }

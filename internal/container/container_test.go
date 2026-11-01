@@ -59,7 +59,7 @@ func runInSubprocess(t *testing.T) {
 		}
 	}
 
-	cmd := exec.CommandContext(context.Background(), os.Args[0], args...) //nolint:gosec // test binary path, not user input
+	cmd := exec.CommandContext(context.Background(), os.Args[0], args...) //nolint:golines // test binary path, not user input
 
 	cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
@@ -425,6 +425,28 @@ func TestContainerLifecycle(t *testing.T) {
 		t.Error("Config() should return same instance (singleton)")
 	}
 
+	assertSingletonAccessors(t, container, logger, repo, srv)
+
+	if container.Probe() == nil {
+		t.Error("Probe() should be non-nil for New()-built containers")
+	}
+
+	assertNoShutdownError(t, container)
+	assertNoShutdownError(t, container)
+}
+
+// assertSingletonAccessors re-resolves every accessor and pins singleton
+// identity with the first-resolution values; extracted to keep
+// TestContainerLifecycle under the cyclomatic-complexity gate.
+func assertSingletonAccessors(
+	t *testing.T,
+	container *Container,
+	logger *slog.Logger,
+	repo content.Repository,
+	srv *server.Server,
+) {
+	t.Helper()
+
 	logger2, err := container.Logger()
 	if err != nil {
 		t.Fatalf("Logger() second access error: %v", err)
@@ -451,13 +473,6 @@ func TestContainerLifecycle(t *testing.T) {
 	if srv != srv2 {
 		t.Error("Server() should return same instance (singleton)")
 	}
-
-	if container.Probe() == nil {
-		t.Error("Probe() should be non-nil for New()-built containers")
-	}
-
-	assertNoShutdownError(t, container)
-	assertNoShutdownError(t, container)
 }
 
 // dagProvider and dagDependent are minimal do services for pinning shutdown
@@ -605,6 +620,7 @@ func TestProbe_RendererDegradationWarnsButRepositoryFails(t *testing.T) {
 // by the drain goroutine instead of leaking its bucket.
 type lateShutdownRepo struct {
 	content.Repository
+
 	shutdownCh chan struct{}
 }
 
