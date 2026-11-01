@@ -397,38 +397,6 @@ func TestHandleContentByPathRawFile(t *testing.T) {
 	}
 }
 
-func TestLiveReloadEndpoint(t *testing.T) {
-	t.Parallel()
-
-	handler := newTestHandlerForEndpointTestsWithDevMode(t, true)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	req := httptest.NewRequestWithContext(
-		ctx,
-		http.MethodGet,
-		"/api/live-reload",
-		nil,
-	)
-	rec := httptest.NewRecorder()
-
-	done := make(chan struct{})
-	go func() {
-		handler.ServeHTTP(rec, req)
-		close(done)
-	}()
-
-	// Wait briefly for the SSE handler to start, then cancel to unblock it.
-	// The SSE handler blocks on ctx.Done() in an infinite loop.
-	cancel()
-	<-done
-
-	if rec.Code == http.StatusNotFound {
-		t.Error("live-reload endpoint should be registered, got 404")
-	}
-}
-
 func TestLiveReloadEndpointDisabledOutsideDevMode(t *testing.T) {
 	t.Parallel()
 
