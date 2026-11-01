@@ -43,9 +43,20 @@ func (f *failingHealthRepository) HealthCheck(_ context.Context) error {
 // runInSubprocess runs the current test in a subprocess to isolate flag.Parse() calls.
 // This is necessary because container.New() ultimately calls config.Load() which uses
 // flag.Parse() - and flag.Parse() can only be called once per process.
+//
+// The child inherits the parent's coverage directory (testing.CoverDir, empty
+// when not built with -cover) so the subprocess's statements count toward the
+// coverage profile; without this, New() and provideConfig read as 0% despite
+// being fully exercised here.
 func runInSubprocess(t *testing.T) {
 	t.Helper()
-	cmd := exec.CommandContext(context.Background(), os.Args[0], "-test.run="+t.Name())
+
+	args := []string{"-test.run=" + t.Name()}
+	if coverDir := testing.CoverDir(); coverDir != "" {
+		args = append(args, "-test.gocoverdir="+coverDir)
+	}
+
+	cmd := exec.CommandContext(context.Background(), os.Args[0], args...) //nolint:gosec // test binary path, not user input
 
 	cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
