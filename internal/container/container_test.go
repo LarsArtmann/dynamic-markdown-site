@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/cockroachdb/errors"
@@ -94,8 +95,10 @@ func TestHealthCheck_SweepsInjectedServices(t *testing.T) {
 
 	c := newInProcessContainer(t)
 
-	if report := c.HealthCheck(context.Background()); len(report) != 0 {
-		t.Errorf("HealthCheck() = %v, want empty map for healthy services", report)
+	for service, err := range c.HealthCheck(context.Background()) {
+		if err != nil {
+			t.Errorf("HealthCheck()[%s] = %v, want nil for healthy services", service, err)
+		}
 	}
 }
 
@@ -106,18 +109,30 @@ func TestHealthCheck_ReportsUnhealthyRepository(t *testing.T) {
 
 	report := c.HealthCheck(context.Background())
 	if len(report) == 0 {
-		t.Fatal("HealthCheck() = empty map, want an error for the unreachable repository")
+		t.Fatal("HealthCheck() = empty map, want one entry per invoked service")
 	}
 
-	for service, err := range report {
-		if err == nil {
-			t.Errorf("HealthCheck()[%s] = nil, want error", service)
+	var foundErr error
+	for _, err := range report {
+		if err != nil {
+			foundErr = err
+
+			break
 		}
+	}
+
+	if foundErr == nil {
+		t.Fatal("HealthCheck() = all nil, want an error for the unreachable repository")
+	}
+
+	if !strings.Contains(foundErr.Error(), errRepositoryUnreachable.Error()) {
+		t.Errorf("HealthCheck() error = %v, want it to wrap %v", foundErr, errRepositoryUnreachable)
 	}
 }
 
 func TestAccessors_ReturnInjectedValues(t *testing.T) {
 	t.Parallel()
+
 	c := newInProcessContainer(t)
 
 	cfg, err := c.Config()

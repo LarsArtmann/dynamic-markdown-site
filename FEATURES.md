@@ -209,7 +209,7 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | ------------------ | -------- | ------------------------------------------------------- |
 | `/`                | GET      | Root directory listing                                  |
 | `/*path`           | GET      | Markdown file or subdirectory listing                   |
-| `/health`          | GET      | Health check — returns `{"status":"healthy"}`           |
+| `/health`          | GET      | Health check — 200 `{"status":"healthy"}`, or 503 `{"status":"unhealthy"}` when the content repository is unreachable |
 | `/refresh`         | GET/POST | Reload content from source (rate limited)               |
 | `/search`          | GET      | Full-text search — `?q=query` (paginated, rate limited) |
 | `/static/*`        | GET      | Embedded static assets (CSS, favicon)                   |
