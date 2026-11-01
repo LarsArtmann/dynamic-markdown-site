@@ -35,7 +35,10 @@ type probeHealthPayload struct {
 func newTestProbe(tb testing.TB, critical []string, checks map[string]health.CheckFunc) *health.Probe {
 	tb.Helper()
 
-	opts := []health.Option{health.WithRefreshInterval(time.Hour)}
+	opts := []health.Option{
+		health.WithRefreshInterval(time.Hour),
+		health.WithVersion(version.Version),
+	}
 	if len(critical) > 0 {
 		opts = append(opts, health.WithCriticalServices(critical...))
 	}
@@ -50,13 +53,21 @@ func newTestProbe(tb testing.TB, critical []string, checks map[string]health.Che
 	return probe
 }
 
-func repositoryCheck(repo interface{ HealthCheck(context.Context) error }) health.CheckFunc {
+// healthCheckingRepo is the slice of the repository contract the probe
+// invokes; test doubles and production repositories both satisfy it.
+type healthCheckingRepo interface {
+	HealthCheck(ctx context.Context) error
+}
+
+func repositoryCheck(repo healthCheckingRepo) health.CheckFunc {
 	return func(ctx context.Context) error {
 		return repo.HealthCheck(ctx)
 	}
 }
 
-func newHealthyTestProbe(tb testing.TB, repo interface{ HealthCheck(context.Context) error }) *health.Probe {
+func newHealthyTestProbe(tb testing.TB, repo healthCheckingRepo) *health.Probe {
+	tb.Helper()
+
 	return newTestProbe(tb, []string{"repository"}, map[string]health.CheckFunc{
 		"repository": repositoryCheck(repo),
 	})

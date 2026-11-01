@@ -43,13 +43,15 @@ func TestGracefulShutdownStopsInFlightRequests(t *testing.T) {
 	// Wrap the handler to signal when the in-flight request reaches it.
 	handlerStarted := make(chan struct{}, 1)
 
+	siteHandler := WithHealthProbes(srv.Handler(), newHealthyTestProbe(t, repo))
+
 	httpSrv := &http.Server{
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			select {
 			case handlerStarted <- struct{}{}:
 			default:
 			}
-			srv.Handler().ServeHTTP(w, r)
+			siteHandler.ServeHTTP(w, r)
 		}),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
