@@ -126,7 +126,7 @@ Dev mode (`-dev` flag) enables:
 
 - **File watching** via [go-filewatcher/v2](https://github.com/larsartmann/go-filewatcher) — monitors all `.md`/`.markdown` files recursively, skips content-excluded directories, and shuts down cleanly via context cancellation
 - **500ms debounce** — batches rapid changes
-- **SSE endpoint** (`/api/live-reload`) — browser receives reload events
+- **SSE endpoint** (`/api/live-reload`) — browser receives reload events; compiled into `-tags dev` builds only (absent from production binaries)
 - **Toast notifications** — connection status in the bottom-right corner
 - **Auto-reconnect** — recovers from dropped connections
 
@@ -209,7 +209,10 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | ------------------ | -------- | --------------------------------------------------------------------------------------------------------------------- |
 | `/`                | GET      | Root directory listing                                                                                                |
 | `/*path`           | GET      | Markdown file or subdirectory listing                                                                                 |
-| `/health`          | GET      | Health check — 200 `{"status":"healthy"}`, or 503 `{"status":"unhealthy"}` when the content repository is unreachable |
+| `/health`          | GET      | Readiness alias (go-health) — 200 `pass`/`warn`, or 503 `fail` when the critical content repository fails              |
+| `/healthz`         | GET      | Liveness probe — always 200 while serving (never checks dependencies)                                                  |
+| `/readyz`          | GET      | Readiness probe — 503 only on critical (repository) failure                                                            |
+| `/startupz`        | GET      | Startup probe — 503 until the first successful health sweep                                                            |
 | `/refresh`         | GET/POST | Reload content from source (rate limited)                                                                             |
 | `/search`          | GET      | Full-text search — `?q=query` (paginated, rate limited)                                                               |
 | `/static/*`        | GET      | Embedded static assets (CSS, favicon)                                                                                 |
@@ -217,7 +220,7 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/robots.txt`      | GET      | robots.txt with sitemap reference                                                                                     |
 | `/metrics`         | GET      | Prometheus-format metrics                                                                                             |
 | `/cache/stats`     | GET      | Cache hit/miss/eviction statistics (JSON)                                                                             |
-| `/api/live-reload` | GET      | SSE stream for live reload (dev mode)                                                                                 |
+| `/api/live-reload` | GET      | SSE stream for live reload (`-tags dev` builds only — compiled out of production)                                      |
 
 ---
 

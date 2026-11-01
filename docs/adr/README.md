@@ -11,3 +11,4 @@ alongside the code that implements them.
 | [0003](./0003-otter-cache.md)                     | Use Otter for HTML caching                        | Accepted |
 | [0004](./0004-prometheus-format-without-dep.md)   | Prometheus-format metrics without `client_golang` | Accepted |
 | [0005](./0005-distroless-and-self-healthcheck.md) | Distroless image with self-contained healthcheck  | Accepted |
+| [0006](./0006-go-health-three-probe-adoption.md)  | Adopt go-health three-probe SDK                   | Accepted |
