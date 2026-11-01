@@ -1,6 +1,6 @@
 module github.com/larsartmann/dynamic-markdown-site
 
-go 1.27
+go 1.27.1
 
 require (
 	charm.land/log/v2 v2.0.1
