@@ -207,23 +207,23 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 
 ## HTTP API
 
-| Endpoint           | Method   | Description                                                                                               |
-| ------------------ | -------- | --------------------------------------------------------------------------------------------------------- |
-| `/`                | GET      | Root directory listing                                                                                    |
-| `/*path`           | GET      | Markdown file or subdirectory listing                                                                     |
-| `/health`          | GET      | Readiness alias (go-health) — 200 `pass`/`warn`, or 503 `fail` when the critical content repository fails |
-| `/healthz`         | GET      | Liveness probe — always 200 while serving (never checks dependencies)                                     |
-| `/readyz`          | GET      | Readiness probe — 503 only on critical (repository) failure                                               |
-| `/startupz`        | GET      | Startup probe — 503 until the first successful health sweep                                               |
-| `/refresh`         | GET/POST | Reload content from source (rate limited)                                                                 |
-| `/search`          | GET      | Full-text search — `?q=query` (paginated, rate limited)                                                   |
-| `/static/*`        | GET      | Embedded static assets (CSS, favicon)                                                                     |
-| `/sitemap.xml`     | GET      | XML sitemap for search engine crawlers                                                                    |
-| `/robots.txt`      | GET      | robots.txt with sitemap reference                                                                         |
-| `/metrics`         | GET      | Prometheus-format metrics (incl. `health_up` + `health_check` gauges for services with real checks)       |
-| `/cache/stats`     | GET      | Cache hit/miss/eviction statistics (JSON)                                                                 |
-| `/api/live-reload` | GET      | SSE stream for live reload (`-tags dev` builds only — compiled out of production)                         |
-| `/debug/health-dashboard` | GET | Health dashboard HTML (`-tags dev` builds only — 404 in production, ADR-0007)                        |
+| Endpoint                  | Method   | Description                                                                                               |
+| ------------------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `/`                       | GET      | Root directory listing                                                                                    |
+| `/*path`                  | GET      | Markdown file or subdirectory listing                                                                     |
+| `/health`                 | GET      | Readiness alias (go-health) — 200 `pass`/`warn`, or 503 `fail` when the critical content repository fails |
+| `/healthz`                | GET      | Liveness probe — always 200 while serving (never checks dependencies)                                     |
+| `/readyz`                 | GET      | Readiness probe — 503 only on critical (repository) failure                                               |
+| `/startupz`               | GET      | Startup probe — 503 until the first successful health sweep                                               |
+| `/refresh`                | GET/POST | Reload content from source (rate limited)                                                                 |
+| `/search`                 | GET      | Full-text search — `?q=query` (paginated, rate limited)                                                   |
+| `/static/*`               | GET      | Embedded static assets (CSS, favicon)                                                                     |
+| `/sitemap.xml`            | GET      | XML sitemap for search engine crawlers                                                                    |
+| `/robots.txt`             | GET      | robots.txt with sitemap reference                                                                         |
+| `/metrics`                | GET      | Prometheus-format metrics (incl. `health_up` + `health_check` gauges for services with real checks)       |
+| `/cache/stats`            | GET      | Cache hit/miss/eviction statistics (JSON)                                                                 |
+| `/api/live-reload`        | GET      | SSE stream for live reload (`-tags dev` builds only — compiled out of production)                         |
+| `/debug/health-dashboard` | GET      | Health dashboard HTML (`-tags dev` builds only — 404 in production, ADR-0007)                             |
 
 ---
 

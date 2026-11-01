@@ -1,12 +1,12 @@
 # Execution Status — go-health Plan Tiers 1% → 20%
 
-| | |
-| --- | --- |
-| Date | 2026-11-01 09:58 |
-| Session scope | Full execution of [docs/planning/2026-11-01_02-13_go-health-integration-and-health-architecture-plan.md](../planning/2026-11-01_02-13_go-health-integration-and-health-architecture-plan.md) (approved by user) |
-| Shipped & pushed | Tier 1% (`97eeebd`), Tier 4% (`cc2c284` + daemon commits); Tier 20% work committed by daemon at head, tree green |
-| Verification | Both build variants OK, full `-race` suite green, lint 0 issues (unmasked), `golangci-lint config verify` OK, `nix flake check --impure` all checks passed, probe e2e executed locally |
-| Honest framing | Tier 20% is ~80% executed but its CI step has **not** run on GitHub yet, coverage re-run (F39) not done, and one flaky watcher-race failure appeared once (passes 3×/3 on re-run) |
+|                  |                                                                                                                                                                                                                 |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date             | 2026-11-01 09:58                                                                                                                                                                                                |
+| Session scope    | Full execution of [docs/planning/2026-11-01_02-13_go-health-integration-and-health-architecture-plan.md](../planning/2026-11-01_02-13_go-health-integration-and-health-architecture-plan.md) (approved by user) |
+| Shipped & pushed | Tier 1% (`97eeebd`), Tier 4% (`cc2c284` + daemon commits); Tier 20% work committed by daemon at head, tree green                                                                                                |
+| Verification     | Both build variants OK, full `-race` suite green, lint 0 issues (unmasked), `golangci-lint config verify` OK, `nix flake check --impure` all checks passed, probe e2e executed locally                          |
+| Honest framing   | Tier 20% is ~80% executed but its CI step has **not** run on GitHub yet, coverage re-run (F39) not done, and one flaky watcher-race failure appeared once (passes 3×/3 on re-run)                               |
 
 ---
 
@@ -74,6 +74,7 @@ Nothing shipped broken — every push left both build variants green and lint cl
 ## f) What To Get Done Next (updated Top 50 — post-execution state)
 
 **Finish Tier 20% (small):**
+
 1. Push and watch the CI run (dev-tag leg + probe e2e) go green.
 2. F39: re-run coverage; raise container package toward ≥70%.
 3. F13: pin "the subcommand probes the readiness alias" explicitly.
@@ -135,7 +136,7 @@ Nothing shipped broken — every push left both build variants green and lint cl
 
 1. **Probe interval vs deployment reality:** is 15 s readiness staleness acceptable for your production deployment (Docker HEALTHCHECK interval is 30 s, so worst-case detection is ≤45 s), or do you want the interval configurable via flag/env so deployments can tighten it?
 2. **CI e2e port:** I hardcoded port 18099 for the probe e2e step. If you ever run self-hosted runners where that port may be taken, I should switch to an ephemeral-port search — is plain `ubuntu-latest` (ephemeral, port-safe) the only target?
-3. **Renderer check semantics:** go-health has a dedicated `Off(detail)` state for *intentionally unconfigured* dependencies (renders `"status":"off"`, never warns). You chose warn/200 for the missing-D2 case, which I implemented as a *failing non-critical check*. Confirm: D2-missing should stay `warn` (visible degradation), not become `off` (silent absence) — correct?
+3. **Renderer check semantics:** go-health has a dedicated `Off(detail)` state for _intentionally unconfigured_ dependencies (renders `"status":"off"`, never warns). You chose warn/200 for the missing-D2 case, which I implemented as a _failing non-critical check_. Confirm: D2-missing should stay `warn` (visible degradation), not become `off` (silent absence) — correct?
 
 ---
 

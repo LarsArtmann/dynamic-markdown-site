@@ -60,7 +60,7 @@ export default defineConfig({
 					items: [
 						{ label: "Configuration", slug: "guides/configuration" },
 						{ label: "Docker", slug: "guides/docker" },
-					{ label: "Kubernetes", slug: "guides/kubernetes" },
+						{ label: "Kubernetes", slug: "guides/kubernetes" },
 						{ label: "Cloud Storage", slug: "guides/cloud-storage" },
 						{ label: "Markdown Features", slug: "guides/markdown-features" },
 						{ label: "API Endpoints", slug: "guides/api-endpoints" },

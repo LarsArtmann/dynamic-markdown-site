@@ -336,17 +336,17 @@ Full-mode buildflow fails on remaining severity error+ findings (`branching-flow
 
 ### Flags
 
-| Flag           | Default | Description                                                |
-| -------------- | ------- | ---------------------------------------------------------- |
-| `-port`        | 8080    | HTTP server port                                           |
-| `-root`        | `.`     | Root directory with markdown files                         |
-| `-storage-url` |         | Blob storage URL: `file://`, `s3://`, `gs://`, `azblob://` |
-| `-log-level`   | info    | debug, info, warn, error                                   |
-| `-cache`       | true    | Enable HTML caching                                        |
-| `-dev`         | false   | Dev mode (no cache, file watching)                         |
-| `-cache-size`  | 10000   | Maximum cached HTML pages (invalid if < 1)                 |
-| `-timeout`     | 30s     | Request timeout                                            |
-| `-probe-interval` | 15s  | Health probe refresh interval (cached-readiness staleness bound; invalid if < 0) |
+| Flag              | Default | Description                                                                      |
+| ----------------- | ------- | -------------------------------------------------------------------------------- |
+| `-port`           | 8080    | HTTP server port                                                                 |
+| `-root`           | `.`     | Root directory with markdown files                                               |
+| `-storage-url`    |         | Blob storage URL: `file://`, `s3://`, `gs://`, `azblob://`                       |
+| `-log-level`      | info    | debug, info, warn, error                                                         |
+| `-cache`          | true    | Enable HTML caching                                                              |
+| `-dev`            | false   | Dev mode (no cache, file watching)                                               |
+| `-cache-size`     | 10000   | Maximum cached HTML pages (invalid if < 1)                                       |
+| `-timeout`        | 30s     | Request timeout                                                                  |
+| `-probe-interval` | 15s     | Health probe refresh interval (cached-readiness staleness bound; invalid if < 0) |
 
 ### Environment Variables
 
