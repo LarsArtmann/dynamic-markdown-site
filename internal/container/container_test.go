@@ -44,16 +44,19 @@ func (f *failingHealthRepository) HealthCheck(_ context.Context) error {
 // This is necessary because container.New() ultimately calls config.Load() which uses
 // flag.Parse() - and flag.Parse() can only be called once per process.
 //
-// The child inherits the parent's coverage directory (testing.CoverDir, empty
-// when not built with -cover) so the subprocess's statements count toward the
-// coverage profile; without this, New() and provideConfig read as 0% despite
+// The parent's -test.gocoverdir flag (present under `go test -cover`) is
+// forwarded so the subprocess's coverage counters merge into the parent's
+// profile: test binaries emit coverage only through that flag, never the
+// GOCOVERDIR env var. Without it, New() and provideConfig read as 0% despite
 // being fully exercised here.
 func runInSubprocess(t *testing.T) {
 	t.Helper()
 
 	args := []string{"-test.run=" + t.Name()}
-	if coverDir := testing.CoverDir(); coverDir != "" {
-		args = append(args, "-test.gocoverdir="+coverDir)
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test.gocoverdir=") {
+			args = append(args, arg)
+		}
 	}
 
 	cmd := exec.CommandContext(context.Background(), os.Args[0], args...) //nolint:gosec // test binary path, not user input
@@ -217,6 +220,10 @@ func TestAccessors_ReturnInjectedValues(t *testing.T) {
 	t.Parallel()
 
 	c := newInProcessContainer(t)
+
+	if c.Probe() != nil {
+		t.Error("Probe() should be nil for a directly-constructed container")
+	}
 
 	cfg, err := c.Config()
 	if err != nil {
@@ -443,6 +450,10 @@ func TestContainerLifecycle(t *testing.T) {
 
 	if srv != srv2 {
 		t.Error("Server() should return same instance (singleton)")
+	}
+
+	if container.Probe() == nil {
+		t.Error("Probe() should be non-nil for New()-built containers")
 	}
 
 	assertNoShutdownError(t, container)
