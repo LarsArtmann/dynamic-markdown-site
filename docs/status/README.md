@@ -10,6 +10,7 @@ Point-in-time session reports. **Resolved reports are archived** and carry inlin
 
 | Report                                                                                                                            | Topic                                                         |
 | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [2026-11-01 samber/do DI + healthcheck architecture review](./2026-11-01_01-07_samber-do-di-and-healthcheck-architecture-review.md) | DI audit (DO-1→6 clean); /health always-200 + lifecycle leaks |
 | [2026-09-27 docs-health AUDIT pass + self-critique](./2026-09-27_04-30_docs-health-audit-pass-and-self-critique.md)               | Full docs audit; §b harvest gaps, §f follow-ups, §g decisions |
 | [2026-09-13 pipeline fix + findings gate](./2026-09-13_14-52_pipeline-fix-and-findings-gate.md)                                   | BuildFlow gate diagnosis; remaining advisories                |
 | [2026-07-27 ratelimit cleanup follow-up + self-review](./2026-07-27_16-41_ratelimit-cleanup-followup-self-review.md)              | Burst-only test semantics                                     |
