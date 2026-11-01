@@ -91,23 +91,16 @@ func (lr *LiveReload) Notify(path string) {
 	}
 }
 
-// admitClient reserves a client slot under the cap, returning false when the
-// dev server already serves its maximum of concurrent SSE streams. The slot
-// is released by the handler's deferred client cleanup.
-func (lr *LiveReload) admitClient() bool {
-	lr.mu.Lock()
-	defer lr.mu.Unlock()
-
-	if len(lr.clients) >= lr.clientCap {
-		return false
-	}
-
-	return true
-}
-
 func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
-	liveness := lr.admitClient()
-	if !liveness {
+	clientChan := make(chan LiveReloadEvent, 100)
+	defer close(clientChan)
+
+	// Cap check and registration share one critical section: two concurrent
+	// connections must not both slip past a nearly-full cap (TOCTOU).
+	lr.mu.Lock()
+	if len(lr.clients) >= lr.clientCap {
+		lr.mu.Unlock()
+
 		lr.logger.Warn(
 			"live reload client rejected: cap reached",
 			"client_ip", clientIP(r),
@@ -123,10 +116,6 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clientChan := make(chan LiveReloadEvent, 100)
-	defer close(clientChan)
-
-	lr.mu.Lock()
 	lr.clients[clientChan] = struct{}{}
 	clientCount := len(lr.clients)
 	lr.mu.Unlock()
