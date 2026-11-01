@@ -19,26 +19,32 @@ Directory pages show a card grid with file/folder icons, titles, and last modifi
 - Case-insensitive matching as a fallback
 - Non-markdown files (images, PDFs, JSON) are served as raw assets
 
-## Health Check
+## Health Probes
 
-```http
-GET /health
-```
+The server exposes the standard Kubernetes three-probe set (backed by [go-health](https://github.com/larsartmann/go-health)) plus a `/health` readiness alias:
 
-Returns JSON with server status, version, uptime, and dependency health:
+| Endpoint     | Method | Question it answers                                            | Failure behavior                          |
+| ------------ | ------ | -------------------------------------------------------------- | ----------------------------------------- |
+| `/healthz`   | GET    | Is the process alive? (never checks dependencies)              | Always 200 while serving                  |
+| `/readyz`    | GET    | Are critical dependencies reachable?                           | 503 only when the content repository fails |
+| `/startupz`  | GET    | Has boot completed?                                            | 503 until the first successful sweep      |
+| `/health`    | GET    | Alias of `/readyz` (Docker `HEALTHCHECK` / `healthcheck` subcommand) | Same as `/readyz`                    |
+
+Readyz and the `/health` alias return JSON with a pass/warn/fail roll-up, version, uptime, and per-dependency checks. The content repository is the only **critical** dependency — its failure returns `503` with `"status": "fail"`. A missing D2 binary degrades diagram rendering but is **non-critical**: the response stays `200` with `"status": "warn"` and the renderer check carries the reason.
 
 ```json
 {
-	"status": "healthy",
+	"status": "pass",
 	"version": "1.0.0",
-	"commit": "abc123",
 	"uptime": "2h30m",
-	"dependencies": {
-		"repository": { "status": "healthy", "modified": "2026-07-13T..." },
-		"cache": { "status": "healthy", "size": 42, "hits": 100, "misses": 5, "hitRate": 0.95 }
+	"checks": {
+		"repository": { "status": "pass" },
+		"renderer": { "status": "fail", "error": "d2 diagram renderer unavailable; diagrams render as code blocks" }
 	}
 }
 ```
+
+Readiness verdicts are cached and refreshed every 15 seconds, so orchestrator probes never fan out into the storage backend.
 
 ## Refresh
 

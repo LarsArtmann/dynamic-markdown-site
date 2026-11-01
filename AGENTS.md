@@ -19,6 +19,7 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 - gocloud.dev for blob storage (S3, GCS, filesystem)
 - D2 + Mermaid for diagram rendering
 - go-filewatcher/v2 for dev-mode file watching (replaces raw fsnotify)
+- go-health for Kubernetes-style health probes (liveness/readiness/startup over the DI container)
 
 ---
 
@@ -27,14 +28,14 @@ A type-safe, high-performance Go web server that converts markdown files into a 
 ### Build & Run
 
 ```bash
-# Build the binary
-go build -o dynamic-markdown-site ./cmd/dynamic-markdown-site
+# Build the binary (production: no live-reload code path — see gotcha 22)
+env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go build -o dynamic-markdown-site ./cmd/dynamic-markdown-site
 
-# Run in dev mode (live reload, no cache)
-go run ./cmd/dynamic-markdown-site -dev -root ./content
+# Run in dev mode (live reload, no cache) — requires the dev build tag
+env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go run -tags dev ./cmd/dynamic-markdown-site -dev -root ./content
 
 # Run from S3/GCS
-go run ./cmd/dynamic-markdown-site -storage-url s3://my-bucket/docs
+env -u GOTOOLCHAIN GOEXPERIMENT=jsonv2 go run ./cmd/dynamic-markdown-site -storage-url s3://my-bucket/docs
 ```
 
 ### Nix
@@ -281,7 +282,11 @@ The `templ` CLI version must match `go.mod`. If the CLI is newer, it generates c
 
 ### 9. SSE Handler Blocks Without Cancellable Context
 
-`handleSSE` enters an infinite loop blocking on `ctx.Done()`. `httptest.ResponseRecorder` implements `http.Flusher`, so the early-return path is NOT taken. Tests must use a cancellable context.
+`handleSSE` enters an infinite loop blocking on `ctx.Done()` or the hub's closed channel. `httptest.ResponseRecorder` implements `http.Flusher`, so the early-return path is NOT taken. Tests must use a cancellable context (or `LiveReload.Close()`).
+
+### 22. Live Reload Is Build-Tag Gated (2026-11-01)
+
+`/api/live-reload` and the SSE hub exist **only in `-tags dev` builds** (`livereload_dev.go` vs the `livereload_prod.go` stub under `//go:build !dev`). Release paths (Docker, goreleaser, nix) never pass the tag, so production binaries contain no SSE code path. Consequences: run dev workflows as `go run -tags dev ./cmd/... -dev`; the SSE tests in `livereload_test.go` carry the same tag, so CI must run `go test -tags dev ./internal/server/` alongside the default suite or the dev path rots untested; `-dev` on a prod-built binary still enables watcher + no-cache but live reload stays off.
 
 ### 10. Rate Limiting Uses Token Bucket
 
