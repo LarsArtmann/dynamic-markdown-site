@@ -102,6 +102,7 @@
 - [ ] Add Kubernetes manifests
 - [ ] CDN/edge deployment manifests (Cloud Run/Fly.io)
 - [ ] Create deployment documentation
+- [ ] Production health dashboard via `health-hub` federation (decided 2026-11-01, ADR-0007): run the go-health-dashboard standalone binary pointed at each instance's `/health` document (`HEALTH_HUB_REMOTES=dms=http://host:8080/health`) rather than embedding the dashboard SDK — dev builds carry it at `/debug/health-dashboard` (ADR-0007); production gets the federated hub with zero new dependencies in release binaries.
 
 ## 🔬 Quality
 
