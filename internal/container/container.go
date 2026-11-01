@@ -114,22 +114,31 @@ func (c *Container) Probe() *health.Probe {
 	return c.probe
 }
 
-// HealthCheck probes every service implementing samber/do's Healthchecker
-// interfaces (the server today). The returned map is keyed by service
-// description; an empty map means every probed service is healthy.
+// HealthCheck probes every invoked service through samber/do's sweep. The
+// returned map holds one entry per service: non-nil for a failed health
+// check, nil for a passing check or a service without a Healthchecker
+// interface (so "any non-nil value means unhealthy", while "all nil means
+// healthy").
 func (c *Container) HealthCheck(ctx context.Context) map[string]error {
 	return c.injector.HealthCheckWithContext(ctx)
 }
 
-// Shutdown gracefully shuts down all services. The probe stops first so its
-// refresh loop cannot sweep services mid-teardown; the injector then runs its
-// dependency-aware shutdown wave.
+// Shutdown gracefully shuts down all services with a background context. The
+// probe stops first so its refresh loop cannot sweep services mid-teardown;
+// the injector then runs its dependency-aware shutdown wave.
 func (c *Container) Shutdown() *do.ShutdownReport {
+	return c.ShutdownWithContext(context.Background())
+}
+
+// ShutdownWithContext is Shutdown with a deadline: the injector runs its
+// shutdown wave under ctx, and the report records whichever services did not
+// finish in time.
+func (c *Container) ShutdownWithContext(ctx context.Context) *do.ShutdownReport {
 	if c.probe != nil {
 		c.probe.Shutdown()
 	}
 
-	return c.injector.Shutdown()
+	return c.injector.ShutdownWithContext(ctx)
 }
 
 // Provider functions
