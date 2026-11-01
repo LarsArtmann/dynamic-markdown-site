@@ -42,7 +42,7 @@ func TestResponseTimeHeaderIsSet(t *testing.T) {
 
 	handler := newTestHandlerFor(t)
 
-	rec := executeRequest(handler, "/health")
+	rec := executeRequest(handler, "/cache/stats")
 
 	header := rec.Header().Get("X-Response-Time")
 	if header == "" {

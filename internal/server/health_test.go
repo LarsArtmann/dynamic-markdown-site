@@ -7,38 +7,101 @@ import (
 	"testing"
 	"time"
 
-	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
+	"github.com/larsartmann/dynamic-markdown-site/internal/version"
+	"github.com/larsartmann/go-health"
 )
 
-type healthPayload struct {
-	Status       string         `json:"status"`
-	Error        string         `json:"error"`
-	Version      string         `json:"version"`
-	Commit       string         `json:"commit"`
-	BuildDate    string         `json:"buildDate"`
-	Timestamp    time.Time      `json:"timestamp"`
-	Uptime       string         `json:"uptime"`
-	Dependencies map[string]any `json:"dependencies"`
+// probeCheck mirrors one entry of the go-health readiness payload.
+type probeCheck struct {
+	Status string `json:"status"`
+	Error  string `json:"error,omitempty"`
 }
 
-func fetchHealth(t *testing.T, srv *Server) healthPayload {
+// probeHealthPayload mirrors the go-health readiness response served at
+// GET /health (the readiness alias for /readyz).
+type probeHealthPayload struct {
+	Status  string                `json:"status"`
+	Version string                `json:"version"`
+	Uptime  string                `json:"uptime"`
+	Checks  map[string]probeCheck `json:"checks"`
+}
+
+// newTestProbe builds a started go-health probe over explicit check funcs.
+// The refresh interval is frozen at an hour so tests observe the
+// deterministic first evaluation only. critical names the subset whose
+// failure flips readiness to 503; the rest degrade to warn.
+func newTestProbe(tb testing.TB, critical []string, checks map[string]health.CheckFunc) *health.Probe {
+	tb.Helper()
+
+	opts := []health.Option{health.WithRefreshInterval(time.Hour)}
+	if len(critical) > 0 {
+		opts = append(opts, health.WithCriticalServices(critical...))
+	}
+
+	probe := health.NewChecks(checks, opts...)
+	if err := probe.Start(context.Background()); err != nil {
+		tb.Fatalf("probe.Start() error: %v", err)
+	}
+
+	tb.Cleanup(probe.Shutdown)
+
+	return probe
+}
+
+func repositoryCheck(repo content.Repository) health.CheckFunc {
+	return func(ctx context.Context) error {
+		return repo.HealthCheck(ctx)
+	}
+}
+
+func newHealthyTestProbe(tb testing.TB, repo content.Repository) *health.Probe {
+	return newTestProbe(tb, []string{"repository"}, map[string]health.CheckFunc{
+		"repository": repositoryCheck(repo),
+	})
+}
+
+func fetchHealth(t *testing.T, srv *Server, probe *health.Probe, wantCode int) probeHealthPayload {
 	t.Helper()
 
+	handler := WithHealthProbes(newTestHandler(srv), probe)
 	rec := httptest.NewRecorder()
-	newTestHandler(srv).ServeHTTP(
+	handler.ServeHTTP(
 		rec,
 		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil),
 	)
 
-	if rec.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", rec.Code)
+	if rec.Code != wantCode {
+		t.Fatalf("status = %d, want %d", rec.Code, wantCode)
 	}
 
-	var payload healthPayload
+	var payload probeHealthPayload
 	decodeJSON(t, rec, &payload)
 
 	return payload
+}
+
+func TestHealthAliasServesReadiness(t *testing.T) {
+	t.Parallel()
+
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+	probe := newHealthyTestProbe(t, repo)
+
+	payload := fetchHealth(t, srv, probe, http.StatusOK)
+
+	if payload.Status != "pass" {
+		t.Errorf("status = %q, want pass", payload.Status)
+	}
+
+	repoCheck, ok := payload.Checks["repository"]
+	if !ok {
+		t.Fatal("expected repository check in payload")
+	}
+
+	if repoCheck.Status != "pass" {
+		t.Errorf("repository check status = %q, want pass", repoCheck.Status)
+	}
 }
 
 func TestHealthEndpointReportsUptime(t *testing.T) {
@@ -46,122 +109,119 @@ func TestHealthEndpointReportsUptime(t *testing.T) {
 
 	repo := content.NewInMemoryRepository()
 	srv := newTestServer(t, repo)
-	srv.startedAt = time.Now().Add(-2 * time.Second)
+	probe := newHealthyTestProbe(t, repo)
 
-	payload := fetchHealth(t, srv)
+	payload := fetchHealth(t, srv, probe, http.StatusOK)
 
 	if payload.Uptime == "" {
-		t.Errorf("expected uptime in response, got empty")
+		t.Fatal("expected uptime in response, got empty")
 	}
 
-	dur, err := time.ParseDuration(payload.Uptime)
-	if err != nil {
+	if _, err := time.ParseDuration(payload.Uptime); err != nil {
 		t.Errorf("uptime %q is not a duration: %v", payload.Uptime, err)
 	}
-	if dur < time.Second {
-		t.Errorf("uptime = %v, want >= 1s", dur)
-	}
 }
 
-func TestHealthEndpointReportsDependencies(t *testing.T) {
+func TestHealthEndpointReportsVersion(t *testing.T) {
 	t.Parallel()
 
 	repo := content.NewInMemoryRepository()
 	srv := newTestServer(t, repo)
+	probe := newHealthyTestProbe(t, repo)
 
-	payload := fetchHealth(t, srv)
+	payload := fetchHealth(t, srv, probe, http.StatusOK)
 
-	repoHealth, ok := payload.Dependencies["repository"].(map[string]any)
-	if !ok {
-		t.Fatalf("expected repository dependency report, got %+v", payload.Dependencies)
-	}
-	if repoHealth["status"] != "healthy" {
-		t.Errorf("expected repository healthy, got %v", repoHealth["status"])
-	}
-
-	cacheHealth, ok := payload.Dependencies["cache"].(map[string]any)
-	if !ok {
-		t.Fatalf("expected cache dependency report, got %+v", payload.Dependencies)
-	}
-	if cacheHealth["status"] != "healthy" {
-		t.Errorf("expected cache healthy, got %v", cacheHealth["status"])
+	if payload.Version != version.Version {
+		t.Errorf("version = %q, want %q", payload.Version, version.Version)
 	}
 }
 
-func TestHealthEndpointReportsUnhealthyRepository(t *testing.T) {
+func TestHealthEndpointFailsOnCriticalRepository(t *testing.T) {
 	t.Parallel()
 
+	repo := &FailingRepository{}
 	srv := newUnhealthyRepositoryServer(t)
+	probe := newTestProbe(t, []string{"repository"}, map[string]health.CheckFunc{
+		"repository": repositoryCheck(repo),
+	})
 
+	payload := fetchHealth(t, srv, probe, http.StatusServiceUnavailable)
+
+	if payload.Status != "fail" {
+		t.Errorf("status = %q, want fail", payload.Status)
+	}
+
+	repoCheck, ok := payload.Checks["repository"]
+	if !ok {
+		t.Fatal("expected repository check in payload")
+	}
+
+	if repoCheck.Status != "fail" {
+		t.Errorf("repository check status = %q, want fail", repoCheck.Status)
+	}
+
+	if repoCheck.Error == "" {
+		t.Error("expected repository check error detail, got empty")
+	}
+}
+
+func TestRendererDegradationWarnsWithoutFailingReadiness(t *testing.T) {
+	t.Parallel()
+
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+	probe := newTestProbe(t, []string{"repository"}, map[string]health.CheckFunc{
+		"repository": repositoryCheck(repo),
+		"renderer": func(_ context.Context) error {
+			return context.DeadlineExceeded // any non-critical failure
+		},
+	})
+
+	payload := fetchHealth(t, srv, probe, http.StatusOK)
+
+	if payload.Status != "warn" {
+		t.Errorf("status = %q, want warn (degraded but serving)", payload.Status)
+	}
+
+	if payload.Checks["renderer"].Status == "pass" {
+		t.Error("renderer check should not report pass while degraded")
+	}
+}
+
+func TestLivenessNeverChecksDependencies(t *testing.T) {
+	t.Parallel()
+
+	repo := &FailingRepository{}
+	srv := newUnhealthyRepositoryServer(t)
+	probe := newTestProbe(t, []string{"repository"}, map[string]health.CheckFunc{
+		"repository": repositoryCheck(repo),
+	})
+
+	handler := WithHealthProbes(newTestHandler(srv), probe)
 	rec := httptest.NewRecorder()
-	newTestHandler(srv).ServeHTTP(
+	handler.ServeHTTP(
 		rec,
-		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil),
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/healthz", nil),
 	)
 
-	if rec.Code != http.StatusServiceUnavailable {
-		t.Fatalf("status = %d, want 503", rec.Code)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("liveness status = %d, want 200 even with a dead critical dependency", rec.Code)
 	}
 
-	var payload healthPayload
+	var payload probeHealthPayload
 	decodeJSON(t, rec, &payload)
 
-	if payload.Status != "unhealthy" {
-		t.Errorf("status = %q, want unhealthy", payload.Status)
-	}
-	if payload.Error == "" {
-		t.Error("expected top-level error detail, got empty")
-	}
-
-	repoHealth, ok := payload.Dependencies["repository"].(map[string]any)
-	if !ok {
-		t.Fatalf("expected repository dependency report")
-	}
-	if repoHealth["status"] != "error" {
-		t.Errorf("expected repository error, got %v", repoHealth["status"])
+	if payload.Status != "pass" {
+		t.Errorf("liveness status = %q, want pass", payload.Status)
 	}
 }
 
-func newUnhealthyRepositoryServer(t *testing.T) *Server {
-	t.Helper()
-
-	htmlCache := cache.NewHTMLCache(10)
-	t.Cleanup(htmlCache.Close)
-
-	return newTestServerWithCache(t, &FailingRepository{}, htmlCache)
-}
-
-func TestHealthCheckReturnsNilForHealthyServer(t *testing.T) {
+func TestWithHealthProbesNilProbeReturnsNext(t *testing.T) {
 	t.Parallel()
 
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
+	next := http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 
-	if err := srv.HealthCheck(context.Background()); err != nil {
-		t.Errorf("HealthCheck() = %v, want nil", err)
-	}
-}
-
-func TestHealthCheckReportsUnhealthyRepository(t *testing.T) {
-	t.Parallel()
-
-	srv := newUnhealthyRepositoryServer(t)
-
-	if err := srv.HealthCheck(context.Background()); err == nil {
-		t.Error("HealthCheck() = nil, want error for unreachable repository")
-	}
-}
-
-func TestHealthCheckRespectsCancelledContext(t *testing.T) {
-	t.Parallel()
-
-	repo := content.NewInMemoryRepository()
-	srv := newTestServer(t, repo)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	cancel()
-
-	if err := srv.HealthCheck(ctx); err == nil {
-		t.Error("HealthCheck() = nil, want error for cancelled context")
+	if got := WithHealthProbes(next, nil); got != next {
+		t.Error("WithHealthProbes with a nil probe must return the wrapped handler unchanged")
 	}
 }

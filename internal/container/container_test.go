@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/larsartmann/dynamic-markdown-site/internal/cache"
@@ -15,6 +16,7 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/domain"
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
+	"github.com/larsartmann/go-health"
 	"github.com/samber/do/v2"
 )
 
@@ -29,6 +31,12 @@ type failingHealthRepository struct {
 
 func (f *failingHealthRepository) Root() (*domain.DirectoryNode, error) {
 	return nil, errRepositoryUnreachable
+}
+
+// HealthCheck is the override the DI sweep and the go-health probe invoke;
+// overriding Root alone would leave the double invisible to health checks.
+func (f *failingHealthRepository) HealthCheck(_ context.Context) error {
+	return errRepositoryUnreachable
 }
 
 // runInSubprocess runs the current test in a subprocess to isolate flag.Parse() calls.
@@ -71,12 +79,16 @@ func newInProcessContainerWithRepo(t *testing.T, repo content.Repository) *Conta
 	htmlCache := cache.NewHTMLCache(10)
 	t.Cleanup(htmlCache.Close)
 
+	// A zero-value DiagramRenderer marks the renderer healthy: the fixture
+	// isolates the repository as the only failing dependency.
+	healthyRenderer := renderer.NewGoldmarkRendererWithDiagrams(&renderer.DiagramRenderer{})
+
 	srv := server.NewServer(
 		repo,
 		content.NewSearcher(repo),
 		slog.New(slog.DiscardHandler),
 		htmlCache,
-		renderer.NewGoldmarkRenderer(),
+		healthyRenderer,
 		false,
 		"Test",
 	)
@@ -127,6 +139,63 @@ func TestHealthCheck_ReportsUnhealthyRepository(t *testing.T) {
 
 	if !strings.Contains(foundErr.Error(), errRepositoryUnreachable.Error()) {
 		t.Errorf("HealthCheck() error = %v, want it to wrap %v", foundErr, errRepositoryUnreachable)
+	}
+}
+
+func TestProbe_StartsOverInjectorAndClassifiesRepositoryCritical(t *testing.T) {
+	t.Parallel()
+
+	injector := do.New()
+	t.Cleanup(func() { _ = injector.Shutdown() })
+
+	repo := content.NewInMemoryRepository()
+	htmlCache := cache.NewHTMLCache(10)
+	t.Cleanup(htmlCache.Close)
+
+	// A zero-value DiagramRenderer marks the renderer healthy; the fixture
+	// mirrors production wiring (same constructor shape as container.New).
+	healthyRenderer := renderer.NewGoldmarkRendererWithDiagrams(&renderer.DiagramRenderer{})
+	srv := server.NewServer(
+		repo,
+		content.NewSearcher(repo),
+		slog.New(slog.DiscardHandler),
+		htmlCache,
+		healthyRenderer,
+		false,
+		"Test",
+	)
+	t.Cleanup(srv.Shutdown)
+
+	do.ProvideValue(injector, &config.Config{CacheSize: 10_000})
+	do.ProvideValue(injector, slog.New(slog.DiscardHandler))
+	do.ProvideValue[content.Repository](injector, repo)
+	do.ProvideValue(injector, srv)
+	do.ProvideValue(injector, healthyRenderer)
+
+	probe := health.New(injector,
+		health.WithCriticalService[content.Repository](),
+		health.WithVersion("test"),
+		health.WithRefreshInterval(time.Hour),
+	)
+
+	if err := probe.Start(context.Background()); err != nil {
+		t.Fatalf("probe.Start() error: %v", err)
+	}
+
+	t.Cleanup(probe.Shutdown)
+
+	resp := probe.CachedResponse()
+	if resp.Status != health.StatusPass {
+		t.Errorf("probe status = %q, want pass", resp.Status)
+	}
+
+	repoCheck, ok := resp.Checks[health.DoServiceName[content.Repository]()]
+	if !ok {
+		t.Fatalf("expected a check for the repository service, got %v", resp.Checks)
+	}
+
+	if repoCheck.Status != health.StatusPass {
+		t.Errorf("repository check status = %q, want pass", repoCheck.Status)
 	}
 }
 

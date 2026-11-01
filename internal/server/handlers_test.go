@@ -145,7 +145,7 @@ var sharedHTTPTestCases = []httpTestCase{
 		method:     http.MethodGet,
 		path:       "/health",
 		wantStatus: http.StatusOK,
-		wantBody:   `"status":"healthy"`,
+		wantBody:   `"status":"pass"`,
 	},
 	{
 		name:       "version",
@@ -153,27 +153,6 @@ var sharedHTTPTestCases = []httpTestCase{
 		path:       "/health",
 		wantStatus: http.StatusOK,
 		wantBody:   `"version":"` + version.Version + `"`,
-	},
-	{
-		name:       "commit",
-		method:     http.MethodGet,
-		path:       "/health",
-		wantStatus: http.StatusOK,
-		wantBody:   `"commit":"` + version.Commit + `"`,
-	},
-	{
-		name:       "build_date",
-		method:     http.MethodGet,
-		path:       "/health",
-		wantStatus: http.StatusOK,
-		wantBody:   `"build_date"`,
-	},
-	{
-		name:       "timestamp",
-		method:     http.MethodGet,
-		path:       "/health",
-		wantStatus: http.StatusOK,
-		wantBody:   `"timestamp"`,
 	},
 }
 
@@ -232,14 +211,19 @@ func newTestHandlerForEndpointTestsWithDevMode(t *testing.T, devMode bool) http.
 func TestHealthEndpoint(t *testing.T) {
 	t.Parallel()
 
-	handler := newTestHandlerFor(t)
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+	handler := WithHealthProbes(newTestHandler(srv), newHealthyTestProbe(t, repo))
+
 	runHTTPTests(t, handler, sharedHTTPTestCases)
 }
 
 func TestHealthEndpointStructure(t *testing.T) {
 	t.Parallel()
 
-	handler := newTestHandlerFor(t)
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+	handler := WithHealthProbes(newTestHandler(srv), newHealthyTestProbe(t, repo))
 	rec := executeRequest(handler, "/health")
 
 	if rec.Code != http.StatusOK {
@@ -247,8 +231,8 @@ func TestHealthEndpointStructure(t *testing.T) {
 	}
 
 	body := rec.Body.String()
-	if !strings.Contains(body, `"status":"healthy"`) {
-		t.Errorf("body should contain healthy status, got: %s", body)
+	if !strings.Contains(body, `"status":"pass"`) {
+		t.Errorf("body should contain pass status, got: %s", body)
 	}
 }
 
@@ -316,7 +300,9 @@ func TestContentByPath(t *testing.T) {
 func TestHealthEndpointContentType(t *testing.T) {
 	t.Parallel()
 
-	handler := newTestHandlerForEndpointTests(t)
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+	handler := WithHealthProbes(newTestHandler(srv), newHealthyTestProbe(t, repo))
 	rec := executeRequest(handler, "/health")
 
 	ct := rec.Header().Get("Content-Type")
@@ -470,6 +456,14 @@ func (f *FailingRepository) GetRaw(_ domain.URLPath) (*content.RawFile, error) {
 
 func (f *FailingRepository) Root() (*domain.DirectoryNode, error) {
 	return nil, errFailingRoot
+}
+
+// HealthCheck mirrors the repository health contract so the failing double
+// behaves like a real repository inside go-health probes.
+func (f *FailingRepository) HealthCheck(_ context.Context) error {
+	_, err := f.Root()
+
+	return err
 }
 
 func (f *FailingRepository) LastModified() time.Time {

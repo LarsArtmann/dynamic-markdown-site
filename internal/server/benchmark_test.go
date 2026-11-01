@@ -46,7 +46,7 @@ func newBenchmarkHandler(b *testing.B) http.Handler {
 		renderer.NewGoldmarkRenderer(), false, "Site",
 	)
 
-	return srv.Handler()
+	return WithHealthProbes(srv.Handler(), newHealthyTestProbe(b, repo))
 }
 
 func createBenchmarkFileContent(index int) string {
