@@ -90,6 +90,7 @@ func newInProcessContainerWithRepo(t *testing.T, repo content.Repository) *Conta
 		slog.New(slog.DiscardHandler),
 		htmlCache,
 		healthyRenderer,
+		nil,
 		false,
 		"Test",
 	)
@@ -162,6 +163,7 @@ func TestProbe_StartsOverInjectorAndClassifiesRepositoryCritical(t *testing.T) {
 		slog.New(slog.DiscardHandler),
 		htmlCache,
 		healthyRenderer,
+		nil,
 		false,
 		"Test",
 	)
@@ -543,6 +545,7 @@ func TestProbe_RendererDegradationWarnsButRepositoryFails(t *testing.T) {
 		slog.New(slog.DiscardHandler),
 		htmlCache,
 		degradedRenderer,
+		nil,
 		false,
 		"Test",
 	)
