@@ -81,13 +81,25 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 func newTestServerWithCache(t *testing.T, repo content.Repository, htmlCache *cache.HTMLCache) *Server {
 	t.Helper()
 
+	return newTestServerWithDevMode(t, repo, htmlCache, false)
+}
+
+func newTestServerWithDevMode(t *testing.T, repo content.Repository, devMode bool) *Server {
+	t.Helper()
+
+	return newTestServerWithDevMode(t, repo, cache.NewHTMLCache(100), devMode)
+}
+
+func newTestServerWithDevMode(t *testing.T, repo content.Repository, htmlCache *cache.HTMLCache, devMode bool) *Server {
+	t.Helper()
+
 	t.Cleanup(htmlCache.Close)
 
 	logger := slog.New(slog.DiscardHandler)
 	searcher := content.NewSearcher(repo)
 	rndr := renderer.NewGoldmarkRenderer()
 
-	srv := NewServer(repo, searcher, logger, htmlCache, rndr, false, "Site")
+	srv := NewServer(repo, searcher, logger, htmlCache, rndr, devMode, "Site")
 	t.Cleanup(srv.Shutdown)
 
 	return srv
@@ -194,6 +206,12 @@ func newTestHandlerWithRepo(t *testing.T) (http.Handler, *content.InMemoryReposi
 func newTestHandlerForEndpointTests(t *testing.T) http.Handler {
 	t.Helper()
 
+	return newTestHandlerForEndpointTestsWithDevMode(t, false)
+}
+
+func newTestHandlerForEndpointTestsWithDevMode(t *testing.T, devMode bool) http.Handler {
+	t.Helper()
+
 	repo := content.NewInMemoryRepository()
 	addTestFile(t, repo, "/guide", "Guide", []byte("# Guide\n\nHello world"), time.Now())
 	addTestFile(t, repo, "/about", "About", []byte("# About\n\npage"), time.Now())
@@ -201,7 +219,7 @@ func newTestHandlerForEndpointTests(t *testing.T) http.Handler {
 
 	addTestDir(t, repo, time.Now())
 
-	srv := newTestServer(t, repo)
+	srv := newTestServerWithDevMode(t, repo, devMode)
 
 	return newTestHandler(srv)
 }
@@ -391,7 +409,7 @@ func TestHandleContentByPathRawFile(t *testing.T) {
 func TestLiveReloadEndpoint(t *testing.T) {
 	t.Parallel()
 
-	handler := newTestHandlerForEndpointTests(t)
+	handler := newTestHandlerForEndpointTestsWithDevMode(t, true)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
@@ -417,6 +435,18 @@ func TestLiveReloadEndpoint(t *testing.T) {
 
 	if rec.Code == http.StatusNotFound {
 		t.Error("live-reload endpoint should be registered, got 404")
+	}
+}
+
+func TestLiveReloadEndpointDisabledOutsideDevMode(t *testing.T) {
+	t.Parallel()
+
+	handler := newTestHandlerForEndpointTests(t)
+
+	rec := executeRequest(handler, "/api/live-reload")
+
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("status = %d, want %d (live reload is dev-mode only)", rec.Code, http.StatusNotFound)
 	}
 }
 

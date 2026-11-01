@@ -17,9 +17,11 @@ type LiveReloadEvent struct {
 }
 
 type LiveReload struct {
-	logger  *slog.Logger
-	mu      sync.RWMutex
-	clients map[chan LiveReloadEvent]struct{}
+	logger    *slog.Logger
+	mu        sync.RWMutex
+	clients   map[chan LiveReloadEvent]struct{}
+	closed    chan struct{}
+	closeOnce sync.Once
 }
 
 func NewLiveReload(logger *slog.Logger) *LiveReload {
@@ -27,7 +29,26 @@ func NewLiveReload(logger *slog.Logger) *LiveReload {
 		logger:  logger,
 		mu:      sync.RWMutex{},
 		clients: make(map[chan LiveReloadEvent]struct{}),
+		closed:  make(chan struct{}),
 	}
+}
+
+// Close disconnects every SSE client and makes handlers exit immediately, so
+// an open live-reload stream cannot hold http.Server.Shutdown until its
+// deadline. It is idempotent and safe to call concurrently with Notify.
+func (lr *LiveReload) Close() {
+	lr.closeOnce.Do(func() {
+		close(lr.closed)
+	})
+
+	lr.mu.Lock()
+	defer lr.mu.Unlock()
+
+	for client := range lr.clients {
+		close(client)
+	}
+
+	lr.clients = make(map[chan LiveReloadEvent]struct{})
 }
 
 func (lr *LiveReload) Notify(path string) {
@@ -99,6 +120,10 @@ func (lr *LiveReload) handleSSE(w http.ResponseWriter, r *http.Request) {
 		select {
 		case <-ctx.Done():
 			lr.logger.Debug("live reload client disconnected")
+
+			return
+		case <-lr.closed:
+			lr.logger.Debug("live reload closed, disconnecting client")
 
 			return
 		case event, ok := <-clientChan:

@@ -177,6 +177,10 @@ func gracefulShutdown(svc *services, httpServer *http.Server) error {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
 
+	// Release SSE clients first: http.Server.Shutdown waits for active
+	// connections, and a live-reload stream never goes idle on its own.
+	svc.server.LiveReload().Close()
+
 	err := httpServer.Shutdown(shutdownCtx)
 	if err != nil {
 		return cockroachdberrors.Wrapf(err, "server shutdown failed (addr: %s)", httpServer.Addr)

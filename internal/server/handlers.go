@@ -71,7 +71,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /cache/stats", s.handleCacheStats)
 	mux.HandleFunc("GET /metrics", s.handleMetrics)
 	mux.HandleFunc("GET /{$}", s.handleRoot)
-	mux.HandleFunc("GET /api/live-reload", s.liveReload.handleSSE)
+	if s.devMode {
+		mux.HandleFunc("GET /api/live-reload", s.liveReload.handleSSE)
+	}
 	mux.HandleFunc("GET /static/", s.serveStaticFile)
 	mux.HandleFunc("GET /", s.handleContentOr404)
 
@@ -92,6 +94,7 @@ func (s *Server) Handler() http.Handler {
 func (s *Server) Shutdown() {
 	s.rateLimiter.Stop()
 	s.searchRateLimiter.Stop()
+	s.liveReload.Close()
 	s.cache.Close()
 }
 
