@@ -1,6 +1,7 @@
 package content
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -61,6 +62,14 @@ func (r *InMemoryRepository) Root() (*domain.DirectoryNode, error) {
 	defer r.mu.RUnlock()
 
 	return r.root, nil
+}
+
+// HealthCheck verifies the content tree is reachable. It satisfies samber/do's
+// HealthcheckerWithContext interface, so the DI health sweep and the go-health
+// probe both pick it up as the repository's own check. The in-memory tree is
+// always reachable by construction.
+func (r *InMemoryRepository) HealthCheck(_ context.Context) error {
+	return nil
 }
 
 // Refresh is a no-op for in-memory repository.

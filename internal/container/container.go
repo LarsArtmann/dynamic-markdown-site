@@ -14,6 +14,8 @@ import (
 	"github.com/larsartmann/dynamic-markdown-site/internal/content"
 	"github.com/larsartmann/dynamic-markdown-site/internal/renderer"
 	"github.com/larsartmann/dynamic-markdown-site/internal/server"
+	"github.com/larsartmann/dynamic-markdown-site/internal/version"
+	"github.com/larsartmann/go-health"
 	"github.com/samber/do/v2"
 )
 
@@ -26,12 +28,21 @@ var errBlobTimeout = errors.New("blob repository creation timed out after 10 sec
 var (
 	_ do.ShutdownerWithError      = (*content.BlobRepository)(nil)
 	_ do.Shutdowner               = (*cache.HTMLCache)(nil)
-	_ do.HealthcheckerWithContext = (*server.Server)(nil)
+	_ do.HealthcheckerWithContext = (*content.FileSystemRepository)(nil)
+	_ do.HealthcheckerWithContext = (*content.BlobRepository)(nil)
+	_ do.HealthcheckerWithContext = (*content.InMemoryRepository)(nil)
+	_ do.HealthcheckerWithContext = (*renderer.GoldmarkRenderer)(nil)
 )
+
+// probeRefreshInterval bounds how often the go-health probe re-runs the DI
+// health sweep. The readiness handler serves the cached verdict between runs,
+// so orchestrator probes never fan out into the repository.
+const probeRefreshInterval = 15 * time.Second
 
 // Container holds the DI injector and provides access to services.
 type Container struct {
 	injector do.Injector
+	probe    *health.Probe
 }
 
 // New creates a new DI container with all services registered.
@@ -57,7 +68,24 @@ func New() (*Container, error) {
 		return nil, errors.Wrap(err, "failed to construct server")
 	}
 
-	return &Container{injector: injector}, nil
+	probe := health.New(injector,
+		// The repository is the only dependency whose failure makes the site
+		// unusable: it alone flips readiness to 503. The renderer's missing-D2
+		// degradation stays non-critical (warn, HTTP 200).
+		health.WithCriticalService[content.Repository](),
+		health.WithVersion(version.Version),
+		health.WithRefreshInterval(probeRefreshInterval),
+	)
+
+	// Start runs the first sweep synchronously and fails fast when a critical
+	// service name never produced a check (typo guard, ErrUnknownCriticalService).
+	if err := probe.Start(context.Background()); err != nil {
+		_ = injector.Shutdown()
+
+		return nil, errors.Wrap(err, "failed to start health probe")
+	}
+
+	return &Container{injector: injector, probe: probe}, nil
 }
 
 // Config returns the application configuration.
@@ -80,6 +108,12 @@ func (c *Container) Server() (*server.Server, error) {
 	return do.Invoke[*server.Server](c.injector)
 }
 
+// Probe returns the go-health probe wired over the injector. Nil for
+// containers built directly in tests without a probe.
+func (c *Container) Probe() *health.Probe {
+	return c.probe
+}
+
 // HealthCheck probes every service implementing samber/do's Healthchecker
 // interfaces (the server today). The returned map is keyed by service
 // description; an empty map means every probed service is healthy.
@@ -87,8 +121,14 @@ func (c *Container) HealthCheck(ctx context.Context) map[string]error {
 	return c.injector.HealthCheckWithContext(ctx)
 }
 
-// Shutdown gracefully shuts down all services.
+// Shutdown gracefully shuts down all services. The probe stops first so its
+// refresh loop cannot sweep services mid-teardown; the injector then runs its
+// dependency-aware shutdown wave.
 func (c *Container) Shutdown() *do.ShutdownReport {
+	if c.probe != nil {
+		c.probe.Shutdown()
+	}
+
 	return c.injector.Shutdown()
 }
 

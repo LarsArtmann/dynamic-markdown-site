@@ -3,6 +3,7 @@ package renderer
 
 import (
 	"bytes"
+	"context"
 	"slices"
 	"strings"
 
@@ -72,6 +73,18 @@ func NewGoldmarkRendererWithDiagrams(diagramRenderer *DiagramRenderer) *Goldmark
 	)
 
 	return &GoldmarkRenderer{md: md, diagramRenderer: diagramRenderer}
+}
+
+// HealthCheck reports whether diagram rendering is available. A missing D2
+// renderer is a degradation, not a failure: markdown still renders, so the
+// check satisfies samber/do's HealthcheckerWithContext interface and surfaces
+// as a non-critical (warn, HTTP 200) entry in the health probe.
+func (r *GoldmarkRenderer) HealthCheck(_ context.Context) error {
+	if r.diagramRenderer == nil {
+		return errors.New("d2 diagram renderer unavailable; diagrams render as code blocks")
+	}
+
+	return nil
 }
 
 // Render converts markdown to HTML and extracts metadata.

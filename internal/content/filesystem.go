@@ -1,6 +1,7 @@
 package content
 
 import (
+	"context"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -58,6 +59,21 @@ func (r *FileSystemRepository) Get(path domain.URLPath) (domain.ContentNode, err
 // Root returns the root directory.
 func (r *FileSystemRepository) Root() (*domain.DirectoryNode, error) {
 	return rootFromTree(&r.tree, &r.mu)
+}
+
+// HealthCheck verifies the content tree is reachable. It satisfies samber/do's
+// HealthcheckerWithContext interface, so the DI health sweep and the go-health
+// probe both pick it up as the repository's own check.
+func (r *FileSystemRepository) HealthCheck(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	if _, err := r.Root(); err != nil {
+		return errors.Wrap(err, "content repository unreachable")
+	}
+
+	return nil
 }
 
 // LastModified returns when the content was last indexed.
