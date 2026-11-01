@@ -3,8 +3,6 @@ package main
 import (
 	"net"
 	"net/http"
-	"os"
-	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -40,17 +38,9 @@ func TestRunHealthcheckReturnsNilForHealthyServer(t *testing.T) {
 
 	addr := listener.Addr().String()
 
-	// Save and restore os.Args.
-	origArgs := slices.Clone(os.Args)
-	t.Cleanup(func() {
-		os.Args = origArgs
-	})
-
-	// Call the healthcheck with --addr pointing at our test server.
-	os.Args = []string{"dynamic-markdown-site", "healthcheck", "--addr", addr, "--timeout", "2"}
-
-	if err := runHealthcheck(); err != nil {
-		t.Errorf("runHealthcheck returned error: %v", err)
+	// Pass args directly: mutating os.Args races parallel test goroutines.
+	if err := runHealthcheckWithArgs([]string{"--addr", addr, "--timeout", "2"}); err != nil {
+		t.Errorf("runHealthcheckWithArgs returned error: %v", err)
 	}
 }
 
@@ -87,14 +77,7 @@ func TestRunHealthcheckFailsOnUnhealthyServer(t *testing.T) {
 
 	addr := listener.Addr().String()
 
-	origArgs := slices.Clone(os.Args)
-	t.Cleanup(func() {
-		os.Args = origArgs
-	})
-
-	os.Args = []string{"dynamic-markdown-site", "healthcheck", "--addr", addr, "--timeout", "2"}
-
-	if err := runHealthcheck(); err == nil {
-		t.Error("runHealthcheck returned nil, want error for a 503 /health verdict")
+	if err := runHealthcheckWithArgs([]string{"--addr", addr, "--timeout", "2"}); err == nil {
+		t.Error("runHealthcheckWithArgs returned nil, want error for a 503 /health verdict")
 	}
 }

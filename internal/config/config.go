@@ -54,31 +54,31 @@ const (
 
 // Config holds all application configuration.
 type Config struct {
-	Port         uint16
-	RootDir      string
-	StorageURL   string
-	LogLevel     string
-	CacheEnabled bool
-	CacheSize    int
-	DevMode      bool
-	Timeout      time.Duration
+	Port          uint16
+	RootDir       string
+	StorageURL    string
+	LogLevel      string
+	CacheEnabled  bool
+	CacheSize     int
+	DevMode       bool
+	Timeout       time.Duration
 	ProbeInterval time.Duration
-	SiteName     string
+	SiteName      string
 }
 
 // DefaultConfig returns a new Config with default values.
 func DefaultConfig() *Config {
 	return &Config{
-		Port:         8080,
-		RootDir:      ".",
-		StorageURL:   "",
-		LogLevel:     logLevelInfo,
-		CacheEnabled: true,
-		CacheSize:    defaultCacheSize,
-		DevMode:      false,
-		Timeout:      30 * time.Second,
+		Port:          8080,
+		RootDir:       ".",
+		StorageURL:    "",
+		LogLevel:      logLevelInfo,
+		CacheEnabled:  true,
+		CacheSize:     defaultCacheSize,
+		DevMode:       false,
+		Timeout:       30 * time.Second,
 		ProbeInterval: defaultProbeInterval,
-		SiteName:     "Site",
+		SiteName:      "Site",
 	}
 }
 
@@ -114,7 +114,12 @@ func (c *Config) defineAndParseFlags() {
 	flag.IntVar(&c.CacheSize, "cache-size", c.CacheSize, "Maximum number of cached HTML pages")
 	flag.BoolVar(&c.DevMode, "dev", c.DevMode, "Development mode (disables caching)")
 	flag.DurationVar(&c.Timeout, "timeout", c.Timeout, "Request timeout")
-	flag.DurationVar(&c.ProbeInterval, "probe-interval", c.ProbeInterval, "Health probe refresh interval (cached readiness staleness bound)")
+	flag.DurationVar(
+		&c.ProbeInterval,
+		"probe-interval",
+		c.ProbeInterval,
+		"Health probe refresh interval (cached readiness staleness bound)",
+	)
 
 	flag.Parse()
 

@@ -46,7 +46,7 @@ func renderHealthExposition(resp health.Response) string {
 
 	b.WriteString("# HELP health_up Whether this instance reports itself healthy.\n")
 	b.WriteString("# TYPE health_up gauge\n")
-	b.WriteString(fmt.Sprintf("health_up %d\n", statusGauge(resp.Status)))
+	fmt.Fprintf(&b, "health_up %d\n", statusGauge(resp.Status))
 
 	b.WriteString("# HELP health_check Whether the named service passes its health check.\n")
 	b.WriteString("# TYPE health_check gauge\n")
@@ -59,11 +59,9 @@ func renderHealthExposition(resp health.Response) string {
 	sort.Strings(names)
 
 	for _, name := range names {
-		b.WriteString(fmt.Sprintf(
-			"health_check{service=%q} %d\n",
+		fmt.Fprintf(&b, "health_check{service=%q} %d\n",
 			name,
-			statusGauge(resp.Checks[name].Status),
-		))
+			statusGauge(resp.Checks[name].Status))
 	}
 
 	return b.String()

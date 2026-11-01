@@ -31,14 +31,23 @@ const healthcheckSubcommand = "healthcheck"
 // have no `wget` or `curl` to back a HEALTHCHECK, so the binary itself
 // performs the probe.
 func runHealthcheck() error {
-	// When invoked from the dispatcher in main() the first argument is
-	// the literal "healthcheck" subcommand. Skip it so flag.Parse can
-	// consume --addr/--timeout.
+	// When invoked from the dispatcher in main() the first argument is the
+	// literal "healthcheck" subcommand. Strip it so flag parsing can consume
+	// --addr/--timeout; direct invocations without the token also work.
 	args := os.Args[1:]
 	if len(args) > 0 && args[0] == healthcheckSubcommand {
 		args = args[1:]
 	}
 
+	return runHealthcheckWithArgs(args)
+}
+
+// runHealthcheckWithArgs parses the healthcheck flags from args (already
+// stripped of the subcommand token) and probes the server's /health endpoint,
+// exiting 0 on a 200 response. Split from runHealthcheck so tests can pass
+// args directly instead of mutating the process-global os.Args (which races
+// parallel test goroutines).
+func runHealthcheckWithArgs(args []string) error {
 	fs := flag.NewFlagSet(healthcheckSubcommand, flag.ContinueOnError)
 	addr := fs.String("addr", "localhost:8080", "host:port to probe")
 	timeoutSec := fs.Int("timeout", 5, "timeout in seconds")
