@@ -15,16 +15,18 @@ import (
 // (/health, /healthz, /readyz, /startupz): duplicate ServeMux patterns
 // panic at registration, and the dashboard's default /health HTML page
 // would shadow the readiness alias that the healthcheck subcommand and
-// Docker HEALTHCHECK depend on (ADR-0005). The kubelet JSON routes stay
-// disabled here for the same reason.
+// Docker HEALTHCHECK depend on (ADR-0005). The dashboard's own kubelet
+// JSON mirrors live under the debug prefix: go-health-dashboard v0.10.2
+// registers them unconditionally (empty-string disabling arrived in
+// v0.12.x, which would force a templ version bump - gotcha 8).
 var healthDashboardRoutes = dashboard.Routes{
 	Dashboard:  "/debug/health-dashboard",
 	SSE:        "/debug/health-dashboard/sse",
 	Favicon:    "/debug/health-dashboard/favicon.svg",
 	DatastarJS: "/debug/health-dashboard/datastar.js",
-	Liveness:   "",
-	Readiness:  "",
-	Startup:    "",
+	Liveness:   "/debug/health-dashboard/healthz",
+	Readiness:  "/debug/health-dashboard/readyz",
+	Startup:    "/debug/health-dashboard/startupz",
 	Healthz:    "",
 	Metrics:    "",
 	Trend:      "",
