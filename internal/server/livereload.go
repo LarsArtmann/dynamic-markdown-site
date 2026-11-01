@@ -26,10 +26,11 @@ type LiveReload struct {
 
 func NewLiveReload(logger *slog.Logger) *LiveReload {
 	return &LiveReload{
-		logger:  logger,
-		mu:      sync.RWMutex{},
-		clients: make(map[chan LiveReloadEvent]struct{}),
-		closed:  make(chan struct{}),
+		logger:    logger,
+		mu:        sync.RWMutex{},
+		clients:   make(map[chan LiveReloadEvent]struct{}),
+		closed:    make(chan struct{}),
+		closeOnce: sync.Once{},
 	}
 }
 

@@ -90,7 +90,12 @@ func newTestServerWithDevMode(t *testing.T, repo content.Repository, devMode boo
 	return newTestServerWithCacheAndDevMode(t, repo, cache.NewHTMLCache(100), devMode)
 }
 
-func newTestServerWithCacheAndDevMode(t *testing.T, repo content.Repository, htmlCache *cache.HTMLCache, devMode bool) *Server {
+func newTestServerWithCacheAndDevMode(
+	t *testing.T,
+	repo content.Repository,
+	htmlCache *cache.HTMLCache,
+	devMode bool,
+) *Server {
 	t.Helper()
 
 	t.Cleanup(htmlCache.Close)
