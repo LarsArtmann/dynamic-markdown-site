@@ -599,3 +599,122 @@ func TestProbe_RendererDegradationWarnsButRepositoryFails(t *testing.T) {
 		t.Error("degraded renderer HealthCheck should fail; it is what produces warn/200 in healthy-repo deployments")
 	}
 }
+
+// lateShutdownRepo is a repository double whose Shutdown is observable, used
+// to verify that a repository constructed after the blob deadline is released
+// by the drain goroutine instead of leaking its bucket.
+type lateShutdownRepo struct {
+	content.Repository
+	shutdownCh chan struct{}
+}
+
+func (r *lateShutdownRepo) Shutdown() error {
+	close(r.shutdownCh)
+
+	return nil
+}
+
+func TestBuildBlobRepository_ReturnsRepositoryWhenConstructionWins(t *testing.T) {
+	t.Parallel()
+
+	fake := &lateShutdownRepo{shutdownCh: make(chan struct{})}
+
+	repo, err := buildBlobRepository(
+		"mem://fast",
+		time.Second,
+		func(_ context.Context, _ string) (content.Repository, error) { return fake, nil },
+	)
+	if err != nil {
+		t.Fatalf("buildBlobRepository() error: %v", err)
+	}
+
+	if repo != content.Repository(fake) {
+		t.Error("buildBlobRepository() returned a different repository than the constructor produced")
+	}
+}
+
+// TestBuildBlobRepository_TimesOutAndShutsDownLateRepository pins the
+// M9/F40-F41 fix: when blob construction finishes after the deadline, the
+// abandoned repository is drained from the result channel and shut down, so
+// the eventual bucket never leaks.
+func TestBuildBlobRepository_TimesOutAndShutsDownLateRepository(t *testing.T) {
+	t.Parallel()
+
+	shutdownCh := make(chan struct{})
+	release := make(chan struct{})
+	fake := &lateShutdownRepo{shutdownCh: shutdownCh}
+
+	_, err := buildBlobRepository(
+		"mem://late",
+		20*time.Millisecond,
+		func(_ context.Context, _ string) (content.Repository, error) {
+			<-release
+
+			return fake, nil
+		},
+	)
+	if !errors.Is(err, errBlobTimeout) {
+		t.Fatalf("buildBlobRepository() error = %v, want errBlobTimeout", err)
+	}
+
+	if !strings.Contains(err.Error(), "mem://late") {
+		t.Errorf("timeout error = %v, want it to carry the storage URL", err)
+	}
+
+	close(release)
+
+	select {
+	case <-shutdownCh:
+	case <-time.After(2 * time.Second):
+		t.Fatal("late-completed repository was never shut down by the drain goroutine")
+	}
+}
+
+// TestBuildBlobRepository_TimesOutAndDropsLateError pins the drain's error
+// branch: a constructor that fails after the deadline produces no shutdown
+// call and no panic from the drain goroutine (a drain panic would fail the
+// whole test binary, so this test passing is the assertion).
+func TestBuildBlobRepository_TimesOutAndDropsLateError(t *testing.T) {
+	t.Parallel()
+
+	release := make(chan struct{})
+
+	_, err := buildBlobRepository(
+		"mem://late-err",
+		20*time.Millisecond,
+		func(_ context.Context, _ string) (content.Repository, error) {
+			<-release
+
+			return content.NewInMemoryRepository(), errors.New("late construction failure")
+		},
+	)
+	if !errors.Is(err, errBlobTimeout) {
+		t.Fatalf("buildBlobRepository() error = %v, want errBlobTimeout", err)
+	}
+
+	close(release)
+}
+
+// TestBuildBlobRepository_DrainSkipsRepositoriesWithoutShutdown covers the
+// type-assertion miss branch: a late repository that does not implement
+// Shutdown is dropped without panic.
+func TestBuildBlobRepository_DrainSkipsRepositoriesWithoutShutdown(t *testing.T) {
+	t.Parallel()
+
+	release := make(chan struct{})
+
+	_, err := buildBlobRepository(
+		"mem://late-noshutdown",
+		20*time.Millisecond,
+		func(_ context.Context, _ string) (content.Repository, error) {
+			<-release
+
+			return content.NewInMemoryRepository(), nil
+		},
+	)
+	if !errors.Is(err, errBlobTimeout) {
+		t.Fatalf("buildBlobRepository() error = %v, want errBlobTimeout", err)
+	}
+
+	close(release)
+}

@@ -19,7 +19,13 @@ import (
 	"github.com/samber/do/v2"
 )
 
-var errBlobTimeout = errors.New("blob repository creation timed out after 10 seconds")
+var errBlobTimeout = errors.New("blob repository creation timed out")
+
+// blobConstructionTimeout bounds blob repository construction. gocloud.dev's
+// blob.OpenBucket does not respect context cancellation for GCS credential
+// discovery, so the bound is enforced with a channel race instead of a
+// cancellable context.
+const blobConstructionTimeout = 10 * time.Second
 
 // Compile-time lifecycle contracts: samber/do dispatches shutdown and health
 // sweeps only through these interfaces, so a service losing its lifecycle
@@ -226,30 +232,18 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 
 	// Use blob storage if StorageURL is configured
 	if cfg.StorageURL != "" {
-		// Use a channel-based timeout since gocloud.dev's blob.OpenBucket doesn't
-		// respect context cancellation for GCS credential discovery
-		type result struct {
-			repo content.Repository
-			err  error
+		repo, err := buildBlobRepository(
+			cfg.StorageURL,
+			blobConstructionTimeout,
+			func(ctx context.Context, url string) (content.Repository, error) {
+				return content.NewBlobRepository(ctx, url)
+			},
+		)
+		if err != nil {
+			return nil, err
 		}
 
-		resultCh := make(chan result, 1)
-
-		go func() {
-			repo, err := content.NewBlobRepository(context.Background(), cfg.StorageURL)
-			resultCh <- result{repo: repo, err: err}
-		}()
-
-		select {
-		case res := <-resultCh:
-			if res.err != nil {
-				return nil, errors.Wrap(res.err, "failed to create blob repository")
-			}
-
-			return res.repo, nil
-		case <-time.After(10 * time.Second):
-			return nil, errors.Wrap(errBlobTimeout, "storage_url="+cfg.StorageURL)
-		}
+		return repo, nil
 	}
 
 	// Use filesystem repository as default
@@ -259,6 +253,66 @@ func provideRepository(i do.Injector) (content.Repository, error) {
 	}
 
 	return repo, nil
+}
+
+// blobResult carries the outcome of one construction attempt through the
+// result channel.
+type blobResult struct {
+	repo content.Repository
+	err  error
+}
+
+// blobRepositoryConstructor builds a blob repository for a storage URL.
+// It exists as a parameter so tests can substitute a controllable
+// constructor without opening real cloud buckets.
+type blobRepositoryConstructor func(ctx context.Context, storageURL string) (content.Repository, error)
+
+// buildBlobRepository races blob construction against timeout. gocloud.dev's
+// blob.OpenBucket does not respect context cancellation during credential
+// discovery, so the bound is enforced by abandoning the goroutine instead.
+//
+// The abandonment is not a leak: a buffered result channel (capacity 1) means
+// the goroutine always completes its send, and a drain goroutine claims the
+// late result, shutting down the eventual repository so its bucket resources
+// are released rather than orphaned past the deadline.
+func buildBlobRepository(
+	storageURL string,
+	timeout time.Duration,
+	construct blobRepositoryConstructor,
+) (content.Repository, error) {
+	resultCh := make(chan blobResult, 1)
+
+	go func() {
+		repo, err := construct(context.Background(), storageURL)
+		resultCh <- blobResult{repo: repo, err: err}
+	}()
+
+	select {
+	case res := <-resultCh:
+		if res.err != nil {
+			return nil, errors.Wrap(res.err, "failed to create blob repository")
+		}
+
+		return res.repo, nil
+	case <-time.After(timeout):
+		go drainAbandonedBlobRepository(resultCh)
+
+		return nil, errors.Wrapf(errBlobTimeout, "storage_url=%s timeout=%s", storageURL, timeout)
+	}
+}
+
+// drainAbandonedBlobRepository claims the result of a construction goroutine
+// that finished after the deadline and releases the repository it produced,
+// if any. The buffered channel guarantees this read never blocks forever.
+func drainAbandonedBlobRepository(resultCh <-chan blobResult) {
+	res := <-resultCh
+	if res.err != nil {
+		return
+	}
+
+	if shutdowner, ok := res.repo.(interface{ Shutdown() error }); ok {
+		_ = shutdowner.Shutdown()
+	}
 }
 
 func provideSearcher(i do.Injector) (*content.Searcher, error) {
