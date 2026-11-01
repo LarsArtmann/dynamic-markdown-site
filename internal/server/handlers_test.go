@@ -81,16 +81,16 @@ func newTestServer(t *testing.T, repo content.Repository) *Server {
 func newTestServerWithCache(t *testing.T, repo content.Repository, htmlCache *cache.HTMLCache) *Server {
 	t.Helper()
 
-	return newTestServerWithDevMode(t, repo, htmlCache, false)
+	return newTestServerWithCacheAndDevMode(t, repo, htmlCache, false)
 }
 
 func newTestServerWithDevMode(t *testing.T, repo content.Repository, devMode bool) *Server {
 	t.Helper()
 
-	return newTestServerWithDevMode(t, repo, cache.NewHTMLCache(100), devMode)
+	return newTestServerWithCacheAndDevMode(t, repo, cache.NewHTMLCache(100), devMode)
 }
 
-func newTestServerWithDevMode(t *testing.T, repo content.Repository, htmlCache *cache.HTMLCache, devMode bool) *Server {
+func newTestServerWithCacheAndDevMode(t *testing.T, repo content.Repository, htmlCache *cache.HTMLCache, devMode bool) *Server {
 	t.Helper()
 
 	t.Cleanup(htmlCache.Close)

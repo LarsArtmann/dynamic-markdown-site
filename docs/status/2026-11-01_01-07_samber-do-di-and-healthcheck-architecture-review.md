@@ -1,5 +1,10 @@
 # samber/do v2 + Health Check Architecture Deep Review
 
+> **RESOLVED 2026-11-01 01:30** — all HIGH/MED findings below were fixed and verified the same
+> night; see [2026-11-01_01-30_samber-do-health-architecture-fixes-executed.md](2026-11-01_01-30_samber-do-health-architecture-fixes-executed.md)
+> for the implementation record, verification matrix, and post-fix scorecard. The text below is
+> the untouched point-in-time baseline.
+
 | | |
 | --- | --- |
 | Date | 2026-11-01 01:07 |
