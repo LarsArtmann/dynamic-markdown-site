@@ -53,6 +53,7 @@ type Config struct {
 	CacheSize    int
 	DevMode      bool
 	Timeout      time.Duration
+	ProbeInterval time.Duration
 	SiteName     string
 }
 
@@ -67,6 +68,7 @@ func DefaultConfig() *Config {
 		CacheSize:    defaultCacheSize,
 		DevMode:      false,
 		Timeout:      30 * time.Second,
+		ProbeInterval: defaultProbeInterval,
 		SiteName:     "Site",
 	}
 }
@@ -103,6 +105,7 @@ func (c *Config) defineAndParseFlags() {
 	flag.IntVar(&c.CacheSize, "cache-size", c.CacheSize, "Maximum number of cached HTML pages")
 	flag.BoolVar(&c.DevMode, "dev", c.DevMode, "Development mode (disables caching)")
 	flag.DurationVar(&c.Timeout, "timeout", c.Timeout, "Request timeout")
+	flag.DurationVar(&c.ProbeInterval, "probe-interval", c.ProbeInterval, "Health probe refresh interval (cached readiness staleness bound)")
 
 	flag.Parse()
 
@@ -121,6 +124,7 @@ func (c *Config) applyEnvironmentOverrides() {
 	c.applyEnvInt("DYNAMIC_MARKDOWN_CACHE_SIZE", func(v int) { c.CacheSize = v })
 	c.applyEnvBool("DYNAMIC_MARKDOWN_DEV", func(v bool) { c.DevMode = v })
 	c.applyEnvDuration("DYNAMIC_MARKDOWN_TIMEOUT", func(v time.Duration) { c.Timeout = v })
+	c.applyEnvDuration("DYNAMIC_MARKDOWN_PROBE_INTERVAL", func(v time.Duration) { c.ProbeInterval = v })
 	c.applyEnvString("DYNAMIC_MARKDOWN_SITE_NAME", func(v string) { c.SiteName = v })
 }
 
