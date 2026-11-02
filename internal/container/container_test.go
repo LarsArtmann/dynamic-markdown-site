@@ -59,7 +59,10 @@ func runInSubprocess(t *testing.T) {
 		}
 	}
 
-	cmd := exec.CommandContext(context.Background(), os.Args[0], args...) //nolint:golines // test binary path, not user input
+	cmd := exec.CommandContext(
+		context.Background(),
+		os.Args[0],
+		args...) //nolint:golines // test binary path, not user input
 
 	cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
