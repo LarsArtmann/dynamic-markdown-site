@@ -4,13 +4,13 @@ go 1.27.1
 
 require (
 	charm.land/log/v2 v2.0.1
-	github.com/a-h/templ v0.3.1100
+	github.com/a-h/templ v0.3.1070
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/cockroachdb/errors v1.14.0
-	github.com/larsartmann/go-filewatcher/v2 v2.4.2
+	github.com/larsartmann/go-filewatcher/v2 v2.4.3
 	github.com/larsartmann/go-health v0.8.1
 	github.com/larsartmann/go-health-dashboard v0.12.2
-	github.com/larsartmann/httputil v1.7.0
+	github.com/larsartmann/httputil v1.8.0
 	github.com/maypok86/otter/v2 v2.4.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/samber/lo v1.53.0
@@ -36,7 +36,7 @@ require (
 	cloud.google.com/go/storage v1.70.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.62.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.62.0 // indirect
-	github.com/LarsArtmann/gogenfilter/v3 v3.6.1 // indirect
+	github.com/LarsArtmann/gogenfilter/v3 v3.7.0 // indirect
 	github.com/Oudwins/tailwind-merge-go v0.2.3 // indirect
 	github.com/PuerkitoBio/goquery v1.13.0 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
@@ -60,7 +60,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.39.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.44.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.51.6 // indirect
-	github.com/aws/smithy-go v1.28.7 // indirect
+	github.com/aws/smithy-go v1.28.8 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.10.4 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -77,7 +77,7 @@ require (
 	github.com/cockroachdb/logtags v0.0.0-20241215232642-bb51bb14a506 // indirect
 	github.com/cockroachdb/redact v1.1.8 // indirect
 	github.com/dlclark/regexp2/v2 v2.12.0 // indirect
-	github.com/dop251/goja v0.0.0-20261103151521-97b96e1e55f5 // indirect
+	github.com/dop251/goja v0.0.0-20261103214539-f5d1d0025744 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.40.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.3.3 // indirect
@@ -95,7 +95,7 @@ require (
 	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/google/pprof v0.0.0-20261102214848-0031fcd306b0 // indirect
+	github.com/google/pprof v0.0.0-20261103193413-97e8293de3c4 // indirect
 	github.com/google/s2a-go v0.1.11 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/google/wire v0.7.0 // indirect
