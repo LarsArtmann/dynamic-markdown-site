@@ -64,6 +64,41 @@ func TestHealthAliasStaysReadinessJSONBesideDashboard(t *testing.T) {
 	}
 }
 
+// TestHealthDashboardCSPGrantsUnsafeEval pins the dashboard CSP lane: the
+// Datastar SDK compiles its data-* expressions with the Function
+// constructor, and without 'unsafe-eval' it throws Error: GenerateExpression
+// at init and the SSE connection never opens (page renders, never updates).
+// The grant is scoped to the dashboard prefix; the site policy elsewhere
+// must stay unchanged.
+func TestHealthDashboardCSPGrantsUnsafeEval(t *testing.T) {
+	t.Parallel()
+
+	repo := content.NewInMemoryRepository()
+	srv := newTestServer(t, repo)
+	probe := newHealthyTestProbe(t, repo)
+	handler := WithHealthProbes(newTestHandler(srv), probe)
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/debug/health-dashboard", nil),
+	)
+	dashCSP := rec.Header().Get("Content-Security-Policy")
+	if !strings.Contains(dashCSP, "'unsafe-eval'") {
+		t.Errorf("dashboard CSP = %q, want 'unsafe-eval' (the Datastar SDK cannot initialize without it)", dashCSP)
+	}
+
+	rec = httptest.NewRecorder()
+	handler.ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/nonexistent-page", nil),
+	)
+	siteCSP := rec.Header().Get("Content-Security-Policy")
+	if strings.Contains(siteCSP, "'unsafe-eval'") {
+		t.Errorf("site CSP = %q, want no 'unsafe-eval' outside the dashboard prefix", siteCSP)
+	}
+}
+
 // TestMountHealthDashboardNilProbeIsNoOp pins the nil guard: containers
 // without a probe must not panic on dashboard mounting.
 func TestMountHealthDashboardNilProbeIsNoOp(t *testing.T) {
