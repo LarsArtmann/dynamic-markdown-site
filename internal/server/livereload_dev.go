@@ -214,6 +214,6 @@ func getTimestamp() string {
 // there at all, so the listing carries the row only where the route does.
 func (s *Server) registerLiveReloadRoute(mux *http.ServeMux, routes *endpoints.Registry) {
 	if s.devMode {
-		mount(routes, mux, "GET /api/live-reload", s.liveReload.handleSSE, "SSE live-reload stream for dev browsers (dev builds only)")
+		mount(routes, mux, "GET /api/live-reload", s.liveReload.handleSSE, "SSE live-reload stream (dev builds only)")
 	}
 }

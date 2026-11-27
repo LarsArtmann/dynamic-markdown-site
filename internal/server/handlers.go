@@ -74,7 +74,7 @@ func (s *Server) Handler() http.Handler {
 	mount(routes, mux, "POST /refresh", s.handleRefresh, "Reload content and clear the HTML cache (JSON; 10/min per IP)")
 	mount(routes, mux, "GET /search", s.handleSearch, "Full-text search page (?q=, page, pageSize; 30/min per IP)")
 	mount(routes, mux, "GET /cache/stats", s.handleCacheStats, "HTML cache size, hit, miss, and eviction counters (JSON)")
-	mount(routes, mux, "GET /metrics", s.handleMetrics, "Prometheus text exposition: cache counters, uptime, health gauges")
+	mount(routes, mux, "GET /metrics", s.handleMetrics, "Prometheus text exposition: cache, uptime, and health gauges")
 	mount(routes, mux, "GET /{$}", s.handleRoot, "Root directory listing (the site's front page)")
 	s.registerLiveReloadRoute(mux, routes)
 	mount(routes, mux, "GET /static/", s.serveStaticFile, "Embedded static assets (CSS, favicon)")

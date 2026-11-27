@@ -42,7 +42,7 @@ func WithHealthProbes(next http.Handler, probe *health.Probe) http.Handler {
 	// The declarations below ARE the probe mux's route table: each one mounts
 	// its handler AND records it for the GET /endpoints listing, exactly like
 	// the site routes in Server.Handler.
-	mount(routes, mux, "GET /health", probe.ReadinessHandler(), "Readiness alias of /readyz (JSON; Docker HEALTHCHECK target)")
+	mount(routes, mux, "GET /health", probe.ReadinessHandler(), "Readiness alias of /readyz for Docker HEALTHCHECK (JSON)")
 
 	probeRoutes := health.DefaultRoutes()
 	probe.RegisterRoutes(mux, probeRoutes)
@@ -58,16 +58,16 @@ func WithHealthProbes(next http.Handler, probe *health.Probe) http.Handler {
 		mux,
 		"GET /debug/health-dashboard",
 		dashboardHandler,
-		"Health dashboard HTML page (dev builds only; 404 in release builds)",
+		"Dev-only health dashboard HTML page (404 in release builds)",
 	))
 	mustMount(routes.Handle(
 		mux,
 		"GET /debug/health-dashboard/",
 		dashboardHandler,
-		"Health dashboard subtree (dev builds only; 404 in release builds): sse, favicon.svg, datastar.js, healthz, readyz, startupz",
+		"Dev-only health dashboard subtree (404 in release builds): sse, favicon.svg, datastar.js, healthz/readyz/startupz",
 	))
 
-	mustMount(routes.Handle(mux, "/", next, "Catch-all: every other request goes to the site handler (routes listed here too)"))
+	mustMount(routes.Handle(mux, "/", next, "Catch-all: other requests go to the site handler (listed here too)"))
 
 	return mux
 }
