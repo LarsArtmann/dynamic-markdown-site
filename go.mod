@@ -11,6 +11,7 @@ require (
 	github.com/larsartmann/go-health v0.10.0
 	github.com/larsartmann/go-health-dashboard v0.13.2
 	github.com/larsartmann/httputil v1.8.0
+	github.com/larsartmann/httputil/endpoints v0.1.0
 	github.com/maypok86/otter/v2 v2.4.0
 	github.com/samber/do/v2 v2.1.0
 	github.com/samber/lo v1.53.0
@@ -111,7 +112,6 @@ require (
 	github.com/larsartmann/go-etag/entitytag v0.6.1 // indirect
 	github.com/larsartmann/go-etag/server v0.6.1 // indirect
 	github.com/larsartmann/go-sse v0.7.0 // indirect
-	github.com/larsartmann/httputil/endpoints v0.1.0 // indirect
 	github.com/larsartmann/templ-components v1.27.0 // indirect
 	github.com/larsartmann/templ-components/datastar v1.27.0 // indirect
 	github.com/larsartmann/templ-components/htmx v1.27.0 // indirect

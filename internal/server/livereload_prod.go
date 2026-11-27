@@ -5,6 +5,8 @@ package server
 import (
 	"log/slog"
 	"net/http"
+
+	"github.com/larsartmann/httputil/endpoints"
 )
 
 // LiveReload is the production stub: compiled out of release binaries, so no
@@ -22,4 +24,4 @@ func (lr *LiveReload) Close() {}
 // prod-built binary runs with -dev, and there is nothing to notify.
 func (lr *LiveReload) Notify(string) {}
 
-func (s *Server) registerLiveReloadRoute(*http.ServeMux) {}
+func (s *Server) registerLiveReloadRoute(*http.ServeMux, *endpoints.Registry) {}
