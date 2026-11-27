@@ -354,7 +354,8 @@ func TestRoutesGoThroughTheRegistry(t *testing.T) {
 
 			if rawMuxRegistration.MatchString(trimmed) {
 				t.Errorf(
-					"%s:%d registers directly on the mux (%s); route it through mount in routes.go so the /endpoints listing cannot drift",
+					"%s:%d registers directly on the mux (%s); route it through mount in routes.go "+
+						"so the /endpoints listing cannot drift",
 					name,
 					lineNo+1,
 					trimmed,
