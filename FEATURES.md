@@ -1,6 +1,6 @@
 # Features
 
-<!-- Last updated: 2026-09-27 -->
+<!-- Last updated: 2026-11-27 -->
 
 A complete catalog of everything Dynamic Markdown Site does — from the user's browser to the server's internals.
 
@@ -151,6 +151,15 @@ Dev mode (`-dev` flag) enables:
 
 Every response carries an `X-Response-Time` header (`internal/server/responsetime.go`) for latency triage without touching client code.
 
+### Route Listing
+
+- **Status**: DONE (adopted 2026-11-27, [`httputil/endpoints`](https://github.com/larsartmann/httputil) v0.1.0)
+- **Endpoint**: `GET /endpoints` lists every route the server mounts, each with a one-line summary
+- **Cannot drift**: `http.ServeMux` cannot enumerate its patterns, so every route is mounted AND recorded in one declaration (`internal/server/routes.go`); a route that bypasses the registry fails a test instead of silently going unlisted
+- **Covers both muxes**: the site routes, the go-health probe routes in front of them (`/health`, `/healthz`, `/readyz`, `/startupz`, `/version`), the dev-only dashboard mount, and the live-reload stream in dev builds
+- **Content negotiation**: JSON for `curl` (no `Accept` header), an HTML table for browsers; always `Vary: Accept` and `Cache-Control: no-store`
+- **Open by design**: the server has no authentication anywhere (`/metrics` and `/cache/stats` are open too) and its route table is public in the README, so the listing is served like every other site route
+
 ---
 
 ## Performance
@@ -215,6 +224,7 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/healthz`                | GET      | Liveness probe — always 200 while serving (never checks dependencies)                                     |
 | `/readyz`                 | GET      | Readiness probe — 503 only on critical (repository) failure                                               |
 | `/startupz`               | GET      | Startup probe — 503 until the first successful health sweep                                               |
+| `/version`                | GET      | Build version JSON (go-health)                                                                            |
 | `/refresh`                | GET/POST | Reload content from source (rate limited)                                                                 |
 | `/search`                 | GET      | Full-text search — `?q=query` (paginated, rate limited)                                                   |
 | `/static/*`               | GET      | Embedded static assets (CSS, favicon)                                                                     |
@@ -222,8 +232,11 @@ Dev mode (`-dev`) automatically disables caching and enables file watching + liv
 | `/robots.txt`             | GET      | robots.txt with sitemap reference                                                                         |
 | `/metrics`                | GET      | Prometheus-format metrics (incl. `health_up` + `health_check` gauges for services with real checks)       |
 | `/cache/stats`            | GET      | Cache hit/miss/eviction statistics (JSON)                                                                 |
+| `/endpoints`              | GET      | Route listing: every mounted route with a summary (JSON, or an HTML table for browsers)                   |
 | `/api/live-reload`        | GET      | SSE stream for live reload (`-tags dev` builds only — compiled out of production)                         |
 | `/debug/health-dashboard` | GET      | Health dashboard HTML (`-tags dev` builds only — 404 in production, ADR-0007)                             |
+
+The live listing at `GET /endpoints` is the authoritative copy of this table; it is derived from the route registrations themselves, so it always matches what is served.
 
 ---
 

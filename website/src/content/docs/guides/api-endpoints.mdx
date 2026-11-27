@@ -128,6 +128,30 @@ GET /static/*path
 
 CSS, favicon, and other embedded assets. Served with immutable cache headers.
 
+## Route Listing
+
+```http
+GET /endpoints
+```
+
+Every route the server mounts, each with a one-line summary. The listing is derived from the route registrations themselves, so it is the authoritative copy of the tables on this page and always matches what is served. Besides the routes above it covers the go-health routes (`/version` reports the build version), the dashboard mount in dev builds, and this listing itself.
+
+`curl` gets JSON (send no `Accept` header); a browser gets an HTML table instead. The response is never cached (`Cache-Control: no-store`).
+
+```bash
+curl -s localhost:8080/endpoints
+```
+
+```json
+{
+  "endpoints": [
+    { "method": "GET", "pattern": "GET /endpoints", "summary": "Endpoint listing (this page)" },
+    { "method": "GET", "pattern": "GET /healthz", "summary": "Liveness probe (go-health JSON): always 200 while serving" },
+    { "method": "GET", "pattern": "GET /search", "summary": "Full-text search page (?q=, page, pageSize; 30/min per IP)" }
+  ]
+}
+```
+
 ## Live Reload (Dev Mode Only)
 
 ```http

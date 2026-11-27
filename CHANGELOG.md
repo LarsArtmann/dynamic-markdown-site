@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Route listing at `GET /endpoints`** — every route the server mounts is now registered through [`httputil/endpoints`](https://github.com/larsartmann/httputil) (new direct dependency, v0.1.0): one declaration mounts the handler on the mux and records it for the listing, so the listing cannot drift from what is served. `curl :8080/endpoints` returns JSON; a browser gets an HTML table (negotiated on `Accept`). The site routes, the go-health probe routes in front of them (including the previously undocumented `/version`), the dev-only dashboard mount, and the live-reload stream in dev builds are all listed; the dashboard sub-mux and the go-health library registration are recorded as mount rows. The listing is open like `/metrics` and `/cache/stats`: the server has no authentication, and the route table was already public. Tests pin the property: the listing must equal the route tables in `internal/server/endpoints_test.go`, and no route may register on a `ServeMux` outside the registry seam
 - Search result pagination — `page` (1-based, clamped) and `pageSize` (default 20, max 100) query params on `/search`, with Previous/Next pager controls in the results view (`internal/domain/search_pagination.go`)
 - Rate limiting for `/search` — 30 requests per minute per IP, separate bucket from `/refresh`, JSON 429 with limit metadata
 - Configurable HTML cache size — `-cache-size` flag / `DYNAMIC_MARKDOWN_CACHE_SIZE` env (default 10000, validated ≥ 1)

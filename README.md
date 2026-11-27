@@ -1,6 +1,6 @@
 # Dynamic Markdown Site
 
-<!-- Last updated: 2026-09-27 -->
+<!-- Last updated: 2026-11-27 -->
 
 A type-safe, high-performance Go web server that turns any directory of markdown files into a beautiful, navigable website — with syntax highlighting, full-text search, diagram rendering, live reload, cloud storage support, and caching built in.
 
@@ -183,7 +183,14 @@ graph LR
 | `/metrics`         | GET      | Prometheus-format metrics                                               |
 | `/cache/stats`     | GET      | Cache hit/miss statistics (JSON)                                        |
 | `/static/*path`    | GET      | Static assets (CSS, favicon)                                            |
+| `/endpoints`       | GET      | Route listing with one-line summaries (JSON, or HTML for browsers)      |
 | `/api/live-reload` | GET      | SSE endpoint for live reload (dev mode only)                            |
+
+The server also serves the go-health probe routes (`/healthz`, `/readyz`, `/startupz`, `/version`); `GET /endpoints` is the authoritative route table, because it is derived from the route registrations themselves:
+
+```bash
+curl -s localhost:8080/endpoints
+```
 
 ## Docker
 
