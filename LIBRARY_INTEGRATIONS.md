@@ -1,6 +1,16 @@
 # Library Integration Report — Dynamic Markdown Site
 
-**Generated:** 2026-05-13 | **Updated:** 2026-09-27 | **Codebase:** `github.com/larsartmann/dynamic-markdown-site`
+**Generated:** 2026-05-13 | **Updated:** 2026-11-27 | **Codebase:** `github.com/larsartmann/dynamic-markdown-site`
+
+---
+
+## 2026-11-27 Addition
+
+One direct dependency added since the refresh below, which is left as it was verified:
+
+| Library                        | Version | Role                                          | Notes                                                                                                                                           |
+| ------------------------------ | ------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| larsartmann/httputil/endpoints | v0.1.0  | `GET /endpoints` route registry over ServeMux | Stdlib-only sub-module of `httputil`; every route is mounted and recorded through the seam in `internal/server/routes.go` (AGENTS.md gotcha 27) |
 
 ---
 
