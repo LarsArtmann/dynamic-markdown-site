@@ -33,8 +33,8 @@ importers:
         specifier: ^0.9.12
         version: 0.9.12(@emnapi/runtime@2.0.0-beta.2)(prettier@3.9.9)(typescript@7.0.2)
       html-validate:
-        specifier: ^11.21.1
-        version: 11.21.1
+        specifier: ^11.23.0
+        version: 11.23.0
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -1893,8 +1893,8 @@ packages:
   html-escaper@3.0.3:
     resolution: {integrity: sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==}
 
-  html-validate@11.21.1:
-    resolution: {integrity: sha512-wop9wWStH8hgsDVv7zTZPF3i2qAVLe1eVGrSVE72A8QURM6En1JytTtSMTj7H0URi2aeSCuXdA/+p+0DbwMrMQ==}
+  html-validate@11.23.0:
+    resolution: {integrity: sha512-IBJ+UeBhwpmOuxtOGyp69XwmnkX6J1XSA3r+UMHTiN2ZnYvFPURdLC9csPNVWWzctnnbbXlWxeh6TbkJFp22Qw==}
     engines: {node: ^22.22.0 || >= 24.8.0}
     hasBin: true
     peerDependencies:
@@ -4469,7 +4469,7 @@ snapshots:
 
   html-escaper@3.0.3: {}
 
-  html-validate@11.21.1:
+  html-validate@11.23.0:
     dependencies:
       '@html-validate/stylish': 6.1.0
       '@sidvind/better-ajv-errors': 7.0.0(ajv@8.20.0)
